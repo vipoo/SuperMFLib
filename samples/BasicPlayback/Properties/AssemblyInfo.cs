@@ -1,0 +1,29 @@
+﻿/****************************************************************************
+While the underlying libraries are covered by LGPL, this sample is released 
+as public domain.  It is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+or FITNESS FOR A PARTICULAR PURPOSE.  
+*****************************************************************************/
+using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+
+[assembly: AssemblyTitle("MF_BasicPlayback")]
+[assembly: AssemblyDescription(".NET sample using MediaFoundation.  See http://directshownet.sourceforge.net/")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: Guid("1b318f25-650a-4b63-b9fc-1029f0ea35e9")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+#if DEBUG
+[assembly: AssemblyProduct("Debug Version")]
+#else
+[assembly : AssemblyProduct("Release Version")]
+#endif
+[assembly: AssemblyCopyright("GNU Lesser General Public License v2.1")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: ComVisible(false)]
+[assembly: CLSCompliant(true)]

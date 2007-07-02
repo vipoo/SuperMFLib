@@ -25,19 +25,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 using System;
 using System.Runtime.InteropServices;
 
+using MediaFoundation.Misc;
+
 namespace MediaFoundation.Transform
 {
-    #region Interfaces
+    #region Declarations
 
-    /// <summary>
-    /// From _MFT_PROCESS_OUTPUT_STATUS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_PROCESS_OUTPUT_STATUS")]
     public enum ProcessOutputStatus
     {
         None = 0,
         NewStreams = 0x00000100
     }
+
+    #endregion
+
+    #region Interfaces
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),

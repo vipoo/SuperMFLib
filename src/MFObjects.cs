@@ -31,10 +31,7 @@ namespace MediaFoundation
 {
     #region Declarations
 
-    /// <summary>
-    /// From MFBYTESTREAM_* defines
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFBYTESTREAM_* defines")]
     public enum MFByteStreamSeekFlags
     {
         None       =                0x00000000,
@@ -47,9 +44,7 @@ namespace MediaFoundation
         IsPartiallyDownloaded =     0x00000200
     }
 
-    /// <summary>
-    /// From MF_ATTRIBUTE_TYPE
-    /// </summary>
+    [UnmanagedName("MF_ATTRIBUTE_TYPE")]
     public enum MF_AttributeType
     {
         Blob = 0x1011,
@@ -61,9 +56,7 @@ namespace MediaFoundation
         Uint64 = 0x15
     }
 
-    /// <summary>
-    /// From MF_ATTRIBUTES_MATCH_TYPE
-    /// </summary>
+    [UnmanagedName("MF_ATTRIBUTES_MATCH_TYPE")]
     public enum MF_AttributesMatchType
     {
         OurItems,
@@ -73,10 +66,7 @@ namespace MediaFoundation
         Smaller
     }
 
-    /// <summary>
-    /// From MF_MEDIATYPE_EQUAL_* defines
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MF_MEDIATYPE_EQUAL_* defines")]
     public enum MFMediaEqual
     {
         None = 0,
@@ -86,10 +76,7 @@ namespace MediaFoundation
         FormatUserData = 0x00000008
     }
 
-    /// <summary>
-    /// From MFVIDEOFORMAT
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVIDEOFORMAT")]
     public struct MFVideoFormat
     {
         public int dwSize;
@@ -99,10 +86,7 @@ namespace MediaFoundation
         public MFVideoSurfaceInfo surfaceInfo;
     }
 
-    /// <summary>
-    /// From MFVideoInfo
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoInfo")]
     public struct MFVideoInfo
     {
         public int dwWidth;
@@ -122,10 +106,7 @@ namespace MediaFoundation
         public long VideoFlags;
     }
 
-    /// <summary>
-    /// From MFVideoCompressedInfo
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoCompressedInfo")]
     public struct MFVideoCompressedInfo
     {
         public long AvgBitrate;
@@ -133,10 +114,7 @@ namespace MediaFoundation
         public int MaxKeyFrameSpacing;
     }
 
-    /// <summary>
-    /// From MFVideoSurfaceInfo
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoSurfaceInfo")]
     public struct MFVideoSurfaceInfo
     {
         public int Format;
@@ -144,19 +122,14 @@ namespace MediaFoundation
         public MFPaletteEntry[] Palette;
     }
 
-    /// <summary>
-    /// From MFRatio
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFRatio")]
     public struct MFRatio
     {
         public int Numerator;
         public int Denominator;
     }
 
-    /// <summary>
-    /// From MFVideoChromaSubsampling
-    /// </summary>
+    [UnmanagedName("MFVideoChromaSubsampling")]
     public enum MFVideoChromaSubsampling
     {
         Cosited = 7,
@@ -172,9 +145,7 @@ namespace MediaFoundation
         Vertically_Cosited = 2
     }
 
-    /// <summary>
-    /// From MFVideoInterlaceMode
-    /// </summary>
+    [UnmanagedName("MFVideoInterlaceMode")]
     public enum MFVideoInterlaceMode
     {
         FieldInterleavedLowerFirst = 4,
@@ -188,9 +159,7 @@ namespace MediaFoundation
         Unknown = 0
     }
 
-    /// <summary>
-    /// From MFVideoTransferFunction
-    /// </summary>
+    [UnmanagedName("MFVideoTransferFunction")]
     public enum MFVideoTransferFunction
     {
         Func10 = 1,
@@ -206,9 +175,7 @@ namespace MediaFoundation
         Unknown = 0
     }
 
-    /// <summary>
-    /// From MFVideoPrimaries
-    /// </summary>
+    [UnmanagedName("MFVideoPrimaries")]
     public enum MFVideoPrimaries
     {
         BT470_2_SysBG = 4,
@@ -224,9 +191,7 @@ namespace MediaFoundation
         Unknown = 0
     }
 
-    /// <summary>
-    /// From MFVideoTransferMatrix
-    /// </summary>
+    [UnmanagedName("MFVideoTransferMatrix")]
     public enum MFVideoTransferMatrix
     {
         BT601 = 2,
@@ -237,9 +202,7 @@ namespace MediaFoundation
         Unknown = 0
     }
 
-    /// <summary>
-    /// From MFVideoLighting
-    /// </summary>
+    [UnmanagedName("MFVideoLighting")]
     public enum MFVideoLighting
     {
         Bright = 1,
@@ -251,9 +214,7 @@ namespace MediaFoundation
         Unknown = 0
     }
 
-    /// <summary>
-    /// From MFNominalRange
-    /// </summary>
+    [UnmanagedName("MFNominalRange")]
     public enum MFNominalRange
     {
         MFNominalRange_0_255 = 1,
@@ -266,10 +227,7 @@ namespace MediaFoundation
         MFNominalRange_Wide = 2
     }
 
-    /// <summary>
-    /// From MFVideoArea
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoArea")]
     public struct MFVideoArea
     {
         public MFOffset OffsetX;
@@ -277,20 +235,14 @@ namespace MediaFoundation
         public SIZE Area;
     }
 
-    /// <summary>
-    /// From MFOffset
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    [StructLayout(LayoutKind.Sequential, Pack = 2), UnmanagedName("MFOffset")]
     public struct MFOffset
     {
         public short fract;
         public short Value;
     }
 
-    /// <summary>
-    /// From MFASYNC_* defines
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFASYNC_* defines")]
     public enum MFASync
     {
         None = 0,
@@ -298,6 +250,7 @@ namespace MediaFoundation
         SignalCallback = 0x00000002
     }
 
+    [UnmanagedName("unnamed enum")]
     public enum MediaEventType
     {
         MEUnknown = 0,
@@ -395,19 +348,14 @@ namespace MediaFoundation
         MEReservedMax = 10000
     }
 
-    /// <summary>
-    /// From MF_EVENT_FLAG_*
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MF_EVENT_FLAG_* defines")]
     public enum MFEventFlag
     {
         None = 0,
         NoWait = 0x00000001
     }
 
-    /// <summary>
-    /// From MFBYTESTREAM_SEEK_ORIGIN
-    /// </summary>
+    [UnmanagedName("MFBYTESTREAM_SEEK_ORIGIN")]
     public enum MFByteStreamSeekOrigin
     {
         Begin,

@@ -33,10 +33,7 @@ namespace MediaFoundation.EVR
 {
     #region Declarations
 
-    /// <summary>
-    /// From MFVideoRenderPrefs
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFVideoRenderPrefs")]
     public enum MFVideoRenderPrefs
     {
         None = 0,
@@ -45,10 +42,7 @@ namespace MediaFoundation.EVR
         Mask = 0x00000003
     }
 
-    /// <summary>
-    /// From MFVideoAspectRatioMode
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFVideoAspectRatioMode")]
     public enum MFVideoAspectRatioMode
     {
         None = 0x00000000,
@@ -58,10 +52,7 @@ namespace MediaFoundation.EVR
         Mask = 0x00000007
     }
 
-    /// <summary>
-    /// From MFVideoNormalizedRect
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoNormalizedRect")]
     public struct MFVideoNormalizedRect
     {
         public float left;
@@ -70,32 +61,23 @@ namespace MediaFoundation.EVR
         public float bottom;
     }
 
-    /// <summary>
-    /// From RemotableHandle
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("RemotableHandle")]
     public struct RemotableHandle
     {
         public int fContext;
         public Unnamed2 u;
     }
 
-    /// <summary>
-    /// From unnamed union
-    /// </summary>
-    [StructLayout(LayoutKind.Explicit, Pack = 4)]
+    [StructLayout(LayoutKind.Explicit, Pack = 4), UnmanagedName("unnamed union")]
     public struct Unnamed2
     {
-        // Fields
         [FieldOffset(0)]
         public int hInproc;
         [FieldOffset(0)]
         public int hRemote;
     }
 
-    /// <summary>
-    /// From MFVP_MESSAGE_TYPE
-    /// </summary>
+    [UnmanagedName("MFVP_MESSAGE_TYPE")]
     public enum MFVP_MessageType
     {
         Flush,
@@ -108,9 +90,7 @@ namespace MediaFoundation.EVR
         CancelStep
     }
 
-    /// <summary>
-    /// From MF_SERVICE_LOOKUP_TYPE
-    /// </summary>
+    [UnmanagedName("MF_SERVICE_LOOKUP_TYPE")]
     public enum MF_ServiceLookupType
     {
         Upstream,

@@ -812,38 +812,28 @@ namespace MediaFoundation
 
     #region Declarations
 
-    /// <summary>
-    /// From MFPMPSESSION_CREATION_FLAGS
-    /// </summary>
+    [UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
     public enum MFPMPSESSION_CREATION_FLAGS
     {
         None = 0,
         UnprotectedProcess = 0x1
     }
 
-    /// <summary>
-    /// From MFWaveFormatExConvertFlags
-    /// </summary>
+    [UnmanagedName("MFWaveFormatExConvertFlags")]
     public enum MFWaveFormatExConvertFlags 
     {
         Normal          = 0,
         ForceExtensible = 1
     } 
 
-    /// <summary>
-    /// From MFNetCredentialRequirements
-    /// </summary>
+    [UnmanagedName("MFNetCredentialRequirements")]
     public enum MFNetCredentialRequirements
     {
         None = 0,
         RequirePrompt = 0x00000001
     }
 
-
-    /// <summary>
-    /// From MFCLOCK_CHARACTERISTICS_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFCLOCK_CHARACTERISTICS_FLAGS")]
     public enum MFClockCharacteristicsFlags
     {
         None = 0,
@@ -852,70 +842,49 @@ namespace MediaFoundation
         IsSystemClock = 0x8
     }
 
-    /// <summary>
-    /// From _MFT_PROCESS_OUTPUT_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_PROCESS_OUTPUT_FLAGS")]
     public enum MFTProcessOutputFlags
     {
         None = 0,
         DiscardWhenNoBuffer = 0x00000001
     }
 
-    /// <summary>
-    /// From _MFT_OUTPUT_STATUS_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_OUTPUT_STATUS_FLAGS")]
     public enum MFTOutputStatusFlags
     {
         None = 0,
         SampleReady = 0x00000001
     }
 
-    /// <summary>
-    /// From _MFT_INPUT_STATUS_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_INPUT_STATUS_FLAGS")]
     public enum MFTInputStatusFlags
     {
         None = 0,
         AcceptData = 0x00000001
     }
 
-    /// <summary>
-    /// From _MFT_SET_TYPE_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_SET_TYPE_FLAGS")]
     public enum MFTSetTypeFlags
     {
         None = 0,
         TestOnly = 0x00000001
     }
 
-    /// <summary>
-    /// From MFTIMER_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFTIMER_FLAGS")]
     public enum MFTimeFlags
     {
         None = 0,
         Relative = 0x00000001
     }
 
-    /// <summary>
-    /// From MFSequencerTopologyFlags
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFSequencerTopologyFlags")]
     public enum MFSequencerTopologyFlags
     {
         None = 0,
         Last = 0x00000001
     }
 
-    /// <summary>
-    /// From _MFT_OUTPUT_STREAM_INFO_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_OUTPUT_STREAM_INFO_FLAGS")]
     public enum MFTOutputStreamInfoFlags
     {
         None = 0,
@@ -930,10 +899,7 @@ namespace MediaFoundation
         Removable = 0x00000800
     }
 
-    /// <summary>
-    /// From _MFT_INPUT_STREAM_INFO_FLAGS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("_MFT_INPUT_STREAM_INFO_FLAGS")]
     public enum MFTInputStreamInfoFlags
     {
         WholeSamples = 0x1,
@@ -946,9 +912,7 @@ namespace MediaFoundation
         ProcessesInPlace = 0x800
     }
 
-    /// <summary>
-    /// From MFSTARTUP_* defines
-    /// </summary>
+    [UnmanagedName("MFSTARTUP_* defines")]
     public enum MFStartup
     {
         NoSocket = 0x1,
@@ -956,9 +920,7 @@ namespace MediaFoundation
         Full = 0
     }
 
-    /// <summary>
-    /// From MF_TOPOSTATUS
-    /// </summary>
+    [UnmanagedName("MF_TOPOSTATUS")]
     public enum MF_TopoStatus
     {
         // MF_TOPOSTATUS_INVALID: Invalid value; will not be sent
@@ -988,9 +950,7 @@ namespace MediaFoundation
         Ended = 400,
     }
 
-    /// <summary>
-    /// From unnamed enum
-    /// </summary>
+    [UnmanagedName("unnamed enum")]
     public enum MF_Resolution
     {
         MediaSource       = 0x00000001,
@@ -1001,10 +961,7 @@ namespace MediaFoundation
         Write             = 0x00020000
     }
 
-    /// <summary>
-    /// From MFAYUVSample
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=1)]
+    [StructLayout(LayoutKind.Sequential, Pack=1), UnmanagedName("MFAYUVSample")]
     public struct MFAYUVSample
     {
         public byte bCrValue;
@@ -1013,9 +970,7 @@ namespace MediaFoundation
         public byte bSampleAlpha8;
     }
 
-    /// <summary>
-    /// From MF_URL_TRUST_STATUS
-    /// </summary>
+    [UnmanagedName("MF_URL_TRUST_STATUS")]
     public enum MF_URLTrustStatus
     {
         Untrusted,
@@ -1023,10 +978,7 @@ namespace MediaFoundation
         Tampered
     }
 
-    /// <summary>
-    /// From unnamed internal struct
-    /// </summary>
-    [StructLayout(LayoutKind.Explicit, Pack=8)]
+    [StructLayout(LayoutKind.Explicit, Pack=8), UnmanagedName("unnamed internal struct")]
     public struct Unnamed1
     {
         // Fields
@@ -1038,19 +990,14 @@ namespace MediaFoundation
         public long u64;
     }
 
-    /// <summary>
-    /// From MF_LEAKY_BUCKET_PAIR
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=4)]
+    [StructLayout(LayoutKind.Sequential, Pack=4), UnmanagedName("MF_LEAKY_BUCKET_PAIR")]
     public struct MF_LeakyBucketPair
     {
         public int dwBitrate;
         public int msBufferWindow;
     }
 
-    /// <summary>
-    /// From MF_QUALITY_DROP_MODE
-    /// </summary>
+    [UnmanagedName("MF_QUALITY_DROP_MODE")]
     public enum MF_QualitydropMode
     {
         None,
@@ -1062,9 +1009,7 @@ namespace MediaFoundation
         NumDropModes
     }
 
-    /// <summary>
-    /// From MF_QUALITY_LEVEL
-    /// </summary>
+    [UnmanagedName("MF_QUALITY_LEVEL")]
     public enum MF_QualityLevel
     {
         Normal,
@@ -1076,10 +1021,7 @@ namespace MediaFoundation
         NumQualityLevels
     }
 
-    /// <summary>
-    /// From MFARGB
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=1)]
+    [StructLayout(LayoutKind.Sequential, Pack=1), UnmanagedName("MFARGB")]
     public struct MFARGB
     {
         public byte rgbBlue;
@@ -1088,10 +1030,7 @@ namespace MediaFoundation
         public byte rgbAlpha;
     }
 
-    /// <summary>
-    /// From MFBYTESTREAM_BUFFERING_PARAMS
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFBYTESTREAM_BUFFERING_PARAMS")]
     public struct MFByteStreamBufferingParams
     {
         public long cbTotalFileSize;
@@ -1104,10 +1043,7 @@ namespace MediaFoundation
         public float dRate;
     }
 
-    /// <summary>
-    /// From _MFCLOCK_PROPERTIES
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=8)]
+    [StructLayout(LayoutKind.Sequential, Pack=8), UnmanagedName("_MFCLOCK_PROPERTIES")]
     public struct MFClockProperties
     {
         public long qwCorrelationRate;
@@ -1118,9 +1054,7 @@ namespace MediaFoundation
         public int dwClockJitter;
     }
 
-    /// <summary>
-    /// From MFCLOCK_STATE
-    /// </summary>
+    [UnmanagedName("MFCLOCK_STATE")]
     public enum MFClockState
     {
         Invalid,
@@ -1129,10 +1063,7 @@ namespace MediaFoundation
         Paused
     }
 
-    /// <summary>
-    /// From MFINPUTTRUSTAUTHORITY_ACCESS_PARAMS
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=4)]
+    [StructLayout(LayoutKind.Sequential, Pack=4), UnmanagedName("MFINPUTTRUSTAUTHORITY_ACCESS_PARAMS")]
     public struct MFInputTrustAuthorityAccessParams
     {
         public int dwSize;
@@ -1146,10 +1077,7 @@ namespace MediaFoundation
         public MFInputTrustAuthorityAction[] rgOutputActions;
     }
 
-    /// <summary>
-    /// From MFINPUTTRUSTAUTHORITY_ACTION
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFINPUTTRUSTAUTHORITY_ACTION")]
     public struct MFInputTrustAuthorityAction
     {
         public MFPolicyManagerAction Action;
@@ -1157,10 +1085,7 @@ namespace MediaFoundation
         public int cbTicket;
     }
 
-    /// <summary>
-    /// From MFNetCredentialManagerGetParam
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFNetCredentialManagerGetParam")]
     public struct MFNetCredentialManagerGetParam
     {
         [MarshalAs(UnmanagedType.Error)]
@@ -1178,9 +1103,7 @@ namespace MediaFoundation
         public int nRetries;
     }
 
-    /// <summary>
-    /// From MFNETSOURCE_PROTOCOL_TYPE
-    /// </summary>
+    [UnmanagedName("MFNETSOURCE_PROTOCOL_TYPE")]
     public enum MFNetSourceProtocolType
     {
         Undefined,
@@ -1189,10 +1112,7 @@ namespace MediaFoundation
         File
     }
 
-    /// <summary>
-    /// From MFPaletteEntry
-    /// </summary>
-    [StructLayout(LayoutKind.Explicit, Pack=1)]
+    [StructLayout(LayoutKind.Explicit, Pack=1), UnmanagedName("MFPaletteEntry")]
     public struct MFPaletteEntry
     {
         // Fields
@@ -1202,9 +1122,7 @@ namespace MediaFoundation
         public MFAYUVSample AYCbCr;
     }
 
-    /// <summary>
-    /// From MFPolicyManagerAction
-    /// </summary>
+    [UnmanagedName("MFPolicyManagerAction")]
     public enum MFPolicyManagerAction
     {
         Copy = 2,
@@ -1218,27 +1136,21 @@ namespace MediaFoundation
         Reserved3 = 7
     }
 
-    /// <summary>
-    /// From MFRATE_DIRECTION
-    /// </summary>
+    [UnmanagedName("MFRATE_DIRECTION")]
     public enum MFRateDirection
     {
         Forward,
         Reverse
     }
 
-    /// <summary>
-    /// From MFSHUTDOWN_STATUS
-    /// </summary>
+    [UnmanagedName("MFSHUTDOWN_STATUS")]
     public enum MFShutdownStatus
     {
         Initiated,
         Completed
     }
 
-    /// <summary>
-    /// From MFSTREAMSINK_MARKER_TYPE
-    /// </summary>
+    [UnmanagedName("MFSTREAMSINK_MARKER_TYPE")]
     public enum MFStreamSinkMarkerType
     {
         Default,
@@ -1247,10 +1159,7 @@ namespace MediaFoundation
         Event
     }
 
-    /// <summary>
-    /// From MFT_INPUT_STREAM_INFO
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=8)]
+    [StructLayout(LayoutKind.Sequential, Pack=8), UnmanagedName("MFT_INPUT_STREAM_INFO")]
     public struct MFTInputStreamInfo
     {
         public long hnsMaxLatency;
@@ -1260,9 +1169,7 @@ namespace MediaFoundation
         public int cbAlignment;
     }
 
-    /// <summary>
-    /// From MFT_MESSAGE_TYPE
-    /// </summary>
+    [UnmanagedName("MFT_MESSAGE_TYPE")]
     public enum MFTMessageType
     {
         CommandDrain = 1,
@@ -1274,10 +1181,7 @@ namespace MediaFoundation
         SetD3DManager = 2
     }
 
-    /// <summary>
-    /// From MFT_OUTPUT_DATA_BUFFER
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_OUTPUT_DATA_BUFFER")]
     public struct MFTOutputDataBuffer
     {
         public int dwStreamID;
@@ -1288,10 +1192,7 @@ namespace MediaFoundation
         public IMFCollection pEvents;
     }
 
-    /// <summary>
-    /// From MFT_OUTPUT_STREAM_INFO
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=4)]
+    [StructLayout(LayoutKind.Sequential, Pack=4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
     public struct MFTOutputStreamInfo
     {
         public MFTOutputStreamInfoFlags dwFlags;
@@ -1299,10 +1200,7 @@ namespace MediaFoundation
         public int cbAlignment;
     }
 
-    /// <summary>
-    /// From MFTOPONODE_ATTRIBUTE_UPDATE
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=8)]
+    [StructLayout(LayoutKind.Sequential, Pack=8), UnmanagedName("MFTOPONODE_ATTRIBUTE_UPDATE")]
     public struct MFTopoNodeAttributeUpdate
     {
         public long NodeId;
@@ -1311,10 +1209,7 @@ namespace MediaFoundation
         public Unnamed1 u1;
     }
 
-    // ---------------------------------
-    /// <summary>
-    /// From MF_OBJECT_TYPE
-    /// </summary>
+    [UnmanagedName("MF_OBJECT_TYPE")]
     public enum MF_ObjectType
     {
         MediaSource,
@@ -1322,9 +1217,7 @@ namespace MediaFoundation
         Invalid
     }
 
-    /// <summary>
-    /// From MF_TOPOLOGY_TYPE
-    /// </summary>
+    [UnmanagedName("MF_TOPOLOGY_TYPE")]
     public enum MF_TopologyType
     {
         Max = -1,
@@ -1334,10 +1227,7 @@ namespace MediaFoundation
         TransformNode = 2
     }
 
-    /// <summary>
-    /// From MFMEDIASOURCE_CHARACTERISTICS
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("MFMEDIASOURCE_CHARACTERISTICS")]
     public enum MFMediaSourceCharacteristics
     {
         None = 0,

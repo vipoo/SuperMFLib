@@ -30,13 +30,25 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace MediaFoundation.Misc
 {
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Struct | AttributeTargets.Class)]
+    public class UnmanagedNameAttribute : System.Attribute
+    {
+        private string m_Name;
+
+        public UnmanagedNameAttribute(string s)
+        {
+            m_Name = s;
+        }
+
+        public override string ToString()
+        {
+            return m_Name;
+        }
+    }
 
     #region Declarations
 
-    /// <summary>
-    /// From STATFLAG
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("STATFLAG")]
     public enum StatFlag
     {
         Default = 0,
@@ -44,10 +56,7 @@ namespace MediaFoundation.Misc
         NoOpen = 2
     }
     
-    /// <summary>
-    /// From STGC
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("STGC")]
     public enum STGC
     {
         Default = 0,
@@ -57,10 +66,7 @@ namespace MediaFoundation.Misc
         Consolidate = 8
     }
 
-    /// <summary>
-    /// From LOCKTYPE
-    /// </summary>
-    [Flags]
+    [Flags, UnmanagedName("LOCKTYPE")]
     public enum LockType
     {
         None = 0,
@@ -69,10 +75,7 @@ namespace MediaFoundation.Misc
         OnlyOnce = 4
     }
 
-    /// <summary>
-    /// From WAVEFORMATEX
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
     public class WaveFormatEx
     {
         public short wFormatTag;
@@ -127,10 +130,7 @@ namespace MediaFoundation.Misc
 
     }
 
-    /// <summary>
-    /// From BITMAPINFOHEADER
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("WAVEFORMATEX")]
     public struct BitmapInfoHeader
     {
         public int biSize;
@@ -146,9 +146,7 @@ namespace MediaFoundation.Misc
         public int biClrImportant;
     }
 
-    /// <summary>
-    /// From STREAM_SEEK
-    /// </summary>
+    [UnmanagedName("STREAM_SEEK")]
     public enum StreamSeek
     {
         Set = 0,
@@ -156,29 +154,21 @@ namespace MediaFoundation.Misc
         End = 2
     }
 
-    /// <summary>
-    /// From PROPERTYKEY
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]
     public struct PropertyKey
     {
         public Guid fmtid;
         public int pID;
     }
 
-    /// <summary>
-    /// From SIZE
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
     public struct SIZE
     {
         public int cx;
         public int cy;
     }
 
-    /// <summary>
-    /// From RECT
-    /// </summary>
+    [UnmanagedName("RECT")]
     public struct RECT
     {
         public int left;

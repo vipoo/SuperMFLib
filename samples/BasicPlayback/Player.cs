@@ -101,7 +101,7 @@ class CPlayer : COMBase, IMFAsyncCallback
             CreateTopologyFromSource(out pTopology);
 
             // Set the topology on the media session.
-            hr = m_pSession.SetTopology(0, pTopology);
+            m_pSession.SetTopology(0, pTopology);
 
             // Set our state to "open pending"
             m_state = PlayerState.OpenPending;

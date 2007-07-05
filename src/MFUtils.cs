@@ -470,30 +470,30 @@ namespace MediaFoundation.Utils
 
     abstract public class COMBase
     {
-        public const int S_OK = 0;
-        public const int S_FALSE = 0;
+        public const int S_Ok = 0;
+        public const int S_False = 0;
 
-        public const int E_NOTIMPL = unchecked((int)0x80004001);
-        public const int E_NOINTERFACE = unchecked((int)0x80004002);
-        public const int E_POINTER = unchecked((int)0x80004003);
-        public const int E_ABORT = unchecked((int)0x80004004);
-        public const int E_FAIL = unchecked((int)0x80004005);
-        public const int E_UNEXPECTED = unchecked((int)0x8000FFFF);
-        public const int E_OUTOFMEMORY = unchecked((int)0x8007000E);
-        public const int E_INVALIDARG = unchecked((int)0x80070057);
-        public const int E_BUFFERTOOSMALL = unchecked((int)0x8007007a);
+        public const int E_NotImplemented = unchecked((int)0x80004001);
+        public const int E_NoInterface = unchecked((int)0x80004002);
+        public const int E_Pointer = unchecked((int)0x80004003);
+        public const int E_Abort = unchecked((int)0x80004004);
+        public const int E_Fail = unchecked((int)0x80004005);
+        public const int E_Unexpected = unchecked((int)0x8000FFFF);
+        public const int E_OutOfMemory = unchecked((int)0x8007000E);
+        public const int E_InvalidArgument = unchecked((int)0x80070057);
+        public const int E_BufferTooSmall = unchecked((int)0x8007007a);
 
-        public static bool SUCCEEDED(int hr)
+        public static bool Succeeded(int hr)
         {
             return hr >= 0;
         }
 
-        public static bool FAILED(int hr)
+        public static bool Failed(int hr)
         {
             return hr < 0;
         }
 
-        public static void SAFE_RELEASE(object o)
+        public static void SafeRelease(object o)
         {
             if (o != null)
             {
@@ -513,6 +513,32 @@ namespace MediaFoundation.Utils
             }
         }
 
+        public static int ParseError(Exception e)
+        {
+            int hr;
+
+            if (e is COMException)
+            {
+                COMException ce = e as COMException;
+                hr = ce.ErrorCode;
+            }
+            else
+            {
+                const string TEXT = "(Exception from HRESULT: 0x";
+                // 		Message	"The system cannot find the file specified. (Exception from HRESULT: 0x80070002)"
+                int iPos = e.Message.LastIndexOf(TEXT);
+                if (iPos < 0)
+                {
+                    hr = E_Fail;
+                }
+                else
+                {
+                    hr = int.Parse(e.Message.Substring(iPos + TEXT.Length, 8), System.Globalization.NumberStyles.AllowHexSpecifier);
+                }
+            }
+
+            return hr;
+        }
     }
 
     #endregion

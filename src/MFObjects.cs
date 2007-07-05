@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endregion
 
 using System;
+using System.Text;
 using System.Runtime.InteropServices;
 
 using MediaFoundation.Misc;
@@ -30,6 +31,19 @@ using MediaFoundation.Misc;
 namespace MediaFoundation
 {
     #region Declarations
+
+    [UnmanagedName("MFASYNC_CALLBACK_QUEUE_ defines")]
+    public enum MFAsyncCallbackQueue
+    {
+        Undefined            = 0x00000000,
+        Standard             = 0x00000001,
+        RT                   = 0x00000002,
+        IO                   = 0x00000003,
+        Timer                = 0x00000004,
+        LongFunction         = 0x00000007,
+        PrivateMask          = unchecked((int)0xFFFF0000),
+        All                  = unchecked((int)0xFFFFFFFF)
+    }
 
     [Flags, UnmanagedName("MFBYTESTREAM_* defines")]
     public enum MFByteStreamSeekFlags
@@ -45,10 +59,11 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_ATTRIBUTE_TYPE")]
-    public enum MF_AttributeType
+    public enum MFAttributeType
     {
+        None = 0x0,
         Blob = 0x1011,
-        Double = 5,
+        Double = 0x5,
         Guid = 0x48,
         IUnknown = 13,
         String = 0x1f,
@@ -371,8 +386,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFRemoteAsyncCallback
     {
-        [PreserveSig]
-        int Invoke(
+        void Invoke(
             int hr,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pRemoteResult
             );
@@ -383,182 +397,153 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFAttributes
     {
-        [PreserveSig]
-        int GetItem(
+        void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        int GetItemType(
+        void GetItemType(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out MF_AttributeType pType
+            out MFAttributeType pType
             );
 
-        [PreserveSig]
-        int CompareItem(
+        void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value,
-            out int pbResult
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        int Compare(
+        void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
             MF_AttributesMatchType MatchType,
-            out int pbResult
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        int GetUINT32(
+        void GetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int punValue
             );
 
-        [PreserveSig]
-        int GetUINT64(
+        void GetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out long punValue
             );
 
-        [PreserveSig]
-        int GetDouble(
+        void GetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out double pfValue
             );
 
-        [PreserveSig]
-        int GetGuid(
+        void GetGuid(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
 
-        [PreserveSig]
-        int GetStringLength(
+        void GetStringLength(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcchLength
             );
 
-        [PreserveSig]
-        int GetString(
+        void GetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszValue,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue,
             int cchBufSize,
-            [In, Out] ref int pcchLength
+            out int pcchLength
             );
 
-        [PreserveSig]
-        int GetAllocatedString(
+        void GetAllocatedString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
             out int pcchLength
             );
 
-        [PreserveSig]
-        int GetBlobSize(
+        void GetBlobSize(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcbBlobSize
             );
 
-        [PreserveSig]
-        int GetBlob(
+        void GetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out byte pBuf, 
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte [] pBuf, 
             int cbBufSize,
-            [In, Out] ref int pcbBlobSize
+            out int pcbBlobSize
             );
 
-        [PreserveSig]
-        int GetAllocatedBlob(
+        // Use GetBlob instead of this
+        void GetAllocatedBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out] IntPtr ppBuf,
+            out IntPtr ip,  // Read w/Marshal.Copy, Free w/Marshal.FreeCoTaskMem
             out int pcbSize
             );
 
-        [PreserveSig]
-        int GetUnknown(
+        void GetUnknown(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.Interface)] out object ppv
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv
             );
 
-        [PreserveSig]
-        int SetItem(
+        void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value
+            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
-        [PreserveSig]
-        int DeleteItem(
+        void DeleteItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey
             );
 
-        [PreserveSig]
-        int DeleteAllItems();
+        void DeleteAllItems();
 
-        [PreserveSig]
-        int SetUINT32(
+        void SetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             int unValue
             );
 
-        [PreserveSig]
-        int SetUINT64(
+        void SetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             long unValue
             );
 
-        [PreserveSig]
-        int SetDouble(
+        void SetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             double fValue
             );
 
-        [PreserveSig]
-        int SetGUID(
+        void SetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue
             );
 
-        [PreserveSig]
-        int SetString(
+        void SetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue
             );
 
-        [PreserveSig]
-        int SetBlob(
+        void SetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In] ref byte pBuf,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=2)] byte [] pBuf,
             int cbBufSize
             );
 
-        [PreserveSig]
-        int SetUnknown(
+        void SetUnknown(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        int LockStore();
+        void LockStore();
 
-        [PreserveSig]
-        int UnlockStore();
+        void UnlockStore();
 
-        [PreserveSig]
-        int GetCount(
+        void GetCount(
             out int pcItems
             );
 
-        [PreserveSig]
-        int GetItemByIndex(
+        void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        int CopyAllItems(
+        void CopyAllItems(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
     }
@@ -568,28 +553,23 @@ namespace MediaFoundation
     Guid("045FA593-8799-42B8-BC8D-8968C6453507")]
     public interface IMFMediaBuffer
     {
-        [PreserveSig]
-        int Lock(
+        void Lock(
             out IntPtr ppbBuffer,
             out int pcbMaxLength,
             out int pcbCurrentLength
             );
 
-        [PreserveSig]
-        int Unlock();
+        void Unlock();
 
-        [PreserveSig]
-        int GetCurrentLength(
+        void GetCurrentLength(
             out int pcbCurrentLength
             );
 
-        [PreserveSig]
-        int SetCurrentLength(
+        void SetCurrentLength(
             [In] int cbCurrentLength
             );
 
-        [PreserveSig]
-        int GetMaxLength(
+        void GetMaxLength(
             out int pcbMaxLength
             );
     }
@@ -601,253 +581,210 @@ namespace MediaFoundation
     {
         #region IMFAttributes methods
 
-        [PreserveSig]
-        new int GetItem(
+        new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int GetItemType(
+        new void GetItemType(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out MF_AttributeType pType
+            out MFAttributeType pType
             );
 
-        [PreserveSig]
-        new int CompareItem(
+        new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value,
-            out int pbResult
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int Compare(
+        new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
             MF_AttributesMatchType MatchType,
-            out int pbResult
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int GetUINT32(
+        new void GetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int punValue
             );
 
-        [PreserveSig]
-        new int GetUINT64(
+        new void GetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out long punValue
             );
 
-        [PreserveSig]
-        new int GetDouble(
+        new void GetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out double pfValue
             );
 
-        [PreserveSig]
-        new int GetGuid(
+        new void GetGuid(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
 
-        [PreserveSig]
-        new int GetStringLength(
+        new void GetStringLength(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetString(
+        new void GetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszValue,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue,
             int cchBufSize,
-            [In, Out] ref int pcchLength
+            out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetAllocatedString(
+        new void GetAllocatedString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetBlobSize(
+        new void GetBlobSize(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetBlob(
+        new void GetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out byte pBuf,
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf,
             int cbBufSize,
-            [In, Out] ref int pcbBlobSize
+            out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetAllocatedBlob(
+        // Use GetBlob instead of this
+        new void GetAllocatedBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out] IntPtr ppBuf,
+            out IntPtr ip,  // Read w/Marshal.Copy, Free w/Marshal.FreeCoTaskMem
             out int pcbSize
             );
 
-        [PreserveSig]
-        new int GetUnknown(
+        new void GetUnknown(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.Interface)] out object ppv
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv
             );
 
-        [PreserveSig]
-        new int SetItem(
+        new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value
+            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
-        [PreserveSig]
-        new int DeleteItem(
+        new void DeleteItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey
             );
 
-        [PreserveSig]
-        new int DeleteAllItems();
+        new void DeleteAllItems();
 
-        [PreserveSig]
-        new int SetUINT32(
+        new void SetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             int unValue
             );
 
-        [PreserveSig]
-        new int SetUINT64(
+        new void SetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             long unValue
             );
 
-        [PreserveSig]
-        new int SetDouble(
+        new void SetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             double fValue
             );
 
-        [PreserveSig]
-        new int SetGUID(
+        new void SetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue
             );
 
-        [PreserveSig]
-        new int SetString(
+        new void SetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue
             );
 
-        [PreserveSig]
-        new int SetBlob(
+        new void SetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In] ref byte pBuf,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
             int cbBufSize
             );
 
-        [PreserveSig]
-        new int SetUnknown(
+        new void SetUnknown(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        new int LockStore();
+        new void LockStore();
 
-        [PreserveSig]
-        new int UnlockStore();
+        new void UnlockStore();
 
-        [PreserveSig]
-        new int GetCount(
+        new void GetCount(
             out int pcItems
             );
 
-        [PreserveSig]
-        new int GetItemByIndex(
+        new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int CopyAllItems(
+        new void CopyAllItems(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
         #endregion
 
-        [PreserveSig]
-        int GetSampleFlags(
+        void GetSampleFlags(
             out int pdwSampleFlags // Must be zero
             );
 
-        [PreserveSig]
-        int SetSampleFlags(
+        void SetSampleFlags(
             [In] int dwSampleFlags // Must be zero
             );
 
-        [PreserveSig]
-        int GetSampleTime(
+        void GetSampleTime(
             out long phnsSampleTime
             );
 
-        [PreserveSig]
-        int SetSampleTime(
+        void SetSampleTime(
             [In] long hnsSampleTime
             );
 
-        [PreserveSig]
-        int GetSampleDuration(
+        void GetSampleDuration(
             out long phnsSampleDuration
             );
 
-        [PreserveSig]
-        int SetSampleDuration(
+        void SetSampleDuration(
             [In] long hnsSampleDuration
             );
 
-        [PreserveSig]
-        int GetBufferCount(
+        void GetBufferCount(
             out int pdwBufferCount
             );
 
-        [PreserveSig]
-        int GetBufferByIndex(
+        void GetBufferByIndex(
             [In] int dwIndex,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaBuffer ppBuffer
             );
 
-        [PreserveSig]
-        int ConvertToContiguousBuffer(
+        void ConvertToContiguousBuffer(
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaBuffer ppBuffer
             );
 
-        [PreserveSig]
-        int AddBuffer(
+        void AddBuffer(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaBuffer pBuffer
             );
 
-        [PreserveSig]
-        int RemoveBufferByIndex(
+        void RemoveBufferByIndex(
             [In] int dwIndex
             );
 
-        [PreserveSig]
-        int RemoveAllBuffers();
+        void RemoveAllBuffers();
 
-        [PreserveSig]
-        int GetTotalLength(
+        void GetTotalLength(
             out int pcbTotalLength
             );
 
-        [PreserveSig]
-        int CopyToBuffer(
+        void CopyToBuffer(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaBuffer pBuffer
             );
     }
@@ -857,39 +794,32 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMF2DBuffer
     {
-        [PreserveSig]
-        int Lock2D(
+        void Lock2D(
             [Out] IntPtr pbScanline0,
             out int plPitch
             );
 
-        [PreserveSig]
-        int Unlock2D();
+        void Unlock2D();
 
-        [PreserveSig]
-        int GetScanline0AndPitch(
+        void GetScanline0AndPitch(
             [Out] IntPtr pbScanline0,
             out int plPitch
             );
 
-        [PreserveSig]
-        int IsContiguousFormat(
+        void IsContiguousFormat(
             out int pfIsContiguous
             );
 
-        [PreserveSig]
-        int GetContiguousLength(
+        void GetContiguousLength(
             out int pcbLength
             );
 
-        [PreserveSig]
-        int ContiguousCopyTo(
+        void ContiguousCopyTo(
             out byte pbDestBuffer,
             [In] int cbDestBuffer
             );
 
-        [PreserveSig]
-        int ContiguousCopyFrom(
+        void ContiguousCopyFrom(
             [In] IntPtr pbSrcBuffer,
             [In] int cbSrcBuffer
             );
@@ -902,211 +832,177 @@ namespace MediaFoundation
     {
         #region IMFAttributes methods
 
-        [PreserveSig]
-        new int GetItem(
+        new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int GetItemType(
+        new void GetItemType(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out MF_AttributeType pType
+            out MFAttributeType pType
             );
 
-        [PreserveSig]
-        new int CompareItem(
+        new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value,
-            out int pbResult
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int Compare(
+        new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
             MF_AttributesMatchType MatchType,
-            out int pbResult
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int GetUINT32(
+        new void GetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int punValue
             );
 
-        [PreserveSig]
-        new int GetUINT64(
+        new void GetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out long punValue
             );
 
-        [PreserveSig]
-        new int GetDouble(
+        new void GetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out double pfValue
             );
 
-        [PreserveSig]
-        new int GetGuid(
+        new void GetGuid(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
 
-        [PreserveSig]
-        new int GetStringLength(
+        new void GetStringLength(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetString(
+        new void GetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszValue,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue,
             int cchBufSize,
-            [In, Out] ref int pcchLength
+            out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetAllocatedString(
+        new void GetAllocatedString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetBlobSize(
+        new void GetBlobSize(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetBlob(
+        new void GetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out byte pBuf,
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf,
             int cbBufSize,
-            [In, Out] ref int pcbBlobSize
+            out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetAllocatedBlob(
+        // Use GetBlob instead of this
+        new void GetAllocatedBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out] IntPtr ppBuf,
+            out IntPtr ip,  // Read w/Marshal.Copy, Free w/Marshal.FreeCoTaskMem
             out int pcbSize
             );
 
-        [PreserveSig]
-        new int GetUnknown(
+        new void GetUnknown(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.Interface)] out object ppv
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv
             );
 
-        [PreserveSig]
-        new int SetItem(
+        new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value
+            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
-        [PreserveSig]
-        new int DeleteItem(
+        new void DeleteItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey
             );
 
-        [PreserveSig]
-        new int DeleteAllItems();
+        new void DeleteAllItems();
 
-        [PreserveSig]
-        new int SetUINT32(
+        new void SetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             int unValue
             );
 
-        [PreserveSig]
-        new int SetUINT64(
+        new void SetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             long unValue
             );
 
-        [PreserveSig]
-        new int SetDouble(
+        new void SetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             double fValue
             );
 
-        [PreserveSig]
-        new int SetGUID(
+        new void SetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue
             );
 
-        [PreserveSig]
-        new int SetString(
+        new void SetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue
             );
 
-        [PreserveSig]
-        new int SetBlob(
+        new void SetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In] ref byte pBuf,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
             int cbBufSize
             );
 
-        [PreserveSig]
-        new int SetUnknown(
+        new void SetUnknown(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        new int LockStore();
+        new void LockStore();
 
-        [PreserveSig]
-        new int UnlockStore();
+        new void UnlockStore();
 
-        [PreserveSig]
-        new int GetCount(
+        new void GetCount(
             out int pcItems
             );
 
-        [PreserveSig]
-        new int GetItemByIndex(
+        new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int CopyAllItems(
+        new void CopyAllItems(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
         #endregion
 
-        [PreserveSig]
-        int GetMajorType(
+        void GetMajorType(
             out Guid pguidMajorType
             );
 
-        [PreserveSig]
-        int IsCompressedFormat(
+        void IsCompressedFormat(
             [MarshalAs(UnmanagedType.Bool)] out bool pfCompressed
             );
 
-        [PreserveSig]
-        int IsEqual(
+        void IsEqual(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pIMediaType,
             out MFMediaEqual pdwFlags
             );
 
-        [PreserveSig]
-        int GetRepresentation(
+        void GetRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation
             );
 
-        [PreserveSig]
-        int FreeRepresentation(
+        void FreeRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             [In] IntPtr pvRepresentation
             );
@@ -1117,211 +1013,181 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFAudioMediaType : IMFMediaType
     {
-        #region IMFMediaType methods
+        #region IMFAttributes methods
 
-        [PreserveSig]
-        new int GetItem(
+        new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int GetItemType(
+        new void GetItemType(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out MF_AttributeType pType
+            out MFAttributeType pType
             );
 
-        [PreserveSig]
-        new int CompareItem(
+        new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value,
-            out int pbResult
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int Compare(
+        new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
             MF_AttributesMatchType MatchType,
-            out int pbResult
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int GetUINT32(
+        new void GetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int punValue
             );
 
-        [PreserveSig]
-        new int GetUINT64(
+        new void GetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out long punValue
             );
 
-        [PreserveSig]
-        new int GetDouble(
+        new void GetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out double pfValue
             );
 
-        [PreserveSig]
-        new int GetGuid(
+        new void GetGuid(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
 
-        [PreserveSig]
-        new int GetStringLength(
+        new void GetStringLength(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetString(
+        new void GetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszValue,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue,
             int cchBufSize,
-            [In, Out] ref int pcchLength
+            out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetAllocatedString(
+        new void GetAllocatedString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetBlobSize(
+        new void GetBlobSize(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetBlob(
+        new void GetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out byte pBuf,
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf,
             int cbBufSize,
-            [In, Out] ref int pcbBlobSize
+            out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetAllocatedBlob(
+        // Use GetBlob instead of this
+        new void GetAllocatedBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out] IntPtr ppBuf,
+            out IntPtr ip,  // Read w/Marshal.Copy, Free w/Marshal.FreeCoTaskMem
             out int pcbSize
             );
 
-        [PreserveSig]
-        new int GetUnknown(
+        new void GetUnknown(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.Interface)] out object ppv
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv
             );
 
-        [PreserveSig]
-        new int SetItem(
+        new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value
+            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
-        [PreserveSig]
-        new int DeleteItem(
+        new void DeleteItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey
             );
 
-        [PreserveSig]
-        new int DeleteAllItems();
+        new void DeleteAllItems();
 
-        [PreserveSig]
-        new int SetUINT32(
+        new void SetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             int unValue
             );
 
-        [PreserveSig]
-        new int SetUINT64(
+        new void SetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             long unValue
             );
 
-        [PreserveSig]
-        new int SetDouble(
+        new void SetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             double fValue
             );
 
-        [PreserveSig]
-        new int SetGUID(
+        new void SetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue
             );
 
-        [PreserveSig]
-        new int SetString(
+        new void SetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue
             );
 
-        [PreserveSig]
-        new int SetBlob(
+        new void SetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In] ref byte pBuf,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
             int cbBufSize
             );
 
-        [PreserveSig]
-        new int SetUnknown(
+        new void SetUnknown(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        new int LockStore();
+        new void LockStore();
 
-        [PreserveSig]
-        new int UnlockStore();
+        new void UnlockStore();
 
-        [PreserveSig]
-        new int GetCount(
+        new void GetCount(
             out int pcItems
             );
 
-        [PreserveSig]
-        new int GetItemByIndex(
+        new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int CopyAllItems(
+        new void CopyAllItems(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        [PreserveSig]
-        new int GetMajorType(
+        #endregion
+
+        #region IMFMediaType methods
+
+        new void GetMajorType(
             out Guid pguidMajorType
             );
 
-        [PreserveSig]
-        new int IsCompressedFormat(
+        new void IsCompressedFormat(
             [MarshalAs(UnmanagedType.Bool)] out bool pfCompressed
             );
 
-        [PreserveSig]
-        new int IsEqual(
+        new void IsEqual(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pIMediaType,
             out MFMediaEqual pdwFlags
             );
 
-        [PreserveSig]
-        new int GetRepresentation(
+        new void GetRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation
             );
 
-        [PreserveSig]
-        new int FreeRepresentation(
+        new void FreeRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             [In] IntPtr pvRepresentation
             );
@@ -1337,219 +1203,188 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFVideoMediaType : IMFMediaType
     {
-        #region IMFMediaType methods
+        #region IMFAttributes methods
 
-        [PreserveSig]
-        new int GetItem(
+        new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int GetItemType(
+        new void GetItemType(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out MF_AttributeType pType
+            out MFAttributeType pType
             );
 
-        [PreserveSig]
-        new int CompareItem(
+        new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value,
-            out int pbResult
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int Compare(
+        new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
             MF_AttributesMatchType MatchType,
-            out int pbResult
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int GetUINT32(
+        new void GetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int punValue
             );
 
-        [PreserveSig]
-        new int GetUINT64(
+        new void GetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out long punValue
             );
 
-        [PreserveSig]
-        new int GetDouble(
+        new void GetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out double pfValue
             );
 
-        [PreserveSig]
-        new int GetGuid(
+        new void GetGuid(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
 
-        [PreserveSig]
-        new int GetStringLength(
+        new void GetStringLength(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetString(
+        new void GetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszValue,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue,
             int cchBufSize,
-            [In, Out] ref int pcchLength
+            out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetAllocatedString(
+        new void GetAllocatedString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetBlobSize(
+        new void GetBlobSize(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetBlob(
+        new void GetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out byte pBuf,
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf,
             int cbBufSize,
-            [In, Out] ref int pcbBlobSize
+            out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetAllocatedBlob(
+        // Use GetBlob instead of this
+        new void GetAllocatedBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out] IntPtr ppBuf,
+            out IntPtr ip,  // Read w/Marshal.Copy, Free w/Marshal.FreeCoTaskMem
             out int pcbSize
             );
 
-        [PreserveSig]
-        new int GetUnknown(
+        new void GetUnknown(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.Interface)] out object ppv
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv
             );
 
-        [PreserveSig]
-        new int SetItem(
+        new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value
+            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
-        [PreserveSig]
-        new int DeleteItem(
+        new void DeleteItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey
             );
 
-        [PreserveSig]
-        new int DeleteAllItems();
+        new void DeleteAllItems();
 
-        [PreserveSig]
-        new int SetUINT32(
+        new void SetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             int unValue
             );
 
-        [PreserveSig]
-        new int SetUINT64(
+        new void SetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             long unValue
             );
 
-        [PreserveSig]
-        new int SetDouble(
+        new void SetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             double fValue
             );
 
-        [PreserveSig]
-        new int SetGUID(
+        new void SetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue
             );
 
-        [PreserveSig]
-        new int SetString(
+        new void SetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue
             );
 
-        [PreserveSig]
-        new int SetBlob(
+        new void SetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In] ref byte pBuf,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
             int cbBufSize
             );
 
-        [PreserveSig]
-        new int SetUnknown(
+        new void SetUnknown(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        new int LockStore();
+        new void LockStore();
 
-        [PreserveSig]
-        new int UnlockStore();
+        new void UnlockStore();
 
-        [PreserveSig]
-        new int GetCount(
+        new void GetCount(
             out int pcItems
             );
 
-        [PreserveSig]
-        new int GetItemByIndex(
+        new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int CopyAllItems(
+        new void CopyAllItems(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        [PreserveSig]
-        new int GetMajorType(
+        #endregion
+
+        #region IMFMediaType methods
+
+        new void GetMajorType(
             out Guid pguidMajorType
             );
 
-        [PreserveSig]
-        new int IsCompressedFormat(
+        new void IsCompressedFormat(
             [MarshalAs(UnmanagedType.Bool)] out bool pfCompressed
             );
 
-        [PreserveSig]
-        new int IsEqual(
+        new void IsEqual(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pIMediaType,
             out MFMediaEqual pdwFlags
             );
 
-        [PreserveSig]
-        new int GetRepresentation(
+        new void GetRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation
             );
 
-        [PreserveSig]
-        new int FreeRepresentation(
+        new void FreeRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             [In] IntPtr pvRepresentation
             );
 
         #endregion
 
-        [PreserveSig]
-        int GetVideoRepresentation(
+        void GetVideoRepresentation(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation,
             [In] int lStride
@@ -1561,26 +1396,21 @@ namespace MediaFoundation
     Guid("AC6B7889-0740-4D51-8619-905994A55CC6")]
     public interface IMFAsyncResult
     {
-        [PreserveSig]
-        int GetState(
+        void GetState(
             [MarshalAs(UnmanagedType.IUnknown)] out object ppunkState
             );
 
-        [PreserveSig]
-        int GetStatus();
+        void GetStatus();
 
-        [PreserveSig]
-        int SetStatus(
+        void SetStatus(
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus
             );
 
-        [PreserveSig]
-        int GetObject(
+        void GetObject(
             [MarshalAs(UnmanagedType.IUnknown)] out object ppObject
             );
 
         [return: MarshalAs(UnmanagedType.IUnknown)]
-        [PreserveSig]
         object GetStateNoAddRef();
     }
 
@@ -1589,14 +1419,12 @@ namespace MediaFoundation
     Guid("A27003CF-2354-4F2A-8D6A-AB7CFF15437E")]
     public interface IMFAsyncCallback
     {
-        [PreserveSig]
-        int GetParameters(
+        void GetParameters(
             out MFASync pdwFlags,
-            out int pdwQueue
+            out MFAsyncCallbackQueue pdwQueue
             );
 
-        [PreserveSig]
-        int Invoke(
+        void Invoke(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pAsyncResult
             );
     }
@@ -1608,204 +1436,175 @@ namespace MediaFoundation
     {
         #region IMFAttributes methods
 
-        [PreserveSig]
-        new int GetItem(
+        new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int GetItemType(
+        new void GetItemType(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out MF_AttributeType pType
+            out MFAttributeType pType
             );
 
-        [PreserveSig]
-        new int CompareItem(
+        new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value,
-            out int pbResult
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int Compare(
+        new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
             MF_AttributesMatchType MatchType,
-            out int pbResult
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
-        [PreserveSig]
-        new int GetUINT32(
+        new void GetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int punValue
             );
 
-        [PreserveSig]
-        new int GetUINT64(
+        new void GetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out long punValue
             );
 
-        [PreserveSig]
-        new int GetDouble(
+        new void GetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out double pfValue
             );
 
-        [PreserveSig]
-        new int GetGuid(
+        new void GetGuid(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
 
-        [PreserveSig]
-        new int GetStringLength(
+        new void GetStringLength(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetString(
+        new void GetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszValue,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue,
             int cchBufSize,
-            [In, Out] ref int pcchLength
+            out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetAllocatedString(
+        new void GetAllocatedString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
             out int pcchLength
             );
 
-        [PreserveSig]
-        new int GetBlobSize(
+        new void GetBlobSize(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetBlob(
+        new void GetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            out byte pBuf,
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf,
             int cbBufSize,
-            [In, Out] ref int pcbBlobSize
+            out int pcbBlobSize
             );
 
-        [PreserveSig]
-        new int GetAllocatedBlob(
+        // Use GetBlob instead of this
+        new void GetAllocatedBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out] IntPtr ppBuf,
+            out IntPtr ip,  // Read w/Marshal.Copy, Free w/Marshal.FreeCoTaskMem
             out int pcbSize
             );
 
-        [PreserveSig]
-        new int GetUnknown(
+        new void GetUnknown(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.Interface)] out object ppv
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv
             );
 
-        [PreserveSig]
-        new int SetItem(
+        new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            ref object Value
+            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
-        [PreserveSig]
-        new int DeleteItem(
+        new void DeleteItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey
             );
 
-        [PreserveSig]
-        new int DeleteAllItems();
+        new void DeleteAllItems();
 
-        [PreserveSig]
-        new int SetUINT32(
+        new void SetUINT32(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             int unValue
             );
 
-        [PreserveSig]
-        new int SetUINT64(
+        new void SetUINT64(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             long unValue
             );
 
-        [PreserveSig]
-        new int SetDouble(
+        new void SetDouble(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             double fValue
             );
 
-        [PreserveSig]
-        new int SetGUID(
+        new void SetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue
             );
 
-        [PreserveSig]
-        new int SetString(
+        new void SetString(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue
             );
 
-        [PreserveSig]
-        new int SetBlob(
+        new void SetBlob(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In] ref byte pBuf,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
             int cbBufSize
             );
 
-        [PreserveSig]
-        new int SetUnknown(
+        new void SetUnknown(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        new int LockStore();
+        new void LockStore();
 
-        [PreserveSig]
-        new int UnlockStore();
+        new void UnlockStore();
 
-        [PreserveSig]
-        new int GetCount(
+        new void GetCount(
             out int pcItems
             );
 
-        [PreserveSig]
-        new int GetItemByIndex(
+        new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [In, Out] ref object pValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
             );
 
-        [PreserveSig]
-        new int CopyAllItems(
+        new void CopyAllItems(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
         #endregion
 
         [PreserveSig]
-        int GetType(
+        void GetType(
             out MediaEventType pmet
             );
 
         [PreserveSig]
-        int GetExtendedType(
+        void GetExtendedType(
             out Guid pguidExtendedType
             );
 
         [PreserveSig]
-        int GetStatus(
+        void GetStatus(
             [MarshalAs(UnmanagedType.Error)] out int phrStatus
             );
 
         [PreserveSig]
-        int GetValue(
+        void GetValue(
             out object pvValue
             );
     }
@@ -1815,25 +1614,22 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFMediaEventGenerator
     {
-        [PreserveSig]
-        int GetEvent(
+        void GetEvent(
             [In] MFEventFlag dwFlags,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
             );
 
         [PreserveSig]
-        int BeginGetEvent(
+        void BeginGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o
             );
 
-        [PreserveSig]
-        int EndGetEvent(
+        void EndGetEvent(
             IMFAsyncResult pResult,
             out IMFMediaEvent ppEvent);
 
-        [PreserveSig]
-        int QueueEvent(
+        void QueueEvent(
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
@@ -1845,91 +1641,76 @@ namespace MediaFoundation
     Guid("AD4C1B00-4BF7-422F-9175-756693D9130D")]
     public interface IMFByteStream
     {
-        [PreserveSig]
-        int GetCapabilities(
+        void GetCapabilities(
             out MFByteStreamSeekFlags pdwCapabilities
             );
 
-        [PreserveSig]
-        int GetLength(
+        void GetLength(
             out long pqwLength
             );
 
-        [PreserveSig]
-        int SetLength(
+        void SetLength(
             [In] long qwLength
             );
 
-        [PreserveSig]
-        int GetCurrentPosition(
+        void GetCurrentPosition(
             out long pqwPosition
             );
 
-        [PreserveSig]
-        int SetCurrentPosition(
+        void SetCurrentPosition(
             [In] long qwPosition
             );
 
-        [PreserveSig]
-        int IsEndOfStream(
+        void IsEndOfStream(
             [MarshalAs(UnmanagedType.Bool)] out bool pfEndOfStream
             );
 
-        [PreserveSig]
-        int Read(
+        void Read(
             [In] IntPtr pb,
             [In] int cb,
             out int pcbRead
             );
 
-        [PreserveSig]
-        int BeginRead(
+        void BeginRead(
             [In] IntPtr pb,
             [In] int cb,
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
             );
 
-        [PreserveSig]
-        int EndRead(
+        void EndRead(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult,
             out int pcbRead
             );
 
-        [PreserveSig]
-        int Write(
+        void Write(
             [In] IntPtr pb,
             [In] int cb,
             out int pcbWritten
             );
 
-        [PreserveSig]
-        int BeginWrite(
+        void BeginWrite(
             [In] IntPtr pb,
             [In] int cb,
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
             );
 
-        [PreserveSig]
-        int EndWrite(
+        void EndWrite(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult,
             out int pcbWritten
             );
 
-        [PreserveSig]
-        int Seek(
+        void Seek(
             [In] MFByteStreamSeekOrigin SeekOrigin,
             [In] long llSeekOffset,
             [In] int dwSeekFlags,
             out long pqwCurrentPosition
             );
 
-        [PreserveSig]
-        int Flush();
+        void Flush();
 
-        [PreserveSig]
-        int Close();
+        void Close();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -1937,36 +1718,30 @@ namespace MediaFoundation
     Guid("5BC8A76B-869A-46A3-9B03-FA218A66AEBE")]
     public interface IMFCollection
     {
-        [PreserveSig]
-        int GetElementCount(
+        void GetElementCount(
             out int pcElements
             );
 
-        [PreserveSig]
-        int GetElement(
+        void GetElement(
             [In] int dwElementIndex,
             [MarshalAs(UnmanagedType.IUnknown)] out object ppUnkElement
             );
 
-        [PreserveSig]
-        int AddElement(
+        void AddElement(
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkElement
             );
 
-        [PreserveSig]
-        int RemoveElement(
+        void RemoveElement(
             [In] int dwElementIndex,
             [MarshalAs(UnmanagedType.IUnknown)] out object ppUnkElement
             );
 
-        [PreserveSig]
-        int InsertElementAt(
+        void InsertElementAt(
             [In] int dwIndex,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown
             );
 
-        [PreserveSig]
-        int RemoveAllElements();
+        void RemoveAllElements();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -1974,47 +1749,40 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFMediaEventQueue
     {
-        [PreserveSig]
-        int GetEvent(
+        void GetEvent(
             [In] MFEventFlag dwFlags,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
             );
 
-        [PreserveSig]
-        int BeginGetEvent(
+        void BeginGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
             );
 
-        [PreserveSig]
-        int EndGetEvent(
+        void EndGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
             );
 
-        [PreserveSig]
-        int QueueEvent(
+        void QueueEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent
             );
 
-        [PreserveSig]
-        int QueueEventParamVar(
+        void QueueEventParamVar(
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus,
             [In] IntPtr pvValue
             );
 
-        [PreserveSig]
-        int QueueEventParamUnk(
+        void QueueEventParamUnk(
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnk
             );
 
-        [PreserveSig]
-        int Shutdown();
+        void Shutdown();
     }
 
     #endregion

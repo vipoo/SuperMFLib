@@ -46,6 +46,183 @@ namespace MediaFoundation.Misc
         }
     }
 
+    public struct Blob
+    {
+        public int cbSize;
+        public IntPtr pBlobData;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public class PropVariant
+    {
+        [FieldOffset(0)]
+        private MFAttributeType type;
+        [FieldOffset(2)]
+        private short reserved1;
+        [FieldOffset(4)]
+        private short reserved2;
+        [FieldOffset(6)]
+        private short reserved3;
+        [FieldOffset(8)]
+        private int intValue;
+        [FieldOffset(8)]
+        private long longValue;
+        [FieldOffset(8)]
+        private double doubleValue;
+        [FieldOffset(8)]
+        private Blob blobValue;
+        [FieldOffset(8)]
+        private IntPtr ptr;
+
+        public PropVariant()
+        {
+            type = MFAttributeType.None;
+        }
+
+        public PropVariant(string value)
+        {
+            type = MFAttributeType.String;
+            ptr = Marshal.StringToCoTaskMemUni(value);
+        }
+
+        public PropVariant(int value)
+        {
+            type = MFAttributeType.Uint32;
+            intValue = value;
+        }
+
+        public PropVariant(double value)
+        {
+            type = MFAttributeType.Double;
+            doubleValue = value;
+        }
+
+        public PropVariant(long value)
+        {
+            type = MFAttributeType.Uint64;
+            longValue = value;
+        }
+
+        public PropVariant(Guid value)
+        {
+            type = MFAttributeType.Guid;
+            ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(value));
+            Marshal.StructureToPtr(value, ptr, false);
+        }
+
+        public PropVariant(byte[] value)
+        {
+            type = MFAttributeType.Blob;
+
+            blobValue.cbSize = value.Length;
+            blobValue.pBlobData = Marshal.AllocCoTaskMem(value.Length);
+            Marshal.Copy(value, 0, blobValue.pBlobData, value.Length);
+        }
+
+        public PropVariant(object value)
+        {
+            type = MFAttributeType.IUnknown;
+            ptr = Marshal.GetIUnknownForObject(value);
+        }
+
+        ~PropVariant()
+        {
+            Clear();
+        }
+
+        public MFAttributeType GetAttribType()
+        {
+            return type;
+        }
+
+        public void Clear()
+        {
+            if (type == MFAttributeType.String || type == MFAttributeType.Guid)
+            {
+                Marshal.FreeCoTaskMem(ptr);
+            }
+            else if (type == MFAttributeType.IUnknown)
+            {
+                Marshal.Release(ptr);
+            }
+            else if (type == MFAttributeType.Blob)
+            {
+                Marshal.FreeCoTaskMem(blobValue.pBlobData);
+                blobValue.pBlobData = IntPtr.Zero;
+            }
+
+            ptr = IntPtr.Zero;
+            type = 0;
+        }
+
+        public string GetString()
+        {
+            if (type == MFAttributeType.String)
+            {
+                return Marshal.PtrToStringUni(ptr);
+            }
+            throw new ArgumentException("PropVariant contents not a string");
+        }
+
+        public int GetInt()
+        {
+            if (type == MFAttributeType.Uint32)
+            {
+                return intValue;
+            }
+            throw new ArgumentException("PropVariant contents not an int32");
+        }
+
+        public long GetLong()
+        {
+            if (type == MFAttributeType.Uint64)
+            {
+                return longValue;
+            }
+            throw new ArgumentException("PropVariant contents not an int64");
+        }
+
+        public double GetDouble()
+        {
+            if (type == MFAttributeType.Double)
+            {
+                return doubleValue;
+            }
+            throw new ArgumentException("PropVariant contents not a double");
+        }
+
+        public Guid GetGuid()
+        {
+            if (type == MFAttributeType.Guid)
+            {
+                return (Guid)Marshal.PtrToStructure(ptr, typeof(Guid));
+            }
+            throw new ArgumentException("PropVariant contents not a Guid");
+        }
+
+        public byte[] GetBlob()
+        {
+            if (type == MFAttributeType.Blob)
+            {
+                byte[] b = new byte[blobValue.cbSize];
+
+                Marshal.Copy(blobValue.pBlobData, b, 0, blobValue.cbSize);
+
+                return b;
+            }
+            throw new ArgumentException("PropVariant contents are not a Blob");
+        }
+
+        public object GetIUnknown()
+        {
+            if (type == MFAttributeType.IUnknown)
+            {
+                return Marshal.GetObjectForIUnknown(ptr);
+            }
+            throw new ArgumentException("PropVariant contents not an IUnknown");
+        }
+    }
+
     #region Declarations
 
     [Flags, UnmanagedName("STATFLAG")]
@@ -258,36 +435,37 @@ namespace MediaFoundation.Misc
 
     #region Generic Interfaces
 
+    [ComVisible(true),
+    Guid("00000000-0000-0000-C000-000000000046")]
+    public interface IUnknown
+    {
+    }
+
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99")]
     public interface IPropertyStore
     {
-        [PreserveSig]
-        int GetCount(
+        void GetCount(
             out int cProps
             );
 
-        [PreserveSig]
-        int GetAt(
+        void GetAt(
             [In] int iProp,
             out PropertyKey pkey
             );
 
-        [PreserveSig]
-        int GetValue(
+        void GetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
             out object pv
             );
 
-        [PreserveSig]
-        int SetValue(
+        void SetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
             [In] ref object propvar
             );
 
-        [PreserveSig]
-        int Commit();
+        void Commit();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -295,15 +473,13 @@ namespace MediaFoundation.Misc
     Guid("0C733A30-2A1C-11CE-ADE5-00AA0044773D")]
     public interface ISequentialStream
     {
-        [PreserveSig]
-        int Read(
+        void Read(
             IntPtr pv,
             [In] int cb,
             out int pcbRead
             );
 
-        [PreserveSig]
-        int Write(
+        void Write(
             IntPtr pv,
             [In] int cb,
             IntPtr pcbWritten // out int
@@ -317,15 +493,13 @@ namespace MediaFoundation.Misc
     {
         #region ISequentialStream Methods
 
-        [PreserveSig]
-        new int Read(
+        new void Read(
             IntPtr pv,
             [In] int cb,
             out int pcbRead
             );
 
-        [PreserveSig]
-        new int Write(
+        new void Write(
             [In] IntPtr pv,
             [In] int cb,
             IntPtr pcbWritten // out int
@@ -333,56 +507,47 @@ namespace MediaFoundation.Misc
 
         #endregion
 
-        [PreserveSig]
-        int Seek(
+        void Seek(
             [In] long dlibMove,
             [In] StreamSeek dwOrigin,
             IntPtr plibNewPosition // out int
             );
 
-        [PreserveSig]
-        int SetSize(
+        void SetSize(
             [In] long libNewSize
             );
 
-        [PreserveSig]
-        int CopyTo(
+        void CopyTo(
             [In, MarshalAs(UnmanagedType.Interface)] IStream pstm,
             [In] long cb,
             IntPtr pcbRead, // out long
             IntPtr pcbWritten // out long
             );
 
-        [PreserveSig]
-        int Commit(
+        void Commit(
             [In] STGC grfCommitFlags
             );
 
-        [PreserveSig]
-        int Revert();
+        void Revert();
 
-        [PreserveSig]
-        int LockRegion(
+        void LockRegion(
             [In] long libOffset,
             [In] long cb,
             [In] LockType dwLockType
             );
 
-        [PreserveSig]
-        int UnlockRegion(
+        void UnlockRegion(
             [In] long libOffset,
             [In] long cb,
             [In] LockType dwLockType
             );
 
-        [PreserveSig]
-        int Stat(
+        void Stat(
             out System.Runtime.InteropServices.ComTypes.STATSTG pstatstg,
             [In] StatFlag grfStatFlag
             );
 
-        [PreserveSig]
-        int Clone(
+        void Clone(
             [MarshalAs(UnmanagedType.Interface)] out IStream ppstm
             );
     }

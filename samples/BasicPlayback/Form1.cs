@@ -42,7 +42,6 @@ namespace MF_BasicPlayback
                     g_pPlayer.ResizeVideo((short)(m.LParam.ToInt32() & 65535), (short)(m.LParam.ToInt32() >> 16));
                     break;
 
-
                 case WM_CHAR:
                     OnKeyPress(m.WParam.ToInt32());
                     break;
@@ -162,15 +161,15 @@ namespace MF_BasicPlayback
 
             openFileDialog1.Filter = "Windows Media|*.wmv;*.wma;*.asf;*.wav|MP3|*.mp3|All files|*.*";
 
+            // File dialog windows must be on STA threads.  ByteStream handlers are happier if
+            // they are opened on MTA.  So, the application stays MTA.
             Invoker I = new Invoker(openFileDialog1);
 
             // Show the File Open dialog.
             if (I.Invoke() == DialogResult.OK)
             {
-                //openFileDialog1.FileName = @"C:\sourceforge\mflib\Test\Media\welcome.wav"; //todo - remove
-                //openFileDialog1.FileName = @"C:\sourceforge\Mflib\Test\Media\AspectRatio4x3.wmv";
-
                 // Open the file with the playback object.
+                //openFileDialog1.FileName = "C:\\sourceforge\\mflib\\Test\\Media\\Welxcome.waxv";
                 hr = g_pPlayer.OpenURL(openFileDialog1.FileName);
 
                 if (hr >= 0)
@@ -209,17 +208,22 @@ namespace MF_BasicPlayback
         }
     }
 
+    /// <summary>
+    /// Opens a specified FileOpenDialog box on an STA thread
+    /// </summary>
     public class Invoker
     {
-        public OpenFileDialog m_Dialog;
+        private OpenFileDialog m_Dialog;
         private DialogResult m_InvokeResult;
-        Thread m_InvokeThread;
+        private Thread m_InvokeThread;
 
+        // Constructor is passed the dialog to use
         public Invoker(OpenFileDialog Dialog)
         {
             m_InvokeResult = DialogResult.None;
             m_Dialog = Dialog;
 
+            // No reason to waste a thread if we aren't MTA
             if (Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA)
             {
                 m_InvokeThread = new Thread(new ThreadStart(InvokeMethod));
@@ -231,6 +235,7 @@ namespace MF_BasicPlayback
             }
         }
 
+        // Start the thread and get the result
         public DialogResult Invoke()
         {
             if (m_InvokeThread != null)
@@ -242,9 +247,11 @@ namespace MF_BasicPlayback
             {
                 m_InvokeResult = m_Dialog.ShowDialog();
             }
+
             return m_InvokeResult;
         }
 
+        // The thread entry point
         private void InvokeMethod()
         {
             m_InvokeResult = m_Dialog.ShowDialog();

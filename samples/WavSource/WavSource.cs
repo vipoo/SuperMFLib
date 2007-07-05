@@ -147,13 +147,13 @@ namespace WavSourceFilter
             )
         {
             m_Log.WriteLine("-BeginGetEvent");
-            int hr = S_OK;
+            int hr = S_Ok;
 
             lock (this)
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
                 }
@@ -170,14 +170,14 @@ namespace WavSourceFilter
             )
         {
             m_Log.WriteLine("-EndGetEvent");
-            int hr = S_OK;
+            int hr = S_Ok;
             ppEvent = null;
 
             lock (this)
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
                 }
@@ -189,7 +189,7 @@ namespace WavSourceFilter
         public int GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
         {
             m_Log.WriteLine("-GetEvent");
-            int hr = S_OK;
+            int hr = S_Ok;
             ppEvent = null;
 
             IMFMediaEventQueue pQueue = null;
@@ -201,7 +201,7 @@ namespace WavSourceFilter
 
                     hr = CheckShutdown();
 
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         pQueue = m_pEventQueue as IMFMediaEventQueue;
                     }
@@ -209,7 +209,7 @@ namespace WavSourceFilter
 
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pQueue.GetEvent(dwFlags, out ppEvent);
             }
@@ -222,13 +222,13 @@ namespace WavSourceFilter
         public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, object pvValue)
         {
             m_Log.WriteLine("-QueueEvent");
-            int hr = S_OK;
+            int hr = S_Ok;
 
             lock (this)
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     int iObjectSize;
 
@@ -270,12 +270,12 @@ namespace WavSourceFilter
             {
                 if (m_pSource == null)
                 {
-                    return E_UNEXPECTED;
+                    return E_Unexpected;
                 }
 
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     ppMediaSource = m_pSource as IMFMediaSource;
                 }
@@ -294,12 +294,12 @@ namespace WavSourceFilter
             {
                 if (m_pStreamDescriptor == null)
                 {
-                    return E_UNEXPECTED;
+                    return E_Unexpected;
                 }
 
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     ppStreamDescriptor = m_pStreamDescriptor;
                 }
@@ -314,10 +314,10 @@ namespace WavSourceFilter
 
             if (m_pSource == null)
             {
-                return E_UNEXPECTED;
+                return E_Unexpected;
             }
 
-            int hr = S_OK;
+            int hr = S_Ok;
 
             IMFSample pSample = null;  // Sample to deliver.
             bool bReachedEOS = false;   // true if we hit end-of-stream during this method.
@@ -331,7 +331,7 @@ namespace WavSourceFilter
                     hr = CheckShutdown();
 
                     // Check if we already reached the end of the stream.
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         if (m_EOS)
                         {
@@ -340,7 +340,7 @@ namespace WavSourceFilter
                     }
 
                     // Check the source is stopped.
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         // GetState does not hold the source's critical section. Safe to call.
                         if (m_pSource.GetState() == WavSource.State.Stopped)
@@ -349,17 +349,17 @@ namespace WavSourceFilter
                         }
                     }
 
-                    // If we succeeded to here, we are able to deliver a sample.
+                    // If we Succeeded to here, we are able to deliver a sample.
 
                     // Create a new audio sample.
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         hr = CreateAudioSample(out pSample);
                     }
 
                     // If the caller provided a token, attach it to the sample as
                     // an attribute.
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         // NOTE: If we processed sample requests asynchronously, we would
                         // need to call AddRef on the token and put the token onto a FIFO
@@ -372,14 +372,14 @@ namespace WavSourceFilter
                     }
 
                     // Send the MEMediaSample event with the new sample.
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         object o = pSample;
                         hr = QueueEvent(MediaEventType.MEMediaSample, Guid.Empty, hr, o);
                     }
 
                     // See if we reached the end of the stream.
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         hr = CheckEndOfStream();    // This method sends MEEndOfStream if needed.
                         bReachedEOS = m_EOS;        // Cache this flag in a local variable.
@@ -398,13 +398,13 @@ namespace WavSourceFilter
             // source's critical section while holding the stream's critical section, at
             // risk of deadlock.
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 if (bReachedEOS)
                 {
                     object o = null;
 
-                    hr = m_pSource.QueueEvent(MediaEventType.MEEndOfPresentation, Guid.Empty, S_OK, o);
+                    hr = m_pSource.QueueEvent(MediaEventType.MEEndOfPresentation, Guid.Empty, S_Ok, o);
                 }
             }
 
@@ -434,10 +434,10 @@ namespace WavSourceFilter
 
                 if (rtNewPosition > duration)
                 {
-                    return E_INVALIDARG;
+                    return E_InvalidArgument;
                 }
 
-                hr = S_OK;
+                hr = S_Ok;
 
                 if (m_rtCurrentPosition != rtNewPosition)
                 {
@@ -448,7 +448,7 @@ namespace WavSourceFilter
                     Debug.Assert(offset <= int.MaxValue);
 
                     hr = m_Riff.MoveToChunkOffset((int)offset);
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         m_rtCurrentPosition = rtNewPosition;
                         m_discontinuity = true;
@@ -481,7 +481,7 @@ namespace WavSourceFilter
                 m_IsShutdown = true;
             }
 
-            return S_OK;
+            return S_Ok;
         }
 
         #endregion
@@ -491,7 +491,7 @@ namespace WavSourceFilter
         private int CheckEndOfStream()
         {
             m_Log.WriteLine("CheckEndOfStream");
-            int hr = S_OK;
+            int hr = S_Ok;
 
             if (m_Riff.BytesRemainingInChunk() < m_Riff.Format().nBlockAlign)
             {
@@ -503,7 +503,7 @@ namespace WavSourceFilter
                 // Send the end-of-stream event,
                 object o = null;
 
-                hr = QueueEvent(MediaEventType.MEEndOfStream, Guid.Empty, S_OK, o);
+                hr = QueueEvent(MediaEventType.MEEndOfStream, Guid.Empty, S_Ok, o);
             }
             return hr;
         }
@@ -519,7 +519,7 @@ namespace WavSourceFilter
             }
             else
             {
-                hr = S_OK;
+                hr = S_Ok;
             }
 
             return hr;
@@ -528,7 +528,7 @@ namespace WavSourceFilter
         private int CreateAudioSample(out IMFSample ppSample)
         {
             m_Log.WriteLine("CreateAudioSample");
-            int hr = S_OK;
+            int hr = S_Ok;
             ppSample = null;
 
             IMFMediaBuffer pBuffer = null;
@@ -548,7 +548,7 @@ namespace WavSourceFilter
             // Create the buffer.
             hr = MFDll.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 int a, b;
 
@@ -557,11 +557,11 @@ namespace WavSourceFilter
 
                 // Set this flag so that we're sure to unlock the buffer, even if
                 // the next call fails.
-                bBufferLocked = SUCCEEDED(hr);
+                bBufferLocked = Succeeded(hr);
             }
 
             // Fill the buffer
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = m_Riff.ReadDataFromChunk(pData, cbBuffer);
             }
@@ -573,35 +573,35 @@ namespace WavSourceFilter
             }
 
             // Set the size of the valid data in the buffer.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pBuffer.SetCurrentLength(cbBuffer);
             }
 
             // Create a new sample and add the buffer to it.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = MFDll.MFCreateSample(out pSample);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pSample.AddBuffer(pBuffer);
             }
 
             // Set the time stamps, duration, and sample flags.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pSample.SetSampleTime(m_rtCurrentPosition);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 duration = Utils.AudioDurationFromBufferSize(m_Riff.Format(), cbBuffer);
                 hr = pSample.SetSampleDuration(duration);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // Set the discontinuity flag.
                 if (m_discontinuity)
@@ -610,7 +610,7 @@ namespace WavSourceFilter
                 }
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // Update our current position.
                 m_rtCurrentPosition += duration;
@@ -724,14 +724,14 @@ namespace WavSourceFilter
 
         public int BeginGetEvent(IMFAsyncCallback pCallback, object punkState)
         {
-            int hr = S_OK;
+            int hr = S_Ok;
             m_Log.WriteLine("-BeginGetEvent");
 
             lock (this)
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
                 }
@@ -742,7 +742,7 @@ namespace WavSourceFilter
 
         public int EndGetEvent(IMFAsyncResult pResult, out IMFMediaEvent ppEvent)
         {
-            int hr = S_OK;
+            int hr = S_Ok;
             ppEvent = null;
             m_Log.WriteLine("-EndGetEvent");
 
@@ -750,7 +750,7 @@ namespace WavSourceFilter
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
                 }
@@ -765,7 +765,7 @@ namespace WavSourceFilter
             //       WavSource lock. This requires some juggling with the
             //       event queue pointer.
 
-            int hr = S_OK;
+            int hr = S_Ok;
             ppEvent = null;
             m_Log.WriteLine("-GetEvent");
 
@@ -778,7 +778,7 @@ namespace WavSourceFilter
                     // Check shutdown
                     hr = CheckShutdown();
 
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         pQueue = m_pEventQueue;
                     }
@@ -786,7 +786,7 @@ namespace WavSourceFilter
 
             }   // release lock
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pQueue.GetEvent(dwFlags, out ppEvent);
             }
@@ -798,14 +798,14 @@ namespace WavSourceFilter
 
         public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, object pvValue)
         {
-            int hr = S_OK;
+            int hr = S_Ok;
             m_Log.WriteLine("-QueueEvent");
 
             lock (this)
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     int iObjectSize;
 
@@ -852,7 +852,7 @@ namespace WavSourceFilter
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     if (m_pPresentationDescriptor == null)
                     {
@@ -860,7 +860,7 @@ namespace WavSourceFilter
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Clone our default presentation descriptor.
                     hr = m_pPresentationDescriptor.Clone(out ppPresentationDescriptor);
@@ -885,7 +885,7 @@ namespace WavSourceFilter
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     pdwCharacteristics = MFMediaSourceCharacteristics.CanPause | MFMediaSourceCharacteristics.CanSeek;
                 }
@@ -921,17 +921,17 @@ namespace WavSourceFilter
                 // Fail if the source is shut down.
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Check parameters.
                     // Start position and presentation descriptor cannot be null.
                     if (pPresentationDescriptor == null) // pvarStartPosition == null || 
                     {
-                        hr = E_INVALIDARG;
+                        hr = E_InvalidArgument;
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Check the time format. Must be "reference time" units.
                     if ((pguidTimeFormat != null) && (pguidTimeFormat != Guid.Empty))
@@ -941,7 +941,7 @@ namespace WavSourceFilter
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Check the start position.
                     if (pvarStartPosition == null)
@@ -978,7 +978,7 @@ namespace WavSourceFilter
                 }
 
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     Debug.Assert(pPresentationDescriptor != null);  // Checked this earlier.
 
@@ -986,19 +986,19 @@ namespace WavSourceFilter
                     hr = ValidatePresentationDescriptor(pPresentationDescriptor);
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Sends the MENewStream or MEUpdatedStream event.
                     hr = QueueNewStreamEvent(pPresentationDescriptor);
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Notify the stream of the new start time.
                     //hr = m_pStream.SetPosition(llStartOffset);
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Send Started or Seeked events. We will send them
                     // 1. from the media source
@@ -1032,7 +1032,7 @@ namespace WavSourceFilter
                             );
 
                         // For restarts, set the actual start time as an attribute.
-                        if (SUCCEEDED(hr))
+                        if (Succeeded(hr))
                         {
                             if (bIsRestartFromCurrentPosition)
                             {
@@ -1041,7 +1041,7 @@ namespace WavSourceFilter
                         }
 
                         // Now  queue the event.
-                        if (SUCCEEDED(hr))
+                        if (Succeeded(hr))
                         {
                             hr = m_pEventQueue.QueueEvent(pEvent);
                         }
@@ -1050,7 +1050,7 @@ namespace WavSourceFilter
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // 2. Send the stream event.
                     if (m_pStream != null)
@@ -1066,7 +1066,7 @@ namespace WavSourceFilter
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Update our state.
                     m_state = State.Started;
@@ -1074,7 +1074,7 @@ namespace WavSourceFilter
 
 
                 // NOTE: If this method were implemented as an asynchronous operation
-                // and the operation failed asynchronously, the media source would need
+                // and the operation Failed asynchronously, the media source would need
                 // to send an MESourceStarted event with the failure code. For this
                 // sample, all operations are synchronous (which is allowed), so any
                 // failures are also synchronous.
@@ -1102,7 +1102,7 @@ namespace WavSourceFilter
                 hr = CheckShutdown();
 
                 // Pause is only allowed from started state.
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     if (m_state != State.Started)
                     {
@@ -1110,24 +1110,24 @@ namespace WavSourceFilter
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Send the appropriate events.
                     if (m_pStream != null)
                     {
                         object o = null;
 
-                        hr = m_pStream.QueueEvent(MediaEventType.MEStreamPaused, Guid.Empty, S_OK, o);
+                        hr = m_pStream.QueueEvent(MediaEventType.MEStreamPaused, Guid.Empty, S_Ok, o);
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     object o = null;
-                    hr = QueueEvent(MediaEventType.MESourcePaused, Guid.Empty, S_OK, o);
+                    hr = QueueEvent(MediaEventType.MESourcePaused, Guid.Empty, S_Ok, o);
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Update our state.
                     m_state = State.Paused;
@@ -1153,23 +1153,23 @@ namespace WavSourceFilter
             {
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Queue events.
                     if (m_pStream != null)
                     {
                         object o = null;
-                        hr = m_pStream.QueueEvent(MediaEventType.MEStreamStopped, Guid.Empty, S_OK, o);
+                        hr = m_pStream.QueueEvent(MediaEventType.MEStreamStopped, Guid.Empty, S_Ok, o);
                     }
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     object o = null;
-                    hr = QueueEvent(MediaEventType.MESourceStopped, Guid.Empty, S_OK, o);
+                    hr = QueueEvent(MediaEventType.MESourceStopped, Guid.Empty, S_Ok, o);
                 }
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Update our state.
                     m_state = State.Stopped;
@@ -1198,7 +1198,7 @@ namespace WavSourceFilter
 
                 hr = CheckShutdown();
 
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Shut down the stream object.
                     if (m_pStream != null)
@@ -1212,7 +1212,7 @@ namespace WavSourceFilter
                         m_pEventQueue.Shutdown();
                     }
 
-                    // Release objects. (Even if Shutdown failed for some reason.)
+                    // Release objects. (Even if Shutdown Failed for some reason.)
                     Dispose();
 
                     // Set our shutdown flag.
@@ -1252,25 +1252,25 @@ namespace WavSourceFilter
                     return MFError.MF_E_INVALIDREQUEST;
                 }
 
-                hr = S_OK;
+                hr = S_Ok;
 
                 // Create a new WAVE RIFF parser object to parse the stream.
                 hr = CWavRiffParser.Create(pStream, out m_pRiff);
 
                 // Parse the WAVE header. This fails if the header is not
                 // well-formed.
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = m_pRiff.ParseWAVEHeader();
                 }
 
                 // Validate the WAVEFORMATEX structure from the file header.
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = ValidateWaveFormat(m_pRiff.Format(), m_pRiff.FormatSize());
                 }
 
-                if (FAILED(hr))
+                if (Failed(hr))
                 {
                     Shutdown();
                 }
@@ -1332,7 +1332,7 @@ namespace WavSourceFilter
 
         private int CreatePresentationDescriptor()
         {
-            int hr = S_OK;
+            int hr = S_Ok;
 
             m_Log.WriteLine("CreatePresentationDescriptor");
 
@@ -1346,7 +1346,7 @@ namespace WavSourceFilter
             hr = MFDll.MFCreateMediaType(out pMediaType);
 
             // Initialize the media type from the WAVEFORMATEX structure.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = MFDll.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
             }
@@ -1355,7 +1355,7 @@ namespace WavSourceFilter
             mt[0] = pMediaType;
 
             // Create the stream descriptor.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = MFDll.MFCreateStreamDescriptor(
                     0,          // stream identifier
@@ -1366,12 +1366,12 @@ namespace WavSourceFilter
             }
 
             // Set the default media type on the media type handler.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pStreamDescriptor.GetMediaTypeHandler(out pHandler);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pHandler.SetCurrentMediaType(pMediaType);
             }
@@ -1380,7 +1380,7 @@ namespace WavSourceFilter
             ms[0] = pStreamDescriptor;
 
             // Create the presentation descriptor.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = MFDll.MFCreatePresentationDescriptor(
                     1,      // Number of stream descriptors
@@ -1390,13 +1390,13 @@ namespace WavSourceFilter
             }
 
             // Select the first stream
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = m_pPresentationDescriptor.SelectStream(0);
             }
 
             // Set the file duration as an attribute on the presentation descriptor.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 long duration = m_pRiff.FileDuration();
                 hr = m_pPresentationDescriptor.SetUINT64(MFAttributesClsid.MF_PD_DURATION, (long)duration);
@@ -1447,7 +1447,7 @@ namespace WavSourceFilter
             // Make sure there is only one stream.
             hr = pPD.GetStreamDescriptorCount(out cStreamDescriptors);
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 if (cStreamDescriptors != 1)
                 {
@@ -1456,14 +1456,14 @@ namespace WavSourceFilter
             }
 
             // Get the stream descriptor.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pPD.GetStreamDescriptorByIndex(0, out fSelected, out pStreamDescriptor);
             }
 
             // Make sure it's selected. (This media source has only one stream, so it
             // is not useful to deselect the only stream.)
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 if (!fSelected)
                 {
@@ -1473,11 +1473,11 @@ namespace WavSourceFilter
 
 
             // Get the media type handler, so that we can get the media type.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = pStreamDescriptor.GetMediaTypeHandler(out pHandler);
             }
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 try
                 {
@@ -1490,13 +1490,13 @@ namespace WavSourceFilter
             }
 
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 pAudioType = (IMFAudioMediaType)pMediaType;
                 //hr = pMediaType.QueryInterface(IID_IMFAudioMediaType, (void**)pAudioType);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 int iSize;
 
@@ -1511,13 +1511,13 @@ namespace WavSourceFilter
                     out iSize, 
                     MFWaveFormatExConvertFlags.Normal);
 
-                if (FAILED(hr) || (pFormat == null) || (this.WaveFormat() == null))
+                if (Failed(hr) || (pFormat == null) || (this.WaveFormat() == null))
                 {
                     hr = MFError.MF_E_INVALIDMEDIATYPE;
                 }
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 Debug.Assert(this.WaveFormat() != null);
 
@@ -1554,13 +1554,13 @@ namespace WavSourceFilter
 
             m_Log.WriteLine("QueueNewStreamEvent");
 
-            int hr = S_OK;
+            int hr = S_Ok;
             IMFStreamDescriptor pSD = null;
 
             bool fSelected = false;
             hr = pPD.GetStreamDescriptorByIndex(0, out fSelected, out pSD);
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // The stream must be selected, because we don't allow the app
                 // to de-select the stream. See ValidatePresentationDescriptor.
@@ -1571,7 +1571,7 @@ namespace WavSourceFilter
                     // The stream already exists, and is still selected.
                     // Send the MEUpdatedStream event.
 
-                    hr = Utils.QueueEventWithIUnknown(this, MediaEventType.MEUpdatedStream, S_OK, m_pStream);
+                    hr = Utils.QueueEventWithIUnknown(this, MediaEventType.MEUpdatedStream, S_Ok, m_pStream);
                 }
                 else
                 {
@@ -1583,10 +1583,10 @@ namespace WavSourceFilter
                     // CreateWavStream creates the stream, so m_pStream is no longer null.
                     Debug.Assert(m_pStream != null);
 
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         // Send the MENewStream event.
-                        hr = Utils.QueueEventWithIUnknown(this, MediaEventType.MENewStream, S_OK, m_pStream);
+                        hr = Utils.QueueEventWithIUnknown(this, MediaEventType.MENewStream, S_Ok, m_pStream);
                     }
                 }
             }
@@ -1601,15 +1601,15 @@ namespace WavSourceFilter
         {
             m_Log.WriteLine("CreateWavStream");
 
-            int hr = S_OK;
+            int hr = S_Ok;
             m_pStream = new WavStream(this, m_pRiff, pSD, hr);
 
             if (m_pStream == null)
             {
-                hr = E_OUTOFMEMORY;
+                hr = E_OutOfMemory;
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 //m_pStream.AddRef();
             }
@@ -1689,7 +1689,7 @@ namespace WavSourceFilter
             }
 
             // Everything checked out.
-            return S_OK;
+            return S_Ok;
         }
 
         private long BufferSizeFromAudioDuration(WaveFormatEx pWav, long duration)
@@ -1726,7 +1726,7 @@ namespace WavSourceFilter
                 // thread in the first place.
                 if (Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA)
                 {
-                    hr = S_OK;
+                    hr = S_Ok;
                 }
                 else
                 {
@@ -1818,7 +1818,7 @@ namespace WavSourceFilter
             ppParser = new CWavRiffParser(pStream, out hr);
 
             // Check the RIFF file type.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 if (ppParser.RiffType() != new FourCC("WAVE"))
                 {
@@ -1845,13 +1845,13 @@ namespace WavSourceFilter
 
         public int ParseWAVEHeader()
         {
-            int hr = S_OK;
+            int hr = S_Ok;
             bool bFoundData = false;
             FourCC fmt = new FourCC("fmt ");
             FourCC data = new FourCC("data");
 
             // Iterate through the RIFF chunks. Ignore chunks we don't recognize.
-            while (SUCCEEDED(hr))
+            while (Succeeded(hr))
             {
                 if (Chunk().FourCC() == fmt)
                 {
@@ -1871,7 +1871,7 @@ namespace WavSourceFilter
                 hr = MoveToNextChunk();
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // To be valid, the file must have a format chunk and a data chunk.
                 // Fail if either of these conditions is not met.
@@ -1881,7 +1881,7 @@ namespace WavSourceFilter
                 }
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 m_rtDuration = Utils.AudioDurationFromBufferSize(m_pWaveFormat, Chunk().DataSize());
             }
@@ -1902,7 +1902,7 @@ namespace WavSourceFilter
 
             int iWaveFormatExSize = Marshal.SizeOf(typeof(WaveFormatEx));
 
-            int hr = S_OK;
+            int hr = S_Ok;
 
             // Some .wav files do not include the cbSize field of the WAVEFORMATEX
             // structure. For uncompressed PCM audio, field is always zero.
@@ -1917,7 +1917,7 @@ namespace WavSourceFilter
             }
 
             // Allocate a buffer for the WAVEFORMAT structure.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 cbFormatSize = Chunk().DataSize();
 
@@ -1927,7 +1927,7 @@ namespace WavSourceFilter
                 m_cbWaveFormat = Math.Max(cbFormatSize, iWaveFormatExSize);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 IntPtr ip = Marshal.AllocCoTaskMem(m_cbWaveFormat);
 
@@ -1941,7 +1941,7 @@ namespace WavSourceFilter
 
                     // Now read cbFormatSize bytes from the file.
                     hr = ReadDataFromChunk(ip, cbFormatSize);
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         m_pWaveFormat = new WaveFormatEx();
 
@@ -1955,7 +1955,7 @@ namespace WavSourceFilter
                 }
             }
 
-            if (FAILED(hr))
+            if (Failed(hr))
             {
                 m_pWaveFormat = null;
                 m_cbWaveFormat = 0;

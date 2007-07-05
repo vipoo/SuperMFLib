@@ -40,9 +40,9 @@ namespace WavSourceFilter
         public int BeginCreateObject(
             IMFByteStream pByteStream,
             string pwszURL,
-            MF_Resolution dwFlags,
+            MFResolution dwFlags,
             IPropertyStore pProps,              // Can be NULL.
-            out object ppIUnknownCancelCookie,  // Can be NULL.
+            out IUnknown ppIUnknownCancelCookie,  // Can be NULL.
             IMFAsyncCallback pCallback,
             object punkState                  // Can be NULL
         )
@@ -53,7 +53,7 @@ namespace WavSourceFilter
 
             if ((pByteStream == null) || (pwszURL == null) || (pCallback == null))
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             IMFAsyncResult pResult = null;
@@ -62,10 +62,10 @@ namespace WavSourceFilter
             WavSource pSource = new WavSource();
 
             hr = pSource.Open(pByteStream);
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = MFDll.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     hr = MFDll.MFInvokeCallback(pResult);
                 }
@@ -83,35 +83,35 @@ namespace WavSourceFilter
 
         public int EndCreateObject(
             IMFAsyncResult pResult,
-            out MF_ObjectType pObjectType,
+            out MFObjectType pObjectType,
             out object ppObject
         )
         {
-            int hr = S_OK;
-            pObjectType = MF_ObjectType.Invalid;
+            int hr = S_Ok;
+            pObjectType = MFObjectType.Invalid;
             ppObject = null;
 
             m_Log.WriteLine("EndCreateObject");
 
             if (pResult == null)
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             hr = pResult.GetObject(out ppObject);
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // Minimal sanity check - is it really a media source?
                 IMFMediaSource pSource = ppObject as IMFMediaSource;
 
                 if (pSource != null)
                 {
-                    pObjectType = MF_ObjectType.MediaSource;
+                    pObjectType = MFObjectType.MediaSource;
                 }
                 else
                 {
-                    hr = E_NOINTERFACE;
+                    hr = E_NoInterface;
                 }
             }
 
@@ -126,7 +126,7 @@ namespace WavSourceFilter
         {
             m_Log.WriteLine("CancelObjectCreation");
 
-            return E_NOTIMPL;
+            return E_NotImplemented;
         }
 
         public int GetMaxNumberOfBytesRequiredForResolution(out long pqwBytes)
@@ -135,7 +135,7 @@ namespace WavSourceFilter
 
             // In a canonical PCM .wav file, the start of the 'data' chunk is at byte offset 44.
             pqwBytes = 44;
-            return S_OK;
+            return S_Ok;
         }
 
         #endregion
@@ -179,7 +179,7 @@ namespace WavSourceFilter
 
         static public int RegisterByteStreamHandler(Guid guid, string sFileExtension, string sDescription)
         {
-            int hr = S_OK;
+            int hr = S_Ok;
 
             RegistryKey hKey;
             RegistryKey hSubKey;
@@ -206,7 +206,7 @@ namespace WavSourceFilter
             RegistryKey hKey = Registry.LocalMachine.OpenSubKey(sKey, true);
             hKey.DeleteValue(guid.ToString("B"));
 
-            return S_OK;
+            return S_Ok;
         }
 
         #endregion

@@ -10,8 +10,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
+using MediaFoundation.Utils;
 
 namespace WavSourceFilter
 {
@@ -83,7 +83,7 @@ namespace WavSourceFilter
 
             if (pStream == null)
             {
-                hr = E_POINTER;
+                hr = E_Pointer;
             }
             else
             {
@@ -124,7 +124,7 @@ namespace WavSourceFilter
             Debug.Assert(m_llCurrentChunkOffset >= 0);
             Debug.Assert(m_llContainerOffset >= 0);
 
-            int hr = S_OK;
+            int hr = S_Ok;
 
             // Update current chunk offset to the start of the next chunk
             m_llCurrentChunkOffset = m_llCurrentChunkOffset + ChunkActualSize();
@@ -133,36 +133,36 @@ namespace WavSourceFilter
             // Are we at the end?
             if ((m_llCurrentChunkOffset - m_llContainerOffset) >= m_dwContainerSize)
             {
-                return E_FAIL;
+                return E_Fail;
             }
 
             // Current chunk offset + size of current chunk
             if (long.MaxValue - m_llCurrentChunkOffset <= ChunkActualSize())
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             // Seek to the start of the chunk.
             hr = m_pStream.SetCurrentPosition(m_llCurrentChunkOffset);
 
             // Read the header.
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = ReadChunkHeader();
             }
 
             // This chunk cannot be any larger than (container size - (chunk offset - container offset) )
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 long maxChunkSize = (long)m_dwContainerSize - (m_llCurrentChunkOffset - m_llContainerOffset);
 
                 if (maxChunkSize < ChunkActualSize())
                 {
-                    hr = E_INVALIDARG;
+                    hr = E_InvalidArgument;
                 }
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 m_dwBytesRemaining = m_chunk.DataSize();
             }
@@ -181,11 +181,11 @@ namespace WavSourceFilter
         {
             if (dwOffset > m_chunk.DataSize())
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             int hr = m_pStream.SetCurrentPosition(m_llCurrentChunkOffset + dwOffset + Marshal.SizeOf(typeof(RIFFCHUNK)));
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 m_dwBytesRemaining = m_chunk.DataSize() - dwOffset;
             }
@@ -200,17 +200,17 @@ namespace WavSourceFilter
 
         public int ReadDataFromChunk(IntPtr pData, int dwLengthInBytes)
         {
-            int hr = S_OK;
+            int hr = S_Ok;
 
             if (dwLengthInBytes > m_dwBytesRemaining)
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             int cbRead = 0;
             hr = m_pStream.Read(pData, dwLengthInBytes, out cbRead);
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 m_dwBytesRemaining -= cbRead;
             }
@@ -245,19 +245,19 @@ namespace WavSourceFilter
 
             if (!m_chunk.IsList())
             {
-                return E_FAIL;
+                return E_Fail;
             }
 
-            int hr = S_OK;
+            int hr = S_Ok;
 
             CRiffParser pRiff = new CRiffParser(m_pStream, new FourCC("LIST"), m_llCurrentChunkOffset, out hr);
             if (pRiff == null)
             {
-                hr = E_OUTOFMEMORY;
+                hr = E_OutOfMemory;
             }
 
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 ppParser = pRiff;
             }
@@ -297,22 +297,22 @@ namespace WavSourceFilter
             // Riff chunks must be WORD aligned
             if (!Utils.IsAligned(m_llContainerOffset, 2))
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             // Offset must be positive.
             if (m_llContainerOffset < 0)
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             // Offset + the size of header must not overflow.
             if (long.MaxValue - m_llContainerOffset <= iRiffSize)
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
-            int hr = S_OK;
+            int hr = S_Ok;
             RIFFLIST header = new RIFFLIST();
             int cbRead = 0;
 
@@ -321,14 +321,14 @@ namespace WavSourceFilter
 
             // Read the header.
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 IntPtr ip = Marshal.AllocCoTaskMem(iRiffSize);
                 try
                 {
                     hr = m_pStream.Read(ip, iRiffSize, out cbRead);
 
-                    if (SUCCEEDED(hr))
+                    if (Succeeded(hr))
                     {
                         // Make sure we read the number of bytes we expected.
                         if (cbRead == iRiffSize)
@@ -337,7 +337,7 @@ namespace WavSourceFilter
                         }
                         else
                         {
-                            hr = E_INVALIDARG;
+                            hr = E_InvalidArgument;
                         }
                     }
 
@@ -348,16 +348,16 @@ namespace WavSourceFilter
                 }
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // Make sure the header ID matches what the caller expected.
                 if (header.fcc != m_fccID)
                 {
-                    hr = E_INVALIDARG;
+                    hr = E_InvalidArgument;
                 }
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 // The size given in the RIFF header does not include the 8-byte header.
                 // However, our m_llContainerOffset is the offset from the start of the
@@ -371,7 +371,7 @@ namespace WavSourceFilter
 
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 hr = ReadChunkHeader();
             }
@@ -394,7 +394,7 @@ namespace WavSourceFilter
             // Offset + the size of header must not overflow.
             if (long.MaxValue - m_llCurrentChunkOffset <= iRiffChunkSize)
             {
-                return E_INVALIDARG;
+                return E_InvalidArgument;
             }
 
             int cbRead;
@@ -403,7 +403,7 @@ namespace WavSourceFilter
             try
             {
                 hr = m_pStream.Read(ip, iRiffChunkSize, out cbRead);
-                if (SUCCEEDED(hr))
+                if (Succeeded(hr))
                 {
                     // Make sure we got the number of bytes we expected.
                     if (cbRead == iRiffChunkSize)
@@ -412,7 +412,7 @@ namespace WavSourceFilter
                     }
                     else
                     {
-                        hr = E_INVALIDARG;
+                        hr = E_InvalidArgument;
                     }
                 }
 
@@ -422,7 +422,7 @@ namespace WavSourceFilter
                 Marshal.FreeCoTaskMem(ip);
             }
 
-            if (SUCCEEDED(hr))
+            if (Succeeded(hr))
             {
                 m_dwBytesRemaining = m_chunk.DataSize();
             }

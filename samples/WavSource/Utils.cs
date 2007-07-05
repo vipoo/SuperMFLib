@@ -26,7 +26,7 @@ namespace Utils
         public xLog(string s)
         {
 #if DEBUG
-            const string sPath = @"C:\sourceforge\mfsamples";
+            const string sPath = @"C:\sourceforge\mflib\samples";
             string fn = string.Format("{0}\\{1}.txt", sPath, s);
             m_Name = s;
             tw = new StreamWriter(fn);

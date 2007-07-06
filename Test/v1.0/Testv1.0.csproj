@@ -35,9 +35,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IMFAttributesTest.cs" />
+    <Compile Include="IMFSampleTest.cs" />
     <Compile Include="IMFSourceResolverTest.cs" />
     <Compile Include="IMFStreamDescriptorTest.cs" />
+    <Compile Include="IMFTopologyNodeTest.cs" />
     <Compile Include="IMFTopologyTest.cs" />
+    <Compile Include="IPropertyStoreTest.cs" />
     <Compile Include="RunTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

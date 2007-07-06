@@ -28,6 +28,15 @@ namespace Testv10
 
                 //IMFStreamDescriptorTest t04 = new IMFStreamDescriptorTest();
                 //t04.DoTests();
+
+                //IMFTopologyNodeTest t05 = new IMFTopologyNodeTest();
+                //t05.DoTests();
+
+                //IMFSampleTest t06 = new IMFSampleTest();
+                //t06.DoTests();
+
+                IPropertyStoreTest t07 = new IPropertyStoreTest();
+                t07.DoTests();
             }
             catch (Exception e)
             {

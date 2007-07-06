@@ -115,7 +115,7 @@ namespace Testv10
         {
             IMFTopologyNode pNode;
 
-            int hr = MFDll.MFCreateTopologyNode(MF_TopologyType.SourcestreamNode, out pNode);
+            int hr = MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
             pNode.GetTopoNodeID(out m_pid);
             pNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, null);
 

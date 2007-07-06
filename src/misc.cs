@@ -332,7 +332,7 @@ namespace MediaFoundation.Misc
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]
-    public struct PropertyKey
+    public class PropertyKey
     {
         public Guid fmtid;
         public int pID;
@@ -452,17 +452,17 @@ namespace MediaFoundation.Misc
 
         void GetAt(
             [In] int iProp,
-            out PropertyKey pkey
+            [Out] PropertyKey pkey
             );
 
         void GetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
-            out object pv
+            [Out] PropVariant pv
             );
 
         void SetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
-            [In] ref object propvar
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant propvar
             );
 
         void Commit();

@@ -137,7 +137,7 @@ namespace MediaFoundation
         public static extern int MFCreateSourceResolver(
         out IMFSourceResolver ppISourceResolver);
 
-        [DllImport("mf.dll")]
+        [DllImport("mfplat.dll")]
         public static extern int CreatePropertyStore(
         out IPropertyStore ppStore);
 
@@ -155,7 +155,7 @@ namespace MediaFoundation
 
         [DllImport("mf.dll")]
         public static extern int MFCreateTopologyNode(
-            MF_TopologyType NodeType,
+            MFTopologyType NodeType,
             out IMFTopologyNode ppNode);
 
         [DllImport("mf.dll")]
@@ -1226,7 +1226,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_TOPOLOGY_TYPE")]
-    public enum MF_TopologyType
+    public enum MFTopologyType
     {
         Max = -1,
         OutputNode = 0,
@@ -3932,7 +3932,7 @@ namespace MediaFoundation
             );
 
         void GetNodeType(
-            out MF_TopologyType pType
+            out MFTopologyType pType
             );
 
         void GetTopoNodeID(

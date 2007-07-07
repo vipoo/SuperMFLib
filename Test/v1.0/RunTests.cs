@@ -53,6 +53,9 @@ namespace Testv10
                 //IMFMediaBufferTest t12 = new IMFMediaBufferTest();
                 //t12.DoTests();
 
+                //IMFMediaEventTest t13 = new IMFMediaEventTest();
+                //t13.DoTests();
+
             }
             catch (Exception e)
             {

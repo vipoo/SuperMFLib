@@ -67,7 +67,7 @@ namespace MediaFoundation
             MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             int hrStatus,
-            [In] object pvValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue,
             out IMFMediaEvent ppEvent);
 
         [DllImport("MFPlat.dll")]
@@ -1513,7 +1513,6 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFByteStreamHandler
     {
-        [PreserveSig]
         void BeginCreateObject(
             [In, MarshalAs(UnmanagedType.Interface)] IMFByteStream pByteStream,
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszURL,
@@ -1723,7 +1722,6 @@ namespace MediaFoundation
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
             );
 
-        [PreserveSig]
         new void BeginGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o);

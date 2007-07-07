@@ -1597,22 +1597,18 @@ namespace MediaFoundation
 
         #endregion
 
-        [PreserveSig]
         void GetType(
             out MediaEventType pmet
             );
 
-        [PreserveSig]
         void GetExtendedType(
             out Guid pguidExtendedType
             );
 
-        [PreserveSig]
         void GetStatus(
             [MarshalAs(UnmanagedType.Error)] out int phrStatus
             );
 
-        [PreserveSig]
         void GetValue(
             [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
@@ -1628,7 +1624,6 @@ namespace MediaFoundation
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
             );
 
-        [PreserveSig]
         void BeginGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o

@@ -35,14 +35,28 @@ namespace Testv10
                 //IMFSampleTest t06 = new IMFSampleTest();
                 //t06.DoTests();
 
-                IPropertyStoreTest t07 = new IPropertyStoreTest();
-                t07.DoTests();
+                //IPropertyStoreTest t07 = new IPropertyStoreTest();
+                //t07.DoTests();
+
+                //IMFByteStreamTest t08 = new IMFByteStreamTest();
+                //t08.DoTests();
+
+                //IMFVideoDisplayControlTest t09 = new IMFVideoDisplayControlTest();
+                //t09.DoTests();
+
             }
             catch (Exception e)
             {
                 int hr = COMBase.ParseError(e);
 
-                System.Windows.Forms.MessageBox.Show(MFError.GetErrorText(hr), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                if (hr != COMBase.E_Fail)
+                {
+                    System.Windows.Forms.MessageBox.Show(MFError.GetErrorText(hr), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show(e.Message, "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                }
             }
         }
     }

@@ -46,7 +46,7 @@ namespace MediaFoundation
     }
 
     [Flags, UnmanagedName("MFBYTESTREAM_* defines")]
-    public enum MFByteStreamSeekFlags
+    public enum MFByteStreamCapabilities
     {
         None       =                0x00000000,
         IsReadable =                0x00000001,
@@ -377,6 +377,13 @@ namespace MediaFoundation
         Current
     }
 
+    [Flags, UnmanagedName("MFBYTESTREAM_SEEK_FLAG_ defines")]
+    public enum MFByteStreamSeekingFlags
+    {
+        None = 0,
+        CancelPendingIO = 1
+    }
+    
     #endregion
 
     #region Interfaces
@@ -1400,18 +1407,19 @@ namespace MediaFoundation
             [MarshalAs(UnmanagedType.IUnknown)] out object ppunkState
             );
 
-        void GetStatus();
+        [PreserveSig]
+        int GetStatus();
 
         void SetStatus(
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus
             );
 
         void GetObject(
-            [MarshalAs(UnmanagedType.IUnknown)] out object ppObject
+            [MarshalAs(UnmanagedType.Interface)] out object ppObject
             );
 
-        [return: MarshalAs(UnmanagedType.IUnknown)]
-        object GetStateNoAddRef();
+        [PreserveSig]
+        IntPtr GetStateNoAddRef();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -1642,7 +1650,7 @@ namespace MediaFoundation
     public interface IMFByteStream
     {
         void GetCapabilities(
-            out MFByteStreamSeekFlags pdwCapabilities
+            out MFByteStreamCapabilities pdwCapabilities
             );
 
         void GetLength(
@@ -1666,13 +1674,13 @@ namespace MediaFoundation
             );
 
         void Read(
-            [In] IntPtr pb,
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.U1, SizeParamIndex=1)] byte [] pb,
             [In] int cb,
             out int pcbRead
             );
 
         void BeginRead(
-            [In] IntPtr pb,
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex = 1)] byte[] pb,
             [In] int cb,
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
@@ -1684,13 +1692,13 @@ namespace MediaFoundation
             );
 
         void Write(
-            [In] IntPtr pb,
+            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex = 1)] byte[] pb,
             [In] int cb,
             out int pcbWritten
             );
 
         void BeginWrite(
-            [In] IntPtr pb,
+            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex = 1)] byte[] pb,
             [In] int cb,
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
@@ -1704,7 +1712,7 @@ namespace MediaFoundation
         void Seek(
             [In] MFByteStreamSeekOrigin SeekOrigin,
             [In] long llSeekOffset,
-            [In] int dwSeekFlags,
+            [In] MFByteStreamSeekingFlags dwSeekFlags,
             out long pqwCurrentPosition
             );
 

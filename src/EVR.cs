@@ -53,28 +53,12 @@ namespace MediaFoundation.EVR
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoNormalizedRect")]
-    public struct MFVideoNormalizedRect
+    public class MFVideoNormalizedRect
     {
         public float left;
         public float top;
         public float right;
         public float bottom;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("RemotableHandle")]
-    public struct RemotableHandle
-    {
-        public int fContext;
-        public Unnamed2 u;
-    }
-
-    [StructLayout(LayoutKind.Explicit, Pack = 4), UnmanagedName("unnamed union")]
-    public struct Unnamed2
-    {
-        [FieldOffset(0)]
-        public int hInproc;
-        [FieldOffset(0)]
-        public int hRemote;
     }
 
     [UnmanagedName("MFVP_MESSAGE_TYPE")]
@@ -121,13 +105,13 @@ namespace MediaFoundation.EVR
     public interface IMFVideoDisplayControl
     {
         void GetNativeVideoSize(
-            [In, Out] ref SIZE pszVideo,
-            [In, Out] ref SIZE pszARVideo
+            [Out] SIZE pszVideo,
+            [Out] SIZE pszARVideo
             );
 
         void GetIdealVideoSize(
-            [In, Out] ref SIZE pszMin,
-            [In, Out] ref SIZE pszMax
+            [Out] SIZE pszMin,
+            [Out] SIZE pszMax
             );
 
         void SetVideoPosition(
@@ -136,8 +120,8 @@ namespace MediaFoundation.EVR
             );
 
         void GetVideoPosition(
-            out MFVideoNormalizedRect pnrcSource,
-            out RECT prcDest
+            [Out] MFVideoNormalizedRect pnrcSource,
+            [Out] RECT prcDest
             );
 
         void SetAspectRatioMode(
@@ -149,20 +133,20 @@ namespace MediaFoundation.EVR
             );
 
         void SetVideoWindow(
-            [In] ref RemotableHandle hwndVideo
+            [In] IntPtr hwndVideo
             );
 
         void GetVideoWindow(
-            [Out] IntPtr phwndVideo
+            out IntPtr phwndVideo
             );
 
         void RepaintVideo();
 
         void GetCurrentImage(
-            [In, Out] ref BitmapInfoHeader pBih,
-            [Out] IntPtr pDib,
+            out BitmapInfoHeader pBih,
+            out IntPtr pDib,
             out int pcbDib,
-            [In, Out] ref long pTimeStamp
+            out long pTimeStamp
             );
 
         void SetBorderColor(
@@ -182,11 +166,11 @@ namespace MediaFoundation.EVR
             );
 
         void SetFullscreen(
-            [In] int fFullscreen
+            [In, MarshalAs(UnmanagedType.Bool)] bool fFullscreen
             );
 
         void GetFullscreen(
-            out int pfFullscreen
+            [MarshalAs(UnmanagedType.Bool)] out bool pfFullscreen
             );
     }
 

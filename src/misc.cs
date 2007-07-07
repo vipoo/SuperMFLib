@@ -339,14 +339,14 @@ namespace MediaFoundation.Misc
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
-    public struct SIZE
+    public class SIZE
     {
         public int cx;
         public int cy;
     }
 
-    [UnmanagedName("RECT")]
-    public struct RECT
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("RECT")]
+    public class RECT
     {
         public int left;
         public int top;

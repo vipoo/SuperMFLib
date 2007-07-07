@@ -576,7 +576,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         try
         {
             // Create the source-stream node. 
-            hr = MFDll.MFCreateTopologyNode(MF_TopologyType.SourcestreamNode, out pNode);
+            hr = MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
             MFError.ThrowExceptionForHR(hr);
 
             // Set attribute: Pointer to the media source.
@@ -632,7 +632,7 @@ class CPlayer : COMBase, IMFAsyncCallback
             pHandler.GetMajorType(out guidMajorType);
 
             // Create a downstream node.
-            hr = MFDll.MFCreateTopologyNode(MF_TopologyType.OutputNode, out pNode);
+            hr = MFDll.MFCreateTopologyNode(MFTopologyType.OutputNode, out pNode);
             MFError.ThrowExceptionForHR(hr);
 
             // Create an IMFActivate object for the renderer, based on the media type.

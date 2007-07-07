@@ -48,7 +48,6 @@ namespace MediaFoundation
             int cInitialSize
         );
 
-
         [DllImport("MfPlat.dll")]
         public static extern int MFStartup(int Version, MFStartup dwFlags);
 
@@ -963,7 +962,7 @@ namespace MediaFoundation
     {
         MediaSource       = 0x00000001,
         ByteStream        = 0x00000002,
-        ContentDoesNotHaveToMatchExtensionOfMimeType   = 0x00000010,
+        ContentDoesNotHaveToMatchExtensionOrMimeType   = 0x00000010,
         KeepByteStreamAliveOnFail              = 0x00000020,
         Read              = 0x00010000,
         Write             = 0x00020000

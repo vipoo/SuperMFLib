@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="IMFAttributesTest.cs" />
     <Compile Include="IMFByteStreamTest.cs" />
+    <Compile Include="IMFMediaEventQueueTest.cs" />
     <Compile Include="IMFSampleTest.cs" />
     <Compile Include="IMFSourceResolverTest.cs" />
     <Compile Include="IMFStreamDescriptorTest.cs" />

@@ -44,6 +44,9 @@ namespace Testv10
                 //IMFVideoDisplayControlTest t09 = new IMFVideoDisplayControlTest();
                 //t09.DoTests();
 
+                //IMFMediaEventQueueTest t10 = new IMFMediaEventQueueTest();
+                //t10.DoTests();
+
             }
             catch (Exception e)
             {

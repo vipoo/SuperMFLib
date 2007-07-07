@@ -1613,7 +1613,7 @@ namespace MediaFoundation
 
         [PreserveSig]
         void GetValue(
-            out object pvValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
     }
 
@@ -1780,7 +1780,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus,
-            [In] IntPtr pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
 
         void QueueEventParamUnk(

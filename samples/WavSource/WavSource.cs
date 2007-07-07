@@ -1493,7 +1493,6 @@ namespace WavSourceFilter
             if (Succeeded(hr))
             {
                 pAudioType = (IMFAudioMediaType)pMediaType;
-                //hr = pMediaType.QueryInterface(IID_IMFAudioMediaType, (void**)pAudioType);
             }
 
             if (Succeeded(hr))

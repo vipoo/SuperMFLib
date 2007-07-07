@@ -63,8 +63,6 @@ namespace Testv10
         {
             IMFMediaEvent pEvent;
             Guid g = Guid.NewGuid();
-            int i;
-            StringBuilder s = new StringBuilder(10);
             PropVariant p = new PropVariant();
 
             m_meq.QueueEventParamVar(MediaEventType.MESessionClosed, g, 0, new PropVariant("asdf"));
@@ -72,6 +70,8 @@ namespace Testv10
             m_meq.GetEvent(MFEventFlag.None, out pEvent);
 
             pEvent.GetValue(p);
+
+            Debug.Assert(p.GetString() == "asdf");
         }
 
         void TestQueueEventParamUnk()

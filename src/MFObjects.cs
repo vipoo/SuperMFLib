@@ -1017,7 +1017,8 @@ namespace MediaFoundation
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("26A0ADC3-CE26-4672-9304-69552EDD3FAF"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Obsolete("To get the properties of the audio format, applications should use the media type attributes. If you need to convert the media type into a WAVEFORMATEX structure, call MFCreateWaveFormatExFromMFMediaType")]
     public interface IMFAudioMediaType : IMFMediaType
     {
         #region IMFAttributes methods

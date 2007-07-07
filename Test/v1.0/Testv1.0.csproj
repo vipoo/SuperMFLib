@@ -34,8 +34,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMFActivateTest.cs" />
     <Compile Include="IMFAttributesTest.cs" />
     <Compile Include="IMFByteStreamTest.cs" />
+    <Compile Include="IMFMediaBufferTest.cs" />
     <Compile Include="IMFMediaEventQueueTest.cs" />
     <Compile Include="IMFSampleTest.cs" />
     <Compile Include="IMFSourceResolverTest.cs" />

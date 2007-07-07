@@ -142,19 +142,20 @@ namespace MediaFoundation
             );
 
         void EndGetEvent(
-            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult, 
             IntPtr p1,
+            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult, 
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
-            //out IntPtr p2
             );
 
-        void QueueEvent([In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent);
+        void QueueEvent(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent
+            );
 
         void QueueEventParamVar(
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus,
-            [In] IntPtr pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
 
         void QueueEventParamUnk(

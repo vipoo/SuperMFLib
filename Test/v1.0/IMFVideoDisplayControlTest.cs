@@ -1,3 +1,5 @@
+// Also tests IMFGetService
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -120,7 +122,7 @@ namespace Testv10
                 // Works in BasicPlayer
                 m_vdc.GetCurrentImage(out bmh, out ip, out i, out l);
             }
-            catch { } 
+            catch { }
         }
 
         void TestSetBorderColor()

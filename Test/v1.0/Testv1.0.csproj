@@ -38,8 +38,13 @@
     <Compile Include="IMFAttributesTest.cs" />
     <Compile Include="IMFByteStreamTest.cs" />
     <Compile Include="IMFMediaBufferTest.cs" />
+    <Compile Include="IMFMediaEventGeneratorTest.cs" />
     <Compile Include="IMFMediaEventQueueTest.cs" />
     <Compile Include="IMFMediaEventTest.cs" />
+    <Compile Include="IMFMediaStreamTest.cs" />
+    <Compile Include="IMFMediaTypeHandlerTest.cs" />
+    <Compile Include="IMFMediaTypeTest.cs" />
+    <Compile Include="IMFPresentationDescriptorTest.cs" />
     <Compile Include="IMFSampleTest.cs" />
     <Compile Include="IMFSourceResolverTest.cs" />
     <Compile Include="IMFStreamDescriptorTest.cs" />

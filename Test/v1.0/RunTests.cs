@@ -56,6 +56,21 @@ namespace Testv10
                 //IMFMediaEventTest t13 = new IMFMediaEventTest();
                 //t13.DoTests();
 
+                //IMFMediaTypeTest t14 = new IMFMediaTypeTest();
+                //t14.DoTests();
+
+                //IMFMediaEventGeneratorTest t15 = new IMFMediaEventGeneratorTest();
+                //t15.DoTests();
+
+                //IMFMediaStreamTest t16 = new IMFMediaStreamTest();
+                //t16.DoTests();
+
+                //IMFMediaTypeHandlerTest t17 = new IMFMediaTypeHandlerTest();
+                //t17.DoTests();
+
+                //IMFPresentationDescriptorTest t18 = new IMFPresentationDescriptorTest();
+                //t18.DoTests();
+
             }
             catch (Exception e)
             {
@@ -63,7 +78,7 @@ namespace Testv10
 
                 if (hr != COMBase.E_Fail)
                 {
-                    System.Windows.Forms.MessageBox.Show(MFError.GetErrorText(hr), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show(string.Format("0x{0:x}: {1}", hr, MFError.GetErrorText(hr)), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 }
                 else
                 {

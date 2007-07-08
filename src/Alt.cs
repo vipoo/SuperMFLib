@@ -60,21 +60,20 @@ namespace MediaFoundation
             //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             IntPtr pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o
-            //IntPtr o
             );
 
         void EndGetEvent(
             //IMFAsyncResult pResult,
             IntPtr pResult,
             out IMFMediaEvent ppEvent
-            //IntPtr ppEvent
             );
 
         void QueueEvent(
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In] object pvValue);
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -107,7 +106,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In] object pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
 
         #endregion
@@ -121,7 +120,7 @@ namespace MediaFoundation
             );
 
         void RequestSample(
-            [In] IUnknown pToken
+            [In, MarshalAs(UnmanagedType.IUnknown)] object pToken
             );
     }
 
@@ -198,7 +197,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In] object pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
 
         #endregion
@@ -214,7 +213,7 @@ namespace MediaFoundation
         void Start(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In] ref object pvarStartPosition
+            [In] PropVariant pvarStartPosition
             );
 
         void Stop();

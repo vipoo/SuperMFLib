@@ -92,13 +92,38 @@ namespace MediaFoundation
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVIDEOFORMAT")]
-    public struct MFVideoFormat
+    public class MFVideoFormat
     {
         public int dwSize;
         public MFVideoInfo videoInfo;
         public Guid guidFormat;
         public MFVideoCompressedInfo compressedInfo;
         public MFVideoSurfaceInfo surfaceInfo;
+    }
+
+    [Flags, UnmanagedName("MFVideoFlags")]
+    public enum MFVideoFlags : long
+    {
+        PAD_TO_Mask = 0x0001 | 0x0002,
+        PAD_TO_None = 0 * 0x0001,
+        PAD_TO_4x3 = 1 * 0x0001,
+        PAD_TO_16x9 = 2 * 0x0001,
+        SrcContentHintMask = 0x0004 | 0x0008 | 0x0010,
+        SrcContentHintNone = 0 * 0x0004,
+        SrcContentHint16x9 = 1 * 0x0004,
+        SrcContentHint235_1 = 2 * 0x0004,
+        AnalogProtected = 0x0020,
+        DigitallyProtected = 0x0040,
+        ProgressiveContent = 0x0080,
+        FieldRepeatCountMask = 0x0100 | 0x0200 | 0x0400,
+        FieldRepeatCountShift = 8,
+        ProgressiveSeqReset = 0x0800,
+        PanScanEnabled = 0x20000,
+        LowerFieldFirst = 0x40000,
+        BottomUpLinearRep = 0x80000,
+        DXVASurface = 0x100000,
+        RenderTargetSurface = 0x400000,
+        ForceQWORD = 0x7FFFFFFF
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoInfo")]
@@ -118,7 +143,7 @@ namespace MediaFoundation
         public MFVideoArea GeometricAperture;
         public MFVideoArea MinimumDisplayAperture;
         public MFVideoArea PanScanAperture;
-        public long VideoFlags;
+        public MFVideoFlags VideoFlags;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoCompressedInfo")]
@@ -999,7 +1024,8 @@ namespace MediaFoundation
             [MarshalAs(UnmanagedType.Bool)] out bool pfCompressed
             );
 
-        void IsEqual(
+        [PreserveSig]
+        int IsEqual(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pIMediaType,
             out MFMediaEqual pdwFlags
             );
@@ -1626,18 +1652,22 @@ namespace MediaFoundation
 
         void BeginGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
+
             [In, MarshalAs(UnmanagedType.IUnknown)] object o
             );
 
         void EndGetEvent(
             IMFAsyncResult pResult,
-            out IMFMediaEvent ppEvent);
+
+            out IMFMediaEvent ppEvent
+            );
 
         void QueueEvent(
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In] object pvValue);
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,

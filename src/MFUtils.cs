@@ -26,6 +26,8 @@ using System;
 using System.Text;
 using System.Runtime.InteropServices;
 
+using MediaFoundation.Misc;
+
 namespace MediaFoundation.Utils
 {
     #region Utility Classes
@@ -307,34 +309,7 @@ namespace MediaFoundation.Utils
 
         #endregion
 
-        #region Declarations
-
-        /// <summary>
-        /// From #defines in WinBase.h
-        /// </summary>
-        [Flags]
-        private enum LoadLibraryExFlags
-        {
-            DontResolveDllReferences = 0x00000001,
-            LoadLibraryAsDataFile = 0x00000002,
-            LoadWithAlteredSearchPath = 0x00000008,
-            LoadIgnoreCodeAuthzLevel = 0x00000010
-        }
-
-        /// <summary>
-        /// From FORMAT_MESSAGE_* defines in WinBase.h
-        /// </summary>
-        [Flags]
-        private enum FormatMessageFlags
-        {
-            AllocateBuffer = 0x00000100,
-            IgnoreInserts = 0x00000200,
-            FromString = 0x00000400,
-            FromHmodule = 0x00000800,
-            FromSystem = 0x00001000,
-            ArgumentArray = 0x00002000,
-            MaxWidthMask = 0x000000FF
-        }
+        #region externs
 
         [DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
         private static extern int FormatMessage(FormatMessageFlags dwFlags, IntPtr lpSource,
@@ -349,6 +324,31 @@ namespace MediaFoundation.Utils
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr LocalFree(IntPtr hMem);
+
+        #endregion
+
+        #region Declarations
+
+        [Flags, UnmanagedName("#defines in WinBase.h")]
+        private enum LoadLibraryExFlags
+        {
+            DontResolveDllReferences = 0x00000001,
+            LoadLibraryAsDataFile = 0x00000002,
+            LoadWithAlteredSearchPath = 0x00000008,
+            LoadIgnoreCodeAuthzLevel = 0x00000010
+        }
+
+        [Flags, UnmanagedName("FORMAT_MESSAGE_* defines")]
+        private enum FormatMessageFlags
+        {
+            AllocateBuffer = 0x00000100,
+            IgnoreInserts = 0x00000200,
+            FromString = 0x00000400,
+            FromHmodule = 0x00000800,
+            FromSystem = 0x00001000,
+            ArgumentArray = 0x00002000,
+            MaxWidthMask = 0x000000FF
+        }
 
         #endregion
 

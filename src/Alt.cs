@@ -89,17 +89,15 @@ namespace MediaFoundation
             );
 
         new void BeginGetEvent(
-            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback, 
+            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             IntPtr p1,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o
-            //IntPtr p2
             );
 
         new void EndGetEvent(
             //IMFAsyncResult pResult,
             IntPtr pResult,
             out IMFMediaEvent ppEvent
-            //IntPtr ppEvent
             );
 
         new void QueueEvent(
@@ -142,7 +140,7 @@ namespace MediaFoundation
 
         void EndGetEvent(
             IntPtr p1,
-            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult, 
+            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
             );
 
@@ -183,14 +181,12 @@ namespace MediaFoundation
             //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             IntPtr pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o
-            //IntPtr o
             );
 
         new void EndGetEvent(
             //IMFAsyncResult pResult,
             IntPtr pResult,
             out IMFMediaEvent ppEvent
-            //IntPtr ppEvent
             );
 
         new void QueueEvent(

@@ -30,6 +30,8 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace MediaFoundation.Misc
 {
+    #region Helper classes
+
     [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Struct | AttributeTargets.Class)]
     public class UnmanagedNameAttribute : System.Attribute
     {
@@ -44,12 +46,6 @@ namespace MediaFoundation.Misc
         {
             return m_Name;
         }
-    }
-
-    public struct Blob
-    {
-        public int cbSize;
-        public IntPtr pBlobData;
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -272,102 +268,6 @@ namespace MediaFoundation.Misc
         }
     }
 
-    #region Declarations
-
-#if ALLOW_UNTESTED_INTERFACES
-
-    [Flags, UnmanagedName("STATFLAG")]
-    public enum StatFlag
-    {
-        Default = 0,
-        NoName = 1,
-        NoOpen = 2
-    }
-    
-    [Flags, UnmanagedName("STGC")]
-    public enum STGC
-    {
-        Default = 0,
-        Overwrite = 1,
-        OnlyIfCurrent = 2,
-        DangerouslyCommitMerelyToToDiskCache = 4,
-        Consolidate = 8
-    }
-
-    [Flags, UnmanagedName("LOCKTYPE")]
-    public enum LockType
-    {
-        None = 0,
-        Write = 1,
-        Exclusive = 2,
-        OnlyOnce = 4
-    }
-
-    [UnmanagedName("STREAM_SEEK")]
-    public enum StreamSeek
-    {
-        Set = 0,
-        Cur = 1,
-        End = 2
-    }
-
-#endif
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
-    public class WaveFormatEx
-    {
-        public short wFormatTag;
-        public short nChannels;
-        public int nSamplesPerSec;
-        public int nAvgBytesPerSec;
-        public short nBlockAlign;
-        public short wBitsPerSample;
-        public short cbSize;
-
-        public bool IsEqual(WaveFormatEx b)
-        {
-            bool bRet = false;
-
-            if (b == null)
-            {
-                bRet = false;
-            }
-            else
-            {
-                if (wFormatTag == b.wFormatTag &&
-                    nChannels == b.nChannels &&
-                    nSamplesPerSec == b.nSamplesPerSec &&
-                    nAvgBytesPerSec == b.nAvgBytesPerSec &&
-                    nBlockAlign == b.nBlockAlign &&
-                    wBitsPerSample == b.wBitsPerSample &&
-                    cbSize == b.cbSize)
-                {
-                    if (cbSize > 0)
-                    {
-                        Debug.Assert(false);
-#if false
-                        for (int x = 0; x < cbSize; x++)
-                        {
-                            if (Marshal.ReadByte(pExtraBytes, x) != Marshal.ReadByte(b.pExtraBytes, x))
-                            {
-                                bRet = false;
-                                break;
-                            }
-                        }
-#endif
-                    }
-                    else
-                    {
-                        bRet = true;
-                    }
-                }
-            }
-
-            return bRet;
-        }
-
-    }
-
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public class FourCC
     {
@@ -432,10 +332,10 @@ namespace MediaFoundation.Misc
 
         public override string ToString()
         {
-            char[] ca = new char[] { 
-                Convert.ToChar((m_fourCC & 255)), 
-                Convert.ToChar((m_fourCC >> 8) & 255), 
-                Convert.ToChar((m_fourCC >> 16) & 255), 
+            char[] ca = new char[] {
+                Convert.ToChar((m_fourCC & 255)),
+                Convert.ToChar((m_fourCC >> 8) & 255),
+                Convert.ToChar((m_fourCC >> 16) & 255),
                 Convert.ToChar((m_fourCC >> 24) & 255)
             };
 
@@ -443,6 +343,111 @@ namespace MediaFoundation.Misc
 
             return s;
         }
+    }
+
+    #endregion
+
+    #region Declarations
+
+#if ALLOW_UNTESTED_INTERFACES
+
+    [Flags, UnmanagedName("STATFLAG")]
+    public enum StatFlag
+    {
+        Default = 0,
+        NoName = 1,
+        NoOpen = 2
+    }
+
+    [Flags, UnmanagedName("STGC")]
+    public enum STGC
+    {
+        Default = 0,
+        Overwrite = 1,
+        OnlyIfCurrent = 2,
+        DangerouslyCommitMerelyToToDiskCache = 4,
+        Consolidate = 8
+    }
+
+    [Flags, UnmanagedName("LOCKTYPE")]
+    public enum LockType
+    {
+        None = 0,
+        Write = 1,
+        Exclusive = 2,
+        OnlyOnce = 4
+    }
+
+    [UnmanagedName("STREAM_SEEK")]
+    public enum StreamSeek
+    {
+        Set = 0,
+        Cur = 1,
+        End = 2
+    }
+
+#endif
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("BLOB")]
+    public struct Blob
+    {
+        public int cbSize;
+        public IntPtr pBlobData;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
+    public class WaveFormatEx
+    {
+        public short wFormatTag;
+        public short nChannels;
+        public int nSamplesPerSec;
+        public int nAvgBytesPerSec;
+        public short nBlockAlign;
+        public short wBitsPerSample;
+        public short cbSize;
+
+        public bool IsEqual(WaveFormatEx b)
+        {
+            bool bRet = false;
+
+            if (b == null)
+            {
+                bRet = false;
+            }
+            else
+            {
+                if (wFormatTag == b.wFormatTag &&
+                    nChannels == b.nChannels &&
+                    nSamplesPerSec == b.nSamplesPerSec &&
+                    nAvgBytesPerSec == b.nAvgBytesPerSec &&
+                    nBlockAlign == b.nBlockAlign &&
+                    wBitsPerSample == b.wBitsPerSample &&
+                    cbSize == b.cbSize)
+                {
+                    if (cbSize > 0)
+                    {
+                        Debug.Assert(false);
+#if false
+                        for (int x = 0; x < cbSize; x++)
+                        {
+                            if (Marshal.ReadByte(pExtraBytes, x) != Marshal.ReadByte(b.pExtraBytes, x))
+                            {
+                                bRet = false;
+                                break;
+                            }
+                        }
+#endif
+                    }
+                    else
+                    {
+                        bRet = true;
+                    }
+                }
+            }
+
+            return bRet;
+        }
+
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]

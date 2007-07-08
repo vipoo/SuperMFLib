@@ -55,24 +55,36 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Explicit)]
     public class PropVariant
     {
+        #region Member variables
+
         [FieldOffset(0)]
         private MFAttributeType type;
+
         [FieldOffset(2)]
         private short reserved1;
+
         [FieldOffset(4)]
         private short reserved2;
+
         [FieldOffset(6)]
         private short reserved3;
+
         [FieldOffset(8)]
         private int intValue;
+
         [FieldOffset(8)]
         private long longValue;
+
         [FieldOffset(8)]
         private double doubleValue;
+
         [FieldOffset(8)]
         private Blob blobValue;
+
         [FieldOffset(8)]
         private IntPtr ptr;
+
+        #endregion
 
         public PropVariant()
         {
@@ -129,6 +141,43 @@ namespace MediaFoundation.Misc
         {
             Clear();
         }
+
+        public static explicit operator string(PropVariant f)
+        {
+            return f.GetString();
+        }
+
+        public static explicit operator int(PropVariant f)
+        {
+            return f.GetInt();
+        }
+
+        public static explicit operator double(PropVariant f)
+        {
+            return f.GetDouble();
+        }
+
+        public static explicit operator long(PropVariant f)
+        {
+            return f.GetLong();
+        }
+
+        public static explicit operator Guid(PropVariant f)
+        {
+            return f.GetGuid();
+        }
+
+        public static explicit operator byte [] (PropVariant f)
+        {
+            return f.GetBlob();
+        }
+
+        // I decided not to do implicits since perf is likely to be
+        // better recycling the PropVariant, and the only way I can
+        // see to support Implicit is to create a new PropVariant.
+        // Also, since I can't free the previous instance, IUnknowns
+        // will linger until the GC cleans up.  Not what I think I
+        // want.
 
         public MFAttributeType GetAttribType()
         {
@@ -225,6 +274,8 @@ namespace MediaFoundation.Misc
 
     #region Declarations
 
+#if ALLOW_UNTESTED_INTERFACES
+
     [Flags, UnmanagedName("STATFLAG")]
     public enum StatFlag
     {
@@ -251,6 +302,16 @@ namespace MediaFoundation.Misc
         Exclusive = 2,
         OnlyOnce = 4
     }
+
+    [UnmanagedName("STREAM_SEEK")]
+    public enum StreamSeek
+    {
+        Set = 0,
+        Cur = 1,
+        End = 2
+    }
+
+#endif
 
     [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
     public class WaveFormatEx
@@ -305,53 +366,6 @@ namespace MediaFoundation.Misc
             return bRet;
         }
 
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("WAVEFORMATEX")]
-    public struct BitmapInfoHeader
-    {
-        public int biSize;
-        public int biWidth;
-        public int biHeight;
-        public short biPlanes;
-        public short biBitCount;
-        public int biCompression;
-        public int biSizeImage;
-        public int biXPelsPerMeter;
-        public int biYPelsPerMeter;
-        public int biClrUsed;
-        public int biClrImportant;
-    }
-
-    [UnmanagedName("STREAM_SEEK")]
-    public enum StreamSeek
-    {
-        Set = 0,
-        Cur = 1,
-        End = 2
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]
-    public class PropertyKey
-    {
-        public Guid fmtid;
-        public int pID;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
-    public class SIZE
-    {
-        public int cx;
-        public int cy;
-    }
-
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("RECT")]
-    public class RECT
-    {
-        public int left;
-        public int top;
-        public int right;
-        public int bottom;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
@@ -431,42 +445,50 @@ namespace MediaFoundation.Misc
         }
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]
+    public class PropertyKey
+    {
+        public Guid fmtid;
+        public int pID;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("WAVEFORMATEX")]
+    public struct BitmapInfoHeader
+    {
+        public int biSize;
+        public int biWidth;
+        public int biHeight;
+        public short biPlanes;
+        public short biBitCount;
+        public int biCompression;
+        public int biSizeImage;
+        public int biXPelsPerMeter;
+        public int biYPelsPerMeter;
+        public int biClrUsed;
+        public int biClrImportant;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
+    public class SIZE
+    {
+        public int cx;
+        public int cy;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("RECT")]
+    public class RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+    }
+
     #endregion
 
     #region Generic Interfaces
 
-    [ComVisible(true),
-    Guid("00000000-0000-0000-C000-000000000046")]
-    public interface IUnknown
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-    Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99")]
-    public interface IPropertyStore
-    {
-        void GetCount(
-            out int cProps
-            );
-
-        void GetAt(
-            [In] int iProp,
-            [Out] PropertyKey pkey
-            );
-
-        void GetValue(
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
-            [Out] PropVariant pv
-            );
-
-        void SetValue(
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant propvar
-            );
-
-        void Commit();
-    }
+#if ALLOW_UNTESTED_INTERFACES
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
@@ -550,6 +572,35 @@ namespace MediaFoundation.Misc
         void Clone(
             [MarshalAs(UnmanagedType.Interface)] out IStream ppstm
             );
+    }
+
+#endif
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99")]
+    public interface IPropertyStore
+    {
+        void GetCount(
+            out int cProps
+            );
+
+        void GetAt(
+            [In] int iProp,
+            [Out] PropertyKey pkey
+            );
+
+        void GetValue(
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
+            [Out] PropVariant pv
+            );
+
+        void SetValue(
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant propvar
+            );
+
+        void Commit();
     }
 
     #endregion

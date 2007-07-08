@@ -33,6 +33,34 @@ namespace MediaFoundation.EVR
 {
     #region Declarations
 
+#if ALLOW_UNTESTED_INTERFACES
+
+    [UnmanagedName("MFVP_MESSAGE_TYPE")]
+    public enum MFVP_MessageType
+    {
+        Flush,
+        InvalidateMediaType,
+        ProcessInputNotify,
+        BeginStreaming,
+        EndStreaming,
+        EndOfStream,
+        Step,
+        CancelStep
+    }
+
+    [UnmanagedName("MF_SERVICE_LOOKUP_TYPE")]
+    public enum MF_ServiceLookupType
+    {
+        Upstream,
+        UpstreamDirect,
+        Downstream,
+        DownstreamDirect,
+        All,
+        Global
+    }
+
+#endif
+
     [Flags, UnmanagedName("MFVideoRenderPrefs")]
     public enum MFVideoRenderPrefs
     {
@@ -61,33 +89,11 @@ namespace MediaFoundation.EVR
         public float bottom;
     }
 
-    [UnmanagedName("MFVP_MESSAGE_TYPE")]
-    public enum MFVP_MessageType
-    {
-        Flush,
-        InvalidateMediaType,
-        ProcessInputNotify,
-        BeginStreaming,
-        EndStreaming,
-        EndOfStream,
-        Step,
-        CancelStep
-    }
-
-    [UnmanagedName("MF_SERVICE_LOOKUP_TYPE")]
-    public enum MF_ServiceLookupType
-    {
-        Upstream,
-        UpstreamDirect,
-        Downstream,
-        DownstreamDirect,
-        All,
-        Global
-    }
-
     #endregion
 
     #region Interfaces
+
+#if ALLOW_UNTESTED_INTERFACES
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
@@ -96,81 +102,6 @@ namespace MediaFoundation.EVR
     {
         void GetDeviceID(
             out Guid pDeviceID
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("A490B1E4-AB84-4D31-A1B2-181E03B1077A"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFVideoDisplayControl
-    {
-        void GetNativeVideoSize(
-            [Out] SIZE pszVideo,
-            [Out] SIZE pszARVideo
-            );
-
-        void GetIdealVideoSize(
-            [Out] SIZE pszMin,
-            [Out] SIZE pszMax
-            );
-
-        void SetVideoPosition(
-            [In] MFVideoNormalizedRect pnrcSource,
-            [In] RECT prcDest
-            );
-
-        void GetVideoPosition(
-            [Out] MFVideoNormalizedRect pnrcSource,
-            [Out] RECT prcDest
-            );
-
-        void SetAspectRatioMode(
-            [In] MFVideoAspectRatioMode dwAspectRatioMode
-            );
-
-        void GetAspectRatioMode(
-            out MFVideoAspectRatioMode pdwAspectRatioMode
-            );
-
-        void SetVideoWindow(
-            [In] IntPtr hwndVideo
-            );
-
-        void GetVideoWindow(
-            out IntPtr phwndVideo
-            );
-
-        void RepaintVideo();
-
-        void GetCurrentImage(
-            out BitmapInfoHeader pBih,
-            out IntPtr pDib,
-            out int pcbDib,
-            out long pTimeStamp
-            );
-
-        void SetBorderColor(
-            [In] int Clr
-            );
-
-        void GetBorderColor(
-            out int pClr
-            );
-
-        void SetRenderingPrefs(
-            [In] MFVideoRenderPrefs dwRenderFlags
-            );
-
-        void GetRenderingPrefs(
-            out MFVideoRenderPrefs pdwRenderFlags
-            );
-
-        void SetFullscreen(
-            [In, MarshalAs(UnmanagedType.Bool)] bool fFullscreen
-            );
-
-        void GetFullscreen(
-            [MarshalAs(UnmanagedType.Bool)] out bool pfFullscreen
             );
     }
 
@@ -356,6 +287,83 @@ namespace MediaFoundation.EVR
 
         void GetNumberOfStreams(
             out int pdwMaxStreams
+            );
+    }
+
+#endif
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("A490B1E4-AB84-4D31-A1B2-181E03B1077A"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFVideoDisplayControl
+    {
+        void GetNativeVideoSize(
+            [Out] SIZE pszVideo,
+            [Out] SIZE pszARVideo
+            );
+
+        void GetIdealVideoSize(
+            [Out] SIZE pszMin,
+            [Out] SIZE pszMax
+            );
+
+        void SetVideoPosition(
+            [In] MFVideoNormalizedRect pnrcSource,
+            [In] RECT prcDest
+            );
+
+        void GetVideoPosition(
+            [Out] MFVideoNormalizedRect pnrcSource,
+            [Out] RECT prcDest
+            );
+
+        void SetAspectRatioMode(
+            [In] MFVideoAspectRatioMode dwAspectRatioMode
+            );
+
+        void GetAspectRatioMode(
+            out MFVideoAspectRatioMode pdwAspectRatioMode
+            );
+
+        void SetVideoWindow(
+            [In] IntPtr hwndVideo
+            );
+
+        void GetVideoWindow(
+            out IntPtr phwndVideo
+            );
+
+        void RepaintVideo();
+
+        void GetCurrentImage(
+            out BitmapInfoHeader pBih,
+            out IntPtr pDib,
+            out int pcbDib,
+            out long pTimeStamp
+            );
+
+        void SetBorderColor(
+            [In] int Clr
+            );
+
+        void GetBorderColor(
+            out int pClr
+            );
+
+        void SetRenderingPrefs(
+            [In] MFVideoRenderPrefs dwRenderFlags
+            );
+
+        void GetRenderingPrefs(
+            out MFVideoRenderPrefs pdwRenderFlags
+            );
+
+        void SetFullscreen(
+            [In, MarshalAs(UnmanagedType.Bool)] bool fFullscreen
+            );
+
+        void GetFullscreen(
+            [MarshalAs(UnmanagedType.Bool)] out bool pfFullscreen
             );
     }
 

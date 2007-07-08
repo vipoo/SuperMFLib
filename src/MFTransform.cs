@@ -31,6 +31,8 @@ namespace MediaFoundation.Transform
 {
     #region Declarations
 
+#if ALLOW_UNTESTED_INTERFACES
+
     [Flags, UnmanagedName("_MFT_PROCESS_OUTPUT_STATUS")]
     public enum ProcessOutputStatus
     {
@@ -38,9 +40,13 @@ namespace MediaFoundation.Transform
         NewStreams = 0x00000100
     }
 
+#endif
+
     #endregion
 
     #region Interfaces
+
+#if ALLOW_UNTESTED_INTERFACES
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
@@ -170,6 +176,8 @@ namespace MediaFoundation.Transform
             out ProcessOutputStatus pdwStatus
             );
     }
+
+#endif
 
     #endregion
 

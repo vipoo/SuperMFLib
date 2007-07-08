@@ -54,8 +54,8 @@ namespace Testv10
             o2 = TestGetItem2(new PropVariant(long.MaxValue));
             Debug.Assert(o2.GetLong() == long.MaxValue);
 
-            o2 = TestGetItem2(new PropVariant(typeof(IUnknown).GUID));
-            Debug.Assert(o2.GetGuid() == typeof(IUnknown).GUID);
+            o2 = TestGetItem2(new PropVariant(typeof(IMFAttributes).GUID));
+            Debug.Assert(o2.GetGuid() == typeof(IMFAttributes).GUID);
 
             o2 = TestGetItem2(new PropVariant(b));
             b2 = o2.GetBlob();

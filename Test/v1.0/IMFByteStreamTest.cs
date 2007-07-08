@@ -101,37 +101,43 @@ namespace Testv10
         {
             int iReq = 32;
             int iRead;
-            byte [] b = new byte[iReq];
+            IntPtr b = Marshal.AllocCoTaskMem(iReq);
 
             m_bs.Read(b, iReq, out iRead);
+
+            Marshal.FreeCoTaskMem(b);
         }
 
         void TestBeginRead()
         {
             int iReq = 32;
-            byte [] b = new byte[iReq];
+            IntPtr b = Marshal.AllocCoTaskMem(iReq);
 
             m_bs.BeginRead(b, iReq, this, this);
             m_mre.WaitOne(-1, true);
+
+            Marshal.FreeCoTaskMem(b);
         }
 
         void TestWrite()
         {
             int iWrote;
             int iReq = 32;
-            byte [] b = new byte[iReq];
+            IntPtr b = Marshal.AllocCoTaskMem(iReq);
             m_bs.Write(b, iReq, out iWrote);
 
             Debug.Assert(iWrote == iReq);
+            Marshal.FreeCoTaskMem(b);
         }
 
         void TestBeginWrite()
         {
             int iReq = 32;
-            byte[] b = new byte[iReq];
+            IntPtr b = Marshal.AllocCoTaskMem(iReq);
             m_bs.BeginWrite(b, iReq, this, this);
 
             m_mre.WaitOne(-1, true);
+            Marshal.FreeCoTaskMem(b);
         }
 
         void TestSeek()

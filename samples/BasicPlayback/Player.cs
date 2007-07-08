@@ -280,7 +280,9 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     void IMFAsyncCallback.GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
     {
-        throw new COMException("IMFAsyncCallback.GetParameters not implemented in Player", E_NotImplemented);
+        pdwFlags = MFASync.FastIOProcessingCallback;
+        pdwQueue = MFAsyncCallbackQueue.Standard;
+        //throw new COMException("IMFAsyncCallback.GetParameters not implemented in Player", E_NotImplemented);
     }
 
     void IMFAsyncCallback.Invoke(IMFAsyncResult pResult)
@@ -636,14 +638,14 @@ class CPlayer : COMBase, IMFAsyncCallback
             MFError.ThrowExceptionForHR(hr);
 
             // Create an IMFActivate object for the renderer, based on the media type.
-            if (CLSID.MFMediaType_Audio == guidMajorType)
+            if (MFMediaType.Audio == guidMajorType)
             {
                 // Create the audio renderer.
                 TRACE(string.Format("Stream {0}: audio stream", streamID));
                 hr = MFDll.MFCreateAudioRendererActivate(out pRendererActivate);
                 MFError.ThrowExceptionForHR(hr);
             }
-            else if (CLSID.MFMediaType_Video == guidMajorType)
+            else if (MFMediaType.Video == guidMajorType)
             {
                 // Create the video renderer.
                 TRACE(string.Format("Stream {0}: video stream", streamID));
@@ -689,15 +691,27 @@ class CPlayer : COMBase, IMFAsyncCallback
 	    // Note: This call is expected to fail if the source
 	    // does not have video.
 
-        int hr = MFDll.MFGetService(
-		    m_pSession,
-            MFServices.MR_VIDEO_RENDER_SERVICE,
-		    typeof(IMFVideoDisplayControl).GUID,
-		    out o
-		    );
-        MFError.ThrowExceptionForHR(hr);
+        try
+        {
+            int hr = MFDll.MFGetService(
+                m_pSession,
+                MFServices.MR_VIDEO_RENDER_SERVICE,
+                typeof(IMFVideoDisplayControl).GUID,
+                out o
+                );
+            MFError.ThrowExceptionForHR(hr);
 
-        m_pVideoDisplay = o as IMFVideoDisplayControl;
+            m_pVideoDisplay = o as IMFVideoDisplayControl;
+        }
+        catch (COMException ce)
+        {
+            if (ce.ErrorCode != COMBase.E_NoInterface)
+            {
+                throw;
+            }
+
+            m_pVideoDisplay = null;
+        }
 
         try
         {
@@ -705,7 +719,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
         catch(Exception ce)
         {
-            hr = ParseError(ce);
+            int hr = ParseError(ce);
             NotifyError(hr);
 	    }
 

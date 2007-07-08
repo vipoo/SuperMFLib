@@ -37,12 +37,12 @@ namespace WavSourceFilter
 
         #region IMFByteStreamHandler methods
 
-        public int BeginCreateObject(
+        public void BeginCreateObject(
             IMFByteStream pByteStream,
             string pwszURL,
             MFResolution dwFlags,
             IPropertyStore pProps,              // Can be NULL.
-            out IUnknown ppIUnknownCancelCookie,  // Can be NULL.
+            out object ppIUnknownCancelCookie,  // Can be NULL.
             IMFAsyncCallback pCallback,
             object punkState                  // Can be NULL
         )
@@ -53,41 +53,33 @@ namespace WavSourceFilter
 
             if ((pByteStream == null) || (pwszURL == null) || (pCallback == null))
             {
-                return E_InvalidArgument;
+                throw new COMException("bad stream, url, or callback", E_InvalidArgument);
             }
 
             IMFAsyncResult pResult = null;
-            int hr;
 
             WavSource pSource = new WavSource();
 
-            hr = pSource.Open(pByteStream);
-            if (Succeeded(hr))
-            {
-                hr = MFDll.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
-                if (Succeeded(hr))
-                {
-                    hr = MFDll.MFInvokeCallback(pResult);
-                }
-            }
+            pSource.Open(pByteStream);
+
+            int hr = MFDll.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = MFDll.MFInvokeCallback(pResult);
+            MFError.ThrowExceptionForHR(hr);
 
             if (pResult != null)
             {
                 Marshal.ReleaseComObject(pResult);
             }
-
-            m_Log.WriteLine(string.Format("BeginCreateObject exit {0}", hr));
-
-            return hr;
         }
 
-        public int EndCreateObject(
+        public void EndCreateObject(
             IMFAsyncResult pResult,
             out MFObjectType pObjectType,
             out object ppObject
         )
         {
-            int hr = S_Ok;
             pObjectType = MFObjectType.Invalid;
             ppObject = null;
 
@@ -95,47 +87,33 @@ namespace WavSourceFilter
 
             if (pResult == null)
             {
-                return E_InvalidArgument;
+                throw new COMException("invalid IMFAsyncResult", E_InvalidArgument);
             }
 
-            hr = pResult.GetObject(out ppObject);
+            pResult.GetObject(out ppObject);
 
-            if (Succeeded(hr))
-            {
-                // Minimal sanity check - is it really a media source?
-                IMFMediaSource pSource = ppObject as IMFMediaSource;
+            // Minimal sanity check - is it really a media source?
+            IMFMediaSource pSource = (IMFMediaSource)ppObject;
 
-                if (pSource != null)
-                {
-                    pObjectType = MFObjectType.MediaSource;
-                }
-                else
-                {
-                    hr = E_NoInterface;
-                }
-            }
+            pObjectType = MFObjectType.MediaSource;
 
             // unneeded SAFE_RELEASE(pSource);
             // unneeded SAFE_RELEASE(ppObject);
-
-            return hr;
-
         }
 
-        public int CancelObjectCreation(object pIUnknownCancelCookie)
+        public void CancelObjectCreation(object pIUnknownCancelCookie)
         {
             m_Log.WriteLine("CancelObjectCreation");
 
-            return E_NotImplemented;
+            throw new COMException("Not implemented", E_NotImplemented);
         }
 
-        public int GetMaxNumberOfBytesRequiredForResolution(out long pqwBytes)
+        public void GetMaxNumberOfBytesRequiredForResolution(out long pqwBytes)
         {
             m_Log.WriteLine("GetMaxNumberOfBytesRequiredForResolution");
 
             // In a canonical PCM .wav file, the start of the 'data' chunk is at byte offset 44.
             pqwBytes = 44;
-            return S_Ok;
         }
 
         #endregion

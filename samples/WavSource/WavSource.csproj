@@ -79,14 +79,16 @@
     <None Include="WavSource.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="MediaFoundation, Version=0.9.0.0, Culture=neutral, PublicKeyToken=36fa660e1d6ebf8d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\src\bin\Debug\MediaFoundation.dll</HintPath>
-    </Reference>
     <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Windows\Microsoft.NET\Framework64\v2.0.50727\System.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MediaFoundation.csproj">
+      <Project>{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}</Project>
+      <Name>MediaFoundation</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -594,7 +594,7 @@ namespace MediaFoundation.Misc
     Guid("0000000C-0000-0000-C000-000000000046")]
     public interface IStream : ISequentialStream
     {
-    #region ISequentialStream Methods
+        #region ISequentialStream Methods
 
         new void Read(
             IntPtr pv,

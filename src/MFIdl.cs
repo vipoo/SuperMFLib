@@ -964,7 +964,7 @@ namespace MediaFoundation
         Tampered
     }
 
-    [StructLayout(LayoutKind.Explicit, Pack=8), UnmanagedName("unnamed internal struct")]
+    [StructLayout(LayoutKind.Explicit, Pack = 8), UnmanagedName("unnamed internal struct")]
     public struct Unnamed1
     {
         [FieldOffset(0)]
@@ -975,7 +975,7 @@ namespace MediaFoundation
         public long u64;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack=4), UnmanagedName("MF_LEAKY_BUCKET_PAIR")]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MF_LEAKY_BUCKET_PAIR")]
     public struct MF_LeakyBucketPair
     {
         public int dwBitrate;
@@ -1019,7 +1019,7 @@ namespace MediaFoundation
         public float dRate;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack=4), UnmanagedName("MFINPUTTRUSTAUTHORITY_ACCESS_PARAMS")]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFINPUTTRUSTAUTHORITY_ACCESS_PARAMS")]
     public struct MFInputTrustAuthorityAccessParams
     {
         public int dwSize;
@@ -1029,7 +1029,7 @@ namespace MediaFoundation
         public int cbExtensionOffset;
         public int cbExtensionSize;
         public int cActions;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst=1)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
         public MFInputTrustAuthorityAction[] rgOutputActions;
     }
 
@@ -1105,7 +1105,7 @@ namespace MediaFoundation
         Event
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack=8), UnmanagedName("MFT_INPUT_STREAM_INFO")]
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFT_INPUT_STREAM_INFO")]
     public struct MFTInputStreamInfo
     {
         public long hnsMaxLatency;
@@ -1138,7 +1138,7 @@ namespace MediaFoundation
         public IMFCollection pEvents;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack=4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
     public struct MFTOutputStreamInfo
     {
         public MFTOutputStreamInfoFlags dwFlags;
@@ -1146,7 +1146,7 @@ namespace MediaFoundation
         public int cbAlignment;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack=8), UnmanagedName("MFTOPONODE_ATTRIBUTE_UPDATE")]
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFTOPONODE_ATTRIBUTE_UPDATE")]
     public struct MFTopoNodeAttributeUpdate
     {
         public long NodeId;
@@ -1451,10 +1451,10 @@ namespace MediaFoundation
     public interface IMFContentProtectionManager
     {
         void BeginEnableContent(
-              IMFActivate  pEnablerActivate,
-              IMFTopology  pTopo,
-              IMFAsyncCallback  pCallback,
-              [MarshalAs(UnmanagedType.Interface)] object punkState
+            IMFActivate pEnablerActivate,
+            IMFTopology pTopo,
+            IMFAsyncCallback pCallback,
+            [MarshalAs(UnmanagedType.Interface)] object punkState
             );
 
         void EndEnableContent(
@@ -1830,7 +1830,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFOutputPolicy : IMFAttributes
     {
-    #region IMFAttributes methods
+        #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1982,7 +1982,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-    #endregion
+        #endregion
 
         void GenerateRequiredSchemas(
             [In] int dwAttributes,
@@ -2006,7 +2006,7 @@ namespace MediaFoundation
     Guid("7BE0FC5B-ABD9-44FB-A5C8-F50136E71599")]
     public interface IMFOutputSchema : IMFAttributes
     {
-    #region IMFAttributes methods
+        #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -2158,7 +2158,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-    #endregion
+        #endregion
 
         void GetSchemaType(
             out Guid pguidSchemaType
@@ -2263,7 +2263,7 @@ namespace MediaFoundation
             out MFClockProperties pClockProperties
             );
 
-    #endregion
+        #endregion
 
         void GetUnderlyingClock(
             [MarshalAs(UnmanagedType.Interface)] out IMFClock ppClock
@@ -2439,7 +2439,7 @@ namespace MediaFoundation
     Guid("8C7B80BF-EE42-4B59-B1DF-55668E1BDCA8")]
     public interface IMFSampleGrabberSinkCallback : IMFClockStateSink
     {
-    #region IMFClockStateSink methods
+        #region IMFClockStateSink methods
 
         new void OnClockStart(
             [In] long hnsSystemTime,
@@ -2463,7 +2463,7 @@ namespace MediaFoundation
             [In] float flRate
             );
 
-    #endregion
+        #endregion
 
         void OnSetPresentationClock(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
@@ -2661,7 +2661,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFStreamSink : IMFMediaEventGenerator
     {
-    #region IMFMediaEventGenerator methods
+        #region IMFMediaEventGenerator methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -2683,7 +2683,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
 
-    #endregion
+        #endregion
 
         void GetMediaSink(
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaSink ppMediaSink
@@ -2826,7 +2826,7 @@ namespace MediaFoundation
             );
 
         void EndRegisterPlatformWorkQueueWithMMCSS(
-            IMFAsyncResult  pResult,
+            IMFAsyncResult pResult,
             out int pdwTaskId
             );
 
@@ -4194,3 +4194,4 @@ namespace MediaFoundation
     #endregion
 
 }
+

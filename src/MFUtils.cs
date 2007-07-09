@@ -525,7 +525,7 @@ namespace MediaFoundation.Utils
             else
             {
                 const string TEXT = "(Exception from HRESULT: 0x";
-                // 		Message	"The system cannot find the file specified. (Exception from HRESULT: 0x80070002)"
+                //      Message "The system cannot find the file specified. (Exception from HRESULT: 0x80070002)"
                 int iPos = e.Message.LastIndexOf(TEXT);
                 if (iPos < 0)
                 {

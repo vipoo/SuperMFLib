@@ -209,7 +209,7 @@ namespace MediaFoundation
         void Start(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In] PropVariant pvarStartPosition
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarStartPosition
             );
 
         void Stop();

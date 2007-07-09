@@ -136,7 +136,7 @@ namespace WavSourceFilter
 
         public void EndGetEvent(
             //IMFAsyncResult pResult, 
-            IntPtr pResult, 
+            IntPtr pResult,
             out IMFMediaEvent ppEvent
             )
         {
@@ -311,10 +311,10 @@ namespace WavSourceFilter
 
         #region Other Public methods
 
-        internal long GetCurrentPosition() 
+        internal long GetCurrentPosition()
         {
             m_Log.WriteLine("GetCurrentPosition");
-            return m_rtCurrentPosition; 
+            return m_rtCurrentPosition;
         }
 
         internal void SetPosition(long rtNewPosition)
@@ -671,10 +671,10 @@ namespace WavSourceFilter
         //-------------------------------------------------------------------
 
         public void Start(
-                   IMFPresentationDescriptor pPresentationDescriptor,
-                   Guid pguidTimeFormat,
-                   PropVariant pvarStartPosition
-                   )
+           IMFPresentationDescriptor pPresentationDescriptor,
+           Guid pguidTimeFormat,
+           PropVariant pvarStartPosition
+           )
         {
             m_Log.WriteLine("-Start");
 
@@ -703,7 +703,7 @@ namespace WavSourceFilter
                 }
 
                 // Check the start position.
-                if ( (pvarStartPosition == null) || (pvarStartPosition.GetAttribType() == MFAttributeType.None) )
+                if ((pvarStartPosition == null) || (pvarStartPosition.GetMFAttributeType() == MFAttributeType.None))
                 {
                     // Start position is "current position".
                     // For stopped, that means 0. Otherwise, use the current position.
@@ -717,7 +717,7 @@ namespace WavSourceFilter
                         bIsRestartFromCurrentPosition = true;
                     }
                 }
-                else if (pvarStartPosition.GetAttribType() == MFAttributeType.Uint64)
+                else if (pvarStartPosition.GetMFAttributeType() == MFAttributeType.Uint64)
                 {
                     // Start position is given in pvarStartPosition in 100-ns units.
                     llStartOffset = (long)pvarStartPosition;
@@ -902,7 +902,7 @@ namespace WavSourceFilter
                     {
                         m_pEventQueue.Shutdown();
                     }
-                    catch {}
+                    catch { }
                 }
 
                 // Release objects. (Even if Shutdown Failed for some reason.)
@@ -1129,9 +1129,9 @@ namespace WavSourceFilter
             //Marshal.PtrToStructure(ip, pFormat);
 
             int hr = MFDll.MFCreateWaveFormatExFromMFMediaType(
-                pMediaType, 
-                out pFormat, 
-                out iSize, 
+                pMediaType,
+                out pFormat,
+                out iSize,
                 MFWaveFormatExConvertFlags.Normal);
             MFError.ThrowExceptionForHR(hr);
 
@@ -1144,7 +1144,7 @@ namespace WavSourceFilter
             {
                 throw new COMException("wave formats don't match", MFError.MF_E_INVALIDMEDIATYPE);
             }
-            
+
             //SAFE_RELEASE(pStreamDescriptor);
             //SAFE_RELEASE(pHandler);
             //SAFE_RELEASE(pMediaType);
@@ -1470,7 +1470,7 @@ namespace WavSourceFilter
                 // structure. For uncompressed PCM audio, field is always zero.
                 int cbMinFormatSize = iWaveFormatExSize - Marshal.SizeOf(typeof(short));
 
-                int cbFormatSize = 0;		// Size of the actual format block in the file.
+                int cbFormatSize = 0;       // Size of the actual format block in the file.
 
                 // Validate the size
                 if (Chunk().DataSize() < cbMinFormatSize)

@@ -51,10 +51,23 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Explicit)]
     public class PropVariant
     {
+        public enum VariantType
+        {
+            None = 0x0,
+            Blob = 0x1011,
+            Double = 0x5,
+            Guid = 0x48,
+            IUnknown = 13,
+            String = 0x1f,
+            Uint32 = 0x13,
+            Uint64 = 0x15,
+            StringArray = 0x1000 + 0x1f
+        }
+
         #region Member variables
 
         [FieldOffset(0)]
-        private MFAttributeType type;
+        private VariantType type;
 
         [FieldOffset(2)]
         private short reserved1;
@@ -84,43 +97,58 @@ namespace MediaFoundation.Misc
 
         public PropVariant()
         {
-            type = MFAttributeType.None;
+            type = VariantType.None;
         }
 
         public PropVariant(string value)
         {
-            type = MFAttributeType.String;
+            type = VariantType.String;
             ptr = Marshal.StringToCoTaskMemUni(value);
+        }
+
+        public PropVariant(string[] value)
+        {
+            type = VariantType.StringArray;
+            ptr = Marshal.AllocCoTaskMem(4 + IntPtr.Size);
+            Marshal.WriteInt32(ptr, value.Length);
+
+            IntPtr ip = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
+            Marshal.WriteIntPtr(ptr, 4, ip);
+
+            for (int x = 0; x < value.Length; x++)
+            {
+                Marshal.WriteIntPtr(ip, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
+            }
         }
 
         public PropVariant(int value)
         {
-            type = MFAttributeType.Uint32;
+            type = VariantType.Uint32;
             intValue = value;
         }
 
         public PropVariant(double value)
         {
-            type = MFAttributeType.Double;
+            type = VariantType.Double;
             doubleValue = value;
         }
 
         public PropVariant(long value)
         {
-            type = MFAttributeType.Uint64;
+            type = VariantType.Uint64;
             longValue = value;
         }
 
         public PropVariant(Guid value)
         {
-            type = MFAttributeType.Guid;
+            type = VariantType.Guid;
             ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(value));
             Marshal.StructureToPtr(value, ptr, false);
         }
 
         public PropVariant(byte[] value)
         {
-            type = MFAttributeType.Blob;
+            type = VariantType.Blob;
 
             blobValue.cbSize = value.Length;
             blobValue.pBlobData = Marshal.AllocCoTaskMem(value.Length);
@@ -129,7 +157,7 @@ namespace MediaFoundation.Misc
 
         public PropVariant(object value)
         {
-            type = MFAttributeType.IUnknown;
+            type = VariantType.IUnknown;
             ptr = Marshal.GetIUnknownForObject(value);
         }
 
@@ -141,6 +169,11 @@ namespace MediaFoundation.Misc
         public static explicit operator string(PropVariant f)
         {
             return f.GetString();
+        }
+
+        public static explicit operator string[](PropVariant f)
+        {
+            return f.GetStringArray();
         }
 
         public static explicit operator int(PropVariant f)
@@ -163,7 +196,7 @@ namespace MediaFoundation.Misc
             return f.GetGuid();
         }
 
-        public static explicit operator byte [] (PropVariant f)
+        public static explicit operator byte[](PropVariant f)
         {
             return f.GetBlob();
         }
@@ -175,34 +208,77 @@ namespace MediaFoundation.Misc
         // will linger until the GC cleans up.  Not what I think I
         // want.
 
-        public MFAttributeType GetAttribType()
+        public MFAttributeType GetMFAttributeType()
         {
-            return type;
+            if (type != VariantType.StringArray)
+            {
+                return (MFAttributeType)type;
+            }
+            throw new Exception("Type is not a MFAttributeType");
+        }
+
+        public VariantType GetAttributeType()
+        {
+            if (type != VariantType.StringArray)
+            {
+                return type;
+            }
+            throw new Exception("Type is not a MFAttributeType");
         }
 
         public void Clear()
         {
-            if (type == MFAttributeType.String || type == MFAttributeType.Guid)
+            if (type == VariantType.String || type == VariantType.Guid)
             {
                 Marshal.FreeCoTaskMem(ptr);
             }
-            else if (type == MFAttributeType.IUnknown)
+            else if (type == VariantType.IUnknown)
             {
                 Marshal.Release(ptr);
             }
-            else if (type == MFAttributeType.Blob)
+            else if (type == VariantType.Blob)
             {
                 Marshal.FreeCoTaskMem(blobValue.pBlobData);
                 blobValue.pBlobData = IntPtr.Zero;
+            }
+            else if (type == VariantType.StringArray)
+            {
+                int iCount = Marshal.ReadInt32(ptr);
+                IntPtr ip = Marshal.ReadIntPtr(ptr, 4);
+
+                for (int x = 0; x < iCount; x++)
+                {
+                    Marshal.FreeCoTaskMem(Marshal.ReadIntPtr(ip, x * IntPtr.Size));
+                }
+                Marshal.FreeCoTaskMem(ip);
+                Marshal.FreeCoTaskMem(ptr);
             }
 
             ptr = IntPtr.Zero;
             type = 0;
         }
 
+        public string[] GetStringArray()
+        {
+            if (type == VariantType.StringArray)
+            {
+                string[] sa;
+
+                int iCount = Marshal.ReadInt32(ptr);
+                sa = new string[iCount];
+
+                IntPtr ip = Marshal.ReadIntPtr(ptr, 4);
+                for (int x = 0; x < iCount; x++)
+                {
+                    sa[x] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(ip, x * IntPtr.Size));
+                }
+            }
+            throw new ArgumentException("PropVariant contents not a string");
+        }
+
         public string GetString()
         {
-            if (type == MFAttributeType.String)
+            if (type == VariantType.String)
             {
                 return Marshal.PtrToStringUni(ptr);
             }
@@ -211,7 +287,7 @@ namespace MediaFoundation.Misc
 
         public int GetInt()
         {
-            if (type == MFAttributeType.Uint32)
+            if (type == VariantType.Uint32)
             {
                 return intValue;
             }
@@ -220,7 +296,7 @@ namespace MediaFoundation.Misc
 
         public long GetLong()
         {
-            if (type == MFAttributeType.Uint64)
+            if (type == VariantType.Uint64)
             {
                 return longValue;
             }
@@ -229,7 +305,7 @@ namespace MediaFoundation.Misc
 
         public double GetDouble()
         {
-            if (type == MFAttributeType.Double)
+            if (type == VariantType.Double)
             {
                 return doubleValue;
             }
@@ -238,7 +314,7 @@ namespace MediaFoundation.Misc
 
         public Guid GetGuid()
         {
-            if (type == MFAttributeType.Guid)
+            if (type == VariantType.Guid)
             {
                 return (Guid)Marshal.PtrToStructure(ptr, typeof(Guid));
             }
@@ -247,7 +323,7 @@ namespace MediaFoundation.Misc
 
         public byte[] GetBlob()
         {
-            if (type == MFAttributeType.Blob)
+            if (type == VariantType.Blob)
             {
                 byte[] b = new byte[blobValue.cbSize];
 
@@ -260,7 +336,7 @@ namespace MediaFoundation.Misc
 
         public object GetIUnknown()
         {
-            if (type == MFAttributeType.IUnknown)
+            if (type == VariantType.IUnknown)
             {
                 return Marshal.GetObjectForIUnknown(ptr);
             }
@@ -518,7 +594,7 @@ namespace MediaFoundation.Misc
     Guid("0000000C-0000-0000-C000-000000000046")]
     public interface IStream : ISequentialStream
     {
-        #region ISequentialStream Methods
+    #region ISequentialStream Methods
 
         new void Read(
             IntPtr pv,

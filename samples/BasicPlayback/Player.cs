@@ -77,14 +77,14 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     public int OpenURL(string sURL)
     {
-	    TRACE("CPlayer::OpenURL");
-	    TRACE("URL = " + sURL);
+        TRACE("CPlayer::OpenURL");
+        TRACE("URL = " + sURL);
 
-	    // 1. Create a new media session.
-	    // 2. Create the media source.
-	    // 3. Create the topology.
-	    // 4. Queue the topology [asynchronous]
-	    // 5. Start playback [asynchronous - does not happen in this method.]
+        // 1. Create a new media session.
+        // 2. Create the media source.
+        // 3. Create the topology.
+        // 4. Queue the topology [asynchronous]
+        // 5. Start playback [asynchronous - does not happen in this method.]
 
         int hr = S_Ok;
         try
@@ -119,21 +119,21 @@ class CPlayer : COMBase, IMFAsyncCallback
             m_state = PlayerState.Ready;
         }
 
-	    return hr;
+        return hr;
     }
 
     public int Play()
     {
-	    TRACE("CPlayer::Pause");
+        TRACE("CPlayer::Pause");
 
         if (m_state != PlayerState.Paused)
-	    {
-		    return E_Fail;
-	    }
+        {
+            return E_Fail;
+        }
         if (m_pSession == null || m_pSource == null)
-	    {
-		    return E_Unexpected;
-	    }
+        {
+            return E_Unexpected;
+        }
 
         int hr = S_Ok;
         
@@ -142,7 +142,7 @@ class CPlayer : COMBase, IMFAsyncCallback
             StartPlayback();
 
             m_state = PlayerState.StartPending;
-		    NotifyState();
+            NotifyState();
         }
         catch (Exception ce)
         {
@@ -150,7 +150,7 @@ class CPlayer : COMBase, IMFAsyncCallback
             NotifyError(hr);
         }
 
-	    return hr;
+        return hr;
     }
 
     public int Pause()
@@ -186,7 +186,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     public int Shutdown()
     {
-	    TRACE("CPlayer::ShutDown");
+        TRACE("CPlayer::ShutDown");
 
         int hr = S_Ok;
 
@@ -209,10 +209,10 @@ class CPlayer : COMBase, IMFAsyncCallback
             hr = ParseError(ce);
         }
 
-	    return hr;
+        return hr;
     }
 
-	// Video functionality
+    // Video functionality
     public int Repaint()
     {
         int hr = S_Ok;
@@ -264,7 +264,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         return hr;
     }
 
-	public PlayerState GetState() 
+    public PlayerState GetState() 
     { 
         return m_state; 
     }
@@ -289,8 +289,8 @@ class CPlayer : COMBase, IMFAsyncCallback
     {
         IMFMediaEvent pEvent = null;
         MediaEventType meType = MediaEventType.MEUnknown;  // Event type
-        int hrStatus = 0;	        // Event status
-        MF_TopoStatus TopoStatus = MF_TopoStatus.Invalid; // Used with MESessionTopologyStatus event.    
+        int hrStatus = 0;           // Event status
+        MFTopoStatus TopoStatus = MFTopoStatus.Invalid; // Used with MESessionTopologyStatus event.    
 
         try
         {
@@ -316,10 +316,10 @@ class CPlayer : COMBase, IMFAsyncCallback
                         // Get the status code.
                         int i;
                         pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out i);
-                        TopoStatus = (MF_TopoStatus)i;
+                        TopoStatus = (MFTopoStatus)i;
                         switch (TopoStatus)
                         {
-                            case MF_TopoStatus.Ready:
+                            case MFTopoStatus.Ready:
                                 OnTopologyReady(pEvent);
                                 break;
                             default:
@@ -368,29 +368,29 @@ class CPlayer : COMBase, IMFAsyncCallback
     #region Protected methods
 
     // NotifyState: Notifies the application when the state changes.
-	protected void NotifyState()
-	{
-		PostMessage(m_hwndEvent, WM_APP_NOTIFY, (int)m_state, IntPtr.Zero);
-	}
+    protected void NotifyState()
+    {
+        PostMessage(m_hwndEvent, WM_APP_NOTIFY, (int)m_state, IntPtr.Zero);
+    }
 
-	// NotifyState: Notifies the application when an error occurs.
+    // NotifyState: Notifies the application when an error occurs.
     protected void NotifyError(int hr)
-	{
-		TRACE("NotifyError: " + hr.ToString());
+    {
+        TRACE("NotifyError: " + hr.ToString());
         m_state = PlayerState.Ready;
-		PostMessage(m_hwndEvent, WM_APP_ERROR, hr, IntPtr.Zero);
-	}
+        PostMessage(m_hwndEvent, WM_APP_ERROR, hr, IntPtr.Zero);
+    }
 
     protected void CreateSession()
     {
-	    // Close the old session, if any.
+        // Close the old session, if any.
         CloseSession();
 
-	    // Create the media session.
+        // Create the media session.
         int hr = MFDll.MFCreateMediaSession(null, out m_pSession);
         MFError.ThrowExceptionForHR(hr);
 
-	    // Start pulling events from the media session
+        // Start pulling events from the media session
         m_pSession.BeginGetEvent(this, null);
     }
 
@@ -404,42 +404,42 @@ class CPlayer : COMBase, IMFAsyncCallback
 
         if (m_pSession != null)
         {
-		    m_pSession.Close();
+            m_pSession.Close();
 
-		    // Wait for the close operation to complete
-		    bool res = m_hCloseEvent.WaitOne(5000, true);
-		    if (!res)
-		    {
-			    TRACE(("WaitForSingleObject timed out!"));
-		    }
+            // Wait for the close operation to complete
+            bool res = m_hCloseEvent.WaitOne(5000, true);
+            if (!res)
+            {
+                TRACE(("WaitForSingleObject timed out!"));
+            }
         }
 
-	    // Complete shutdown operations
+        // Complete shutdown operations
 
-	    // 1. Shut down the media source
-	    if (m_pSource != null)
-	    {
-		    m_pSource.Shutdown();
+        // 1. Shut down the media source
+        if (m_pSource != null)
+        {
+            m_pSource.Shutdown();
             SafeRelease(m_pSource);
             m_pSource = null;
         }
 
-	    // 2. Shut down the media session. (Synchronous operation, no events.)
-	    if (m_pSession != null)
-	    {
-		    m_pSession.Shutdown();
+        // 2. Shut down the media session. (Synchronous operation, no events.)
+        if (m_pSession != null)
+        {
+            m_pSession.Shutdown();
             Marshal.ReleaseComObject(m_pSession);
             m_pSession = null;
-	    }
+        }
     }
 
     protected void StartPlayback()
     {
-	    TRACE("CPlayer::StartPlayback");
+        TRACE("CPlayer::StartPlayback");
 
         Debug.Assert(m_pSession != null);
 
-	    m_pSession.Start(Guid.Empty, null);
+        m_pSession.Start(Guid.Empty, new PropVariant());
     }
 
     protected void CreateMediaSource(string sURL)
@@ -449,38 +449,38 @@ class CPlayer : COMBase, IMFAsyncCallback
         IMFSourceResolver pSourceResolver = null;
         object pSource = null;
 
-	    // Create the source resolver.
+        // Create the source resolver.
         int hr = MFDll.MFCreateSourceResolver(out pSourceResolver);
         MFError.ThrowExceptionForHR(hr);
 
-	    // Use the source resolver to create the media source.
+        // Use the source resolver to create the media source.
         MFObjectType ObjectType = MFObjectType.Invalid;
 
         pSourceResolver.CreateObjectFromURL(
-                sURL,						// URL of the source.
-                MFResolution.MediaSource,	// Create a source object.
-                null,						// Optional property store.
-                out ObjectType,				// Receives the created object type. 
-                out pSource					// Receives a pointer to the media source.
+                sURL,                       // URL of the source.
+                MFResolution.MediaSource,   // Create a source object.
+                null,                       // Optional property store.
+                out ObjectType,             // Receives the created object type. 
+                out pSource                 // Receives a pointer to the media source.
             );
 
         // Get the IMFMediaSource interface from the media source.
         m_pSource = (IMFMediaSource)pSource;
 
-	    // Clean up
+        // Clean up
         Marshal.ReleaseComObject(pSourceResolver);
     }
 
     protected void CreateTopologyFromSource(out IMFTopology ppTopology)
     {
-	    TRACE("CPlayer::CreateTopologyFromSource");
+        TRACE("CPlayer::CreateTopologyFromSource");
 
         Debug.Assert(m_pSession != null);
         Debug.Assert(m_pSource != null);
 
         IMFTopology pTopology = null;
         IMFPresentationDescriptor pSourcePD = null;
-	    int cSourceStreams = 0;
+        int cSourceStreams = 0;
 
         try
         {
@@ -523,7 +523,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         int iStream
         )
     {
-	    TRACE("CPlayer::AddBranchToPartialTopology");
+        TRACE("CPlayer::AddBranchToPartialTopology");
 
         Debug.Assert(pTopology != null);
 
@@ -610,11 +610,11 @@ class CPlayer : COMBase, IMFAsyncCallback
         IMFMediaTypeHandler pHandler = null;
         IMFActivate pRendererActivate = null;
 
-	    Guid guidMajorType = Guid.Empty;
+        Guid guidMajorType = Guid.Empty;
         int hr = S_Ok;
 
-	    // Get the stream ID.
-	    int streamID = 0;
+        // Get the stream ID.
+        int streamID = 0;
 
         try
         {
@@ -678,18 +678,18 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
     }
 
-	// Media event handlers
+    // Media event handlers
     protected void OnTopologyReady(IMFMediaEvent pEvent)
     {
         object o;
         TRACE("CPlayer::OnTopologyReady");
 
-	    // Ask for the IMFVideoDisplayControl interface.
-	    // This interface is implemented by the EVR and is
-	    // exposed by the media session as a service.
+        // Ask for the IMFVideoDisplayControl interface.
+        // This interface is implemented by the EVR and is
+        // exposed by the media session as a service.
 
-	    // Note: This call is expected to fail if the source
-	    // does not have video.
+        // Note: This call is expected to fail if the source
+        // does not have video.
 
         try
         {
@@ -721,44 +721,44 @@ class CPlayer : COMBase, IMFAsyncCallback
         {
             int hr = ParseError(ce);
             NotifyError(hr);
-	    }
+        }
 
-	    // If we succeeded, the Start call is pending. Don't notify the app yet.
+        // If we succeeded, the Start call is pending. Don't notify the app yet.
     }
 
     protected void OnSessionStarted(IMFMediaEvent pEvent)
     {
-	    TRACE("CPlayer::OnSessionStarted");
+        TRACE("CPlayer::OnSessionStarted");
 
         m_state = PlayerState.Started;
-	    NotifyState();
+        NotifyState();
     }
 
     protected void OnSessionPaused(IMFMediaEvent pEvent)
     {
-	    TRACE("CPlayer::OnSessionPaused");
+        TRACE("CPlayer::OnSessionPaused");
 
         m_state = PlayerState.Paused;
-	    NotifyState();
+        NotifyState();
     }
 
     protected void OnSessionClosed(IMFMediaEvent pEvent)
     {
-	    TRACE("CPlayer::OnSessionClosed");
+        TRACE("CPlayer::OnSessionClosed");
 
-	    // The application thread is waiting on this event, inside the 
-	    // CPlayer::CloseSession method. 
+        // The application thread is waiting on this event, inside the 
+        // CPlayer::CloseSession method. 
         m_hCloseEvent.Set();
     }
 
     protected void OnPresentationEnded(IMFMediaEvent pEvent)
     {
-	    TRACE("CPlayer::OnPresentationEnded");
+        TRACE("CPlayer::OnPresentationEnded");
 
         // The session puts itself into the stopped state autmoatically.
 
         m_state = PlayerState.Ready;
-	    NotifyState();
+        NotifyState();
     }
 
     #endregion
@@ -774,14 +774,14 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     #region Member Variables
 
-    protected IMFMediaSession			m_pSession;
-	protected IMFMediaSource			m_pSource;
-	protected IMFVideoDisplayControl	m_pVideoDisplay;
+    protected IMFMediaSession           m_pSession;
+    protected IMFMediaSource            m_pSource;
+    protected IMFVideoDisplayControl    m_pVideoDisplay;
 
-    protected IntPtr m_hwndVideo;		// Video window.
-    protected IntPtr m_hwndEvent;		// App window to receive events.
-    protected PlayerState m_state;			// Current state of the media session.
-    protected AutoResetEvent m_hCloseEvent;		// Event to wait on while closing
+    protected IntPtr m_hwndVideo;       // Video window.
+    protected IntPtr m_hwndEvent;       // App window to receive events.
+    protected PlayerState m_state;          // Current state of the media session.
+    protected AutoResetEvent m_hCloseEvent;     // Event to wait on while closing
 
     #endregion
 };

@@ -282,7 +282,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_ATTRIBUTES_MATCH_TYPE")]
-    public enum MF_AttributesMatchType
+    public enum MFAttributesMatchType
     {
         OurItems,
         TheirItems,
@@ -488,7 +488,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -678,7 +678,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -914,7 +914,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -1088,7 +1088,7 @@ namespace MediaFoundation
 
         void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -1315,7 +1315,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -1607,7 +1607,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 

@@ -172,11 +172,11 @@ namespace MediaFoundation
 
         [DllImport("mf.dll")]
         public static extern int MFGetSupportedSchemes(
-        [MarshalAs(UnmanagedType.Struct)] out object pPropVarSchemeArray  );
+        [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pPropVarSchemeArray  );
 
         [DllImport("mf.dll")]
         public static extern int MFGetSupportedMimeTypes(
-        [MarshalAs(UnmanagedType.Struct)] out object pPropVarMimeTypeArray);
+        [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pPropVarMimeTypeArray);
 
         [DllImport("mf.dll")]
         public static extern int MFCreatePresentationClock(
@@ -243,7 +243,7 @@ namespace MediaFoundation
 
         [DllImport("mf.dll")]
         public static extern int MFCreateSequencerSource(
-            object pReserved,
+            [MarshalAs(UnmanagedType.IUnknown)] object pReserved,
             out IMFSequencerSource ppSequencerSource
         );
 
@@ -251,7 +251,7 @@ namespace MediaFoundation
         public static extern int MFCreateSequencerSegmentOffset(
             int dwId,
             long hnsOffset,
-            [MarshalAs(UnmanagedType.Struct)] out object pvarSegmentOffset
+            [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pvarSegmentOffset
         );
 
         [DllImport("mf.dll")]
@@ -1187,7 +1187,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_TOPOSTATUS")]
-    public enum MF_TopoStatus
+    public enum MFTopoStatus
     {
         // MF_TOPOSTATUS_INVALID: Invalid value; will not be sent
         Invalid = 0,
@@ -1603,17 +1603,17 @@ namespace MediaFoundation
             );
 
         void GetAllLanguages(
-            out object ppvLanguages
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvLanguages
             );
 
         void SetProperty(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
-            [In] ref object ppvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvValue
             );
 
         void GetProperty(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
-            out object ppvValue
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvValue
             );
 
         void DeleteProperty(
@@ -1621,7 +1621,7 @@ namespace MediaFoundation
             );
 
         void GetAllPropertyNames(
-            out object ppvNames
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvNames
             );
     }
 
@@ -1795,7 +1795,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFOutputPolicy : IMFAttributes
     {
-        #region IMFAttributes methods
+    #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1815,7 +1815,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -1947,7 +1947,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        #endregion
+    #endregion
 
         void GenerateRequiredSchemas(
             [In] int dwAttributes,
@@ -1971,7 +1971,7 @@ namespace MediaFoundation
     Guid("7BE0FC5B-ABD9-44FB-A5C8-F50136E71599")]
     public interface IMFOutputSchema : IMFAttributes
     {
-        #region IMFAttributes methods
+    #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1991,7 +1991,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -2123,7 +2123,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        #endregion
+    #endregion
 
         void GetSchemaType(
             out Guid pguidSchemaType
@@ -2203,7 +2203,7 @@ namespace MediaFoundation
     Guid("868CE85C-8EA9-4F55-AB82-B009A910A805")]
     public interface IMFPresentationClock : IMFClock
     {
-        #region IMFClock methods
+    #region IMFClock methods
 
         new void GetClockCharacteristics(
             out MFClockCharacteristicsFlags pdwCharacteristics
@@ -2228,7 +2228,7 @@ namespace MediaFoundation
             out MFClockProperties pClockProperties
             );
 
-        #endregion
+    #endregion
 
         void SetTimeSource(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationTimeSource pTimeSource
@@ -2264,7 +2264,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFPresentationTimeSource : IMFClock
     {
-        #region IMFClock methods
+    #region IMFClock methods
 
         new void GetClockCharacteristics(
             out MFClockCharacteristicsFlags pdwCharacteristics
@@ -2289,7 +2289,7 @@ namespace MediaFoundation
             out MFClockProperties pClockProperties
             );
 
-        #endregion
+    #endregion
 
         void GetUnderlyingClock(
             [MarshalAs(UnmanagedType.Interface)] out IMFClock ppClock
@@ -2448,7 +2448,7 @@ namespace MediaFoundation
             );
 
         void GetStyles(
-            out object pPropVarStyleArray
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pPropVarStyleArray
             );
 
         void SetSelectedStyle(
@@ -2465,7 +2465,7 @@ namespace MediaFoundation
     Guid("8C7B80BF-EE42-4B59-B1DF-55668E1BDCA8")]
     public interface IMFSampleGrabberSinkCallback : IMFClockStateSink
     {
-        #region IMFClockStateSink methods
+    #region IMFClockStateSink methods
 
         new void OnClockStart(
             [In] long hnsSystemTime,
@@ -2489,7 +2489,7 @@ namespace MediaFoundation
             [In] float flRate
             );
 
-        #endregion
+    #endregion
 
         void OnSetPresentationClock(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
@@ -2687,7 +2687,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFStreamSink : IMFMediaEventGenerator
     {
-        #region IMFMediaEventGenerator methods
+    #region IMFMediaEventGenerator methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -2709,7 +2709,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
             );
 
-        #endregion
+    #endregion
 
         void GetMediaSink(
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaSink ppMediaSink
@@ -2729,8 +2729,8 @@ namespace MediaFoundation
 
         void PlaceMarker(
             [In] MFStreamSinkMarkerType eMarkerType,
-            [In] ref object pvarMarkerValue,
-            [In] ref object pvarContextValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarMarkerValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarContextValue
             );
 
         void Flush();
@@ -2921,7 +2921,7 @@ namespace MediaFoundation
         void Start(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In] PropVariant pvarStartPosition
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarStartPosition
             );
 
         void Stop();
@@ -2956,7 +2956,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3138,7 +3138,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3338,7 +3338,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3538,7 +3538,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3786,7 +3786,8 @@ namespace MediaFoundation
 
         void Start(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In] object pvarStartPosition);
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarStartPosition
+            );
 
         void Pause();
 
@@ -3953,7 +3954,7 @@ namespace MediaFoundation
 
         new void Compare(
             [MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs,
-            MF_AttributesMatchType MatchType,
+            MFAttributesMatchType MatchType,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 

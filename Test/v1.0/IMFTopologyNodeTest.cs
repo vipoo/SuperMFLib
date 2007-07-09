@@ -79,8 +79,7 @@ namespace Testv10
         {
             IMFTopologyNode tn;
 
-            int hr = MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
 
             m_tn.ConnectOutput(0, tn, 0);
         }
@@ -97,8 +96,7 @@ namespace Testv10
 
             IMFTopologyNode tn;
 
-            int hr = MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
 
             tn.ConnectOutput(0, m_tn, 0);
 
@@ -119,8 +117,7 @@ namespace Testv10
         {
             IMFMediaType pType, pType2;
 
-            int hr = MFDll.MFCreateMediaType(out pType);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out pType);
 
             m_tn.SetOutputPrefType(0, pType);
             m_tn.GetOutputPrefType(0, out pType2);
@@ -132,8 +129,7 @@ namespace Testv10
         {
             IMFMediaType pType, pType2;
 
-            int hr = MFDll.MFCreateMediaType(out pType);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out pType);
 
             // Returns E_NOTIMPL since this is a source node
             try
@@ -149,16 +145,14 @@ namespace Testv10
         {
             IMFTopologyNode tn;
 
-            int hr = MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
 
             tn.CloneFrom(m_tn);
         }
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out m_tn);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopologyNode(MFTopologyType.TransformNode, out m_tn);
         }
     }
 }

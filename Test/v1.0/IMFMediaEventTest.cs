@@ -61,14 +61,13 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateMediaEvent(
+            MFPlatDll.MFCreateMediaEvent(
                 MediaEventType.MESourceStarted,
                 Guid.NewGuid(),
                 313,
                 new PropVariant("asdf"),
                 out m_me
                 );
-            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

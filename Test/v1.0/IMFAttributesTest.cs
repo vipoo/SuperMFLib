@@ -75,7 +75,7 @@ namespace Testv10
 
             m_attr.GetItem(g, o2);
             m_attr.GetItemType(g, out pType);
-            Debug.Assert(o2.GetAttribType() == o.GetAttribType() && o2.GetAttribType() == pType);
+            Debug.Assert(o2.GetMFAttributeType() == o.GetMFAttributeType() && o2.GetMFAttributeType() == pType);
 
             return o2;
         }
@@ -250,27 +250,25 @@ namespace Testv10
 
             m_attr.GetCount(out iCnt1);
 
-            int hr = MFDll.MFCreateAttributes(out attr, 20);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateAttributes(out attr, 20);
 
             m_attr.CopyAllItems(attr);
             attr.GetCount(out iCnt2);
 
             Debug.Assert(iCnt1 == iCnt2 && iCnt1 > 0);
 
-            m_attr.Compare(attr, MF_AttributesMatchType.AllItems, out bRes);
+            m_attr.Compare(attr, MFAttributesMatchType.AllItems, out bRes);
             Debug.Assert(bRes);
 
             attr.DeleteAllItems();
 
-            m_attr.Compare(attr, MF_AttributesMatchType.AllItems, out bRes);
+            m_attr.Compare(attr, MFAttributesMatchType.AllItems, out bRes);
             Debug.Assert(!bRes);
         }
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateAttributes(out m_attr, 20);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateAttributes(out m_attr, 20);
         }
     }
 }

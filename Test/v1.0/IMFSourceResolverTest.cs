@@ -149,9 +149,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateSourceResolver(out m_sr);
-
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateSourceResolver(out m_sr);
         }
 
         #region IMFAsyncCallback Members

@@ -14,8 +14,7 @@ namespace Testv10
         {
             try
             {
-                int hr = MFDll.MFStartup(0x10070, MFStartup.Full);
-                MFError.ThrowExceptionForHR(hr);
+                MFPlatDll.MFStartup(0x10070, MFStartup.Full);
 
                 //IMFSourceResolverTest t01 = new IMFSourceResolverTest();
                 //t01.DoTests();
@@ -70,6 +69,18 @@ namespace Testv10
 
                 //IMFPresentationDescriptorTest t18 = new IMFPresentationDescriptorTest();
                 //t18.DoTests();
+
+                //IMFMediaSessionTest t19 = new IMFMediaSessionTest();
+                //t19.DoTests();
+
+                //IMFClockTest t20 = new IMFClockTest();
+                //t20.DoTests();
+
+                //IMFCollectionTest t21 = new IMFCollectionTest();
+                //t21.DoTests();
+
+                IMFPresentationTimeSourceTest t22 = new IMFPresentationTimeSourceTest();
+                t22.DoTests();
 
             }
             catch (Exception e)

@@ -62,8 +62,7 @@ namespace Testv10
         {
             IMFTopology tp;
 
-            int hr = MFDll.MFCreateTopology(out tp);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopology(out tp);
 
             try
             {
@@ -115,7 +114,7 @@ namespace Testv10
         {
             IMFTopologyNode pNode;
 
-            int hr = MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
+            MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
             pNode.GetTopoNodeID(out m_pid);
             pNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, null);
 
@@ -124,8 +123,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateTopology(out m_Top);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopology(out m_Top);
         }
     }
 }

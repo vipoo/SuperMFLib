@@ -40,11 +40,9 @@ namespace Testv10
         private void GetInterface()
         {
             IMFMediaType[] pmt = new IMFMediaType[1];
-            int hr = MFDll.MFCreateMediaType(out pmt[0]);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out pmt[0]);
 
-            hr = MFDll.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
         }
     }
 }

@@ -60,8 +60,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateMemoryBuffer(100, out m_mb);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMemoryBuffer(100, out m_mb);
         }
     }
 }

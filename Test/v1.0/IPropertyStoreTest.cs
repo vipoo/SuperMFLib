@@ -66,8 +66,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.CreatePropertyStore(out m_ps);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.CreatePropertyStore(out m_ps);
         }
     }
 }

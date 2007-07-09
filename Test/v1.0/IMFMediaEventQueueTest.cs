@@ -47,15 +47,13 @@ namespace Testv10
         {
             IMFMediaEvent pEvent;
 
-            int hr = MFDll.MFCreateMediaEvent(
+            MFPlatDll.MFCreateMediaEvent(
                 MediaEventType.MESourceStarted,
                 Guid.Empty,
                 0,
                 null,
                 out pEvent
                 );
-            MFError.ThrowExceptionForHR(hr);
-
             m_meq.QueueEvent(pEvent);
         }
 
@@ -86,8 +84,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateEventQueue(out m_meq);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateEventQueue(out m_meq);
         }
 
 

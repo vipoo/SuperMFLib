@@ -87,8 +87,7 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            int hr = MFDll.MFCreateMemoryBuffer(100, out pBuff);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMemoryBuffer(100, out pBuff);
 
             pBuff.SetCurrentLength(17);
 
@@ -117,16 +116,14 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            int hr = MFDll.MFCreateMemoryBuffer(17, out pBuff);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMemoryBuffer(17, out pBuff);
 
             m_ps.CopyToBuffer(pBuff);
         }
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateSample(out m_ps);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateSample(out m_ps);
         }
     }
 }

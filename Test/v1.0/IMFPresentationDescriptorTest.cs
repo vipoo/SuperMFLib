@@ -72,8 +72,7 @@ namespace Testv10
             MFObjectType pObjectType;
             object pSource;
 
-            int hr = MFDll.MFCreateSourceResolver(out m_sr);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateSourceResolver(out m_sr);
 
             m_sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",

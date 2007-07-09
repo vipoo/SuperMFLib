@@ -52,14 +52,14 @@ namespace Testv10
             IMFMediaType mt;
             MFMediaEqual f;
 
-            int hr = MFDll.MFCreateMediaType(out mt);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out mt);
 
             Guid g1 = Guid.NewGuid();
 
             mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, g1);
 
-            hr = m_mt.IsEqual(mt, out f);
+            int hr = m_mt.IsEqual(mt, out f);
+            Debug.Assert(hr == 0); // ??
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -103,8 +103,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr = MFDll.MFCreateMediaType(out m_mt);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out m_mt);
         }
     }
 }

@@ -61,8 +61,7 @@ namespace Testv10
             object pSource;
             IMFSourceResolver sr;
 
-            int hr = MFDll.MFCreateSourceResolver(out sr);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateSourceResolver(out sr);
 
             sr.CreateObjectFromURL(
                 @"file://C:\sourceforge\mflib\Test\v1.0\test.wmv",
@@ -165,8 +164,7 @@ namespace Testv10
             object pSource;
             IMFSourceResolver sr;
 
-            int hr = MFDll.MFCreateSourceResolver(out sr);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateSourceResolver(out sr);
 
             sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",

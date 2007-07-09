@@ -37,8 +37,7 @@ namespace Testv10
             object pSource = null;
 
             // Create the source resolver.
-            int hr = MFDll.MFCreateSourceResolver(out pSourceResolver);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateSourceResolver(out pSourceResolver);
 
             pSourceResolver.CreateObjectFromURL(
                     @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",

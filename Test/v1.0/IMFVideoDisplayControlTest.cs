@@ -168,13 +168,11 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr;
             object o;
             IMFActivate pRendererActivate = null;
 
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            hr = MFDll.MFCreateVideoRendererActivate(IntPtr.Zero, out pRendererActivate);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateVideoRendererActivate(IntPtr.Zero, out pRendererActivate);
 
             pRendererActivate.ActivateObject(typeof(IMFGetService).GUID, out o);
             IMFGetService imfs = o as IMFGetService;

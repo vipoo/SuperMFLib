@@ -34,11 +34,8 @@ namespace Testv10
 
         private void GetInterface()
         {
-            int hr;
-
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            hr = MFDll.MFCreateVideoRendererActivate(IntPtr.Zero, out m_a);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateVideoRendererActivate(IntPtr.Zero, out m_a);
         }
     }
 }

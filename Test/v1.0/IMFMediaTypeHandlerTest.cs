@@ -31,8 +31,8 @@ namespace Testv10
         {
             IMFMediaType mt, mt2;
 
-            int hr = MFDll.MFCreateMediaType(out mt);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out mt);
+
             mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
             m_mth.IsMediaTypeSupported(mt, out mt2);
@@ -78,13 +78,11 @@ namespace Testv10
         {
             IMFStreamDescriptor m_sd;
             IMFMediaType[] pmt = new IMFMediaType[1];
-            int hr = MFDll.MFCreateMediaType(out pmt[0]);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out pmt[0]);
 
             pmt[0].SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
-            hr = MFDll.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
 
             m_sd.GetMediaTypeHandler(out m_mth);
         }

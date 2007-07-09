@@ -36,15 +36,21 @@
   <ItemGroup>
     <Compile Include="IMFActivateTest.cs" />
     <Compile Include="IMFAttributesTest.cs" />
+    <Compile Include="IMFByteStreamHandlerTest.cs" />
     <Compile Include="IMFByteStreamTest.cs" />
+    <Compile Include="IMFClockTest.cs" />
+    <Compile Include="IMFCollectionTest.cs" />
     <Compile Include="IMFMediaBufferTest.cs" />
     <Compile Include="IMFMediaEventGeneratorTest.cs" />
     <Compile Include="IMFMediaEventQueueTest.cs" />
     <Compile Include="IMFMediaEventTest.cs" />
+    <Compile Include="IMFMediaSessionTest.cs" />
     <Compile Include="IMFMediaStreamTest.cs" />
     <Compile Include="IMFMediaTypeHandlerTest.cs" />
     <Compile Include="IMFMediaTypeTest.cs" />
+    <Compile Include="IMFPresentationClockTest.cs" />
     <Compile Include="IMFPresentationDescriptorTest.cs" />
+    <Compile Include="IMFPresentationTimeSourceTest.cs" />
     <Compile Include="IMFSampleTest.cs" />
     <Compile Include="IMFSourceResolverTest.cs" />
     <Compile Include="IMFStreamDescriptorTest.cs" />

@@ -62,11 +62,9 @@ namespace WavSourceFilter
 
             pSource.Open(pByteStream);
 
-            int hr = MFDll.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
 
-            hr = MFDll.MFInvokeCallback(pResult);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFInvokeCallback(pResult);
 
             if (pResult != null)
             {

@@ -419,8 +419,7 @@ namespace WavSourceFilter
             cbBuffer = Math.Min(cbBuffer, m_Riff.BytesRemainingInChunk());
 
             // Create the buffer.
-            int hr = MFDll.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
 
             int a, b;
 
@@ -442,8 +441,7 @@ namespace WavSourceFilter
             pBuffer.SetCurrentLength(cbBuffer);
 
             // Create a new sample and add the buffer to it.
-            hr = MFDll.MFCreateSample(out pSample);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateSample(out pSample);
 
             pSample.AddBuffer(pBuffer);
 
@@ -548,8 +546,7 @@ namespace WavSourceFilter
             m_state = State.Stopped;
 
             // Create the media event queue.
-            int hr = MFDll.MFCreateEventQueue(out m_pEventQueue);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateEventQueue(out m_pEventQueue);
         }
 
         ~WavSource()
@@ -764,14 +761,13 @@ namespace WavSourceFilter
                     IMFMediaEvent pEvent = null;
 
                     // Create the event.
-                    int hr = MFDll.MFCreateMediaEvent(
+                    MFPlatDll.MFCreateMediaEvent(
                         MediaEventType.MESourceStarted,
                         Guid.Empty,
                         S_Ok,
                         var,
                         out pEvent
                         );
-                    MFError.ThrowExceptionForHR(hr);
 
                     // For restarts, set the actual start time as an attribute.
                     if (bIsRestartFromCurrentPosition)
@@ -1022,24 +1018,21 @@ namespace WavSourceFilter
             Debug.Assert(WaveFormat() != null);
 
             // Create an empty media type.
-            int hr = MFDll.MFCreateMediaType(out pMediaType);
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFCreateMediaType(out pMediaType);
 
             // Initialize the media type from the WAVEFORMATEX structure.
-            hr = MFDll.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
-            MFError.ThrowExceptionForHR(hr);
+            MFPlatDll.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
 
             IMFMediaType[] mt = new IMFMediaType[1];
             mt[0] = pMediaType;
 
             // Create the stream descriptor.
-            hr = MFDll.MFCreateStreamDescriptor(
+            MFPlatDll.MFCreateStreamDescriptor(
                 0,          // stream identifier
-                1,          // Number of media types.
+                mt.Length,          // Number of media types.
                 mt, // Array of media types
                 out pStreamDescriptor
                 );
-            MFError.ThrowExceptionForHR(hr);
 
             // Set the default media type on the media type handler.
             pStreamDescriptor.GetMediaTypeHandler(out pHandler);
@@ -1049,12 +1042,11 @@ namespace WavSourceFilter
             ms[0] = pStreamDescriptor;
 
             // Create the presentation descriptor.
-            hr = MFDll.MFCreatePresentationDescriptor(
-                1,      // Number of stream descriptors
+            MFPlatDll.MFCreatePresentationDescriptor(
+                ms.Length,      // Number of stream descriptors
                 ms, // Array of stream descriptors
                 out m_pPresentationDescriptor
                 );
-            MFError.ThrowExceptionForHR(hr);
 
             // Select the first stream
             m_pPresentationDescriptor.SelectStream(0);
@@ -1128,12 +1120,11 @@ namespace WavSourceFilter
             //pFormat = new WaveFormatEx();
             //Marshal.PtrToStructure(ip, pFormat);
 
-            int hr = MFDll.MFCreateWaveFormatExFromMFMediaType(
+            MFPlatDll.MFCreateWaveFormatExFromMFMediaType(
                 pMediaType,
                 out pFormat,
                 out iSize,
                 MFWaveFormatExConvertFlags.Normal);
-            MFError.ThrowExceptionForHR(hr);
 
             if ((pFormat == null) || (this.WaveFormat() == null))
             {

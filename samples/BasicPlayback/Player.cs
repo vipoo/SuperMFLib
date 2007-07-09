@@ -63,8 +63,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
         m_hCloseEvent = new AutoResetEvent(false);
 
-        int hr = MFDll.MFStartup(0x10070, MFStartup.Full);
-        MFError.ThrowExceptionForHR(hr);
+        MFPlatDll.MFStartup(0x10070, MFStartup.Full);
     }
 
     // Destructor is private. Caller should call Release.
@@ -198,7 +197,7 @@ class CPlayer : COMBase, IMFAsyncCallback
                 CloseSession();
 
                 // Shutdown the Media Foundation platform
-                MFDll.MFShutdown();
+                MFPlatDll.MFShutdown();
 
                 m_hCloseEvent.Close();
                 m_hCloseEvent = null;
@@ -387,8 +386,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         CloseSession();
 
         // Create the media session.
-        int hr = MFDll.MFCreateMediaSession(null, out m_pSession);
-        MFError.ThrowExceptionForHR(hr);
+        MFDll.MFCreateMediaSession(null, out m_pSession);
 
         // Start pulling events from the media session
         m_pSession.BeginGetEvent(this, null);
@@ -446,29 +444,33 @@ class CPlayer : COMBase, IMFAsyncCallback
     {
         TRACE("CPlayer::CreateMediaSource");
 
-        IMFSourceResolver pSourceResolver = null;
-        object pSource = null;
+        IMFSourceResolver pSourceResolver;
+        object pSource;
 
         // Create the source resolver.
-        int hr = MFDll.MFCreateSourceResolver(out pSourceResolver);
-        MFError.ThrowExceptionForHR(hr);
+        MFDll.MFCreateSourceResolver(out pSourceResolver);
 
-        // Use the source resolver to create the media source.
-        MFObjectType ObjectType = MFObjectType.Invalid;
+        try
+        {
+            // Use the source resolver to create the media source.
+            MFObjectType ObjectType = MFObjectType.Invalid;
 
-        pSourceResolver.CreateObjectFromURL(
-                sURL,                       // URL of the source.
-                MFResolution.MediaSource,   // Create a source object.
-                null,                       // Optional property store.
-                out ObjectType,             // Receives the created object type. 
-                out pSource                 // Receives a pointer to the media source.
-            );
+            pSourceResolver.CreateObjectFromURL(
+                    sURL,                       // URL of the source.
+                    MFResolution.MediaSource,   // Create a source object.
+                    null,                       // Optional property store.
+                    out ObjectType,             // Receives the created object type. 
+                    out pSource                 // Receives a pointer to the media source.
+                );
 
-        // Get the IMFMediaSource interface from the media source.
-        m_pSource = (IMFMediaSource)pSource;
-
-        // Clean up
-        Marshal.ReleaseComObject(pSourceResolver);
+            // Get the IMFMediaSource interface from the media source.
+            m_pSource = (IMFMediaSource)pSource;
+        }
+        finally
+        {
+            // Clean up
+            Marshal.ReleaseComObject(pSourceResolver);
+        }
     }
 
     protected void CreateTopologyFromSource(out IMFTopology ppTopology)
@@ -485,8 +487,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         try
         {
             // Create a new topology.
-            int hr = MFDll.MFCreateTopology(out pTopology);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopology(out pTopology);
 
             // Create the presentation descriptor for the media source.
             m_pSource.CreatePresentationDescriptor(out pSourcePD);
@@ -573,13 +574,11 @@ class CPlayer : COMBase, IMFAsyncCallback
         Debug.Assert(m_pSource != null);
 
         IMFTopologyNode pNode = null;
-        int hr = S_Ok;
 
         try
         {
             // Create the source-stream node. 
-            hr = MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
 
             // Set attribute: Pointer to the media source.
             pNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, m_pSource);
@@ -634,23 +633,20 @@ class CPlayer : COMBase, IMFAsyncCallback
             pHandler.GetMajorType(out guidMajorType);
 
             // Create a downstream node.
-            hr = MFDll.MFCreateTopologyNode(MFTopologyType.OutputNode, out pNode);
-            MFError.ThrowExceptionForHR(hr);
+            MFDll.MFCreateTopologyNode(MFTopologyType.OutputNode, out pNode);
 
             // Create an IMFActivate object for the renderer, based on the media type.
             if (MFMediaType.Audio == guidMajorType)
             {
                 // Create the audio renderer.
                 TRACE(string.Format("Stream {0}: audio stream", streamID));
-                hr = MFDll.MFCreateAudioRendererActivate(out pRendererActivate);
-                MFError.ThrowExceptionForHR(hr);
+                MFDll.MFCreateAudioRendererActivate(out pRendererActivate);
             }
             else if (MFMediaType.Video == guidMajorType)
             {
                 // Create the video renderer.
                 TRACE(string.Format("Stream {0}: video stream", streamID));
-                hr = MFDll.MFCreateVideoRendererActivate(m_hwndVideo, out pRendererActivate);
-                MFError.ThrowExceptionForHR(hr);
+                MFDll.MFCreateVideoRendererActivate(m_hwndVideo, out pRendererActivate);
             }
             else
             {
@@ -693,23 +689,17 @@ class CPlayer : COMBase, IMFAsyncCallback
 
         try
         {
-            int hr = MFDll.MFGetService(
+            MFDll.MFGetService(
                 m_pSession,
                 MFServices.MR_VIDEO_RENDER_SERVICE,
                 typeof(IMFVideoDisplayControl).GUID,
                 out o
                 );
-            MFError.ThrowExceptionForHR(hr);
 
             m_pVideoDisplay = o as IMFVideoDisplayControl;
         }
-        catch (COMException ce)
+        catch (InvalidCastException e)
         {
-            if (ce.ErrorCode != COMBase.E_NoInterface)
-            {
-                throw;
-            }
-
             m_pVideoDisplay = null;
         }
 
@@ -784,4 +774,4 @@ class CPlayer : COMBase, IMFAsyncCallback
     protected AutoResetEvent m_hCloseEvent;     // Event to wait on while closing
 
     #endregion
-};
+}

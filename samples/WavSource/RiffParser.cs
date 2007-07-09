@@ -55,14 +55,14 @@ namespace WavSourceFilter
 
         IMFByteStream m_pStream;
 
-        FourCC m_fccID;		// FOURCC of the current container ('RIFF' or 'LIST').
-        FourCC m_fccType;		// FOURCC of the RIFF file type or LIST type.
+        FourCC m_fccID;    // FOURCC of the current container ('RIFF' or 'LIST').
+        FourCC m_fccType;   // FOURCC of the RIFF file type or LIST type.
 
         long m_llContainerOffset;    // Start of the container, as an offset into the stream.
-        int m_dwContainerSize;		// Size of the container including the RIFF header.
-        long m_llCurrentChunkOffset;	// Start of the current RIFF chunk, as an offset into the stream.
+        int m_dwContainerSize;      // Size of the container including the RIFF header.
+        long m_llCurrentChunkOffset;    // Start of the current RIFF chunk, as an offset into the stream.
 
-        CRiffChunk m_chunk;		        // Current RIFF chunk.
+        CRiffChunk m_chunk;             // Current RIFF chunk.
 
         int m_dwBytesRemaining;     // How many bytes are left in this chunk?
 

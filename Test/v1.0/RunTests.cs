@@ -79,8 +79,8 @@ namespace Testv10
                 //IMFCollectionTest t21 = new IMFCollectionTest();
                 //t21.DoTests();
 
-                IMFPresentationTimeSourceTest t22 = new IMFPresentationTimeSourceTest();
-                t22.DoTests();
+                //IMFPresentationTimeSourceTest t22 = new IMFPresentationTimeSourceTest();
+                //t22.DoTests();
 
             }
             catch (Exception e)

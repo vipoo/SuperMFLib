@@ -53,7 +53,7 @@ namespace Testv10
 
         void TestGetValue()
         {
-            PropVariant p = new PropVariant();
+            PropVariant p = new PropVariant("FDSA");
             m_me.GetValue(p);
 
             Debug.Assert(p.GetString() == "asdf");

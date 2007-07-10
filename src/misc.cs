@@ -161,6 +161,11 @@ namespace MediaFoundation.Misc
             ptr = Marshal.GetIUnknownForObject(value);
         }
 
+        public PropVariant(IntPtr value)
+        {
+            Marshal.PtrToStructure(value, this);
+        }
+
         ~PropVariant()
         {
             Clear();

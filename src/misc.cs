@@ -49,7 +49,7 @@ namespace MediaFoundation.Misc
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    public class PropVariant
+    public class PropVariant : IDisposable
     {
         public enum VariantType
         {
@@ -342,6 +342,16 @@ namespace MediaFoundation.Misc
             }
             throw new ArgumentException("PropVariant contents not an IUnknown");
         }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            Clear();
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]

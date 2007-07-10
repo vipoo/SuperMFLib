@@ -48,6 +48,90 @@ namespace MediaFoundation.Misc
         }
     }
 
+    // Class to release PropVariants on parameters that output PropVariants.  There
+    // should be no reason for code to call this class directly.  It is invoked
+    // automatically when the appropriate methods are called.
+    internal class PVMarshaler : ICustomMarshaler
+    {
+        // The managed object passed in to MarshalManagedToNative
+        protected PropVariant m_prop;
+
+        public PVMarshaler()
+        {
+        }
+
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            IntPtr p;
+
+            // Cast the object back to a PropVariant
+            m_prop = managedObj as PropVariant;
+
+            if (m_prop != null)
+            {
+                // Release any memory currently allocated
+                m_prop.Clear();
+
+                // Create an appropriately sized buffer, blank it, and send it to 
+                // the marshaler to make the COM call with.
+                int iSize = GetNativeDataSize();
+                p = Marshal.AllocCoTaskMem(iSize);
+
+                if (IntPtr.Size == 4)
+                {
+                    Marshal.WriteInt64(p, 0);
+                    Marshal.WriteInt64(p, 8, 0);
+                }
+                else
+                {
+                    Marshal.WriteInt64(p, 0);
+                    Marshal.WriteInt64(p, 8, 0);
+                    Marshal.WriteInt64(p, 16, 0);
+                }
+            }
+            else
+            {
+                p = IntPtr.Zero;
+            }
+
+            return p;
+        }
+
+        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
+        // from MarshalManagedToNative.  The return value is unused.
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            Marshal.PtrToStructure(pNativeData, m_prop);
+            m_prop = null;
+
+            return m_prop;
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
+        {
+            m_prop = null;
+        }
+
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            Marshal.FreeCoTaskMem(pNativeData);
+        }
+
+        // The number of bytes to marshal out
+        public int GetNativeDataSize()
+        {
+            return Marshal.SizeOf(typeof(PropVariant));
+        }
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            return new PVMarshaler();
+        }
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public class PropVariant : IDisposable
     {
@@ -688,7 +772,7 @@ namespace MediaFoundation.Misc
 
         void GetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
-            [Out] PropVariant pv
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pv
             );
 
         void SetValue(

@@ -472,7 +472,7 @@ namespace MediaFoundation
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void GetItemType(
@@ -557,7 +557,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
         new void DeleteItem(
@@ -613,7 +613,7 @@ namespace MediaFoundation
         new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void CopyAllItems(
@@ -662,7 +662,7 @@ namespace MediaFoundation
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void GetItemType(
@@ -747,7 +747,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
         new void DeleteItem(
@@ -803,7 +803,7 @@ namespace MediaFoundation
         new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void CopyAllItems(
@@ -898,7 +898,7 @@ namespace MediaFoundation
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void GetItemType(
@@ -983,7 +983,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
         new void DeleteItem(
@@ -1039,7 +1039,7 @@ namespace MediaFoundation
         new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void CopyAllItems(
@@ -1072,7 +1072,7 @@ namespace MediaFoundation
     {
         void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef=typeof(PVMarshaler))] PropVariant pValue
             );
 
         void GetItemType(
@@ -1157,7 +1157,7 @@ namespace MediaFoundation
 
         void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
         void DeleteItem(
@@ -1213,7 +1213,7 @@ namespace MediaFoundation
         void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef=typeof(PVMarshaler))] PropVariant pValue
             );
 
         void CopyAllItems(
@@ -1299,7 +1299,7 @@ namespace MediaFoundation
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void GetItemType(
@@ -1384,7 +1384,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
         new void DeleteItem(
@@ -1440,7 +1440,7 @@ namespace MediaFoundation
         new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void CopyAllItems(
@@ -1591,7 +1591,7 @@ namespace MediaFoundation
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void GetItemType(
@@ -1676,7 +1676,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
             );
 
         new void DeleteItem(
@@ -1732,7 +1732,7 @@ namespace MediaFoundation
         new void GetItemByIndex(
             int unIndex,
             out Guid pguidKey,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
             );
 
         new void CopyAllItems(
@@ -1824,5 +1824,4 @@ namespace MediaFoundation
     }
 
     #endregion
-
 }

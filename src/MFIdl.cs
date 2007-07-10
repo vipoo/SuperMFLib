@@ -2234,43 +2234,6 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("7FF12CCE-F76F-41C2-863B-1666C8E5E139"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFPresentationTimeSource : IMFClock
-    {
-        #region IMFClock methods
-
-        new void GetClockCharacteristics(
-            out MFClockCharacteristicsFlags pdwCharacteristics
-            );
-
-        new void GetCorrelatedTime(
-            [In] int dwReserved,
-            out long pllClockTime,
-            out long phnsSystemTime
-            );
-
-        new void GetContinuityKey(
-            out int pdwContinuityKey
-            );
-
-        new void GetState(
-            [In] int dwReserved,
-            out MFClockState peClockState
-            );
-
-        new void GetProperties(
-            out MFClockProperties pClockProperties
-            );
-
-        #endregion
-
-        void GetUnderlyingClock(
-            [MarshalAs(UnmanagedType.Interface)] out IMFClock ppClock
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("EC15E2E9-E36B-4F7C-8758-77D452EF4CE7")]
     public interface IMFQualityAdvise
@@ -4189,6 +4152,43 @@ namespace MediaFoundation
         void Stop();
 
         void Pause();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("7FF12CCE-F76F-41C2-863B-1666C8E5E139"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFPresentationTimeSource : IMFClock
+    {
+        #region IMFClock methods
+
+        new void GetClockCharacteristics(
+            out MFClockCharacteristicsFlags pdwCharacteristics
+            );
+
+        new void GetCorrelatedTime(
+            [In] int dwReserved,
+            out long pllClockTime,
+            out long phnsSystemTime
+            );
+
+        new void GetContinuityKey(
+            out int pdwContinuityKey
+            );
+
+        new void GetState(
+            [In] int dwReserved,
+            out MFClockState peClockState
+            );
+
+        new void GetProperties(
+            out MFClockProperties pClockProperties
+            );
+
+        #endregion
+
+        void GetUnderlyingClock(
+            [MarshalAs(UnmanagedType.Interface)] out IMFClock ppClock
+            );
     }
 
     #endregion

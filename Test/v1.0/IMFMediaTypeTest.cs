@@ -59,7 +59,7 @@ namespace Testv10
             mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, g1);
 
             int hr = m_mt.IsEqual(mt, out f);
-            Debug.Assert(hr == 0); // ??
+            Debug.Assert(hr == 1);
         }
 
         [StructLayout(LayoutKind.Sequential)]

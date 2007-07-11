@@ -123,7 +123,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     public int Play()
     {
-        TRACE("CPlayer::Pause");
+        TRACE("CPlayer::Play");
 
         if (m_state != PlayerState.Paused)
         {

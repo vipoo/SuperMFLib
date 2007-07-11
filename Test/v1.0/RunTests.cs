@@ -16,6 +16,9 @@ namespace Testv10
             {
                 MFPlatDll.MFStartup(0x10070, MFStartup.Full);
 
+                //TestWave t00 = new TestWave();
+                //t00.DoTests();
+
                 //IMFSourceResolverTest t01 = new IMFSourceResolverTest();
                 //t01.DoTests();
 

@@ -74,7 +74,7 @@ namespace MediaFoundation
         [DllImport("MfPlat.dll", PreserveSig = false)]
         public static extern void MFCreateWaveFormatExFromMFMediaType(
             IMFMediaType pMFType,
-            out WaveFormatEx ppWF,
+            [Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(WEMarshaler))] out WaveFormatEx ppWF,
             out int pcbSize,
             MFWaveFormatExConvertFlags Flags
         );
@@ -102,7 +102,7 @@ namespace MediaFoundation
         [DllImport("MfPlat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromWaveFormatEx(
             IMFMediaType pMFType,
-            [MarshalAs(UnmanagedType.LPStruct)] WaveFormatEx pWaveFormat,
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(WEMarshaler))] WaveFormatEx ppWF,
             int cbBufSize
         );
 

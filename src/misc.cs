@@ -132,6 +132,55 @@ namespace MediaFoundation.Misc
         }
     }
 
+    // Class to handle WAVEFORMATEXTENSIBLE
+    internal class WEMarshaler : ICustomMarshaler
+    {
+        public WEMarshaler()
+        {
+        }
+
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            WaveFormatEx wfe = managedObj as WaveFormatEx;
+
+            IntPtr ip = wfe.GetPtr();
+
+            return ip;
+        }
+
+        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
+        // from MarshalManagedToNative.  The return value is unused.
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            WaveFormatEx wfe = WaveFormatEx.PtrToWave(pNativeData);
+
+            return wfe;
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
+        {
+        }
+
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            Marshal.FreeCoTaskMem(pNativeData);
+        }
+
+        // The number of bytes to marshal out - never called
+        public int GetNativeDataSize()
+        {
+            return -1;
+        }
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            return new WEMarshaler();
+        }
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public class PropVariant : IDisposable
     {
@@ -563,6 +612,30 @@ namespace MediaFoundation.Misc
 
 #endif
 
+    [Flags, UnmanagedName("SPEAKER_* defines")]
+    public enum WaveMask
+    {
+        None = 0x0,
+        FrontLeft = 0x1,
+        FrontRight = 0x2,
+        FrontCenter = 0x4,
+        LowFrequency = 0x8,
+        BackLeft = 0x10,
+        BackRight = 0x20,
+        FrontLeftOfCenter = 0x40,
+        FrontRightOfCenter = 0x80,
+        BackCenter = 0x100,
+        SideLeft = 0x200,
+        SideRight = 0x400,
+        TopCenter = 0x800,
+        TopFrontLeft = 0x1000,
+        TopFrontCenter = 0x2000,
+        TopFrontRight = 0x4000,
+        TopBackLeft = 0x8000,
+        TopBackCenter = 0x10000,
+        TopBackRight = 0x20000
+    }
+
     [StructLayout(LayoutKind.Sequential), UnmanagedName("BLOB")]
     public struct Blob
     {
@@ -580,6 +653,179 @@ namespace MediaFoundation.Misc
         public short nBlockAlign;
         public short wBitsPerSample;
         public short cbSize;
+
+        public IntPtr GetPtr()
+        {
+            IntPtr ip;
+
+            // See what kind of WaveFormat object we've got
+            if (this is WaveFormatExtensibleWithData)
+            {
+                int iExtensibleSize = Marshal.SizeOf(typeof(WaveFormatExtensible));
+                int iWaveFormatExSize = Marshal.SizeOf(typeof(WaveFormatEx));
+
+                // WaveFormatExtensibleWithData - Have to copy the byte array too
+                WaveFormatExtensibleWithData pData = this as WaveFormatExtensibleWithData;
+
+                int iExtraBytes = pData.cbSize - (iExtensibleSize - iWaveFormatExSize);
+
+                // Account for copying the array.  This may result in us allocating more bytes than we 
+                // need (if cbSize < IntPtr.Size), but it prevents us from overrunning the buffer.
+                int iUseSize = Math.Max(iExtraBytes, IntPtr.Size);
+
+                // Remember, cbSize include the length of WaveFormatExtensible
+                ip = Marshal.AllocCoTaskMem(iExtensibleSize + iUseSize);
+
+                // Copies the waveformatex + waveformatextensible
+                Marshal.StructureToPtr(pData, ip, false);
+
+                // Get a pointer to the byte after the copy
+                IntPtr ip2 = new IntPtr(ip.ToInt64() + iExtensibleSize);
+
+                // Copy the extra bytes
+                Marshal.Copy(pData.byteData, 0, ip2, pData.cbSize - (iExtensibleSize - iWaveFormatExSize));
+            }
+            else if (this is WaveFormatExtensible)
+            {
+                int iWaveFormatExtensibleSize = Marshal.SizeOf(typeof(WaveFormatExtensible));
+
+                // WaveFormatExtensible - Just do a simple copy
+                WaveFormatExtensible pExt = this as WaveFormatExtensible;
+
+                ip = Marshal.AllocCoTaskMem(iWaveFormatExtensibleSize);
+
+                Marshal.StructureToPtr(this as WaveFormatExtensible, ip, false);
+            }
+            else if (this is WaveFormatExWithData)
+            {
+                int iWaveFormatExSize = Marshal.SizeOf(typeof(WaveFormatEx));
+
+                // WaveFormatExWithData - Have to copy the byte array too
+                WaveFormatExWithData pData = this as WaveFormatExWithData;
+
+                // Account for copying the array.  This may result in us allocating more bytes than we 
+                // need (if cbSize < IntPtr.Size), but it prevents us from overrunning the buffer.
+                int iUseSize = Math.Max(pData.cbSize, IntPtr.Size);
+
+                ip = Marshal.AllocCoTaskMem(iWaveFormatExSize + iUseSize);
+
+                Marshal.StructureToPtr(pData, ip, false);
+
+                IntPtr ip2 = new IntPtr(ip.ToInt64() + iWaveFormatExSize);
+                Marshal.Copy(pData.byteData, 0, ip2, pData.cbSize);
+            }
+            else if (this is WaveFormatEx)
+            {
+                int iWaveFormatExSize = Marshal.SizeOf(typeof(WaveFormatEx));
+
+                // WaveFormatEx - just do a copy
+                ip = Marshal.AllocCoTaskMem(iWaveFormatExSize);
+                Marshal.StructureToPtr(this as WaveFormatEx, ip, false);
+            }
+            else
+            {
+                // Someone added our custom marshaler to something they shouldn't have
+                Debug.Assert(false, "Shouldn't ever get here");
+                ip = IntPtr.Zero;
+            }
+
+            return ip;
+        }
+
+        public static WaveFormatEx PtrToWave(IntPtr pNativeData)
+        {
+            short wFormatTag = Marshal.ReadInt16(pNativeData);
+            WaveFormatEx wfe;
+
+            // WAVE_FORMAT_EXTENSIBLE == -2
+            if (wFormatTag != -2)
+            {
+                short cbSize;
+
+                // By spec, PCM has no cbSize element
+                if (wFormatTag != 1)
+                {
+                    cbSize = Marshal.ReadInt16(pNativeData, 16);
+                }
+                else
+                {
+                    cbSize = 0;
+                }
+
+                // Does the structure contain extra data?
+                if (cbSize == 0)
+                {
+                    // Create a simple WaveFormatEx struct
+                    wfe = new WaveFormatEx();
+                    Marshal.PtrToStructure(pNativeData, wfe);
+
+                    // It probably already has the right value, but there is a special case
+                    // where it might not, so, just to be safe...
+                    wfe.cbSize = 0;
+                }
+                else
+                {
+                    WaveFormatExWithData dat = new WaveFormatExWithData();
+
+                    // Manually parse the data into the structure
+                    dat.wFormatTag = wFormatTag;
+                    dat.nChannels = Marshal.ReadInt16(pNativeData, 2);
+                    dat.nSamplesPerSec = Marshal.ReadInt32(pNativeData, 4);
+                    dat.nAvgBytesPerSec = Marshal.ReadInt32(pNativeData, 8);
+                    dat.nBlockAlign = Marshal.ReadInt16(pNativeData, 12);
+                    dat.wBitsPerSample = Marshal.ReadInt16(pNativeData, 14);
+                    dat.cbSize = cbSize;
+
+                    dat.byteData = new byte[dat.cbSize];
+                    IntPtr ip2 = new IntPtr(pNativeData.ToInt64() + 18);
+                    Marshal.Copy(ip2, dat.byteData, 0, dat.cbSize);
+
+                    wfe = dat as WaveFormatEx;
+                }
+            }
+            else
+            {
+                short cbSize;
+                int extrasize = Marshal.SizeOf(typeof(WaveFormatExtensible)) - Marshal.SizeOf(typeof(WaveFormatEx));
+
+                cbSize = Marshal.ReadInt16(pNativeData, 16);
+                if (cbSize == extrasize)
+                {
+                    WaveFormatExtensible ext = new WaveFormatExtensible();
+                    Marshal.PtrToStructure(pNativeData, ext);
+                    wfe = ext as WaveFormatEx;
+                }
+                else
+                {
+                    WaveFormatExtensibleWithData ext = new WaveFormatExtensibleWithData();
+                    int iExtraBytes = cbSize - extrasize;
+
+                    ext.wFormatTag = wFormatTag;
+                    ext.nChannels = Marshal.ReadInt16(pNativeData, 2);
+                    ext.nSamplesPerSec = Marshal.ReadInt32(pNativeData, 4);
+                    ext.nAvgBytesPerSec = Marshal.ReadInt32(pNativeData, 8);
+                    ext.nBlockAlign = Marshal.ReadInt16(pNativeData, 12);
+                    ext.wBitsPerSample = Marshal.ReadInt16(pNativeData, 14);
+                    ext.cbSize = cbSize;
+
+                    ext.wValidBitsPerSample = Marshal.ReadInt16(pNativeData, 18);
+                    ext.dwChannelMask = (WaveMask)Marshal.ReadInt16(pNativeData, 20);
+
+                    // Read the Guid
+                    byte [] byteGuid = new byte[16];
+                    Marshal.Copy(new IntPtr(pNativeData.ToInt64() + 24), byteGuid, 0, 16);
+                    ext.SubFormat = new Guid(byteGuid);
+
+                    ext.byteData = new byte[iExtraBytes];
+                    IntPtr ip2 = new IntPtr(pNativeData.ToInt64() + Marshal.SizeOf(typeof(WaveFormatExtensible)));
+                    Marshal.Copy(ip2, ext.byteData, 0, iExtraBytes);
+
+                    wfe = ext as WaveFormatEx;
+                }
+            }
+
+            return wfe;
+        }
 
         public bool IsEqual(WaveFormatEx b)
         {
@@ -599,30 +845,106 @@ namespace MediaFoundation.Misc
                     wBitsPerSample == b.wBitsPerSample &&
                     cbSize == b.cbSize)
                 {
-                    if (cbSize > 0)
-                    {
-                        Debug.Assert(false);
-#if false
-                        for (int x = 0; x < cbSize; x++)
-                        {
-                            if (Marshal.ReadByte(pExtraBytes, x) != Marshal.ReadByte(b.pExtraBytes, x))
-                            {
-                                bRet = false;
-                                break;
-                            }
-                        }
-#endif
-                    }
-                    else
-                    {
                         bRet = true;
-                    }
                 }
             }
 
             return bRet;
         }
 
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
+    public class WaveFormatExWithData : WaveFormatEx
+    {
+        public byte [] byteData;
+
+        public bool IsEqual(WaveFormatExWithData b)
+        {
+            bool bRet = base.IsEqual(b);
+
+            if (bRet)
+            {
+                if (b.byteData == null || byteData == null || b.byteData.Length != byteData.Length)
+                {
+                    bRet = false;
+                }
+                else
+                {
+                    for (int x = 0; x < b.byteData.Length; x++)
+                    {
+                        if (b.byteData[x] != byteData[x])
+                        {
+                            bRet = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return bRet;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
+    public class WaveFormatExtensibleWithData : WaveFormatExtensible
+    {
+        public byte[] byteData;
+
+        public bool IsEqual(WaveFormatExWithData b)
+        {
+            bool bRet = base.IsEqual(b);
+
+            if (bRet)
+            {
+                if (b.byteData == null || byteData == null || b.byteData.Length != byteData.Length)
+                {
+                    bRet = false;
+                }
+                else
+                {
+                    for (int x = 0; x < b.byteData.Length; x++)
+                    {
+                        if (b.byteData[x] != byteData[x])
+                        {
+                            bRet = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return bRet;
+        }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Pack = 1), UnmanagedName("WAVEFORMATEX")]
+    public class WaveFormatExtensible : WaveFormatEx
+    {
+        [FieldOffset(0)]
+        public short wValidBitsPerSample;
+        [FieldOffset(0)]
+        public short wSamplesPerBlock;
+        [FieldOffset(0)]
+        public short wReserved;
+        [FieldOffset(2)]
+        public WaveMask dwChannelMask;
+        [FieldOffset(6)]
+        public Guid SubFormat;
+
+        public bool IsEqual(WaveFormatExtensible b)
+        {
+            bool bRet = base.IsEqual(b);
+
+            if (bRet)
+            {
+                bRet = (wValidBitsPerSample == b.wValidBitsPerSample &&
+                    dwChannelMask == b.dwChannelMask &&
+                    SubFormat == b.SubFormat);
+            }
+
+            return bRet;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]

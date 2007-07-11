@@ -1464,7 +1464,7 @@ namespace MediaFoundation
             );
 
         void GetRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation
             );
 

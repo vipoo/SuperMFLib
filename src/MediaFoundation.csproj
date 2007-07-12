@@ -65,18 +65,22 @@
   <ItemGroup>
     <Compile Include="Alt.cs" />
     <Compile Include="EVR.cs" />
+    <Compile Include="Externs.cs" />
     <Compile Include="MFObjects.cs" />
     <Compile Include="MFTransform.cs" />
     <Compile Include="MFUtils.cs" />
     <Compile Include="misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MFIdl.cs" />
+    <Compile Include="WMContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MediaFoundation.snk" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

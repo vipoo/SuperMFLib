@@ -30,287 +30,6 @@ using MediaFoundation.Misc;
 
 namespace MediaFoundation
 {
-    #region Externals
-
-    public class MFPlatDll
-    {
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFShutdown();
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFStartup(
-            int Version, MFStartup dwFlags
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateSystemTimeSource(
-            out IMFPresentationTimeSource ppSystemTimeSource
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateCollection(
-            out IMFCollection ppIMFCollection
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateStreamDescriptor(
-            int dwStreamIdentifier,
-            int cMediaTypes,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IMFMediaType[] apMediaTypes,
-            out IMFStreamDescriptor ppDescriptor
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void CreatePropertyStore(
-            out IPropertyStore ppStore
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateAttributes(
-            out IMFAttributes ppMFAttributes,
-            int cInitialSize
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateWaveFormatExFromMFMediaType(
-            IMFMediaType pMFType,
-            [Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(WEMarshaler))] out WaveFormatEx ppWF,
-            out int pcbSize,
-            MFWaveFormatExConvertFlags Flags
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateAsyncResult(
-            [MarshalAs(UnmanagedType.IUnknown)] object punkObject,
-            IMFAsyncCallback pCallback,
-            [MarshalAs(UnmanagedType.IUnknown)] object punkState,
-            out IMFAsyncResult ppAsyncResult
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFInvokeCallback(
-            IMFAsyncResult pAsyncResult
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreatePresentationDescriptor(
-            int cStreamDescriptors,
-            [MarshalAs(UnmanagedType.LPArray)] IMFStreamDescriptor[] apStreamDescriptors,
-            out IMFPresentationDescriptor ppPresentationDescriptor
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFInitMediaTypeFromWaveFormatEx(
-            IMFMediaType pMFType,
-            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(WEMarshaler))] WaveFormatEx ppWF,
-            int cbBufSize
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateEventQueue(
-            out IMFMediaEventQueue ppMediaEventQueue
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateMediaType(
-            out IMFMediaType ppMFType
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateMediaEvent(
-            MediaEventType met,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
-            int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue,
-            out IMFMediaEvent ppEvent
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateSample(
-            out IMFSample ppIMFSample
-        );
-
-        [DllImport("MfPlat.dll", PreserveSig = false)]
-        public static extern void MFCreateMemoryBuffer(
-            int cbMaxLength,
-            out IMFMediaBuffer ppBuffer
-        );
-
-    }
-
-    public class MFDll
-    {
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFGetService(
-            [In, MarshalAs(UnmanagedType.Interface)] object punkObject,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [Out, MarshalAs(UnmanagedType.Interface)] out object ppvObject
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateVideoRendererActivate(
-            IntPtr hwndVideo,
-            out IMFActivate ppActivate
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateTopologyNode(
-            MFTopologyType NodeType,
-            out IMFTopologyNode ppNode
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateSourceResolver(
-            out IMFSourceResolver ppISourceResolver
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateMediaSession(
-            IMFAttributes pConfiguration,
-            out IMFMediaSession ppMediaSession
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateTopology(
-            out IMFTopology ppTopo
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateAudioRendererActivate(
-            out IMFActivate ppActivate
-        );
-
-#if ALLOW_UNTESTED_INTERFACES
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreatePMPMediaSession(
-            MFPMPSESSION_CREATION_FLAGS dwCreationFlags,
-            IMFAttributes pConfiguration,
-            out IMFMediaSession ppMediaSession,
-            out IMFActivate ppEnablerActivate
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFGetSupportedSchemes(
-            [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pPropVarSchemeArray
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFGetSupportedMimeTypes(
-            [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pPropVarMimeTypeArray
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreatePresentationClock(
-            out IMFPresentationClock ppPresentationClock
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFRequireProtectedEnvironment(
-            IMFPresentationDescriptor pPresentationDescriptor
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFSerializePresentationDescriptor(
-            IMFPresentationDescriptor pPD,
-            out int pcbData,
-            IntPtr ppbData
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFDeserializePresentationDescriptor(
-            int cbData,
-            IntPtr pbData,
-            out IMFPresentationDescriptor ppPD
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateSimpleTypeHandler(
-            out IMFMediaTypeHandler ppHandler
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFShutdownObject(
-            object pUnk
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateAudioRenderer(
-            IMFAttributes pAudioAttributes,
-            out IMFMediaSink ppSink
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateTopoLoader(
-            out IMFTopoLoader ppObj
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateSampleGrabberSinkActivate(
-            IMFMediaType pIMFMediaType,
-            IMFSampleGrabberSinkCallback pIMFSampleGrabberSinkCallback,
-            out IMFActivate ppIActivate
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateStandardQualityManager(
-            out IMFQualityManager ppQualityManager
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateQualityManager(
-            out IMFQualityManager ppQualityManager
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateSequencerSource(
-            [MarshalAs(UnmanagedType.IUnknown)] object pReserved,
-            out IMFSequencerSource ppSequencerSource
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateSequencerSegmentOffset(
-            int dwId,
-            long hnsOffset,
-            [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pvarSegmentOffset
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateCredentialCache(
-            out IMFNetCredentialCache ppCache
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateProxyLocator(
-            string pszProtocol,
-            IPropertyStore pProxyConfig,
-            out IMFNetProxyLocator ppProxyLocator
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateNetSchemePlugin(
-            [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.IUnknown)] object ppvHandler
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreatePMPServer(
-            int dwCreationFlags,
-            out IMFPMPServer ppPMPServer
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateRemoteDesktopPlugin(
-            out IMFRemoteDesktopPlugin ppPlugin
-        );
-
-#endif
-
-    }
-
-    #endregion
-
     #region GUIDs, IIDs
 
     public sealed class MFAttributesClsid
@@ -871,6 +590,68 @@ namespace MediaFoundation
     #region Declarations
 
 #if ALLOW_UNTESTED_INTERFACES
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MPEG2VIDEOINFO")]
+    public struct Mpeg2VideoInfo
+    {
+        VideoInfoHeader2 hdr;
+        int dwStartTimeCode;        //  ?? not used for DVD ??
+        int cbSequenceHeader;       // is 0 for DVD (no sequence header)
+        int dwProfile;              // use enum MPEG2Profile
+        int dwLevel;                // use enum MPEG2Level
+        int dwFlags;                // use AMMPEG2_* defines.  Reject connection if undefined bits are not 0
+        int[] dwSequenceHeader;    // DWORD instead of Byte for alignment purposes
+        //   For MPEG-2, if a sequence_header is included, the sequence_extension
+        //   should also be included
+    }
+
+    [UnmanagedName("MFStandardVideoFormat")]
+    public enum MFStandardVideoFormat
+    {
+        reserved = 0,
+        NTSC = (reserved + 1),
+        PAL = (NTSC + 1),
+        DVD_NTSC = (PAL + 1),
+        DVD_PAL = (DVD_NTSC + 1),
+        DV_PAL = (DVD_PAL + 1),
+        DV_NTSC = (DV_PAL + 1),
+        ATSC_SD480i = (DV_NTSC + 1),
+        ATSC_HD1080i = (ATSC_SD480i + 1),
+        ATSC_HD720p = (ATSC_HD1080i + 1)
+    }
+
+    [UnmanagedName("MF_FILE_FLAGS")]
+    public enum MFFileFlags
+    {
+        None = 0,
+        NoBuffering = 0x1
+    }
+
+    [UnmanagedName("MF_FILE_ACCESSMODE")]
+    public enum MFFileAccessMode
+    {
+        None = 0,
+        Read = 1,
+        Write = 2,
+        ReadWrite = 3
+    }
+
+    [UnmanagedName("MF_FILE_OPENMODE")]
+    public enum MFFileOpenMode
+    {
+        FailIfNotExist = 0,
+        FailIfExist = 1,
+        ResetIfExist = 2,
+        AppendIfExist = 3,
+        DeleteIfExist = 4
+    }
+
+    [UnmanagedName("MFT_REGISTER_TYPE_INFO")]
+    public struct MFTRegisterTypeInfo
+    {
+        public Guid guidMajorType;
+        public Guid guidSubtype;
+    }
 
     [UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
     public enum MFPMPSESSION_CREATION_FLAGS

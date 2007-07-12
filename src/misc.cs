@@ -610,6 +610,98 @@ namespace MediaFoundation.Misc
         End = 2
     }
 
+    [UnmanagedName("MPEG1VIDEOINFO"), StructLayout(LayoutKind.Sequential)]
+    public struct MPEG1VideoInfo
+    {
+        public VideoInfoHeader hdr;
+        public int dwStartTimeCode;
+        public int cbSequenceHeader;
+        public byte bSequenceHeader;
+    }
+
+    /// <summary>
+    /// When you are done with an instance of this class,
+    /// it should be released with FreeAMMediaType() to avoid leaking
+    /// </summary>
+    [UnmanagedName("AM_MEDIA_TYPE"), StructLayout(LayoutKind.Sequential)]
+    public class AMMediaType
+    {
+        public Guid majorType;
+        public Guid subType;
+        [MarshalAs(UnmanagedType.Bool)]
+        public bool fixedSizeSamples;
+        [MarshalAs(UnmanagedType.Bool)]
+        public bool temporalCompression;
+        public int sampleSize;
+        public Guid formatType;
+        public IntPtr unkPtr; // IUnknown Pointer
+        public int formatSize;
+        public IntPtr formatPtr; // Pointer to a buff determined by formatType
+    }
+
+    [UnmanagedName("VIDEOINFOHEADER"), StructLayout(LayoutKind.Sequential)]
+    public class VideoInfoHeader
+    {
+        public RECT SrcRect;
+        public RECT TargetRect;
+        public int BitRate;
+        public int BitErrorRate;
+        public long AvgTimePerFrame;
+        public BitmapInfoHeader BmiHeader;
+    }
+
+    [UnmanagedName("AMINTERLACE_*"), Flags]
+    public enum AMInterlace
+    {
+        None = 0,
+        IsInterlaced = 0x00000001,
+        OneFieldPerSample = 0x00000002,
+        Field1First = 0x00000004,
+        Unused = 0x00000008,
+        FieldPatternMask = 0x00000030,
+        FieldPatField1Only = 0x00000000,
+        FieldPatField2Only = 0x00000010,
+        FieldPatBothRegular = 0x00000020,
+        FieldPatBothIrregular = 0x00000030,
+        DisplayModeMask = 0x000000c0,
+        DisplayModeBobOnly = 0x00000000,
+        DisplayModeWeaveOnly = 0x00000040,
+        DisplayModeBobOrWeave = 0x00000080,
+    }
+
+    [UnmanagedName("AMCOPYPROTECT_*")]
+    public enum AMCopyProtect
+    {
+        None = 0,
+        RestrictDuplication = 0x00000001
+    }
+
+    [UnmanagedName("From AMCONTROL_*"), Flags]
+    public enum AMControl
+    {
+        None = 0,
+        Used = 0x00000001,
+        PadTo4x3 = 0x00000002,
+        PadTo16x9 = 0x00000004,
+    }
+
+    [UnmanagedName("VIDEOINFOHEADER2"), StructLayout(LayoutKind.Sequential)]
+    public class VideoInfoHeader2
+    {
+        public RECT SrcRect;
+        public RECT TargetRect;
+        public int BitRate;
+        public int BitErrorRate;
+        public long AvgTimePerFrame;
+        public AMInterlace InterlaceFlags;
+        public AMCopyProtect CopyProtectFlags;
+        public int PictAspectRatioX;
+        public int PictAspectRatioY;
+        public AMControl ControlFlags;
+        public int Reserved2;
+        public BitmapInfoHeader BmiHeader;
+    }
+
 #endif
 
     [Flags, UnmanagedName("SPEAKER_* defines")]
@@ -991,6 +1083,29 @@ namespace MediaFoundation.Misc
     #region Generic Interfaces
 
 #if ALLOW_UNTESTED_INTERFACES
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("71604b0f-97b0-4764-8577-2f13e98a1422")]
+    public interface INamedPropertyStore
+    {
+        void GetNamedValue( 
+            string pszName,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
+        );
+        
+        void SetNamedValue( 
+            string pszName,
+            PropVariant propvar);
+        
+        void GetNameCount( 
+            out int pdwCount);
+        
+        void GetNameAt( 
+            int iProp,
+            [MarshalAs(UnmanagedType.BStr)] out string pbstrName);
+        
+    }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),

@@ -35,6 +35,67 @@ namespace MediaFoundation.EVR
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_ProcAmpValues")]
+    public struct DXVA2ProcAmpValues
+    {
+        int Brightness;
+        int Contrast;
+        int Hue;
+        int Saturation;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_ValueRange")]
+    public struct DXVA2ValueRange
+    {
+        int MinValue;
+        int MaxValue;
+        int DefaultValue;
+        int StepSize;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_VideoProcessorCaps")]
+    public struct DXVA2VideoProcessorCaps
+    {
+        int DeviceCaps;
+        int InputPool;
+        int NumForwardRefSamples;
+        int NumBackwardRefSamples;
+        int Reserved;
+        int DeinterlaceTechnology;
+        int ProcAmpControlCaps;
+        int VideoProcessorOperations;
+        int NoiseFilterTechnology;
+        int DetailFilterTechnology;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFVideoAlphaBitmapParams")]
+    public struct MFVideoAlphaBitmapParams
+    {
+        int dwFlags;
+        int clrSrcKey;
+        RECT rcSrc;
+        MFVideoNormalizedRect nrcDest;
+        float fAlpha;
+        int dwFilterMode;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFVideoAlphaBitmap")]
+    public struct MFVideoAlphaBitmap
+    {
+        bool GetBitmapFromDC;
+        Unnamed001 stru;
+        MFVideoAlphaBitmapParams paras;
+    }
+
+    [StructLayout(LayoutKind.Explicit), UnmanagedName("unnamed union")]
+    public struct Unnamed001
+    {
+        [FieldOffset(0)]
+        IntPtr hdc;
+        [FieldOffset(0)]
+        object pDDS; // IDirect3DSurface9
+    }
+
     [UnmanagedName("MFVP_MESSAGE_TYPE")]
     public enum MFVP_MessageType
     {
@@ -94,6 +155,76 @@ namespace MediaFoundation.EVR
     #region Interfaces
 
 #if ALLOW_UNTESTED_INTERFACES
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("814C7B20-0FDB-4eec-AF8F-F957C8F69EDC")]
+    public interface IMFVideoMixerBitmap
+    {
+        void SetAlphaBitmap( 
+            /* [in] */ MFVideoAlphaBitmap pBmpParms);
+        
+        void ClearAlphaBitmap( );
+        
+        void UpdateAlphaBitmapParameters( 
+            /* [in] */ MFVideoAlphaBitmapParams pBmpParms);
+        
+        void GetAlphaBitmapParameters( 
+            /* [out] */ 
+            out MFVideoAlphaBitmapParams pBmpParms);
+        
+    }
+    
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("6AB0000C-FECE-4d1f-A2AC-A9573530656E")]
+    public interface IMFVideoProcessor
+    {
+        void GetAvailableVideoProcessorModes( 
+            /* [out][in] */ out int lpdwNumProcessingModes,
+            /* [size_is][size_is][out] */ out Guid [] ppVideoProcessingModes);
+        
+        void GetVideoProcessorCaps( 
+            /* [in] */ Guid lpVideoProcessorMode,
+            /* [out] */ out DXVA2VideoProcessorCaps lpVideoProcessorCaps);
+        
+        void GetVideoProcessorMode( 
+            /* [out] */ out Guid lpMode);
+        
+        void SetVideoProcessorMode( 
+            /* [in] */ Guid lpMode);
+        
+        void GetProcAmpRange( 
+            int dwProperty,
+            /* [out] */ out DXVA2ValueRange pPropRange);
+        
+        void GetProcAmpValues( 
+            int dwFlags,
+            /* [out] */ out DXVA2ProcAmpValues Values);
+        
+        void SetProcAmpValues( 
+            int dwFlags,
+            /* [in] */ DXVA2ProcAmpValues pValues);
+        
+        void GetFilteringRange( 
+            int dwProperty,
+            /* [out] */ out DXVA2ValueRange pPropRange);
+        
+        void GetFilteringValue( 
+            int dwProperty,
+            /* [out] */ out int pValue);
+        
+        void SetFilteringValue( 
+            int dwProperty,
+            /* [in] */ int pValue);
+        
+        void GetBackgroundColor( 
+            /* [out] */ out int lpClrBkg);
+        
+        void SetBackgroundColor( 
+            int ClrBkg);
+        
+    }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),

@@ -191,67 +191,67 @@ namespace MediaFoundation
         out INamedPropertyStore ppStore
         );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFLockPlatform();
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFUnlockPlatform();
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFPutWorkItem(
             int dwQueue,
             IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFPutWorkItemEx(
             int dwQueue,
             IMFAsyncResult pResult);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFScheduleWorkItem(
             IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState,
             long Timeout,
             long pKey);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFScheduleWorkItemEx(
             IMFAsyncResult pResult,
             long Timeout,
             long pKey);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCancelWorkItem(
             long Key);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFGetTimerPeriodicity(
             out int Periodicity);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFAddPeriodicCallback(
             IntPtr Callback,
             [MarshalAs(UnmanagedType.IUnknown)] object pContext,
             out int pdwKey);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFRemovePeriodicCallback(
             int dwKey);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFAllocateWorkQueue(
             out int pdwWorkQueue);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFLockWorkQueue(
             [In] int dwWorkQueue);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFUnlockWorkQueue(
             [In] int dwWorkQueue);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFBeginRegisterWorkQueueWithMMCSS(
             int dwWorkQueueId,
             [In, MarshalAs(UnmanagedType.LPWStr)] string wszClass,
@@ -259,18 +259,18 @@ namespace MediaFoundation
             [In] IMFAsyncCallback pDoneCallback,
             [In] [MarshalAs(UnmanagedType.IUnknown)] object pDoneState);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFEndRegisterWorkQueueWithMMCSS(
             [In] IMFAsyncResult pResult,
             out int pdwTaskId);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFBeginUnregisterWorkQueueWithMMCSS(
             int dwWorkQueueId,
             [In] IMFAsyncCallback pDoneCallback,
             [In] [MarshalAs(UnmanagedType.IUnknown)] object pDoneState);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFEndUnregisterWorkQueueWithMMCSS(
             [In] IMFAsyncResult pResult);
 
@@ -279,18 +279,18 @@ namespace MediaFoundation
             int dwWorkQueueId,
             [MarshalAs(UnmanagedType.LPWStr)] string szClass);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFGetWorkQueueMMCSSClass(
             int dwWorkQueueId,
             [MarshalAs(UnmanagedType.LPWStr)] out string pwszClass,
             out  int pcchClass);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFGetWorkQueueMMCSSTaskId(
             int dwWorkQueueId,
             out int pdwTaskId);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateFile(
             MFFileAccessMode AccessMode,
             MFFileOpenMode OpenMode,
@@ -298,14 +298,14 @@ namespace MediaFoundation
             [MarshalAs(UnmanagedType.LPWStr)] string pwszFileURL,
             out IMFByteStream ppIByteStream);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateTempFile(
             MFFileAccessMode AccessMode,
             MFFileOpenMode OpenMode,
             MFFileFlags fFlags,
             out IMFByteStream ppIByteStream);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFBeginCreateFile(
             [In]  MFFileAccessMode AccessMode,
             [In]  MFFileOpenMode OpenMode,
@@ -315,23 +315,23 @@ namespace MediaFoundation
             [In]  [MarshalAs(UnmanagedType.IUnknown)] object pState,
             [MarshalAs(UnmanagedType.IUnknown)] out object ppCancelCookie);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFEndCreateFile(
             [In] IMFAsyncResult pResult,
             out IMFByteStream ppFile);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCancelCreateFile(
             [In] [MarshalAs(UnmanagedType.IUnknown)] object pCancelCookie);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateMediaBufferWrapper(
             [In] IMFMediaBuffer pBuffer,
             [In] int cbOffset,
             [In] int dwLength,
             out  IMFMediaBuffer ppBuffer);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateLegacyMediaBufferOnMFMediaBuffer(
             [In] IMFSample pSample,
             [In] IMFMediaBuffer pMFMediaBuffer,
@@ -345,33 +345,33 @@ namespace MediaFoundation
             [In] bool fBottomUpWhenLinear,
             out IMFMediaBuffer ppBuffer);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateAlignedMemoryBuffer(
             [In] int cbMaxLength,
             [In] int cbAligment,
             out IMFMediaBuffer ppBuffer);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitAttributesFromBlob(
             [In]                    IMFAttributes pAttributes,
             IntPtr pBuf,
             [In]                    int cbBufSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFGetAttributesAsBlobSize(
             [In]    IMFAttributes pAttributes,
             out   int pcbBufSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFGetAttributesAsBlob(
             [In]                    IMFAttributes pAttributes,
             IntPtr pBuf,
             [In]                    int cbBufSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTRegister(
             [In, MarshalAs(UnmanagedType.LPStruct)]                            Guid clsidMFT,
             [In, MarshalAs(UnmanagedType.LPStruct)]                            Guid guidCategory,
@@ -384,12 +384,12 @@ namespace MediaFoundation
             [In]                        IMFAttributes pAttributes
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTUnregister(
             [In, MarshalAs(UnmanagedType.LPStruct)]    Guid clsidMFT
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTEnum(
             [In, MarshalAs(UnmanagedType.LPStruct)]                    Guid guidCategory,
             [In]                    int Flags,
@@ -400,7 +400,7 @@ namespace MediaFoundation
             out                   int pcMFTs
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTGetInfo(
             [In, MarshalAs(UnmanagedType.LPStruct)]                                Guid clsidMFT,
             [MarshalAs(UnmanagedType.LPWStr)] out string pszName,
@@ -411,21 +411,21 @@ namespace MediaFoundation
             out IMFAttributes ppAttributes
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFValidateMediaTypeSize(
             [In, MarshalAs(UnmanagedType.LPStruct)]                    Guid FormatType,
             IntPtr pBlock,
             [In]                    int cbSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateMFVideoFormatFromMFMediaType(
             [In]        IMFMediaType pMFType,
             out       MFVideoFormat ppMFVF, // must be deleted with CoTaskMemFree
             out   int pcbSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromVideoInfoHeader(
             [In]                    IMFMediaType pMFType,
             VideoInfoHeader pVIH,
@@ -433,7 +433,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)]                Guid pSubtype
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromVideoInfoHeader2(
             [In]                    IMFMediaType pMFType,
             VideoInfoHeader2 pVIH2,
@@ -441,7 +441,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)]                Guid pSubtype
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromMPEG1VideoInfo(
             [In]                    IMFMediaType pMFType,
             MPEG1VideoInfo pMP1VI,
@@ -449,7 +449,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)]                Guid pSubtype
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromMPEG2VideoInfo(
             [In]                    IMFMediaType pMFType,
             Mpeg2VideoInfo pMP2VI,
@@ -465,7 +465,7 @@ namespace MediaFoundation
             out               bool pbKnown
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCalculateImageSize(
             [In, MarshalAs(UnmanagedType.LPStruct)]                    Guid guidSubtype,
             [In]                    int unWidth,
@@ -473,54 +473,54 @@ namespace MediaFoundation
             out                   int pcbImageSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFFrameRateToAverageTimePerFrame(
             [In]                    int unNumerator,
             [In]                    int unDenominator,
             out                   long punAverageTimePerFrame
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFAverageTimePerFrameToFrameRate(
             [In]                    long unAverageTimePerFrame,
             out                   int punNumerator,
             out                   int punDenominator
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromMFVideoFormat(
             [In]                    IMFMediaType pMFType,
             MFVideoFormat pMFVF,
             [In]                    int cbBufSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitMediaTypeFromAMMediaType(
             [In]    IMFMediaType pMFType,
             [In]    AMMediaType pAMType
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitAMMediaTypeFromMFMediaType(
             [In]    IMFMediaType pMFType,
             [In, MarshalAs(UnmanagedType.LPStruct)]    Guid guidFormatBlockType,
             AMMediaType pAMType
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateAMMediaTypeFromMFMediaType(
             [In]    IMFMediaType pMFType,
             [In, MarshalAs(UnmanagedType.LPStruct)]    Guid guidFormatBlockType,
             out AMMediaType ppAMType // delete with DeleteMediaType
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCompareFullToPartialMediaType(
             [In]    IMFMediaType pMFTypeFull,
             [In]    IMFMediaType pMFTypePartial
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFWrapMediaType(
             [In]    IMFMediaType pOrig,
             [In, MarshalAs(UnmanagedType.LPStruct)]    Guid MajorType,
@@ -528,7 +528,7 @@ namespace MediaFoundation
             out   IMFMediaType ppWrap
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFUnwrapMediaType(
             [In]    IMFMediaType pWrap,
             out   IMFMediaType ppOrig
@@ -600,7 +600,7 @@ namespace MediaFoundation
             out int pdwPlaneSize
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateAudioMediaType(
             [In]    WaveFormatEx pAudioFormat,
             out   IMFAudioMediaType ppIAudioMediaType
@@ -656,24 +656,24 @@ namespace MediaFoundation
             int dwCount
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateMediaTypeFromRepresentation(
             [MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
             IntPtr pvRepresentation,
             out IMFMediaType ppIMediaType
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFGetSystemTime(
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFSerializeAttributesToStream(
             IMFAttributes pAttr,
             int dwOptions,
             IStream pStm);
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFDeserializeAttributesFromStream(
             IMFAttributes pAttr,
             int dwOptions,
@@ -702,14 +702,14 @@ namespace MediaFoundation
             IMFPresentationDescriptor pPresentationDescriptor
         );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFSerializePresentationDescriptor(
             IMFPresentationDescriptor pPD,
             out int pcbData,
             IntPtr ppbData
         );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFDeserializePresentationDescriptor(
             int cbData,
             IntPtr pbData,

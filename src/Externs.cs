@@ -23,14 +23,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endregion
 
 using System;
-using System.Text;
 using System.Runtime.InteropServices;
 
 using MediaFoundation.Misc;
 
 namespace MediaFoundation
 {
-    public class MFPlatDll
+    public class MFExtern
     {
         [DllImport("MfPlat.dll", PreserveSig = false)]
         public static extern void MFShutdown();
@@ -134,10 +133,6 @@ namespace MediaFoundation
             out IMFMediaBuffer ppBuffer
         );
 
-    }
-
-    public class MFDll
-    {
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFGetService(
             [In, MarshalAs(UnmanagedType.Interface)] object punkObject,
@@ -801,14 +796,6 @@ namespace MediaFoundation
             out IMFRemoteDesktopPlugin ppPlugin
         );
 
-#endif
-
-    }
-
-    class WMContainer
-    {
-#if ALLOW_UNTESTED_INTERFACES
-
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFContentInfo(
             /* out */     out IMFASFContentInfo ppIContentInfo);
@@ -876,12 +863,6 @@ namespace MediaFoundation
         public static extern void MFCreatePresentationDescriptorFromASFProfile(
             /* in  */     IMFASFProfile pIProfile,
             /* out */     out IMFPresentationDescriptor ppIPD);
-#endif
-    }
-
-    class evr
-    {
-#if ALLOW_UNTESTED_INTERFACES
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateVideoPresenter(

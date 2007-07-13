@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
+using MediaFoundation.Misc;
 
 namespace Testv10
 {
@@ -62,7 +62,7 @@ namespace Testv10
         {
             IMFTopology tp;
 
-            MFDll.MFCreateTopology(out tp);
+            MFExtern.MFCreateTopology(out tp);
 
             try
             {
@@ -114,7 +114,7 @@ namespace Testv10
         {
             IMFTopologyNode pNode;
 
-            MFDll.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
+            MFExtern.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
             pNode.GetTopoNodeID(out m_pid);
             pNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, null);
 
@@ -123,7 +123,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFDll.MFCreateTopology(out m_Top);
+            MFExtern.MFCreateTopology(out m_Top);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
+using MediaFoundation.Misc;
 
 namespace Testv10
 {
@@ -149,7 +149,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFDll.MFCreateSourceResolver(out m_sr);
+            MFExtern.MFCreateSourceResolver(out m_sr);
         }
 
         #region IMFAsyncCallback Members

@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 
 namespace Testv10
@@ -250,7 +249,7 @@ namespace Testv10
 
             m_attr.GetCount(out iCnt1);
 
-            MFPlatDll.MFCreateAttributes(out attr, 20);
+            MFExtern.MFCreateAttributes(out attr, 20);
 
             m_attr.CopyAllItems(attr);
             attr.GetCount(out iCnt2);
@@ -268,7 +267,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFPlatDll.MFCreateAttributes(out m_attr, 20);
+            MFExtern.MFCreateAttributes(out m_attr, 20);
         }
     }
 }

@@ -8,7 +8,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -30,7 +29,7 @@ namespace Testv10
             object pSource = null;
 
             // Create the source resolver.
-            MFDll.MFCreateSourceResolver(out pSourceResolver);
+            MFExtern.MFCreateSourceResolver(out pSourceResolver);
 
             pSourceResolver.CreateObjectFromURL(
                     @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",

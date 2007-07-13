@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 
 namespace Testv10
 {
@@ -87,7 +86,7 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            MFPlatDll.MFCreateMemoryBuffer(100, out pBuff);
+            MFExtern.MFCreateMemoryBuffer(100, out pBuff);
 
             pBuff.SetCurrentLength(17);
 
@@ -116,14 +115,14 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            MFPlatDll.MFCreateMemoryBuffer(17, out pBuff);
+            MFExtern.MFCreateMemoryBuffer(17, out pBuff);
 
             m_ps.CopyToBuffer(pBuff);
         }
 
         private void GetInterface()
         {
-            MFPlatDll.MFCreateSample(out m_ps);
+            MFExtern.MFCreateSample(out m_ps);
         }
     }
 }

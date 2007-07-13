@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -35,7 +34,7 @@ namespace Testv10
         private void GetInterface()
         {
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            MFDll.MFCreateVideoRendererActivate(IntPtr.Zero, out m_a);
+            MFExtern.MFCreateVideoRendererActivate(IntPtr.Zero, out m_a);
         }
     }
 }

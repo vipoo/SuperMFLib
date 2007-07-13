@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -80,12 +79,12 @@ namespace Testv10
         {
             IMFPresentationClock pc;
 
-            MFDll.MFCreatePresentationClock(out pc);
+            MFExtern.MFCreatePresentationClock(out pc);
             m_c = pc as IMFClock;
 
             IMFMediaSession ms;
 
-            MFDll.MFCreateMediaSession(null, out ms);
+            MFExtern.MFCreateMediaSession(null, out ms);
             ms.GetClock(out m_c);
         }
     }

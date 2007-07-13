@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 
 namespace Testv10
@@ -66,7 +65,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFPlatDll.CreatePropertyStore(out m_ps);
+            MFExtern.CreatePropertyStore(out m_ps);
         }
     }
 }

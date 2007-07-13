@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -31,7 +30,7 @@ namespace Testv10
         {
             IMFMediaType mt, mt2;
 
-            MFPlatDll.MFCreateMediaType(out mt);
+            MFExtern.MFCreateMediaType(out mt);
 
             mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
@@ -78,11 +77,11 @@ namespace Testv10
         {
             IMFStreamDescriptor m_sd;
             IMFMediaType[] pmt = new IMFMediaType[1];
-            MFPlatDll.MFCreateMediaType(out pmt[0]);
+            MFExtern.MFCreateMediaType(out pmt[0]);
 
             pmt[0].SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
-            MFPlatDll.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
+            MFExtern.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
 
             m_sd.GetMediaTypeHandler(out m_mth);
         }

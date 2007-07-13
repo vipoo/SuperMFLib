@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -20,7 +19,7 @@ namespace Testv10
         {
             IMFClock pc;
 
-            MFPlatDll.MFCreateSystemTimeSource(out m_pts);
+            MFExtern.MFCreateSystemTimeSource(out m_pts);
             m_pts.GetUnderlyingClock(out pc);
         }
     }

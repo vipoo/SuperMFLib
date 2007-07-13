@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -69,7 +68,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFPlatDll.MFCreateCollection(out m_col);
+            MFExtern.MFCreateCollection(out m_col);
         }
     }
 }

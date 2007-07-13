@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -36,7 +35,7 @@ namespace Testv10
         {
             IMFTopology pTop;
 
-            MFDll.MFCreateTopology(out pTop);
+            MFExtern.MFCreateTopology(out pTop);
             m_ms.SetTopology(MFSessionSetTopologyFlags.None, pTop);
         }
 
@@ -96,7 +95,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFDll.MFCreateMediaSession(null, out m_ms);
+            MFExtern.MFCreateMediaSession(null, out m_ms);
         }
     }
 }

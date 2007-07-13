@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -47,7 +46,7 @@ namespace Testv10
         {
             IMFMediaEvent pEvent;
 
-            MFPlatDll.MFCreateMediaEvent(
+            MFExtern.MFCreateMediaEvent(
                 MediaEventType.MESourceStarted,
                 Guid.Empty,
                 0,
@@ -84,7 +83,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFPlatDll.MFCreateEventQueue(out m_meq);
+            MFExtern.MFCreateEventQueue(out m_meq);
         }
 
 

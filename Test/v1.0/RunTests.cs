@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
+using MediaFoundation.Misc;
 
 namespace Testv10
 {
@@ -14,7 +14,7 @@ namespace Testv10
         {
             try
             {
-                MFPlatDll.MFStartup(0x10070, MFStartup.Full);
+                MFExtern.MFStartup(0x10070, MFStartup.Full);
 
                 //TestWave t00 = new TestWave();
                 //t00.DoTests();

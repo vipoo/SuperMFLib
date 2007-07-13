@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -52,7 +51,7 @@ namespace Testv10
             IMFMediaType mt;
             MFMediaEqual f;
 
-            MFPlatDll.MFCreateMediaType(out mt);
+            MFExtern.MFCreateMediaType(out mt);
 
             Guid g1 = Guid.NewGuid();
 
@@ -103,7 +102,7 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFPlatDll.MFCreateMediaType(out m_mt);
+            MFExtern.MFCreateMediaType(out m_mt);
         }
     }
 }

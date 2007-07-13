@@ -6,7 +6,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -72,7 +71,7 @@ namespace Testv10
             MFObjectType pObjectType;
             object pSource;
 
-            MFDll.MFCreateSourceResolver(out m_sr);
+            MFExtern.MFCreateSourceResolver(out m_sr);
 
             m_sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",

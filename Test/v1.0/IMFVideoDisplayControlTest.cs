@@ -8,7 +8,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
 
@@ -172,7 +171,7 @@ namespace Testv10
             IMFActivate pRendererActivate = null;
 
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            MFDll.MFCreateVideoRendererActivate(IntPtr.Zero, out pRendererActivate);
+            MFExtern.MFCreateVideoRendererActivate(IntPtr.Zero, out pRendererActivate);
 
             pRendererActivate.ActivateObject(typeof(IMFGetService).GUID, out o);
             IMFGetService imfs = o as IMFGetService;

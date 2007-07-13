@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 
 namespace Testv10
 {
@@ -40,9 +39,9 @@ namespace Testv10
         private void GetInterface()
         {
             IMFMediaType[] pmt = new IMFMediaType[1];
-            MFPlatDll.MFCreateMediaType(out pmt[0]);
+            MFExtern.MFCreateMediaType(out pmt[0]);
 
-            MFPlatDll.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
+            MFExtern.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
         }
     }
 }

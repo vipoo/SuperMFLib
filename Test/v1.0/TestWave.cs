@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using MediaFoundation;
-using MediaFoundation.Utils;
 using MediaFoundation.Misc;
 
 namespace Testv10

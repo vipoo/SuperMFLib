@@ -2,7 +2,5 @@
 v1.0 Original release (2007-07-15)
 
 
-102 Interfaces defined
+114 Interfaces defined
 33 Interfaces tested 
-
-2 Samples

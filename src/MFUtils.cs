@@ -725,6 +725,154 @@ namespace MediaFoundation.Misc
         }
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("BITMAPINFOHEADER")]
+    public class BitmapInfoHeader
+    {
+        public int biSize;
+        public int biWidth;
+        public int biHeight;
+        public short biPlanes;
+        public short biBitCount;
+        public int biCompression;
+        public int biSizeImage;
+        public int biXPelsPerMeter;
+        public int biYPelsPerMeter;
+        public int biClrUsed;
+        public int biClrImportant;
+
+        public IntPtr GetPtr()
+        {
+            IntPtr ip;
+
+            // See what kind of BitmapInfoHeader object we've got
+            if (this is BitmapInfoHeaderWithData)
+            {
+                int iBitmapInfoHeaderSize = Marshal.SizeOf(typeof(BitmapInfoHeader));
+
+                // BitmapInfoHeaderWithData - Have to copy the array too
+                BitmapInfoHeaderWithData pData = this as BitmapInfoHeaderWithData;
+
+                // Account for copying the array.  This may result in us allocating more bytes than we 
+                // need (if cbSize < IntPtr.Size), but it prevents us from overrunning the buffer.
+                int iUseSize = Math.Max(pData.bmiColors.Length * 4, IntPtr.Size);
+
+                ip = Marshal.AllocCoTaskMem(iBitmapInfoHeaderSize + iUseSize);
+
+                Marshal.StructureToPtr(pData, ip, false);
+
+                IntPtr ip2 = new IntPtr(ip.ToInt64() + iBitmapInfoHeaderSize);
+                Marshal.Copy(pData.bmiColors, 0, ip2, pData.bmiColors.Length);
+            }
+            else if (this is BitmapInfoHeader)
+            {
+                int iBitmapInfoHeaderSize = Marshal.SizeOf(typeof(BitmapInfoHeader));
+
+                // WaveFormatEx - just do a copy
+                ip = Marshal.AllocCoTaskMem(iBitmapInfoHeaderSize);
+                Marshal.StructureToPtr(this as BitmapInfoHeader, ip, false);
+            }
+            else
+            {
+                Debug.Assert(false, "Shouldn't ever get here");
+                ip = IntPtr.Zero;
+            }
+
+            return ip;
+        }
+
+        public static BitmapInfoHeader PtrToBMI(IntPtr pNativeData)
+        {
+            int iEntries;
+            int biCompression;
+            int biClrUsed;
+            int biBitCount;
+
+            biBitCount = Marshal.ReadInt16(pNativeData, 14);
+            biCompression = Marshal.ReadInt32(pNativeData, 16);
+            biClrUsed = Marshal.ReadInt32(pNativeData, 32);
+
+            if (biCompression == 3) // BI_BITFIELDS
+            {
+                iEntries = 3;
+            }
+            else if (biClrUsed > 0)
+            {
+                iEntries = biClrUsed;
+            }
+            else if (biBitCount <= 8)
+            {
+                iEntries = 1 << biBitCount;
+            }
+            else
+            {
+                iEntries = 0;
+            }
+
+            BitmapInfoHeader bmi;
+
+            if (iEntries == 0)
+            {
+                // Create a simple BitmapInfoHeader struct
+                bmi = new BitmapInfoHeader();
+                Marshal.PtrToStructure(pNativeData, bmi);
+            }
+            else
+            {
+                BitmapInfoHeaderWithData ext = new BitmapInfoHeaderWithData();
+
+                ext.biSize = Marshal.ReadInt32(pNativeData, 0);
+                ext.biWidth = Marshal.ReadInt32(pNativeData, 4);
+                ext.biHeight = Marshal.ReadInt32(pNativeData, 8);
+                ext.biPlanes = Marshal.ReadInt16(pNativeData, 12);
+                ext.biBitCount = Marshal.ReadInt16(pNativeData, 14);
+                ext.biCompression = Marshal.ReadInt32(pNativeData, 16);
+                ext.biSizeImage = Marshal.ReadInt32(pNativeData, 20);
+                ext.biXPelsPerMeter = Marshal.ReadInt32(pNativeData, 24);
+                ext.biYPelsPerMeter = Marshal.ReadInt32(pNativeData, 28);
+                ext.biClrUsed = Marshal.ReadInt32(pNativeData, 32);
+                ext.biClrImportant = Marshal.ReadInt32(pNativeData, 36);
+
+                bmi = ext as BitmapInfoHeader;
+
+                ext.bmiColors = new int[iEntries];
+                IntPtr ip2 = new IntPtr(pNativeData.ToInt64() + Marshal.SizeOf(typeof(BitmapInfoHeader)));
+                Marshal.Copy(ip2, ext.bmiColors, 0, iEntries);
+            }
+
+            return bmi;
+        }
+
+        public void CopyFrom(BitmapInfoHeader bmi)
+        {
+            biSize = bmi.biSize;
+            biWidth = bmi.biWidth;
+            biHeight = bmi.biHeight;
+            biPlanes = bmi.biPlanes;
+            biBitCount = bmi.biBitCount;
+            biCompression = bmi.biCompression;
+            biSizeImage = bmi.biSizeImage;
+            biSizeImage = bmi.biSizeImage;
+            biYPelsPerMeter = bmi.biYPelsPerMeter;
+            biClrUsed = bmi.biClrUsed;
+            biClrImportant = bmi.biClrImportant;
+
+            if (bmi is BitmapInfoHeaderWithData)
+            {
+                BitmapInfoHeaderWithData ext = this as BitmapInfoHeaderWithData;
+                BitmapInfoHeaderWithData ext2 = bmi as BitmapInfoHeaderWithData;
+
+                ext.bmiColors = new int[ext2.bmiColors.Length];
+                ext2.bmiColors.CopyTo(ext.bmiColors, 0);
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("BITMAPINFO")]
+    public class BitmapInfoHeaderWithData : BitmapInfoHeader
+    {
+        public int[] bmiColors;
+    }
+
     #endregion
 
     #region Utility Classes
@@ -1375,6 +1523,66 @@ namespace MediaFoundation.Misc
         public static ICustomMarshaler GetInstance(string cookie)
         {
             return new WEMarshaler();
+        }
+    }
+
+    // Class to handle BITMAPINFO
+    internal class BMMarshaler : ICustomMarshaler
+    {
+        protected BitmapInfoHeader m_bmi;
+
+        public BMMarshaler()
+        {
+        }
+
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            m_bmi = managedObj as BitmapInfoHeader;
+
+            IntPtr ip = m_bmi.GetPtr();
+
+            return ip;
+        }
+
+        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
+        // from MarshalManagedToNative.  The return value is unused.
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            BitmapInfoHeader bmi = BitmapInfoHeader.PtrToBMI(pNativeData);
+
+            // If we this call is In+Out, the return value is ignored.  If
+            // this is out, then m_bmi will be null.
+            if (m_bmi != null)
+            {
+                m_bmi.CopyFrom(bmi);
+                bmi = null;
+            }
+
+            return bmi;
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
+        {
+            m_bmi = null;
+        }
+
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            Marshal.FreeCoTaskMem(pNativeData);
+        }
+
+        // The number of bytes to marshal out - never called
+        public int GetNativeDataSize()
+        {
+            return -1;
+        }
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            return new BMMarshaler();
         }
     }
 

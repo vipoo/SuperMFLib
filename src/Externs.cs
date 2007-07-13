@@ -457,9 +457,9 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)]                Guid pSubtype
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
+        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCalculateBitmapImageSize(
-            BitmapInfoHeader pBMIH,
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BMMarshaler))] BitmapInfoHeader pBMIH,
             [In]                    int cbBufSize,
             out                   int pcbImageSize,
             out               bool pbKnown
@@ -574,7 +574,7 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateVideoMediaTypeFromBitMapInfoHeader(
-            BitmapInfoHeader pbmihBitMapInfoHeader,
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BMMarshaler))] BitmapInfoHeader pbmihBitMapInfoHeader,
             int dwPixelAspectRatioX,
             int dwPixelAspectRatioY,
             MFVideoInterlaceMode InterlaceMode,

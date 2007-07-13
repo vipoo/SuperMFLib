@@ -201,22 +201,6 @@ namespace MediaFoundation.Misc
         public int pID;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("WAVEFORMATEX")]
-    public struct BitmapInfoHeader
-    {
-        public int biSize;
-        public int biWidth;
-        public int biHeight;
-        public short biPlanes;
-        public short biBitCount;
-        public int biCompression;
-        public int biSizeImage;
-        public int biXPelsPerMeter;
-        public int biYPelsPerMeter;
-        public int biClrUsed;
-        public int biClrImportant;
-    }
-
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
     public class SIZE
     {

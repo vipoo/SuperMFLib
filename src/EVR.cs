@@ -467,7 +467,7 @@ namespace MediaFoundation.EVR
         void RepaintVideo();
 
         void GetCurrentImage(
-            out BitmapInfoHeader pBih,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BMMarshaler))] BitmapInfoHeader pBih,
             out IntPtr pDib,
             out int pcbDib,
             out long pTimeStamp

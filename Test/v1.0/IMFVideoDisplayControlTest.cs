@@ -109,7 +109,7 @@ namespace Testv10
 
         void TestGetCurrentImage()
         {
-            BitmapInfoHeader bmh;
+            BitmapInfoHeader bmh = new BitmapInfoHeader();
             int i;
             long l = 0;
             IntPtr ip = IntPtr.Zero;
@@ -119,7 +119,7 @@ namespace Testv10
             try
             {
                 // Works in BasicPlayer
-                m_vdc.GetCurrentImage(out bmh, out ip, out i, out l);
+                m_vdc.GetCurrentImage(bmh, out ip, out i, out l);
             }
             catch { }
         }

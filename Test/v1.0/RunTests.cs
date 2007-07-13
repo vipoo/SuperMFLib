@@ -16,6 +16,9 @@ namespace Testv10
             {
                 MFExtern.MFStartup(0x10070, MFStartup.Full);
 
+                //TestBMI t0a = new TestBMI();
+                //t0a.DoTests();
+
                 //TestWave t00 = new TestWave();
                 //t00.DoTests();
 

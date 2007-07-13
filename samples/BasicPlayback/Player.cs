@@ -166,10 +166,27 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
 
         int hr = S_Ok;
-        
+
         try
         {
             m_pSession.Pause();
+
+            IntPtr ip, ip2;
+            int i;
+            long l;
+            BitmapInfoHeader bmh;
+
+            bmh.biSize = Marshal.SizeOf(typeof(BitmapInfoHeader)) * 10;
+
+            try
+            {
+                this.m_pVideoDisplay.GetCurrentImage(out bmh, out ip, out i, out l);
+            }
+            catch (Exception e)
+            {
+            }
+            //bmh = new BitmapInfoHeader();
+            //Marshal.PtrToStructure(ip2, bmh);
 
             m_state = PlayerState.PausePending;
             NotifyState();

@@ -1,8 +1,8 @@
 /****************************************************************************
-While the underlying libraries are covered by LGPL, this sample is released 
-as public domain.  It is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE.  
+While the underlying libraries are covered by LGPL, this sample is released
+as public domain.  It is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.
 *****************************************************************************/
 
 using System;
@@ -106,7 +106,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
             SafeRelease(pTopology);
 
-            // If SetTopology succeeded, the media session will queue an 
+            // If SetTopology succeeded, the media session will queue an
             // MESessionTopologySet event.
         }
         catch (Exception ce)
@@ -133,7 +133,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
 
         int hr = S_Ok;
-        
+
         try
         {
             StartPlayback();
@@ -168,23 +168,6 @@ class CPlayer : COMBase, IMFAsyncCallback
         try
         {
             m_pSession.Pause();
-
-            IntPtr ip, ip2;
-            int i;
-            long l;
-            BitmapInfoHeader bmh;
-
-            bmh.biSize = Marshal.SizeOf(typeof(BitmapInfoHeader)) * 10;
-
-            try
-            {
-                this.m_pVideoDisplay.GetCurrentImage(out bmh, out ip, out i, out l);
-            }
-            catch (Exception e)
-            {
-            }
-            //bmh = new BitmapInfoHeader();
-            //Marshal.PtrToStructure(ip2, bmh);
 
             m_state = PlayerState.PausePending;
             NotifyState();
@@ -278,13 +261,13 @@ class CPlayer : COMBase, IMFAsyncCallback
         return hr;
     }
 
-    public PlayerState GetState() 
-    { 
-        return m_state; 
+    public PlayerState GetState()
+    {
+        return m_state;
     }
 
-    public bool HasVideo() 
-    { 
+    public bool HasVideo()
+    {
         return (m_pVideoDisplay != null);
     }
 
@@ -304,7 +287,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         IMFMediaEvent pEvent = null;
         MediaEventType meType = MediaEventType.MEUnknown;  // Event type
         int hrStatus = 0;           // Event status
-        MFTopoStatus TopoStatus = MFTopoStatus.Invalid; // Used with MESessionTopologyStatus event.    
+        MFTopoStatus TopoStatus = MFTopoStatus.Invalid; // Used with MESessionTopologyStatus event.
 
         try
         {
@@ -474,7 +457,7 @@ class CPlayer : COMBase, IMFAsyncCallback
                     sURL,                       // URL of the source.
                     MFResolution.MediaSource,   // Create a source object.
                     null,                       // Optional property store.
-                    out ObjectType,             // Receives the created object type. 
+                    out ObjectType,             // Receives the created object type.
                     out pSource                 // Receives a pointer to the media source.
                 );
 
@@ -592,7 +575,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
         try
         {
-            // Create the source-stream node. 
+            // Create the source-stream node.
             MFExtern.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
 
             // Set attribute: Pointer to the media source.
@@ -751,8 +734,8 @@ class CPlayer : COMBase, IMFAsyncCallback
     {
         TRACE("CPlayer::OnSessionClosed");
 
-        // The application thread is waiting on this event, inside the 
-        // CPlayer::CloseSession method. 
+        // The application thread is waiting on this event, inside the
+        // CPlayer::CloseSession method.
         m_hCloseEvent.Set();
     }
 

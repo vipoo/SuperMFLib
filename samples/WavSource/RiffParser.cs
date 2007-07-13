@@ -11,7 +11,6 @@ using System.Runtime.InteropServices;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
-using MediaFoundation.Utils;
 
 namespace WavSourceFilter
 {

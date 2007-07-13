@@ -12,7 +12,6 @@ using Microsoft.Win32;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
-using MediaFoundation.Utils;
 
 using Utils;
 
@@ -62,9 +61,9 @@ namespace WavSourceFilter
 
             pSource.Open(pByteStream);
 
-            MFPlatDll.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
+            MFExtern.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
 
-            MFPlatDll.MFInvokeCallback(pResult);
+            MFExtern.MFInvokeCallback(pResult);
 
             if (pResult != null)
             {

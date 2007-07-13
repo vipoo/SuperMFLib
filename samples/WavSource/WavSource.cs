@@ -12,7 +12,6 @@ using System.Threading;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
-using MediaFoundation.Utils;
 using Utils;
 
 namespace WavSourceFilter
@@ -419,7 +418,7 @@ namespace WavSourceFilter
             cbBuffer = Math.Min(cbBuffer, m_Riff.BytesRemainingInChunk());
 
             // Create the buffer.
-            MFPlatDll.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
+            MFExtern.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
 
             int a, b;
 
@@ -441,7 +440,7 @@ namespace WavSourceFilter
             pBuffer.SetCurrentLength(cbBuffer);
 
             // Create a new sample and add the buffer to it.
-            MFPlatDll.MFCreateSample(out pSample);
+            MFExtern.MFCreateSample(out pSample);
 
             pSample.AddBuffer(pBuffer);
 
@@ -546,7 +545,7 @@ namespace WavSourceFilter
             m_state = State.Stopped;
 
             // Create the media event queue.
-            MFPlatDll.MFCreateEventQueue(out m_pEventQueue);
+            MFExtern.MFCreateEventQueue(out m_pEventQueue);
         }
 
         ~WavSource()
@@ -761,7 +760,7 @@ namespace WavSourceFilter
                     IMFMediaEvent pEvent = null;
 
                     // Create the event.
-                    MFPlatDll.MFCreateMediaEvent(
+                    MFExtern.MFCreateMediaEvent(
                         MediaEventType.MESourceStarted,
                         Guid.Empty,
                         S_Ok,
@@ -1018,16 +1017,16 @@ namespace WavSourceFilter
             Debug.Assert(WaveFormat() != null);
 
             // Create an empty media type.
-            MFPlatDll.MFCreateMediaType(out pMediaType);
+            MFExtern.MFCreateMediaType(out pMediaType);
 
             // Initialize the media type from the WAVEFORMATEX structure.
-            MFPlatDll.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
+            MFExtern.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
 
             IMFMediaType[] mt = new IMFMediaType[1];
             mt[0] = pMediaType;
 
             // Create the stream descriptor.
-            MFPlatDll.MFCreateStreamDescriptor(
+            MFExtern.MFCreateStreamDescriptor(
                 0,          // stream identifier
                 mt.Length,          // Number of media types.
                 mt, // Array of media types
@@ -1042,7 +1041,7 @@ namespace WavSourceFilter
             ms[0] = pStreamDescriptor;
 
             // Create the presentation descriptor.
-            MFPlatDll.MFCreatePresentationDescriptor(
+            MFExtern.MFCreatePresentationDescriptor(
                 ms.Length,      // Number of stream descriptors
                 ms, // Array of stream descriptors
                 out m_pPresentationDescriptor
@@ -1120,7 +1119,7 @@ namespace WavSourceFilter
             //pFormat = new WaveFormatEx();
             //Marshal.PtrToStructure(ip, pFormat);
 
-            MFPlatDll.MFCreateWaveFormatExFromMFMediaType(
+            MFExtern.MFCreateWaveFormatExFromMFMediaType(
                 pMediaType,
                 out pFormat,
                 out iSize,

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Threading;
 
-using MediaFoundation.Utils;
+using MediaFoundation.Misc;
 
 namespace MF_BasicPlayback
 {

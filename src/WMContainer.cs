@@ -17,7 +17,7 @@ Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
-Foundation = new Guid(Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #endregion
@@ -199,7 +199,7 @@ namespace MediaFoundation
             /* [out] */ out Guid pguidType);
         
         void SetType( 
-            /* [in] */ Guid guidType);
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidType);
         
         void GetRecordCount( 
             /* [out] */ out int pdwRecordCount);
@@ -665,7 +665,7 @@ namespace MediaFoundation
             /* [optional][out][in] */ out int pcbExtensionSystemInfo);
         
         void AddPayloadExtension( 
-            /* [in] */ Guid guidExtensionSystemID,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtensionSystemID,
             /* [in] */ short cbExtensionDataSize,
             /* [size_is][in] */ IntPtr pbExtensionSystemInfo,
             /* [in] */ int cbExtensionSystemInfo);

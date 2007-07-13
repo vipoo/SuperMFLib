@@ -1,9 +1,12 @@
-Of the ~102 interfaces defined in the source code, 33 of them have 
-been tested to ensure that they are correctly defined.  If you were
-to count all the methods on those interface, you would find 230
-methods.
+There are 114 interfaces listed for Media Foundation at 
+http://msdn2.microsoft.com/en-us/library/ms696268.aspx and 
+150 externs defined at http://msdn2.microsoft.com/en-us/library/ms696205.aspx
 
-These interfaces have been tested
+This doc describes the status of each of these.
+
+======================== Interfaces ====================================
+
+These 32 interfaces have been tested (4 of these are duplicates to deal with MF bug)
 
 IMFActivate
 IMFAsyncCallback
@@ -37,14 +40,20 @@ IMFStreamDescriptor
 IMFTopology
 IMFTopologyNode
 IMFVideoDisplayControl
+
+------------------------------------------------------------------------------
+
+This 1 tested interfaces is not part of Media Foundation, but MF uses it so it
+is defined in the library.
+
 IPropertyStore
 
 ------------------------------------------------------------------------------
-These interfaces are defined in the library, but have not yet been tested.
+These 75 interfaces are defined in the library, but have not yet been tested.
 
+IMF2DBuffer
 IEVRFilterConfig
 IEVRTrustedVideoPlugin
-IMF2DBuffer
 IMFAudioPolicy
 IMFAudioStreamVolume
 IMFByteStreamBuffering
@@ -107,35 +116,6 @@ IMFVideoPresenter
 IMFVideoRenderer
 IMFVideoSampleAllocator
 IMFWorkQueueServices
-ISequentialStream
-IStream
-
-------------------------------------------------------------------------------
-
-These interfaces are in the source code, but are deprecated, undocumented, or 
-otherwise untestable which means they are not, and will not be tested:
-
-IMFAudioMediaType
-IMFRemoteAsyncCallback
-
-------------------------------------------------------------------------------
-
-These interfaces are listed on MSDN as MediaFoundation, but are not currently 
-in the library.  That may change depending on interest.
-
-IDirect3DDeviceManager9
-IDirectXVideoAccelerationService
-IDirectXVideoDecoder
-IDirectXVideoDecoderService
-IDirectXVideoMemoryConfiguration
-IDirectXVideoProcessor
-IDirectXVideoProcessorService
-
-IEVRVideoStreamControl
-
-IMFVideoMixerBitmap
-IMFVideoProcessor
-
 IMFASFContentInfo
 IMFASFIndexer
 IMFASFMultiplexer
@@ -145,4 +125,219 @@ IMFASFSplitter
 IMFASFStreamConfig
 IMFASFStreamPrioritization
 IMFASFStreamSelector
+IMFVideoMixerBitmap
+IMFVideoProcessor
 
+------------------------------------------------------------------------------
+
+These 2 interfaces are defined in the library, but are deprecated, undocumented 
+or otherwise untestable:
+
+IMFAudioMediaType
+IMFRemoteAsyncCallback
+
+------------------------------------------------------------------------------
+
+These 9 interfaces require work that is beyond the scope of this library and
+are not defined in the library:
+
+IEVRVideoStreamControl
+IDirect3DDeviceManager9
+IDirectXVideoAccelerationService
+IDirectXVideoDecoder
+IDirectXVideoDecoderService
+IDirectXVideoMemoryConfiguration
+IDirectXVideoProcessor
+IDirectXVideoProcessorService
+
+------------------------------------------------------------------------------
+
+These 3 untested interfaces are not part of Media Foundation, but MF uses them
+so they are defined in the library.
+
+INamedPropertyStore
+ISequentialStream
+IStream
+
+
+====================== Externs ===========================
+
+These 25 externs are tested
+
+CreateNamedPropertyStore
+MFCreateAsyncResult
+MFCreateAttributes
+MFCreateAudioRendererActivate
+MFCreateCollection
+MFCreateEventQueue
+MFCreateMediaEvent
+MFCreateMediaSession
+MFCreateMediaType
+MFCreateMemoryBuffer
+MFCreatePresentationClock
+MFCreatePresentationDescriptor
+MFCreateSample
+MFCreateSourceResolver
+MFCreateStreamDescriptor
+MFCreateSystemTimeSource
+MFCreateTopology
+MFCreateTopologyNode
+MFCreateVideoRendererActivate
+MFCreateWaveFormatExFromMFMediaType
+MFGetService
+MFInitMediaTypeFromWaveFormatEx
+MFInvokeCallback
+MFShutdown
+MFStartup
+
+------------------------------------------------------------------------------
+These 110 externs are defined in the library, but have not yet been tested.
+
+CreatePropertyStore
+MFAddPeriodicCallback
+MFAllocateWorkQueue
+MFAverageTimePerFrameToFrameRate
+MFBeginCreateFile
+MFBeginRegisterWorkQueueWithMMCSS
+MFBeginUnregisterWorkQueueWithMMCSS
+MFCalculateBitmapImageSize
+MFCalculateImageSize
+MFCancelCreateFile
+MFCancelWorkItem
+MFCompareFullToPartialMediaType
+MFConvertColorInfoFromDXVA
+MFConvertColorInfoToDXVA
+MFConvertFromFP16Array
+MFConvertToFP16Array
+MFCopyImage
+MFCreateAlignedMemoryBuffer
+MFCreateAMMediaTypeFromMFMediaType
+MFCreateASFContentInfo
+MFCreateASFIndexer
+MFCreateASFIndexerByteStream
+MFCreateASFMediaSink
+MFCreateASFMediaSinkActivate
+MFCreateASFMultiplexer
+MFCreateASFProfile
+MFCreateASFProfileFromPresentationDescriptor
+MFCreateASFSplitter
+MFCreateASFStreamSelector
+MFCreateAudioMediaType
+MFCreateAudioRenderer
+MFCreateCredentialCache
+MFCreateDXSurfaceBuffer
+MFCreateFile
+MFCreateLegacyMediaBufferOnMFMediaBuffer
+MFCreateMediaBufferWrapper
+MFCreateMediaTypeFromRepresentation
+MFCreateMFVideoFormatFromMFMediaType
+MFCreateNetSchemePlugin
+MFCreatePMPMediaSession
+MFCreatePMPServer
+MFCreatePresentationDescriptorFromASFProfile
+MFCreateProxyLocator
+MFCreateRemoteDesktopPlugin
+MFCreateSampleGrabberSinkActivate
+MFCreateSequencerSegmentOffset
+MFCreateSequencerSource
+MFCreateSimpleTypeHandler
+MFCreateStandardQualityManager
+MFCreateTempFile
+MFCreateTopoLoader
+MFCreateVideoMediaType
+MFCreateVideoMediaTypeFromBitMapInfoHeader
+MFCreateVideoMediaTypeFromSubtype
+MFCreateVideoMixer
+MFCreateVideoMixerAndPresenter
+MFCreateVideoPresenter
+MFCreateVideoRenderer
+MFCreateVideoSampleFromSurface
+MFCreateWMAEncoderActivate
+MFCreateWMVEncoderActivate
+MFDeserializeAttributesFromStream
+MFDeserializePresentationDescriptor
+MFEndCreateFile
+MFEndRegisterWorkQueueWithMMCSS
+MFEndUnregisterWorkQueueWithMMCSS
+MFFrameRateToAverageTimePerFrame
+MFGetAttributesAsBlob
+MFGetAttributesAsBlobSize
+MFGetPlaneSize
+MFGetStrideForBitmapInfoHeader
+MFGetSupportedMimeTypes
+MFGetSupportedSchemes
+MFGetSystemTime
+MFGetTimerPeriodicity
+MFGetUncompressedVideoFormat
+MFGetWorkQueueMMCSSClass
+MFGetWorkQueueMMCSSTaskId
+MFInitAMMediaTypeFromMFMediaType
+MFInitAttributesFromBlob
+MFInitMediaTypeFromAMMediaType
+MFInitMediaTypeFromMFVideoFormat
+MFInitMediaTypeFromMPEG1VideoInfo
+MFInitMediaTypeFromMPEG2VideoInfo
+MFInitMediaTypeFromVideoInfoHeader
+MFInitMediaTypeFromVideoInfoHeader2
+MFInitVideoFormat
+MFInitVideoFormat_RGB
+MFIsFormatYUV
+MFLockPlatform
+MFLockWorkQueue
+MFPERIODICCALLBACK Callback
+MFPutWorkItem
+MFPutWorkItemEx
+MFRemovePeriodicCallback
+MFRequireProtectedEnvironment
+MFScheduleWorkItem
+MFScheduleWorkItemEx
+MFSerializeAttributesToStream
+MFSerializePresentationDescriptor
+MFShutdownObject
+MFTEnum
+MFTGetInfo
+MFTRegister
+MFTUnregister
+MFUnlockPlatform
+MFUnlockWorkQueue
+MFUnwrapMediaType
+MFValidateMediaTypeSize
+MFWrapMediaType
+
+------------------------------------------------------------------------------
+These 6 externs require work that is beyond the scope of this library:
+
+DXVA2_Fixed32OpaqueAlpha
+DXVA2_Fixed32TransparentAlpha
+DXVA2CreateDirect3DDeviceManager9
+DXVA2CreateVideoService
+DXVA2FixedToFloat
+DXVA2FloatToFixed
+
+------------------------------------------------------------------------------
+
+These 4 externs are defined in the library, but are deprecated, undocumented 
+or otherwise untestable:
+
+MFSetWorkQueueClass
+MFCreateVideoMediaTypeFromVideoInfoHeader
+MFCreateVideoMediaTypeFromVideoInfoHeader2
+MFCreateQualityManager
+
+------------------------------------------------------------------------------
+
+These 11 externs are not defined in the library, because they are deprecated, 
+undocumented or otherwise untestable:
+
+MFGetAttribute2UINT32asUINT64 (undoced)
+MFSetAttribute2UINT32asUINT64 (undoced)
+MFGetAttributeDouble
+MFGetAttributeRatio
+MFGetAttributeSize
+MFGetAttributeUINT32
+MFGetAttributeUINT64
+MFSetAttributeRatio
+MFSetAttributeSize
+
+MFHeapAlloc
+MFHeapFree

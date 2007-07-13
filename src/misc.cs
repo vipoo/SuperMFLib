@@ -1090,12 +1090,12 @@ namespace MediaFoundation.Misc
     public interface INamedPropertyStore
     {
         void GetNamedValue( 
-            string pszName,
+            [MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
         );
         
         void SetNamedValue( 
-            string pszName,
+            [MarshalAs(UnmanagedType.LPWStr)] string pszName,
             PropVariant propvar);
         
         void GetNameCount( 

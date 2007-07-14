@@ -1,6 +1,5 @@
 -----------------------------------------------------------------
-v1.0 Original release (2007-07-15)
-
+v0.9 Beta 1 release (2007-07-15)
 
 114 Interfaces defined
 33 Interfaces tested 

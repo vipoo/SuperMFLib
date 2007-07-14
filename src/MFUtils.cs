@@ -49,34 +49,42 @@ namespace MediaFoundation.Misc
             StringArray = 0x1000 + 0x1f
         }
 
+        [DllImport("ole32.dll", PreserveSig=false)]
+        private static extern int PropVariantClear(
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvar
+            );
+
         #region Member variables
 
         [FieldOffset(0)]
-        private VariantType type;
+        protected VariantType type;
 
         [FieldOffset(2)]
-        private short reserved1;
+        protected short reserved1;
 
         [FieldOffset(4)]
-        private short reserved2;
+        protected short reserved2;
 
         [FieldOffset(6)]
-        private short reserved3;
+        protected short reserved3;
 
         [FieldOffset(8)]
-        private int intValue;
+        protected int intValue;
 
         [FieldOffset(8)]
-        private long longValue;
+        protected long longValue;
 
         [FieldOffset(8)]
-        private double doubleValue;
+        protected double doubleValue;
 
         [FieldOffset(8)]
-        private Blob blobValue;
+        protected Blob blobValue;
 
         [FieldOffset(8)]
-        private IntPtr ptr;
+        protected IntPtr ptr;
+
+        [FieldOffset(8)]
+        protected CALPWstr calpwstr;
 
         #endregion
 
@@ -94,15 +102,13 @@ namespace MediaFoundation.Misc
         public PropVariant(string[] value)
         {
             type = VariantType.StringArray;
-            ptr = Marshal.AllocCoTaskMem(4 + IntPtr.Size);
-            Marshal.WriteInt32(ptr, value.Length);
 
-            IntPtr ip = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
-            Marshal.WriteIntPtr(ptr, 4, ip);
+            calpwstr.cElems = value.Length;
+            calpwstr.pElems = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
 
             for (int x = 0; x < value.Length; x++)
             {
-                Marshal.WriteIntPtr(ip, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
+                Marshal.WriteIntPtr(calpwstr.pElems, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
             }
         }
 
@@ -218,34 +224,7 @@ namespace MediaFoundation.Misc
 
         public void Clear()
         {
-            if (type == VariantType.String || type == VariantType.Guid)
-            {
-                Marshal.FreeCoTaskMem(ptr);
-            }
-            else if (type == VariantType.IUnknown)
-            {
-                Marshal.Release(ptr);
-            }
-            else if (type == VariantType.Blob)
-            {
-                Marshal.FreeCoTaskMem(blobValue.pBlobData);
-                blobValue.pBlobData = IntPtr.Zero;
-            }
-            else if (type == VariantType.StringArray)
-            {
-                int iCount = Marshal.ReadInt32(ptr);
-                IntPtr ip = Marshal.ReadIntPtr(ptr, 4);
-
-                for (int x = 0; x < iCount; x++)
-                {
-                    Marshal.FreeCoTaskMem(Marshal.ReadIntPtr(ip, x * IntPtr.Size));
-                }
-                Marshal.FreeCoTaskMem(ip);
-                Marshal.FreeCoTaskMem(ptr);
-            }
-
-            ptr = IntPtr.Zero;
-            type = 0;
+            PropVariantClear(this);
         }
 
         public string[] GetStringArray()
@@ -254,16 +233,17 @@ namespace MediaFoundation.Misc
             {
                 string[] sa;
 
-                int iCount = Marshal.ReadInt32(ptr);
+                int iCount = calpwstr.cElems;
                 sa = new string[iCount];
 
-                IntPtr ip = Marshal.ReadIntPtr(ptr, 4);
                 for (int x = 0; x < iCount; x++)
                 {
-                    sa[x] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(ip, x * IntPtr.Size));
+                    sa[x] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(calpwstr.pElems, x * IntPtr.Size));
                 }
+
+                return sa;
             }
-            throw new ArgumentException("PropVariant contents not a string");
+            throw new ArgumentException("PropVariant contents not a string array");
         }
 
         public string GetString()

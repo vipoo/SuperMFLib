@@ -33,6 +33,120 @@ namespace MediaFoundation.Transform
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [UnmanagedName("MFT_REGISTER_TYPE_INFO")]
+    public class MFTRegisterTypeInfo
+    {
+        public Guid guidMajorType;
+        public Guid guidSubtype;
+    }
+
+    [Flags, UnmanagedName("_MFT_PROCESS_OUTPUT_FLAGS")]
+    public enum MFTProcessOutputFlags
+    {
+        None = 0,
+        DiscardWhenNoBuffer = 0x00000001
+    }
+
+    [Flags, UnmanagedName("_MFT_OUTPUT_STATUS_FLAGS")]
+    public enum MFTOutputStatusFlags
+    {
+        None = 0,
+        SampleReady = 0x00000001
+    }
+
+    [Flags, UnmanagedName("_MFT_INPUT_STATUS_FLAGS")]
+    public enum MFTInputStatusFlags
+    {
+        None = 0,
+        AcceptData = 0x00000001
+    }
+
+    [Flags, UnmanagedName("_MFT_SET_TYPE_FLAGS")]
+    public enum MFTSetTypeFlags
+    {
+        None = 0,
+        TestOnly = 0x00000001
+    }
+
+    [Flags, UnmanagedName("_MFT_OUTPUT_STREAM_INFO_FLAGS")]
+    public enum MFTOutputStreamInfoFlags
+    {
+        None = 0,
+        WholeSamples = 0x00000001,
+        SingleSamplePerBuffer = 0x00000002,
+        FixedSampelSize = 0x00000004,
+        Discardable = 0x00000008,
+        Optional = 0x00000010,
+        ProvidesSamples = 0x00000100,
+        CanProvideSamples = 0x00000200,
+        LazyRead = 0x00000400,
+        Removable = 0x00000800
+    }
+
+    [Flags, UnmanagedName("_MFT_INPUT_STREAM_INFO_FLAGS")]
+    public enum MFTInputStreamInfoFlags
+    {
+        WholeSamples = 0x1,
+        SingleSamplePerBuffer = 0x2,
+        FixedSampleSize = 0x4,
+        HoldsBuffers = 0x8,
+        DoesNotAddRef = 0x100,
+        Removable = 0x200,
+        Optional = 0x400,
+        ProcessesInPlace = 0x800
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFT_INPUT_STREAM_INFO")]
+    public struct MFTInputStreamInfo
+    {
+        public long hnsMaxLatency;
+        public MFTInputStreamInfoFlags dwFlags;
+        public int cbSize;
+        public int cbMaxLookahead;
+        public int cbAlignment;
+    }
+
+    [UnmanagedName("MFT_MESSAGE_TYPE")]
+    public enum MFTMessageType
+    {
+        CommandDrain = 1,
+        CommandFlush = 0,
+        NotifyBeginStreaming = 0x10000000,
+        NotifyEndOfStream = 0x10000002,
+        NotifyEndStreaming = 0x10000001,
+        NotifyStartOfStream = 0x10000003,
+        SetD3DManager = 2
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_OUTPUT_DATA_BUFFER")]
+    public struct MFTOutputDataBuffer
+    {
+        public int dwStreamID;
+        [MarshalAs(UnmanagedType.Interface)]
+        public IMFSample pSample;
+        public MFTOutputDataBufferFlags dwStatus;
+        [MarshalAs(UnmanagedType.Interface)]
+        public IMFCollection pEvents;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
+    public struct MFTOutputStreamInfo
+    {
+        public MFTOutputStreamInfoFlags dwFlags;
+        public int cbSize;
+        public int cbAlignment;
+    }
+
+    [Flags, UnmanagedName("_MFT_OUTPUT_DATA_BUFFER_FLAGS")]
+    public enum MFTOutputDataBufferFlags
+    {
+        None = 0,
+        Incomplete = 0x01000000,
+        FormatChange = 0x00000100,
+        StreamEnd = 0x00000200,
+        NoSample = 0x00000300
+    };
+
     [Flags, UnmanagedName("_MFT_PROCESS_OUTPUT_STATUS")]
     public enum ProcessOutputStatus
     {

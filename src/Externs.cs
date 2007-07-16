@@ -26,6 +26,7 @@ using System;
 using System.Runtime.InteropServices;
 
 using MediaFoundation.Misc;
+using MediaFoundation.Transform;
 
 namespace MediaFoundation
 {

@@ -567,21 +567,21 @@ namespace MediaFoundation
         public static readonly Guid Default = new Guid(0x81A412E6, 0x8103, 0x4B06, 0x85, 0x7F, 0x18, 0x62, 0x78, 0x10, 0x24, 0xAC);
         /// <summary> From MFMediaType_Audio </summary>
         public static readonly Guid Audio = new Guid(0x73647561, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71);
-        /// <summary> From Video </summary>
+        /// <summary> From MFMediaType_Video </summary>
         public static readonly Guid Video = new Guid(0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71);
-        /// <summary> From Protected </summary>
+        /// <summary> From MFMediaType_Protected </summary>
         public static readonly Guid Protected = new Guid(0x7b4b6fe6, 0x9d04, 0x4494, 0xbe, 0x14, 0x7e, 0x0b, 0xd0, 0x76, 0xc8, 0xe4);
-        /// <summary> From SAMI </summary>
+        /// <summary> From MFMediaType_SAMI </summary>
         public static readonly Guid SAMI = new Guid(0xe69669a0, 0x3dcd, 0x40cb, 0x9e, 0x2e, 0x37, 0x08, 0x38, 0x7c, 0x06, 0x16);
-        /// <summary> From Script </summary>
+        /// <summary> From MFMediaType_Script </summary>
         public static readonly Guid Script = new Guid(0x72178C22, 0xE45B, 0x11D5, 0xBC, 0x2A, 0x00, 0xB0, 0xD0, 0xF3, 0xF4, 0xAB);
-        /// <summary> From Image </summary>
+        /// <summary> From MFMediaType_Image </summary>
         public static readonly Guid Image = new Guid(0x72178C23, 0xE45B, 0x11D5, 0xBC, 0x2A, 0x00, 0xB0, 0xD0, 0xF3, 0xF4, 0xAB);
-        /// <summary> From HTML </summary>
+        /// <summary> From MFMediaType_HTML </summary>
         public static readonly Guid HTML = new Guid(0x72178C24, 0xE45B, 0x11D5, 0xBC, 0x2A, 0x00, 0xB0, 0xD0, 0xF3, 0xF4, 0xAB);
-        /// <summary> From Binary </summary>
+        /// <summary> From MFMediaType_Binary </summary>
         public static readonly Guid Binary = new Guid(0x72178C25, 0xE45B, 0x11D5, 0xBC, 0x2A, 0x00, 0xB0, 0xD0, 0xF3, 0xF4, 0xAB);
-        /// <summary> From FileTransfer </summary>
+        /// <summary> From MFMediaType_FileTransfer </summary>
         public static readonly Guid FileTransfer = new Guid(0x72178C26, 0xE45B, 0x11D5, 0xBC, 0x2A, 0x00, 0xB0, 0xD0, 0xF3, 0xF4, 0xAB);
     }
 
@@ -647,7 +647,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MFT_REGISTER_TYPE_INFO")]
-    public struct MFTRegisterTypeInfo
+    public class MFTRegisterTypeInfo
     {
         public Guid guidMajorType;
         public Guid guidSubtype;
@@ -903,7 +903,7 @@ namespace MediaFoundation
         CommandFlush = 0,
         NotifyBeginStreaming = 0x10000000,
         NotifyEndOfStream = 0x10000002,
-        NotifyendStreaming = 0x10000001,
+        NotifyEndStreaming = 0x10000001,
         NotifyStartOfStream = 0x10000003,
         SetD3DManager = 2
     }

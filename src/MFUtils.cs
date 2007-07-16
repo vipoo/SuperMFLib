@@ -353,9 +353,25 @@ namespace MediaFoundation.Misc
             this.m_fourCC = fcc;
         }
 
+        public FourCC(Guid g)
+        {
+            byte[] asc;
+            asc = g.ToByteArray();
+
+            this.m_fourCC = asc[0];
+            this.m_fourCC |= asc[1] << 8;
+            this.m_fourCC |= asc[2] << 16;
+            this.m_fourCC |= asc[3] << 24;
+        }
+
         public int ToInt32()
         {
             return this.m_fourCC;
+        }
+
+        public static explicit operator int(FourCC f)
+        {
+            return f.ToInt32();
         }
 
         public Guid ToMediaSubtype()

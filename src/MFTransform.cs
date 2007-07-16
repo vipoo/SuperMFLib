@@ -67,9 +67,9 @@ namespace MediaFoundation.Transform
 
         void GetStreamIDs(
             int dwInputIDArraySize,
-            out int pdwInputIDs,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int [] pdwInputIDs,
             int dwOutputIDArraySize,
-            out int pdwOutputIDs
+           [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] int[] pdwOutputIDs
             );
 
         void GetInputStreamInfo(
@@ -102,7 +102,7 @@ namespace MediaFoundation.Transform
 
         void AddInputStreams(
             int cStreams,
-            [In] ref int adwStreamIDs
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] MFTInputStreamInfo[] adwStreamIDs
             );
 
         void GetInputAvailableType(
@@ -160,7 +160,7 @@ namespace MediaFoundation.Transform
 
         void ProcessMessage(
             MFTMessageType eMessage,
-            int ulParam
+            IntPtr ulParam
             );
 
         void ProcessInput(
@@ -172,7 +172,7 @@ namespace MediaFoundation.Transform
         void ProcessOutput(
             MFTProcessOutputFlags dwFlags,
             int cOutputBufferCount,
-            [In, Out] ref MFTOutputDataBuffer pOutputSamples,
+            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=1)] MFTOutputDataBuffer [] pOutputSamples,
             out ProcessOutputStatus pdwStatus
             );
     }

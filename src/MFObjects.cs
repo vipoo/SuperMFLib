@@ -432,7 +432,7 @@ namespace MediaFoundation
     public interface IMF2DBuffer
     {
         void Lock2D(
-            [Out] IntPtr pbScanline0,
+            [Out] out IntPtr pbScanline0,
             out int plPitch
             );
 

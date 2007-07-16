@@ -37,7 +37,8 @@ namespace MediaFoundation
 
         [DllImport("MfPlat.dll", PreserveSig = false)]
         public static extern void MFStartup(
-            int Version, MFStartup dwFlags
+            int Version,
+            MFStartup dwFlags
         );
 
         [DllImport("MfPlat.dll", PreserveSig = false)]
@@ -374,15 +375,15 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTRegister(
-            [In, MarshalAs(UnmanagedType.LPStruct)]                            Guid clsidMFT,
-            [In, MarshalAs(UnmanagedType.LPStruct)]                            Guid guidCategory,
-            [In, MarshalAs(UnmanagedType.LPWStr)]                            string pszName,
-            [In]                            int Flags,
-            [In]                            int cInputTypes,
+            [In] Guid clsidMFT,
+            [In] Guid guidCategory,
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
+            [In] int Flags, // Must be zero
+            [In] int cInputTypes,
             MFTRegisterTypeInfo pInputTypes,
-            [In]                            int cOutputTypes,
+            [In] int cOutputTypes,
             MFTRegisterTypeInfo pOutputTypes,
-            [In]                        IMFAttributes pAttributes
+            [In] IMFAttributes pAttributes
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]

@@ -83,17 +83,8 @@ namespace MediaFoundation.EVR
     public struct MFVideoAlphaBitmap
     {
         bool GetBitmapFromDC;
-        Unnamed001 stru;
+        IntPtr stru;
         MFVideoAlphaBitmapParams paras;
-    }
-
-    [StructLayout(LayoutKind.Explicit), UnmanagedName("unnamed union")]
-    public struct Unnamed001
-    {
-        [FieldOffset(0)]
-        IntPtr hdc;
-        [FieldOffset(0)]
-        object pDDS; // IDirect3DSurface9
     }
 
     [UnmanagedName("MFVP_MESSAGE_TYPE")]

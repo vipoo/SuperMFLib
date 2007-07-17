@@ -119,7 +119,7 @@ namespace Testv10
             gv1 = Guid.NewGuid();
             m_attr.SetGUID(g, gv1);
 
-            m_attr.GetGuid(g, out gv2);
+            m_attr.GetGUID(g, out gv2);
 
             Debug.Assert(gv1 == gv2);
         }

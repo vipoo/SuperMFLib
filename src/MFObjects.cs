@@ -507,7 +507,7 @@ namespace MediaFoundation
             out double pfValue
             );
 
-        new void GetGuid(
+        new void GetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
@@ -697,7 +697,7 @@ namespace MediaFoundation
             out double pfValue
             );
 
-        new void GetGuid(
+        new void GetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
@@ -933,7 +933,7 @@ namespace MediaFoundation
             out double pfValue
             );
 
-        new void GetGuid(
+        new void GetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
@@ -1107,7 +1107,7 @@ namespace MediaFoundation
             out double pfValue
             );
 
-        void GetGuid(
+        void GetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
@@ -1334,7 +1334,7 @@ namespace MediaFoundation
             out double pfValue
             );
 
-        new void GetGuid(
+        new void GetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );
@@ -1626,7 +1626,7 @@ namespace MediaFoundation
             out double pfValue
             );
 
-        new void GetGuid(
+        new void GetGUID(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
             out Guid pguidValue
             );

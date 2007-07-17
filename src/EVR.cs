@@ -101,7 +101,7 @@ namespace MediaFoundation.EVR
     }
 
     [UnmanagedName("MF_SERVICE_LOOKUP_TYPE")]
-    public enum MF_ServiceLookupType
+    public enum MFServiceLookupType
     {
         Upstream,
         UpstreamDirect,
@@ -344,7 +344,7 @@ namespace MediaFoundation.EVR
     public interface IMFTopologyServiceLookup
     {
         void LookupService(
-            [In] MF_ServiceLookupType type,
+            [In] MFServiceLookupType type,
             [In] int dwIndex,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,

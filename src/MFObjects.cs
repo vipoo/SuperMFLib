@@ -427,42 +427,6 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("7DC9D5F9-9ED9-44EC-9BBF-0600BB589FBB"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMF2DBuffer
-    {
-        void Lock2D(
-            [Out] out IntPtr pbScanline0,
-            out int plPitch
-            );
-
-        void Unlock2D();
-
-        void GetScanline0AndPitch(
-            [Out] IntPtr pbScanline0,
-            out int plPitch
-            );
-
-        void IsContiguousFormat(
-            out int pfIsContiguous
-            );
-
-        void GetContiguousLength(
-            out int pcbLength
-            );
-
-        void ContiguousCopyTo(
-            out byte pbDestBuffer,
-            [In] int cbDestBuffer
-            );
-
-        void ContiguousCopyFrom(
-            [In] IntPtr pbSrcBuffer,
-            [In] int cbSrcBuffer
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("26A0ADC3-CE26-4672-9304-69552EDD3FAF"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Obsolete("To get the properties of the audio format, applications should use the media type attributes. If you need to convert the media type into a WAVEFORMATEX structure, call MFCreateWaveFormatExFromMFMediaType")]
@@ -1820,6 +1784,42 @@ namespace MediaFoundation
 
         void GetMaxLength(
             out int pcbMaxLength
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("7DC9D5F9-9ED9-44EC-9BBF-0600BB589FBB"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMF2DBuffer
+    {
+        void Lock2D(
+            [Out] out IntPtr pbScanline0,
+            out int plPitch
+            );
+
+        void Unlock2D();
+
+        void GetScanline0AndPitch(
+            out IntPtr pbScanline0,
+            out int plPitch
+            );
+
+        void IsContiguousFormat(
+            [MarshalAs(UnmanagedType.Bool)] out bool pfIsContiguous
+            );
+
+        void GetContiguousLength(
+            out int pcbLength
+            );
+
+        void ContiguousCopyTo(
+            IntPtr pbDestBuffer,
+            [In] int cbDestBuffer
+            );
+
+        void ContiguousCopyFrom(
+            [In] IntPtr pbSrcBuffer,
+            [In] int cbSrcBuffer
             );
     }
 

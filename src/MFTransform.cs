@@ -31,8 +31,6 @@ namespace MediaFoundation.Transform
 {
     #region Declarations
 
-#if ALLOW_UNTESTED_INTERFACES
-
     [UnmanagedName("_MFT_DRAIN_TYPE")]
     public enum MFTDrainType
     {
@@ -159,13 +157,9 @@ namespace MediaFoundation.Transform
         NewStreams = 0x00000100
     }
 
-#endif
-
     #endregion
 
     #region Interfaces
-
-#if ALLOW_UNTESTED_INTERFACES
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
@@ -221,7 +215,7 @@ namespace MediaFoundation.Transform
 
         void AddInputStreams(
             int cStreams,
-            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] MFTInputStreamInfo[] adwStreamIDs
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] adwStreamIDs
             );
 
         void GetInputAvailableType(
@@ -295,8 +289,6 @@ namespace MediaFoundation.Transform
             out ProcessOutputStatus pdwStatus
             );
     }
-
-#endif
 
     #endregion
 

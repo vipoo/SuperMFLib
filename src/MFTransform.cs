@@ -33,6 +33,13 @@ namespace MediaFoundation.Transform
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [UnmanagedName("_MFT_DRAIN_TYPE")]
+    public enum MFTDrainType
+    {
+        ProduceTails = 0x00000000,
+        NoTails = 0x00000001
+    }
+
     [UnmanagedName("MFT_REGISTER_TYPE_INFO")]
     public class MFTRegisterTypeInfo
     {
@@ -74,7 +81,7 @@ namespace MediaFoundation.Transform
         None = 0,
         WholeSamples = 0x00000001,
         SingleSamplePerBuffer = 0x00000002,
-        FixedSampelSize = 0x00000004,
+        FixedSampleSize = 0x00000004,
         Discardable = 0x00000008,
         Optional = 0x00000010,
         ProvidesSamples = 0x00000100,
@@ -122,11 +129,9 @@ namespace MediaFoundation.Transform
     public struct MFTOutputDataBuffer
     {
         public int dwStreamID;
-        [MarshalAs(UnmanagedType.Interface)]
-        public IMFSample pSample;
+        public IntPtr pSample; // Doesn't release correctly when marshaled as IMFSample
         public MFTOutputDataBufferFlags dwStatus;
-        [MarshalAs(UnmanagedType.Interface)]
-        public IMFCollection pEvents;
+        [MarshalAs(UnmanagedType.Interface)] public IMFCollection pEvents;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
@@ -168,22 +173,22 @@ namespace MediaFoundation.Transform
     public interface IMFTransform
     {
         void GetStreamLimits(
-            out int pdwInputMinimum,
-            out int pdwInputMaximum,
-            out int pdwOutputMinimum,
-            out int pdwOutputMaximum
+            [Out] MFInt pdwInputMinimum,
+            [Out] MFInt pdwInputMaximum,
+            [Out] MFInt pdwOutputMinimum,
+            [Out] MFInt pdwOutputMaximum
             );
 
         void GetStreamCount(
-            out int pcInputStreams,
-            out int pcOutputStreams
+            [Out] MFInt pcInputStreams,
+            [Out] MFInt pcOutputStreams
             );
 
         void GetStreamIDs(
             int dwInputIDArraySize,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int [] pdwInputIDs,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int [] pdwInputIDs,
             int dwOutputIDArraySize,
-           [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] int[] pdwOutputIDs
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] int[] pdwOutputIDs
             );
 
         void GetInputStreamInfo(

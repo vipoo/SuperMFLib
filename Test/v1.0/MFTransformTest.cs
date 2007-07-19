@@ -62,7 +62,7 @@ namespace Testv10
                 ot,
                 null);
 
-            MFExtern.MFTGetInfo(g1, out s, it2, out icnt, ot2, out ocnt, ip);
+            MFExtern.MFTGetInfo(g1, out s, it2, out icnt, ot2, out ocnt, IntPtr.Zero);
 
             MFExtern.MFTUnregister(g1);
         }

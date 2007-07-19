@@ -199,6 +199,17 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT
             );
 
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFTGetInfo(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT,
+            [MarshalAs(UnmanagedType.LPWStr)] out string pszName,
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 3)] MFTRegisterTypeInfo[] ppInputTypes,
+            out int pcInputTypes,
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 5)] MFTRegisterTypeInfo[] ppOutputTypes,
+            out int pcOutputTypes,
+            IntPtr ip // Must be IntPtr.Zero due to MF bug, but should be out IMFAttributes ppAttributes
+            );
+
 #if ALLOW_UNTESTED_INTERFACES
 
         [DllImport("mf.dll", PreserveSig = false)]
@@ -400,17 +411,6 @@ namespace MediaFoundation
             [In]                IMFAttributes pAttributes,
             out   Guid ppclsidMFT, // must be freed with CoTaskMemFree
             out                   int pcMFTs
-            );
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFTGetInfo(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT,
-            [MarshalAs(UnmanagedType.LPWStr)] out string pszName,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=3)] MFTRegisterTypeInfo [] ppInputTypes,
-            out int pcInputTypes,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=5)] MFTRegisterTypeInfo [] ppOutputTypes,
-            out int pcOutputTypes,
-            IntPtr ip // IMFAttributes ppAttributes
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]

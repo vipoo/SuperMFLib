@@ -181,6 +181,24 @@ namespace MediaFoundation
             out IMFPresentationClock ppPresentationClock
         );
 
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFTRegister(
+            [In] Guid clsidMFT,
+            [In] Guid guidCategory,
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
+            [In] int Flags, // Must be zero
+            [In] int cInputTypes,
+            [In, MarshalAs(UnmanagedType.LPArray)] MFTRegisterTypeInfo[] pInputTypes,
+            [In] int cOutputTypes,
+            [In, MarshalAs(UnmanagedType.LPArray)] MFTRegisterTypeInfo[] pOutputTypes,
+            [In] IMFAttributes pAttributes
+            );
+
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFTUnregister(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT
+            );
+
 #if ALLOW_UNTESTED_INTERFACES
 
         [DllImport("mf.dll", PreserveSig = false)]
@@ -374,24 +392,6 @@ namespace MediaFoundation
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFTRegister(
-            [In] Guid clsidMFT,
-            [In] Guid guidCategory,
-            [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
-            [In] int Flags, // Must be zero
-            [In] int cInputTypes,
-            MFTRegisterTypeInfo pInputTypes,
-            [In] int cOutputTypes,
-            MFTRegisterTypeInfo pOutputTypes,
-            [In] IMFAttributes pAttributes
-            );
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFTUnregister(
-            [In, MarshalAs(UnmanagedType.LPStruct)]    Guid clsidMFT
-            );
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTEnum(
             [In, MarshalAs(UnmanagedType.LPStruct)]                    Guid guidCategory,
             [In]                    int Flags,
@@ -404,13 +404,13 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTGetInfo(
-            [In, MarshalAs(UnmanagedType.LPStruct)]                                Guid clsidMFT,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT,
             [MarshalAs(UnmanagedType.LPWStr)] out string pszName,
-            out MFTRegisterTypeInfo ppInputTypes,
-            out                           int pcInputTypes,
-            out MFTRegisterTypeInfo ppOutputTypes,
-            out                           int pcOutputTypes,
-            out IMFAttributes ppAttributes
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=3)] MFTRegisterTypeInfo [] ppInputTypes,
+            out int pcInputTypes,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=5)] MFTRegisterTypeInfo [] ppOutputTypes,
+            out int pcOutputTypes,
+            IntPtr ip // IMFAttributes ppAttributes
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]

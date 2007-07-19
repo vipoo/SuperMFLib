@@ -38,8 +38,8 @@ namespace MediaFoundation.Transform
         NoTails = 0x00000001
     }
 
-    [UnmanagedName("MFT_REGISTER_TYPE_INFO")]
-    public class MFTRegisterTypeInfo
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_REGISTER_TYPE_INFO")]
+    public struct MFTRegisterTypeInfo
     {
         public Guid guidMajorType;
         public Guid guidSubtype;

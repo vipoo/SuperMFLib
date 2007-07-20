@@ -206,6 +206,29 @@ namespace MF_BasicPlayback
 
             MessageBox.Show(this, s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
+        private void openUrlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int hr;
+
+            fmURL f = new fmURL();
+
+            if (f.ShowDialog(this) == DialogResult.OK)
+            {
+                // Open the file with the playback object.
+                hr = g_pPlayer.OpenURL(f.tbURL.Text);
+
+                if (hr >= 0)
+                {
+                    UpdateUI(this.Handle, CPlayer.PlayerState.OpenPending);
+                }
+                else
+                {
+                    NotifyError(this.Handle, "Could not open this URL.", hr);
+                    UpdateUI(this.Handle, CPlayer.PlayerState.Ready);
+                }
+            }
+        }
     }
 
     /// <summary>

@@ -111,7 +111,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
         catch (Exception ce)
         {
-            hr = ParseError(ce);  // ce.ErrorCode;
+            hr = Marshal.GetHRForException(ce);
             NotifyError(hr);
             m_state = PlayerState.Ready;
         }
@@ -143,7 +143,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
         catch (Exception ce)
         {
-            hr = ParseError(ce);
+            hr = Marshal.GetHRForException(ce);
             NotifyError(hr);
         }
 
@@ -174,7 +174,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
         catch (Exception ce)
         {
-            hr = ParseError(ce);
+            hr = Marshal.GetHRForException(ce);
             NotifyError(hr);
         }
 
@@ -203,7 +203,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
         catch (Exception ce)
         {
-            hr = ParseError(ce);
+            hr = Marshal.GetHRForException(ce);
         }
 
         return hr;
@@ -222,7 +222,7 @@ class CPlayer : COMBase, IMFAsyncCallback
             }
             catch (Exception ce)
             {
-                hr = ParseError(ce);
+                hr = Marshal.GetHRForException(ce);
             }
         }
 
@@ -254,7 +254,7 @@ class CPlayer : COMBase, IMFAsyncCallback
             }
             catch (Exception ce)
             {
-                hr = ParseError(ce);
+                hr = Marshal.GetHRForException(ce);
             }
         }
 
@@ -707,7 +707,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         }
         catch(Exception ce)
         {
-            int hr = ParseError(ce);
+            int hr = Marshal.GetHRForException(ce);
             NotifyError(hr);
         }
 

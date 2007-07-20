@@ -202,7 +202,7 @@ namespace MF_BasicPlayback
 
         void NotifyError(IntPtr hwnd, string sErrorMessage, int hrErr)
         {
-            string s = string.Format("{0} (HRESULT = {1:x} {2})", sErrorMessage, hrErr, MFError.GetErrorText(hrErr));
+            string s = string.Format("{0} (HRESULT = 0x{1:x} {2})", sErrorMessage, hrErr, MFError.GetErrorText(hrErr));
 
             MessageBox.Show(this, s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }

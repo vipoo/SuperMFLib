@@ -68,30 +68,30 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFContentInfo
     {
-        void GetHeaderSize( 
-            /* [in] */ IMFMediaBuffer pIStartOfContent,
-            /* [out] */ out long cbHeaderSize);
+        void GetHeaderSize(
+            [In] IMFMediaBuffer pIStartOfContent,
+            out long cbHeaderSize);
         
-        void ParseHeader( 
-            /* [in] */ IMFMediaBuffer pIHeaderBuffer,
-            /* [in] */ long cbOffsetWithinHeader);
+        void ParseHeader(
+            [In] IMFMediaBuffer pIHeaderBuffer,
+            [In] long cbOffsetWithinHeader);
         
         void GenerateHeader( 
-            /* [out][in] */ IMFMediaBuffer pIHeader,
-            /* [out] */ out int pcbHeader);
+            [In] IMFMediaBuffer pIHeader,
+            out int pcbHeader);
         
-        void GetProfile( 
-            /* [out] */ out IMFASFProfile ppIProfile);
+        void GetProfile(
+            out IMFASFProfile ppIProfile);
         
-        void SetProfile( 
-            /* [in] */ IMFASFProfile pIProfile);
+        void SetProfile(
+            [In] IMFASFProfile pIProfile);
         
-        void GeneratePresentationDescriptor( 
-            /* [out] */ out IMFPresentationDescriptor ppIPresentationDescriptor);
+        void GeneratePresentationDescriptor(
+            out IMFPresentationDescriptor ppIPresentationDescriptor);
 
         void GetEncodingConfigurationPropertyStore(
-            /* [in] */ short wStreamNumber,
-            /* [out] */ out IPropertyStore ppIStore);
+            [In] short wStreamNumber,
+            out IPropertyStore ppIStore);
         
     }
 
@@ -101,55 +101,55 @@ namespace MediaFoundation
     public interface IMFASFIndexer
     {
         void SetFlags( 
-            /* [in] */ int dwFlags);
+            [In] int dwFlags);
         
-        void GetFlags( 
-            /* [out] */ out int pdwFlags);
+        void GetFlags(
+            out int pdwFlags);
         
-        void Initialize( 
-            /* [in] */ IMFASFContentInfo pIContentInfo);
+        void Initialize(
+            [In] IMFASFContentInfo pIContentInfo);
         
-        void GetIndexPosition( 
-            /* [in] */ IMFASFContentInfo pIContentInfo,
-            /* [out] */ out long pcbIndexOffset);
+        void GetIndexPosition(
+            [In] IMFASFContentInfo pIContentInfo,
+            out long pcbIndexOffset);
         
-        void SetIndexByteStreams( 
-            /* [in] */ IMFByteStream [] ppIByteStreams,
-            /* [in] */ int cByteStreams);
+        void SetIndexByteStreams(
+            [In] IMFByteStream[] ppIByteStreams,
+            [In] int cByteStreams);
         
-        void GetIndexByteStreamCount( 
-            /* [out] */ out int pcByteStreams);
+        void GetIndexByteStreamCount(
+            out int pcByteStreams);
         
-        void GetIndexStatus( 
-            /* [in] */ ASFIndexIdentifier pIndexIdentifier,
-            /* [out] */ out bool pfIsIndexed,
-            /* [out] */ out byte pbIndexDescriptor,
-            /* [out][in] */ out int pcbIndexDescriptor);
+        void GetIndexStatus(
+            [In] ASFIndexIdentifier pIndexIdentifier,
+            out bool pfIsIndexed,
+            out byte pbIndexDescriptor,
+            out int pcbIndexDescriptor);
         
-        void SetIndexStatus( 
-            /* [in] */ IntPtr pbIndexDescriptor,
-            /* [in] */ int cbIndexDescriptor,
-            /* [in] */ bool fGenerateIndex);
+        void SetIndexStatus(
+            [In] IntPtr pbIndexDescriptor,
+            [In] int cbIndexDescriptor,
+            [In] bool fGenerateIndex);
         
-        void GetSeekPositionForValue( 
-            /* [in] */ PropVariant pvarValue,
-            /* [in] */ ASFIndexIdentifier pIndexIdentifier,
-            /* [out] */ out long pcbOffsetWithinData,
-            /* [optional][out] */ long phnsApproxTime,
-            /* [optional][out] */ out int pdwPayloadNumberOfStreamWithinPacket);
+        void GetSeekPositionForValue(
+            [In] PropVariant pvarValue,
+            [In] ASFIndexIdentifier pIndexIdentifier,
+            out long pcbOffsetWithinData,
+            out long phnsApproxTime,
+            out int pdwPayloadNumberOfStreamWithinPacket);
         
-        void GenerateIndexEntries( 
-            /* [in] */ IMFSample pIASFPacketSample);
+        void GenerateIndexEntries(
+            [In] IMFSample pIASFPacketSample);
         
-        void CommitIndex( 
-            /* [in] */ IMFASFContentInfo pIContentInfo);
+        void CommitIndex(
+            [In] IMFASFContentInfo pIContentInfo);
         
-        void GetIndexWriteSpace( 
-            /* [out] */ out long pcbIndexWriteSpace);
+        void GetIndexWriteSpace(
+            out long pcbIndexWriteSpace);
         
-        void GetCompletedIndex( 
-            /* [in] */ IMFMediaBuffer pIIndexBuffer,
-            /* [in] */ long cbOffsetWithinIndex);
+        void GetCompletedIndex(
+            [In] IMFMediaBuffer pIIndexBuffer,
+            [In] long cbOffsetWithinIndex);
         
     }
 
@@ -158,35 +158,35 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFMultiplexer
     {
-        void Initialize( 
-            /* [in] */ IMFASFContentInfo pIContentInfo);
+        void Initialize(
+            [In] IMFASFContentInfo pIContentInfo);
         
-        void SetFlags( 
-            /* [in] */ int dwFlags);
+        void SetFlags(
+            [In] int dwFlags);
         
-        void GetFlags( 
-            /* [out] */ out int pdwFlags);
+        void GetFlags(
+            out int pdwFlags);
         
-        void ProcessSample( 
-            /* [in] */ short wStreamNumber,
-            /* [in] */ IMFSample pISample,
-            /* [in] */ long hnsTimestampAdjust);
+        void ProcessSample(
+            [In] short wStreamNumber,
+            [In] IMFSample pISample,
+            [In] long hnsTimestampAdjust);
         
-        void GetNextPacket( 
-            /* [out] */ out int pdwStatusFlags,
-            /* [out] */ out IMFSample ppIPacket);
+        void GetNextPacket(
+            out int pdwStatusFlags,
+            out IMFSample ppIPacket);
         
         void Flush( );
         
         void End( 
-            /* [out][in] */ IMFASFContentInfo pIContentInfo);
+            [In] IMFASFContentInfo pIContentInfo);
         
-        void GetStatistics( 
-            /* [in] */ short wStreamNumber,
-            /* [out] */ ASFMuxStatistics pMuxStats);
+        void GetStatistics(
+            [In] short wStreamNumber,
+            out ASFMuxStatistics pMuxStats);
         
-        void SetSyncTolerance( 
-            /* [in] */ int msSyncTolerance);
+        void SetSyncTolerance(
+            [In] int msSyncTolerance);
         
     }
     
@@ -195,36 +195,36 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFMutualExclusion
     {
-        void GetType( 
-            /* [out] */ out Guid pguidType);
+        void GetType(
+            out Guid pguidType);
         
         void SetType( 
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidType);
         
-        void GetRecordCount( 
-            /* [out] */ out int pdwRecordCount);
+        void GetRecordCount(
+            out int pdwRecordCount);
         
-        void GetStreamsForRecord( 
-            /* [in] */ int dwRecordNumber,
-            /* [out] */ out short pwStreamNumArray,
-            /* [out][in] */ out int pcStreams);
+        void GetStreamsForRecord(
+            [In] int dwRecordNumber,
+            out short pwStreamNumArray,
+            out int pcStreams);
         
-        void AddStreamForRecord( 
-            /* [in] */ int dwRecordNumber,
-            /* [in] */ short wStreamNumber);
+        void AddStreamForRecord(
+            [In] int dwRecordNumber,
+            [In] short wStreamNumber);
         
-        void RemoveStreamFromRecord( 
-            /* [in] */ int dwRecordNumber,
-            /* [in] */ short wStreamNumber);
+        void RemoveStreamFromRecord(
+            [In] int dwRecordNumber,
+            [In] short wStreamNumber);
         
-        void RemoveRecord( 
-            /* [in] */ int dwRecordNumber);
+        void RemoveRecord(
+            [In] int dwRecordNumber);
         
-        void AddRecord( 
-            /* [out] */ out int pdwRecordNumber);
+        void AddRecord(
+            out int pdwRecordNumber);
 
-        void Clone( 
-            /* [out] */ out IMFASFMutualExclusion ppIMutex);
+        void Clone(
+            out IMFASFMutualExclusion ppIMutex);
         
     }
 
@@ -387,57 +387,57 @@ namespace MediaFoundation
 
         #endregion
 
-        void GetStreamCount( 
-            /* [out] */ out int pcStreams);
+        void GetStreamCount(
+            out int pcStreams);
         
-        void GetStream( 
-            /* [in] */ int dwStreamIndex,
-            /* [out] */ out short pwStreamNumber,
-            /* [out] */ out IMFASFStreamConfig ppIStream);
+        void GetStream(
+            [In] int dwStreamIndex,
+            out short pwStreamNumber,
+            out IMFASFStreamConfig ppIStream);
         
-        void GetStreamByNumber( 
-            /* [in] */ short wStreamNumber,
-            /* [out] */ out IMFASFStreamConfig ppIStream);
+        void GetStreamByNumber(
+            [In] short wStreamNumber,
+            out IMFASFStreamConfig ppIStream);
         
-        void SetStream( 
-            /* [in] */ IMFASFStreamConfig pIStream);
+        void SetStream(
+            [In] IMFASFStreamConfig pIStream);
         
-        void RemoveStream( 
-            /* [in] */ short wStreamNumber);
+        void RemoveStream(
+            [In] short wStreamNumber);
         
-        void CreateStream( 
-            /* [in] */ IMFMediaType pIMediaType,
-            /* [out] */ out IMFASFStreamConfig ppIStream);
+        void CreateStream(
+            [In] IMFMediaType pIMediaType,
+            out IMFASFStreamConfig ppIStream);
         
-        void GetMutualExclusionCount( 
-            /* [out] */ out int pcMutexs);
+        void GetMutualExclusionCount(
+            out int pcMutexs);
         
-        void GetMutualExclusion( 
-            /* [in] */ int dwMutexIndex,
-            /* [out] */ out IMFASFMutualExclusion ppIMutex);
+        void GetMutualExclusion(
+            [In] int dwMutexIndex,
+            out IMFASFMutualExclusion ppIMutex);
         
-        void AddMutualExclusion( 
-            /* [in] */ IMFASFMutualExclusion pIMutex);
+        void AddMutualExclusion(
+            [In] IMFASFMutualExclusion pIMutex);
         
-        void RemoveMutualExclusion( 
-            /* [in] */ int dwMutexIndex);
+        void RemoveMutualExclusion(
+            [In] int dwMutexIndex);
         
         void CreateMutualExclusion( 
-            /* [out] */ out IMFASFMutualExclusion ppIMutex);
+            out IMFASFMutualExclusion ppIMutex);
         
-        void GetStreamPrioritization( 
-            /* [out] */ out IMFASFStreamPrioritization ppIStreamPrioritization);
+        void GetStreamPrioritization(
+            out IMFASFStreamPrioritization ppIStreamPrioritization);
         
-        void AddStreamPrioritization( 
-            /* [in] */ IMFASFStreamPrioritization pIStreamPrioritization);
+        void AddStreamPrioritization(
+            [In] IMFASFStreamPrioritization pIStreamPrioritization);
         
         void RemoveStreamPrioritization( );
         
-        void CreateStreamPrioritization( 
-            /* [out] */ out IMFASFStreamPrioritization ppIStreamPrioritization);
+        void CreateStreamPrioritization(
+            out IMFASFStreamPrioritization ppIStreamPrioritization);
         
-        void Clone( 
-            /* [out] */ out IMFASFProfile ppIProfile);
+        void Clone(
+            out IMFASFProfile ppIProfile);
         
     }
 
@@ -446,37 +446,37 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFSplitter
     {
-        void Initialize( 
-            /* [in] */ IMFASFContentInfo pIContentInfo);
+        void Initialize(
+            [In] IMFASFContentInfo pIContentInfo);
         
-        void SetFlags( 
-            /* [in] */ int dwFlags);
+        void SetFlags(
+            [In] int dwFlags);
         
-        void GetFlags( 
-            /* [out] */ out int pdwFlags);
+        void GetFlags(
+            out int pdwFlags);
         
-        void SelectStreams( 
-            /* [in] */ short [] pwStreamNumbers,
-            /* [in] */ short wNumStreams);
+        void SelectStreams(
+            [In] short[] pwStreamNumbers,
+            [In] short wNumStreams);
         
         void GetSelectedStreams( 
-            /* [out] */ short [] pwStreamNumbers,
-            /* [out][in] */ out short pwNumStreams);
+            [Out] short [] pwStreamNumbers,
+            out short pwNumStreams);
         
-        void ParseData( 
-            /* [in] */ IMFMediaBuffer pIBuffer,
-            /* [in] */ int cbBufferOffset,
-            /* [in] */ int cbLength);
+        void ParseData(
+            [In] IMFMediaBuffer pIBuffer,
+            [In] int cbBufferOffset,
+            [In] int cbLength);
         
-        void GetNextSample( 
-            /* [out] */ out int pdwStatusFlags,
-            /* [out] */ out short pwStreamNumber,
-            /* [out] */ out IMFSample ppISample);
+        void GetNextSample(
+            out int pdwStatusFlags,
+            out short pwStreamNumber,
+            out IMFSample ppISample);
         
         void Flush( );
         
-        void GetLastSendTime( 
-            /* [out] */ out int pdwLastSendTime);
+        void GetLastSendTime(
+            out int pdwLastSendTime);
         
     }
 
@@ -639,41 +639,41 @@ namespace MediaFoundation
 
         #endregion
 
-        void GetStreamType( 
-            /* [out] */ out Guid pguidStreamType);
+        void GetStreamType(
+            out Guid pguidStreamType);
         
         [PreserveSig]
         short GetStreamNumber( );
         
-        void SetStreamNumber( 
-            /* [in] */ short wStreamNum);
+        void SetStreamNumber(
+            [In] short wStreamNum);
         
-        void GetMediaType( 
-            /* [out] */ out IMFMediaType ppIMediaType);
+        void GetMediaType(
+            out IMFMediaType ppIMediaType);
         
-        void SetMediaType( 
-            /* [in] */ IMFMediaType pIMediaType);
+        void SetMediaType(
+            [In] IMFMediaType pIMediaType);
         
-        void GetPayloadExtensionCount( 
-            /* [out] */ out short pcPayloadExtensions);
+        void GetPayloadExtensionCount(
+            out short pcPayloadExtensions);
         
-        void GetPayloadExtension( 
-            /* [in] */ short wPayloadExtensionNumber,
-            /* [out] */ out Guid pguidExtensionSystemID,
-            /* [out] */ out short pcbExtensionDataSize,
-            /* [size_is][optional][out] */ IntPtr pbExtensionSystemInfo,
-            /* [optional][out][in] */ out int pcbExtensionSystemInfo);
+        void GetPayloadExtension(
+            [In] short wPayloadExtensionNumber,
+            out Guid pguidExtensionSystemID,
+            out short pcbExtensionDataSize,
+            IntPtr pbExtensionSystemInfo,
+            out int pcbExtensionSystemInfo);
         
         void AddPayloadExtension( 
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtensionSystemID,
-            /* [in] */ short cbExtensionDataSize,
-            /* [size_is][in] */ IntPtr pbExtensionSystemInfo,
-            /* [in] */ int cbExtensionSystemInfo);
+            [In] short cbExtensionDataSize,
+            IntPtr pbExtensionSystemInfo,
+            [In] int cbExtensionSystemInfo);
         
         void RemoveAllPayloadExtensions( );
         
-        void Clone( 
-            /* [out] */ out IMFASFStreamConfig ppIStreamConfig);
+        void Clone(
+            out IMFASFStreamConfig ppIStreamConfig);
         
     }
 
@@ -682,23 +682,23 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFStreamPrioritization
     {
-        void GetStreamCount( 
-            /* [out] */ out int pdwStreamCount);
+        void GetStreamCount(
+            out int pdwStreamCount);
         
-        void GetStream( 
-            /* [in] */ int dwStreamIndex,
-            /* [out] */ out short pwStreamNumber,
-            /* [out] */ out short pwStreamFlags);
+        void GetStream(
+            [In] int dwStreamIndex,
+            out short pwStreamNumber,
+            out short pwStreamFlags);
         
-        void AddStream( 
-            /* [in] */ short wStreamNumber,
-            /* [in] */ short wStreamFlags);
+        void AddStream(
+            [In] short wStreamNumber,
+            [In] short wStreamFlags);
         
-        void RemoveStream( 
-            /* [in] */ int dwStreamIndex);
+        void RemoveStream(
+            [In] int dwStreamIndex);
 
-        void Clone( 
-            /* [out] */ out IMFASFStreamPrioritization ppIStreamPrioritization);
+        void Clone(
+            out IMFASFStreamPrioritization ppIStreamPrioritization);
         
     }
     
@@ -707,63 +707,64 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFStreamSelector
     {
-        void GetStreamCount( 
-            /* [out] */ out int pcStreams);
+        void GetStreamCount(
+            out int pcStreams);
         
-        void GetOutputCount( 
-            /* [out] */ out int pcOutputs);
+        void GetOutputCount(
+            out int pcOutputs);
         
-        void GetOutputStreamCount( 
-            /* [in] */ int dwOutputNum,
-            /* [out] */ out int pcStreams);
+        void GetOutputStreamCount(
+            [In] int dwOutputNum,
+            out int pcStreams);
         
-        void GetOutputStreamNumbers( 
-            /* [in] */ int dwOutputNum,
-            /* [out] */ short [] rgwStreamNumbers);
+        void GetOutputStreamNumbers(
+            [In] int dwOutputNum,
+            [Out] short [] rgwStreamNumbers);
         
-        void GetOutputFromStream( 
-            /* [in] */ short wStreamNum,
-            /* [out] */ out int pdwOutput);
+        void GetOutputFromStream(
+            [In] short wStreamNum,
+            out int pdwOutput);
         
-        void GetOutputOverride( 
-            /* [in] */ int dwOutputNum,
-            /* [out] */ ASFSelectionStatus pSelection);
+        void GetOutputOverride(
+            [In] int dwOutputNum,
+            out ASFSelectionStatus pSelection);
         
-        void SetOutputOverride( 
-            /* [in] */ int dwOutputNum,
-            /* [in] */ ASFSelectionStatus Selection);
+        void SetOutputOverride(
+            [In] int dwOutputNum,
+            [In] ASFSelectionStatus Selection);
         
-        void GetOutputMutexCount( 
-            /* [in] */ int dwOutputNum,
-            /* [out] */ out int pcMutexes);
+        void GetOutputMutexCount(
+            [In] int dwOutputNum,
+            out int pcMutexes);
         
-        void GetOutputMutex( 
-            /* [in] */ int dwOutputNum,
-            /* [in] */ int dwMutexNum,
-            /* [out] */ [MarshalAs(UnmanagedType.IUnknown)] out object ppMutex);
+        void GetOutputMutex(
+            [In] int dwOutputNum,
+            [In] int dwMutexNum,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppMutex);
         
-        void SetOutputMutexSelection( 
-            /* [in] */ int dwOutputNum,
-            /* [in] */ int dwMutexNum,
-            /* [in] */ short wSelectedRecord);
+        void SetOutputMutexSelection(
+            [In] int dwOutputNum,
+            [In] int dwMutexNum,
+            [In] short wSelectedRecord);
         
         void GetBandwidthStepCount( 
-            /* [out] */ out int pcStepCount);
+            out int pcStepCount);
         
-        void GetBandwidthStep( 
-            /* [in] */ int dwStepNum,
-            /* [out] */ out int pdwBitrate,
-            /* [out] */ out short rgwStreamNumbers,
-            /* [out] */ ASFSelectionStatus rgSelections);
+        void GetBandwidthStep(
+            [In] int dwStepNum,
+            out int pdwBitrate,
+            out short rgwStreamNumbers,
+            out ASFSelectionStatus rgSelections);
         
-        void BitrateToStepNumber( 
-            /* [in] */ int dwBitrate,
-            /* [out] */ out int pdwStepNum);
+        void BitrateToStepNumber(
+            [In] int dwBitrate,
+            out int pdwStepNum);
         
-        void SetStreamSelectorFlags( 
-            /* [in] */ int dwStreamSelectorFlags);
+        void SetStreamSelectorFlags(
+            [In] int dwStreamSelectorFlags);
 
     }
+
 #endif
 
     #endregion

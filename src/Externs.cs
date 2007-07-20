@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 
 using MediaFoundation.Misc;
 using MediaFoundation.Transform;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace MediaFoundation
 {
@@ -55,7 +56,7 @@ namespace MediaFoundation
         public static extern void MFCreateStreamDescriptor(
             int dwStreamIdentifier,
             int cMediaTypes,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IMFMediaType[] apMediaTypes,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IMFMediaType[] apMediaTypes,
             out IMFStreamDescriptor ppDescriptor
         );
 
@@ -94,7 +95,7 @@ namespace MediaFoundation
         [DllImport("MfPlat.dll", PreserveSig = false)]
         public static extern void MFCreatePresentationDescriptor(
             int cStreamDescriptors,
-            [MarshalAs(UnmanagedType.LPArray)] IMFStreamDescriptor[] apStreamDescriptors,
+            [In, MarshalAs(UnmanagedType.LPArray)] IMFStreamDescriptor[] apStreamDescriptors,
             out IMFPresentationDescriptor ppPresentationDescriptor
         );
 
@@ -214,12 +215,12 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFGetUncompressedVideoFormat(
-            [In]    MFVideoFormat pVideoFormat
+            [In] MFVideoFormat pVideoFormat
         );
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void CreateNamedPropertyStore(
-        out INamedPropertyStore ppStore
+            out INamedPropertyStore ppStore
         );
 
         [DllImport("mfplat.dll", PreserveSig = false)]
@@ -800,39 +801,39 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFContentInfo(
-            /* out */     out IMFASFContentInfo ppIContentInfo);
+            out IMFASFContentInfo ppIContentInfo);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFProfile(
-            /* out */     out IMFASFProfile ppIProfile);
+            out IMFASFProfile ppIProfile);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFProfileFromPresentationDescriptor(
-            /* in  */     IMFPresentationDescriptor pIPD,
-            /* out */     out IMFASFProfile ppIProfile);
+            [In] IMFPresentationDescriptor pIPD,
+            out IMFASFProfile ppIProfile);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFSplitter(
-            /* out */     out IMFASFSplitter ppISplitter);
+            out IMFASFSplitter ppISplitter);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFMultiplexer(
-            /* out */     out IMFASFMultiplexer ppIMultiplexer);
+            out IMFASFMultiplexer ppIMultiplexer);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFIndexer(
-            /* out */     out IMFASFIndexer ppIIndexer);
+            out IMFASFIndexer ppIIndexer);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFIndexerByteStream(
-            /* in */      IMFByteStream pIContentByteStream,
-            /* in */      long cbIndexStartOffset,
-            /* out */     out IMFByteStream pIIndexByteStream);
+            [In] IMFByteStream pIContentByteStream,
+            [In] long cbIndexStartOffset,
+            out IMFByteStream pIIndexByteStream);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFStreamSelector(
-            /* in */ IMFASFProfile pIASFProfile,
-            /* out */ out IMFASFStreamSelector ppSelector);
+            [In] IMFASFProfile pIASFProfile,
+            out IMFASFStreamSelector ppSelector);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFMediaSink(
@@ -863,8 +864,8 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreatePresentationDescriptorFromASFProfile(
-            /* in  */     IMFASFProfile pIProfile,
-            /* out */     out IMFPresentationDescriptor ppIPD);
+            [In] IMFASFProfile pIProfile,
+            out IMFPresentationDescriptor ppIPD);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateVideoPresenter(

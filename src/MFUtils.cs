@@ -1418,33 +1418,6 @@ namespace MediaFoundation.Misc
                 }
             }
         }
-
-        public static int ParseError(Exception e)
-        {
-            int hr;
-
-            if (e is COMException)
-            {
-                COMException ce = e as COMException;
-                hr = ce.ErrorCode;
-            }
-            else
-            {
-                const string TEXT = "(Exception from HRESULT: 0x";
-                //      Message "The system cannot find the file specified. (Exception from HRESULT: 0x80070002)"
-                int iPos = e.Message.LastIndexOf(TEXT);
-                if (iPos < 0)
-                {
-                    hr = E_Fail;
-                }
-                else
-                {
-                    hr = int.Parse(e.Message.Substring(iPos + TEXT.Length, 8), System.Globalization.NumberStyles.AllowHexSpecifier);
-                }
-            }
-
-            return hr;
-        }
     }
 
     #endregion

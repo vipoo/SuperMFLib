@@ -34,79 +34,13 @@ namespace MediaFoundation.Misc
 
 #if ALLOW_UNTESTED_INTERFACES
 
-    [Flags, UnmanagedName("STATFLAG")]
-    public enum StatFlag
-    {
-        Default = 0,
-        NoName = 1,
-        NoOpen = 2
-    }
-
-    [Flags, UnmanagedName("STGC")]
-    public enum STGC
-    {
-        Default = 0,
-        Overwrite = 1,
-        OnlyIfCurrent = 2,
-        DangerouslyCommitMerelyToToDiskCache = 4,
-        Consolidate = 8
-    }
-
-    [Flags, UnmanagedName("LOCKTYPE")]
-    public enum LockType
-    {
-        None = 0,
-        Write = 1,
-        Exclusive = 2,
-        OnlyOnce = 4
-    }
-
-    [UnmanagedName("STREAM_SEEK")]
-    public enum StreamSeek
-    {
-        Set = 0,
-        Cur = 1,
-        End = 2
-    }
-
     [UnmanagedName("MPEG1VIDEOINFO"), StructLayout(LayoutKind.Sequential)]
     public struct MPEG1VideoInfo
     {
         public VideoInfoHeader hdr;
         public int dwStartTimeCode;
         public int cbSequenceHeader;
-        public byte bSequenceHeader;
-    }
-
-    /// <summary>
-    /// When you are done with an instance of this class,
-    /// it should be released with FreeAMMediaType() to avoid leaking
-    /// </summary>
-    [UnmanagedName("AM_MEDIA_TYPE"), StructLayout(LayoutKind.Sequential)]
-    public class AMMediaType
-    {
-        public Guid majorType;
-        public Guid subType;
-        [MarshalAs(UnmanagedType.Bool)]
-        public bool fixedSizeSamples;
-        [MarshalAs(UnmanagedType.Bool)]
-        public bool temporalCompression;
-        public int sampleSize;
-        public Guid formatType;
-        public IntPtr unkPtr; // IUnknown Pointer
-        public int formatSize;
-        public IntPtr formatPtr; // Pointer to a buff determined by formatType
-    }
-
-    [UnmanagedName("VIDEOINFOHEADER"), StructLayout(LayoutKind.Sequential)]
-    public class VideoInfoHeader
-    {
-        public RECT SrcRect;
-        public RECT TargetRect;
-        public int BitRate;
-        public int BitErrorRate;
-        public long AvgTimePerFrame;
-        public BitmapInfoHeader BmiHeader;
+        public byte [] bSequenceHeader; // Needs marshaler
     }
 
     [UnmanagedName("AMINTERLACE_*"), Flags]
@@ -144,6 +78,17 @@ namespace MediaFoundation.Misc
         PadTo16x9 = 0x00000004,
     }
 
+    [UnmanagedName("VIDEOINFOHEADER"), StructLayout(LayoutKind.Sequential)]
+    public class VideoInfoHeader
+    {
+        public RECT SrcRect;
+        public RECT TargetRect;
+        public int BitRate;
+        public int BitErrorRate;
+        public long AvgTimePerFrame;
+        public BitmapInfoHeader BmiHeader;  // Custom marshaler?
+    }
+
     [UnmanagedName("VIDEOINFOHEADER2"), StructLayout(LayoutKind.Sequential)]
     public class VideoInfoHeader2
     {
@@ -158,10 +103,30 @@ namespace MediaFoundation.Misc
         public int PictAspectRatioY;
         public AMControl ControlFlags;
         public int Reserved2;
-        public BitmapInfoHeader BmiHeader;
+        public BitmapInfoHeader BmiHeader;  // Custom marshaler?
     }
 
 #endif
+
+    /// <summary>
+    /// When you are done with an instance of this class,
+    /// it should be released with FreeAMMediaType() to avoid leaking
+    /// </summary>
+    [UnmanagedName("AM_MEDIA_TYPE"), StructLayout(LayoutKind.Sequential)]
+    public class AMMediaType
+    {
+        public Guid majorType;
+        public Guid subType;
+        [MarshalAs(UnmanagedType.Bool)]
+        public bool fixedSizeSamples;
+        [MarshalAs(UnmanagedType.Bool)]
+        public bool temporalCompression;
+        public int sampleSize;
+        public Guid formatType;
+        public IntPtr unkPtr; // IUnknown Pointer
+        public int formatSize;
+        public IntPtr formatPtr; // Pointer to a buff determined by formatType
+    }
 
     [Flags, UnmanagedName("SPEAKER_* defines")]
     public enum WaveMask

@@ -1409,10 +1409,7 @@ namespace MediaFoundation.Misc
                 {
                     try
                     {
-                        // While this code will make any c++ COM programmer shudder,
-                        // it actually is appropriate for c#.
-                        while (Marshal.ReleaseComObject(o) > 0)
-                            ;
+                        Marshal.ReleaseComObject(o);
                     }
                     catch { }
                 }

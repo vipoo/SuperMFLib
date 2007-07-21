@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 using MediaFoundation;
@@ -94,16 +94,9 @@ namespace Testv10
             }
             catch (Exception e)
             {
-                int hr = COMBase.ParseError(e);
+                int hr = Marshal.GetHRForException(e);
 
-                if (hr != COMBase.E_Fail)
-                {
-                    System.Windows.Forms.MessageBox.Show(string.Format("0x{0:x}: {1}", hr, MFError.GetErrorText(hr)), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                }
-                else
-                {
-                    System.Windows.Forms.MessageBox.Show(e.Message, "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                }
+                System.Windows.Forms.MessageBox.Show(string.Format("0x{0:x}: {1}", hr, MFError.GetErrorText(hr)), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             }
         }
     }

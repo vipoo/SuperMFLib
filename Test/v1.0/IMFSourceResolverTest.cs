@@ -95,21 +95,13 @@ namespace Testv10
                 out pObjectType,
                 out pSource);
 
-            try
-            {
-                m_sr.CreateObjectFromByteStream(
-                    pSource as IMFByteStream,
-                    @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
-                    MFResolution.MediaSource,
-                    null,
-                    out ptype,
-                    out pobj);
-            }
-            catch (Exception ce)
-            {
-                int hr = ParseError(ce);
-                throw new COMException(MFError.GetErrorText(hr), hr);
-            }
+            m_sr.CreateObjectFromByteStream(
+                pSource as IMFByteStream,
+                @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
+                MFResolution.MediaSource,
+                null,
+                out ptype,
+                out pobj);
         }
 
         void TestBeginCreateObjectFromByteStream()
@@ -127,24 +119,16 @@ namespace Testv10
                 out pObjectType,
                 out pSource);
 
-            try
-            {
-                m_sr.BeginCreateObjectFromByteStream(
-                    pSource as IMFByteStream,
-                    @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
-                    MFResolution.MediaSource,
-                    null,
-                    out pCookie,
-                    this,
-                    pobj);
+            m_sr.BeginCreateObjectFromByteStream(
+                pSource as IMFByteStream,
+                @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
+                MFResolution.MediaSource,
+                null,
+                out pCookie,
+                this,
+                pobj);
 
-                m_mre.WaitOne(-1, true);
-            }
-            catch (Exception ce)
-            {
-                int hr = ParseError(ce);
-                throw new COMException(MFError.GetErrorText(hr), hr);
-            }
+            m_mre.WaitOne(-1, true);
         }
 
         private void GetInterface()

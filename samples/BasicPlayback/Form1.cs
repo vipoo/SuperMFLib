@@ -159,10 +159,11 @@ namespace MF_BasicPlayback
         {
             int hr = 0;
 
-            openFileDialog1.Filter = "Windows Media|*.wmv;*.wma;*.asf;*.wav|MP3|*.mp3|All files|*.*";
+            openFileDialog1.Filter = "Windows Media|*.wmv;*.wma;*.asf|Wave|*.wav|MP3|*.mp3|All files|*.*";
 
             // File dialog windows must be on STA threads.  ByteStream handlers are happier if
-            // they are opened on MTA.  So, the application stays MTA.
+            // they are opened on MTA.  So, the application stays MTA and we call OpenFileDialog
+            // on its own thread.
             Invoker I = new Invoker(openFileDialog1);
 
             // Show the File Open dialog.

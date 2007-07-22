@@ -89,6 +89,7 @@
     <Compile Include="IMFTopologyNodeTest.cs" />
     <Compile Include="IMFTopologyTest.cs" />
     <Compile Include="IMFVideoDisplayControlTest.cs" />
+    <Compile Include="INamedPropertyStoreTest.cs" />
     <Compile Include="IPropertyStoreTest.cs" />
     <Compile Include="MFTransformTest.cs" />
     <Compile Include="RunTests.cs" />

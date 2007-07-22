@@ -193,20 +193,18 @@ namespace MediaFoundation.Misc
 
     #region Generic Interfaces
 
-#if ALLOW_UNTESTED_INTERFACES
-
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("71604b0f-97b0-4764-8577-2f13e98a1422")]
     public interface INamedPropertyStore
     {
         void GetNamedValue( 
-            [MarshalAs(UnmanagedType.LPWStr)] string pszName,
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
         );
         
         void SetNamedValue( 
-            [MarshalAs(UnmanagedType.LPWStr)] string pszName,
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             PropVariant propvar);
         
         void GetNameCount( 
@@ -215,10 +213,7 @@ namespace MediaFoundation.Misc
         void GetNameAt( 
             int iProp,
             [MarshalAs(UnmanagedType.BStr)] out string pbstrName);
-        
     }
-
-#endif
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),

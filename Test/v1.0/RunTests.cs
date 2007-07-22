@@ -88,9 +88,11 @@ namespace Testv10
                 //IMFPresentationTimeSourceTest t22 = new IMFPresentationTimeSourceTest();
                 //t22.DoTests();
 
-                MFTransformTest t23 = new MFTransformTest();
-                t23.DoTests();
+                //MFTransformTest t23 = new MFTransformTest();
+                //t23.DoTests();
 
+                //INamedPropertyStoreTest t24 = new INamedPropertyStoreTest();
+                //t24.DoTests();
             }
             catch (Exception e)
             {

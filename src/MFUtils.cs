@@ -50,7 +50,7 @@ namespace MediaFoundation.Misc
         }
 
         [DllImport("ole32.dll", PreserveSig=false)]
-        private static extern int PropVariantClear(
+        private static extern void PropVariantClear(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvar
             );
 
@@ -404,12 +404,36 @@ namespace MediaFoundation.Misc
 
         public override string ToString()
         {
-            char[] ca = new char[] {
-                Convert.ToChar((m_fourCC & 255)),
-                Convert.ToChar((m_fourCC >> 8) & 255),
-                Convert.ToChar((m_fourCC >> 16) & 255),
-                Convert.ToChar((m_fourCC >> 24) & 255)
-            };
+            char c;
+            char[] ca = new char[4];
+            
+            c = Convert.ToChar(m_fourCC & 255);
+            if (!Char.IsLetterOrDigit(c))
+            {
+                c = ' ';
+            }
+            ca[0] = c;
+
+            c = Convert.ToChar((m_fourCC >> 8) & 255);
+            if (!Char.IsLetterOrDigit(c))
+            {
+                c = ' ';
+            }
+            ca[1] = c;
+
+            c = Convert.ToChar((m_fourCC >> 16) & 255);
+            if (!Char.IsLetterOrDigit(c))
+            {
+                c = ' ';
+            }
+            ca[2] = c;
+
+            c = Convert.ToChar((m_fourCC >> 24) & 255);
+            if (!Char.IsLetterOrDigit(c))
+            {
+                c = ' ';
+            }
+            ca[3] = c;
 
             string s = new string(ca);
 

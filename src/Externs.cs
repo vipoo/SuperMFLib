@@ -697,7 +697,7 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFGetSupportedMimeTypes(
-            [MarshalAs(UnmanagedType.LPStruct)] out PropVariant pPropVarMimeTypeArray
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pPropVarSchemeArray
         );
 
         [DllImport("mf.dll", PreserveSig = false)]

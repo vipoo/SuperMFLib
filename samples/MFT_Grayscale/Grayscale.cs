@@ -1106,7 +1106,7 @@ namespace MFT_Grayscale
         // dwWidthInPixels:  Frame width in pixels.
         // dwHeightInPixels: Frame height, in pixels.
         //-------------------------------------------------------------------
-        private void TransformImage_UYVY(
+        unsafe private void TransformImage_UYVY(
             IntPtr pDest,
             int lDestStride,
             IntPtr pSrc,
@@ -1115,17 +1115,14 @@ namespace MFT_Grayscale
             int dwHeightInPixels
             )
         {
-#if true
-            // While I believe this code will work, I can't find a file of the
-            // right format to try it with, so I'm leaving it commented out
-            Debug.Assert(false, "Untested code");
-#else
             // This routine uses unsafe pointers only for perf reasons.  Note you'll
             // need to mark the routine as unsafe, and change the project settings to
             // allow unsafe code
 
-            short* pSrc_Pixel = (short*)pSrc;
-            short* pDest_Pixel = (short*)pDest;
+            ushort* pSrc_Pixel = (ushort*)pSrc;
+            ushort* pDest_Pixel = (ushort*)pDest;
+            int lMySrcStride = (lSrcStride / 2);  // lSrcStride is in bytes and we need words
+            int lMyDestStride = (lDestStride / 2); // lSrcStride is in bytes and we need words
 
             for (int y = 0; y < dwHeightInPixels; y++)
             {
@@ -1135,23 +1132,24 @@ namespace MFT_Grayscale
                     // Each WORD is a byte pair (U/V, Y)
                     // Windows is little-endian so the order appears reversed.
 
-                    short pixel = (short)(pSrc_Pixel[x] & 0xFF00);
-                    pixel |= 0x0080;
-                    pDest_Pixel[x] = pixel;
-                }
-                pSrc_Pixel += lSrcStride;
-                pDest_Pixel += lDestStride;
-            }
-#endif
-        }
+                    //short pixel = (short)(pSrc_Pixel[x] & 0xFF00);
+                    //pixel |= 0x0080;
+                    //pDest_Pixel[x] = pixel;
 
+                    pDest_Pixel[x] = (ushort)((pSrc_Pixel[x] & 0xFF00) | 0x0080);
+                }
+
+                pSrc_Pixel += lMySrcStride;
+                pDest_Pixel += lMyDestStride;
+            }
+        }
 
         //-------------------------------------------------------------------
         // Name: TransformImage_YUY2
         // Description: Converts an image in YUY2 format to grayscale.
         //-------------------------------------------------------------------
 
-        private void TransformImage_YUY2(
+        unsafe private void TransformImage_YUY2(
             IntPtr pDest,
             int lDestStride,
             IntPtr pSrc,
@@ -1160,17 +1158,14 @@ namespace MFT_Grayscale
             int dwHeightInPixels
             )
         {
-#if true
-            // While I believe this code will work, I can't find a file of the
-            // right format to try it with, so I'm leaving it commented out
-            Debug.Assert(false, "Untested code");
-#else
             // This routine uses unsafe pointers only for perf reasons.  Note you'll
             // need to mark the routine as unsafe, and change the project settings to
             // allow unsafe code
 
-            short* pSrc_Pixel = (short*)pSrc;
-            short* pDest_Pixel = (short*)pDest;
+            ushort* pSrc_Pixel = (ushort*)pSrc;
+            ushort* pDest_Pixel = (ushort*)pDest;
+            int lMySrcStride = (lSrcStride / 2);  // lSrcStride is in bytes and we need words
+            int lMyDestStride = (lDestStride / 2); // lSrcStride is in bytes and we need words
 
             for (int y = 0; y < dwHeightInPixels; y++)
             {
@@ -1180,14 +1175,16 @@ namespace MFT_Grayscale
                     // Each WORD is a byte pair (Y, U/V)
                     // Windows is little-endian so the order appears reversed.
 
-                    short pixel = (short)(pSrc_Pixel[x] & 0x00FF);
-                    pixel |= unchecked((short)0x8000);
-                    pDest_Pixel[x] = pixel;
+                    //ushort pixel = (ushort)(pSrc_Pixel[x] & 0x00FF);
+                    //pixel |= (ushort)0x8000;
+                    //pDest_Pixel[x] = pixel;
+
+                    pDest_Pixel[x] = (ushort)((pSrc_Pixel[x] & 0x00FF) | 0x8000);
                 }
-                pSrc_Pixel += lSrcStride;
-                pDest_Pixel += lDestStride;
+
+                pSrc_Pixel += lMySrcStride;
+                pDest_Pixel += lMyDestStride;
             }
-#endif
         }
 
         //-------------------------------------------------------------------

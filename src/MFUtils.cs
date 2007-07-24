@@ -1424,19 +1424,7 @@ namespace MediaFoundation.Misc
         {
             if (o != null)
             {
-                IDisposable id = o as IDisposable;
-                if (id != null)
-                {
-                    id.Dispose();
-                }
-                else
-                {
-                    try
-                    {
-                        Marshal.ReleaseComObject(o);
-                    }
-                    catch { }
-                }
+                Marshal.ReleaseComObject(o);
             }
         }
     }

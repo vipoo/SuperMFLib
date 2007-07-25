@@ -1,4 +1,18 @@
 -----------------------------------------------------------------
+v.091 beta 2
+
+A few more tested externs (for the GrayScale sample)
+Two more tested interfaces: IMFTransform, IMF2DBuffer
+Fix DllImport statement for PropVariantClear (Thanks Stephen!)
+Helper class MFInt
+
+General cleanup of some of the methods in the untested area
+Fix the name for GetGUID to match MF docs
+Change SafeRelease to a much simpler function
+Remove ParseError in favor of Marshal.GetHRForException()
+Remove ISequentialStream & IStream in favor of .Net's implementation
+
+-----------------------------------------------------------------
 v0.9 Beta 1 release (2007-07-15)
 
 114 Interfaces defined

@@ -1,4 +1,4 @@
-There are 114 interfaces listed for Media Foundation at 
+There are 113 interfaces listed for Media Foundation at 
 http://msdn2.microsoft.com/en-us/library/ms696268.aspx and 
 150 externs defined at http://msdn2.microsoft.com/en-us/library/ms696205.aspx
 
@@ -6,8 +6,9 @@ This doc describes the status of each of these.
 
 ======================== Interfaces ====================================
 
-These 32 interfaces have been tested (4 of these are duplicates to deal with MF bug)
+These 30 interfaces have been tested (4 of these are duplicates to deal with MF bug)
 
+IMF2DBuffer
 IMFActivate
 IMFAsyncCallback
 IMFAsyncResult
@@ -39,21 +40,31 @@ IMFSourceResolver
 IMFStreamDescriptor
 IMFTopology
 IMFTopologyNode
+IMFTransform
 IMFVideoDisplayControl
 
 ------------------------------------------------------------------------------
 
-This 1 tested interfaces is not part of Media Foundation, but MF uses it so it
-is defined in the library.
+These 2 tested interfaces are not part of Media Foundation, but MF uses them so
+they are defined in the library.
 
 IPropertyStore
+INamedPropertyStore
 
 ------------------------------------------------------------------------------
-These 75 interfaces are defined in the library, but have not yet been tested.
+These 74 interfaces are defined in the library, but have not yet been tested.
 
-IMF2DBuffer
 IEVRFilterConfig
 IEVRTrustedVideoPlugin
+IMFASFContentInfo
+IMFASFIndexer
+IMFASFMultiplexer
+IMFASFMutualExclusion
+IMFASFProfile
+IMFASFSplitter
+IMFASFStreamConfig
+IMFASFStreamPrioritization
+IMFASFStreamSelector
 IMFAudioPolicy
 IMFAudioStreamVolume
 IMFByteStreamBuffering
@@ -105,28 +116,18 @@ IMFTopologyNodeAttributeEditor
 IMFTopologyServiceLookup
 IMFTopologyServiceLookupClient
 IMFTrackedSample
-IMFTransform
 IMFTrustedInput
 IMFTrustedOutput
 IMFVideoDeviceID
 IMFVideoMediaType
+IMFVideoMixerBitmap
 IMFVideoMixerControl
 IMFVideoPositionMapper
 IMFVideoPresenter
+IMFVideoProcessor
 IMFVideoRenderer
 IMFVideoSampleAllocator
 IMFWorkQueueServices
-IMFASFContentInfo
-IMFASFIndexer
-IMFASFMultiplexer
-IMFASFMutualExclusion
-IMFASFProfile
-IMFASFSplitter
-IMFASFStreamConfig
-IMFASFStreamPrioritization
-IMFASFStreamSelector
-IMFVideoMixerBitmap
-IMFVideoProcessor
 
 ------------------------------------------------------------------------------
 
@@ -138,7 +139,7 @@ IMFRemoteAsyncCallback
 
 ------------------------------------------------------------------------------
 
-These 9 interfaces require work that is beyond the scope of this library and
+These 8 interfaces require work that is beyond the scope of this library and
 are not defined in the library:
 
 IEVRVideoStreamControl
@@ -150,19 +151,9 @@ IDirectXVideoMemoryConfiguration
 IDirectXVideoProcessor
 IDirectXVideoProcessorService
 
-------------------------------------------------------------------------------
-
-These 3 untested interfaces are not part of Media Foundation, but MF uses them
-so they are defined in the library.
-
-INamedPropertyStore
-ISequentialStream
-IStream
-
-
 ====================== Externs ===========================
 
-These 25 externs are tested
+These 28 externs are tested
 
 CreateNamedPropertyStore
 MFCreateAsyncResult
@@ -189,9 +180,12 @@ MFInitMediaTypeFromWaveFormatEx
 MFInvokeCallback
 MFShutdown
 MFStartup
+MFTGetInfo
+MFTRegister
+MFTUnregister
 
 ------------------------------------------------------------------------------
-These 110 externs are defined in the library, but have not yet been tested.
+These 107 externs are defined in the library, but have not yet been tested.
 
 CreatePropertyStore
 MFAddPeriodicCallback
@@ -295,9 +289,6 @@ MFSerializeAttributesToStream
 MFSerializePresentationDescriptor
 MFShutdownObject
 MFTEnum
-MFTGetInfo
-MFTRegister
-MFTUnregister
 MFUnlockPlatform
 MFUnlockWorkQueue
 MFUnwrapMediaType
@@ -305,7 +296,8 @@ MFValidateMediaTypeSize
 MFWrapMediaType
 
 ------------------------------------------------------------------------------
-These 6 externs require work that is beyond the scope of this library:
+These 6 externs require work that is beyond the scope of this library and
+are not included in the library:
 
 DXVA2_Fixed32OpaqueAlpha
 DXVA2_Fixed32TransparentAlpha
@@ -316,13 +308,13 @@ DXVA2FloatToFixed
 
 ------------------------------------------------------------------------------
 
-These 4 externs are defined in the library, but are deprecated, undocumented 
-or otherwise untestable:
+These 4 externs are defined in the library, but are undocumented and therefor
+untested:
 
-MFSetWorkQueueClass
+MFCreateQualityManager
 MFCreateVideoMediaTypeFromVideoInfoHeader
 MFCreateVideoMediaTypeFromVideoInfoHeader2
-MFCreateQualityManager
+MFSetWorkQueueClass
 
 ------------------------------------------------------------------------------
 

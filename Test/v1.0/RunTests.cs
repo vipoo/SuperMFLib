@@ -16,6 +16,9 @@ namespace Testv10
             {
                 MFExtern.MFStartup(0x10070, MFStartup.Full);
 
+                //TestPropVariant tpv = new TestPropVariant();
+                //tpv.DoTests();
+
                 //TestBMI t0a = new TestBMI();
                 //t0a.DoTests();
 

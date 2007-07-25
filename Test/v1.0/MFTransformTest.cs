@@ -18,7 +18,6 @@ namespace Testv10
             string s;
             int icnt, ocnt;
             IntPtr ip = IntPtr.Zero;
-            IMFAttributes a;
             MFTRegisterTypeInfo[] it = null; // new MFTRegisterTypeInfo[5];
             MFTRegisterTypeInfo[] ot = null; // new MFTRegisterTypeInfo[5];
 

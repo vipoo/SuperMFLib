@@ -1762,7 +1762,18 @@ namespace MediaFoundation.Misc
         {
             if (o != null)
             {
-                Marshal.ReleaseComObject(o);
+                if (Marshal.IsComObject(o))
+                {
+                    Marshal.ReleaseComObject(o);
+                }
+                else
+                {
+                    IDisposable iDis = o as IDisposable;
+                    if (iDis != null)
+                    {
+                        iDis.Dispose();
+                    }
+                }
             }
         }
     }

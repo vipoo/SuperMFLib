@@ -977,7 +977,6 @@ class CPlayer : COMBase, IMFAsyncCallback
             finally
             {
                 SafeRelease(pTransformNode);
-                Marshal.ReleaseComObject(pTransformUnk);
                 //SafeRelease(pTransformUnk);
             }
         }

@@ -696,7 +696,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
             m_pVideoDisplay = o as IMFVideoDisplayControl;
         }
-        catch (InvalidCastException e)
+        catch (InvalidCastException)
         {
             m_pVideoDisplay = null;
         }

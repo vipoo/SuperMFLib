@@ -39,15 +39,15 @@ namespace Testv10
             Debug.Assert(p8.ToString() == "\"a\",\"b\",\"c\"");
             Debug.Assert(p9.ToString() == "Testv10.TestPropVariant");
 
-            Type t1 = p1.GetRuntimeType();
-            Type t2 = p2.GetRuntimeType();
-            Type t3 = p3.GetRuntimeType();
-            Type t4 = p4.GetRuntimeType();
-            Type t5 = p5.GetRuntimeType();
-            Type t6 = p6.GetRuntimeType();
-            Type t7 = p7.GetRuntimeType();
-            Type t8 = p8.GetRuntimeType();
-            Type t9 = p9.GetRuntimeType();
+            //Type t1 = p1.GetRuntimeType();
+            //Type t2 = p2.GetRuntimeType();
+            //Type t3 = p3.GetRuntimeType();
+            //Type t4 = p4.GetRuntimeType();
+            //Type t5 = p5.GetRuntimeType();
+            //Type t6 = p6.GetRuntimeType();
+            //Type t7 = p7.GetRuntimeType();
+            //Type t8 = p8.GetRuntimeType();
+            //Type t9 = p9.GetRuntimeType();
 
             int i1 = p1.GetHashCode();
             int i2 = p2.GetHashCode();

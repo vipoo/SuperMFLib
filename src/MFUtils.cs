@@ -313,6 +313,297 @@ namespace MediaFoundation.Misc
             throw new ArgumentException("PropVariant contents not an IUnknown");
         }
 
+        public override string ToString()
+        {
+            // This method is primarily intended for debugging so that a readable string will show
+            // up in the output window
+            string sRet;
+
+            switch (type)
+            {
+                case VariantType.None:
+                    {
+                        sRet = "<Empty>";
+                        break;
+                    }
+
+                case VariantType.Blob:
+                    {
+                        const string FormatString = "x2"; // Hex 2 digit format 
+                        const int MaxEntries = 16;
+
+                        byte[] blob = GetBlob();
+
+                        // Number of bytes we're going to format
+                        int n = Math.Min(MaxEntries, blob.Length);
+
+                        if (n == 0)
+                        {
+                            sRet = "<Empty Array>";
+                        }
+                        else
+                        {
+                            // Only format the first MaxEntries bytes
+                            sRet = blob[0].ToString(FormatString);
+                            for (int i = 1; i < n; i++)
+                            {
+                                sRet += ',' + blob[i].ToString(FormatString);
+                            }
+
+                            // If the string is longer, add an indicator
+                            if (blob.Length > n)
+                            {
+                                sRet += "...";
+                            }
+                        }
+                        break;
+                    }
+
+                case VariantType.Double:
+                    {
+                        sRet = GetDouble().ToString();
+                        break;
+                    }
+
+                case VariantType.Guid:
+                    {
+                        sRet = GetGuid().ToString();
+                        break;
+                    }
+
+                case VariantType.IUnknown:
+                    {
+                        sRet = GetIUnknown().ToString();
+                        break;
+                    }
+
+                case VariantType.String:
+                    {
+                        sRet = GetString();
+                        break;
+                    }
+
+                case VariantType.Uint32:
+                    {
+                        sRet = GetInt().ToString();
+                        break;
+                    }
+
+                case VariantType.Uint64:
+                    {
+                        sRet = GetLong().ToString();
+                        break;
+                    }
+
+                case VariantType.StringArray:
+                    {
+                        sRet = "";
+                        foreach (string entry in GetStringArray())
+                        {
+                            sRet += (sRet.Length == 0 ? "\"" : ",\"") + entry + '\"';
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        sRet = base.ToString();
+                        break;
+                    }
+            }
+
+            return sRet;
+        }
+
+        public override int GetHashCode()
+        {
+            // Give a (slightly) better hash value in case someone uses PropVariants
+            // in a hash table.
+            int iRet;
+
+            switch (type)
+            {
+                case VariantType.None:
+                    {
+                        iRet = base.GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Blob:
+                    {
+                        iRet = GetBlob().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Double:
+                    {
+                        iRet = GetDouble().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Guid:
+                    {
+                        iRet = GetGuid().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.IUnknown:
+                    {
+                        iRet = GetIUnknown().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.String:
+                    {
+                        iRet = GetString().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Uint32:
+                    {
+                        iRet = GetInt().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Uint64:
+                    {
+                        iRet = GetLong().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.StringArray:
+                    {
+                        iRet = GetStringArray().GetHashCode();
+                        break;
+                    }
+                default:
+                    {
+                        iRet = base.GetHashCode();
+                        break;
+                    }
+            }
+
+            return iRet;
+        }
+
+        public override bool Equals(object obj)
+        {
+            bool bRet;
+            PropVariant p = obj as PropVariant;
+
+            if ((p == null) || (p.type != type))
+            {
+                bRet = false;
+            }
+            else
+            {
+                switch (type)
+                {
+                    case VariantType.None:
+                        {
+                            bRet = true;
+                            break;
+                        }
+
+                    case VariantType.Blob:
+                        {
+                            byte[] b1;
+                            byte[] b2;
+
+                            b1 = GetBlob();
+                            b2 = p.GetBlob();
+
+                            if (b1.Length == b2.Length)
+                            {
+                                bRet = true;
+                                for (int x = 0; x < b1.Length; x++)
+                                {
+                                    if (b1[x] != b2[x])
+                                    {
+                                        bRet = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bRet = false;
+                            }
+                            break;
+                        }
+
+                    case VariantType.Double:
+                        {
+                            bRet = GetDouble() == p.GetDouble();
+                            break;
+                        }
+
+                    case VariantType.Guid:
+                        {
+                            bRet = GetGuid() == p.GetGuid();
+                            break;
+                        }
+
+                    case VariantType.IUnknown:
+                        {
+                            bRet = GetIUnknown() == p.GetIUnknown();
+                            break;
+                        }
+
+                    case VariantType.String:
+                        {
+                            bRet = GetString() == p.GetString();
+                            break;
+                        }
+
+                    case VariantType.Uint32:
+                        {
+                            bRet = GetInt() == p.GetInt();
+                            break;
+                        }
+
+                    case VariantType.Uint64:
+                        {
+                            bRet = GetLong() == p.GetLong();
+                            break;
+                        }
+
+                    case VariantType.StringArray:
+                        {
+                            string[] sa1;
+                            string[] sa2;
+
+                            sa1 = GetStringArray();
+                            sa2 = p.GetStringArray();
+
+                            if (sa1.Length == sa2.Length)
+                            {
+                                bRet = true;
+                                for (int x = 0; x < sa1.Length; x++)
+                                {
+                                    if (sa1[x] != sa2[x])
+                                    {
+                                        bRet = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bRet = false;
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            bRet = base.Equals(obj);
+                            break;
+                        }
+                }
+            }
+
+            return bRet;
+        }
+
         #region IDisposable Members
 
         public void Dispose()
@@ -893,6 +1184,68 @@ namespace MediaFoundation.Misc
         public int[] bmiColors;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public class MFInt
+    {
+        protected int m_value;
+
+        public MFInt(int v)
+        {
+            m_value = v;
+        }
+
+        public int GetValue()
+        {
+            return m_value;
+        }
+
+        // While I *could* enable this code, it almost certainly won't do what you 
+        // think it will.  Generally you don't want to create a *new* instance of
+        // MFInt and assign a value to it.  You want to assign a value to an
+        // existing instance.  In order to do this automatically, .Net would have
+        // to support overloading operator =.  But since it doesn't, use Assign()
+
+        //public static implicit operator MFInt(int f)
+        //{
+        //    return new MFInt(f);
+        //}
+
+        public static implicit operator int(MFInt f)
+        {
+            return f.m_value;
+        }
+
+        public int ToInt32()
+        {
+            return m_value;
+        }
+
+        public void Assign(int f)
+        {
+            m_value = f;
+        }
+
+        public override string ToString()
+        {
+            return m_value.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MFInt)
+            {
+                return ((MFInt)obj).m_value == m_value;
+            }
+
+            return Convert.ToInt32(obj) == m_value;
+        }
+    }
+
     #endregion
 
     #region Utility Classes
@@ -1330,68 +1683,6 @@ namespace MediaFoundation.Misc
                     Marshal.ThrowExceptionForHR(hr);
                 }
             }
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class MFInt
-    {
-        protected int m_value;
-
-        public MFInt(int v)
-        {
-            m_value = v;
-        }
-
-        public int GetValue()
-        {
-            return m_value;
-        }
-
-        // While I *could* enable this code, it almost certainly won't do what you 
-        // think it will.  Generally you don't want to create a *new* instance of
-        // MFInt and assign a value to it.  You want to assign a value to an
-        // existing instance.  In order to do this automatically, .Net would have
-        // to support overloading operator =.  But since it doesn't, use Assign()
-
-        //public static implicit operator MFInt(int f)
-        //{
-        //    return new MFInt(f);
-        //}
-
-        public static implicit operator int(MFInt f)
-        {
-            return f.m_value;
-        }
-
-        public int ToInt32()
-        {
-            return m_value;
-        }
-
-        public void Assign(int f)
-        {
-            m_value = f;
-        }
-
-        public override string ToString()
-        {
-            return m_value.ToString();
-        }
-
-        public override int GetHashCode()
-        {
-            return m_value.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is MFInt)
-            {
-                return ((MFInt)obj).m_value == m_value;
-            }
-
-            return Convert.ToInt32(obj) == m_value;
         }
     }
 

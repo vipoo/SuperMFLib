@@ -604,6 +604,28 @@ namespace MediaFoundation.Misc
             return bRet;
         }
 
+        public static bool operator ==(PropVariant pv1, PropVariant pv2)
+        {
+            // If both are null, or both are same instance, return true.
+            if (System.Object.ReferenceEquals(pv1, pv2))
+            {
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            if (((object)pv1 == null) || ((object)pv2 == null))
+            {
+                return false;
+            }
+
+            return pv1.Equals(pv2);
+        }
+
+        public static bool operator !=(PropVariant pv1, PropVariant pv2)
+        {
+            return !(pv1 == pv2);
+        }
+
         #region IDisposable Members
 
         public void Dispose()
@@ -618,7 +640,8 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public class FourCC
     {
-        private int m_fourCC = 0;
+        const string m_SubTypeExtension = "-0000-0010-8000-00aa00389b71";
+        private int m_fourCC;
 
         public FourCC(string fcc)
         {
@@ -629,10 +652,7 @@ namespace MediaFoundation.Misc
 
             byte[] asc = Encoding.ASCII.GetBytes(fcc);
 
-            this.m_fourCC = asc[0];
-            this.m_fourCC |= asc[1] << 8;
-            this.m_fourCC |= asc[2] << 16;
-            this.m_fourCC |= asc[3] << 24;
+            LoadFromBytes(asc[0], asc[1], asc[2], asc[3]);
         }
 
         public FourCC(char a, char b, char c, char d)
@@ -641,23 +661,38 @@ namespace MediaFoundation.Misc
 
         public FourCC(int fcc)
         {
-            this.m_fourCC = fcc;
+            m_fourCC = fcc;
+        }
+
+        public FourCC(byte a, byte b, byte c, byte d)
+        {
+            LoadFromBytes(a, b, c, d);
         }
 
         public FourCC(Guid g)
         {
+            if (!g.ToString().Contains(m_SubTypeExtension))
+            {
+                throw new Exception("Not a FourCC Guid");
+            }
+
             byte[] asc;
             asc = g.ToByteArray();
 
-            this.m_fourCC = asc[0];
-            this.m_fourCC |= asc[1] << 8;
-            this.m_fourCC |= asc[2] << 16;
-            this.m_fourCC |= asc[3] << 24;
+            LoadFromBytes(asc[0], asc[1], asc[2], asc[3]);
+        }
+
+        public void LoadFromBytes(byte a, byte b, byte c, byte d)
+        {
+            m_fourCC = a;
+            m_fourCC |= b << 8;
+            m_fourCC |= c << 16;
+            m_fourCC |= d << 24;
         }
 
         public int ToInt32()
         {
-            return this.m_fourCC;
+            return m_fourCC;
         }
 
         public static explicit operator int(FourCC f)
@@ -667,17 +702,29 @@ namespace MediaFoundation.Misc
 
         public Guid ToMediaSubtype()
         {
-            return new Guid(this.m_fourCC.ToString("X") + "-0000-0010-8000-00AA00389B71");
+            return new Guid(m_fourCC.ToString("X") + m_SubTypeExtension);
         }
 
         public static bool operator ==(FourCC fcc1, FourCC fcc2)
         {
+            // If both are null, or both are same instance, return true.
+            if (System.Object.ReferenceEquals(fcc1, fcc2))
+            {
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            if (((object)fcc1 == null) || ((object)fcc2 == null))
+            {
+                return false;
+            }
+
             return fcc1.m_fourCC == fcc2.m_fourCC;
         }
 
         public static bool operator !=(FourCC fcc1, FourCC fcc2)
         {
-            return fcc1.m_fourCC != fcc2.m_fourCC;
+            return !(fcc1 == fcc2);
         }
 
         public override bool Equals(object obj)
@@ -685,12 +732,12 @@ namespace MediaFoundation.Misc
             if (!(obj is FourCC))
                 return false;
 
-            return (obj as FourCC).m_fourCC == this.m_fourCC;
+            return (obj as FourCC).m_fourCC == m_fourCC;
         }
 
         public override int GetHashCode()
         {
-            return this.m_fourCC.GetHashCode();
+            return m_fourCC.GetHashCode();
         }
 
         public override string ToString()

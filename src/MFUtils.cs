@@ -490,7 +490,7 @@ namespace MediaFoundation.Misc
             bool bRet;
             PropVariant p = obj as PropVariant;
 
-            if ((p == null) || (p.type != type))
+            if ((((object)p) == null) || (p.type != type))
             {
                 bRet = false;
             }
@@ -790,6 +790,11 @@ namespace MediaFoundation.Misc
         public short wBitsPerSample;
         public short cbSize;
 
+        public override string ToString()
+        {
+            return string.Format("{0} {1} {2} {3}", wFormatTag, nChannels, nSamplesPerSec, wBitsPerSample);
+        }
+
         public IntPtr GetPtr()
         {
             IntPtr ip;
@@ -963,31 +968,57 @@ namespace MediaFoundation.Misc
             return wfe;
         }
 
-        public bool IsEqual(WaveFormatEx b)
+        public static bool operator ==(WaveFormatEx a, WaveFormatEx b)
         {
-            bool bRet = false;
-
-            if (b == null)
+            // If both are null, or both are same instance, return true.
+            if (System.Object.ReferenceEquals(a, b))
             {
-                bRet = false;
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            bool bRet;
+            Type t1 = a.GetType();
+            Type t2 = b.GetType();
+
+            if (t1 == t2 &&
+                a.wFormatTag == b.wFormatTag &&
+                a.nChannels == b.nChannels &&
+                a.nSamplesPerSec == b.nSamplesPerSec &&
+                a.nAvgBytesPerSec == b.nAvgBytesPerSec &&
+                a.nBlockAlign == b.nBlockAlign &&
+                a.wBitsPerSample == b.wBitsPerSample &&
+                a.cbSize == b.cbSize)
+            {
+                bRet = true;
             }
             else
             {
-                if (wFormatTag == b.wFormatTag &&
-                    nChannels == b.nChannels &&
-                    nSamplesPerSec == b.nSamplesPerSec &&
-                    nAvgBytesPerSec == b.nAvgBytesPerSec &&
-                    nBlockAlign == b.nBlockAlign &&
-                    wBitsPerSample == b.wBitsPerSample &&
-                    cbSize == b.cbSize)
-                {
-                    bRet = true;
-                }
+                bRet = false;
             }
 
             return bRet;
         }
 
+        public static bool operator !=(WaveFormatEx a, WaveFormatEx b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this == (obj as WaveFormatEx);
+        }
+
+        public override int GetHashCode()
+        {
+            return nAvgBytesPerSec + wFormatTag;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
@@ -995,62 +1026,52 @@ namespace MediaFoundation.Misc
     {
         public byte[] byteData;
 
-        public bool IsEqual(WaveFormatExWithData b)
+        public static bool operator ==(WaveFormatExWithData a, WaveFormatExWithData b)
         {
-            bool bRet = base.IsEqual(b);
+            bool bRet = ((WaveFormatEx)a) == ((WaveFormatEx)b);
 
             if (bRet)
             {
-                if (b.byteData == null || byteData == null || b.byteData.Length != byteData.Length)
+                if (b.byteData == null)
                 {
-                    bRet = false;
+                    bRet = a.byteData == null;
                 }
                 else
                 {
-                    for (int x = 0; x < b.byteData.Length; x++)
+                    if (b.byteData.Length == a.byteData.Length)
                     {
-                        if (b.byteData[x] != byteData[x])
+                        for (int x = 0; x < b.byteData.Length; x++)
                         {
-                            bRet = false;
-                            break;
+                            if (b.byteData[x] != a.byteData[x])
+                            {
+                                bRet = false;
+                                break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        bRet = false;
                     }
                 }
             }
 
             return bRet;
         }
-    }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
-    public class WaveFormatExtensibleWithData : WaveFormatExtensible
-    {
-        public byte[] byteData;
-
-        public bool IsEqual(WaveFormatExWithData b)
+        public static bool operator !=(WaveFormatExWithData a, WaveFormatExWithData b)
         {
-            bool bRet = base.IsEqual(b);
+            return !(a == b);
+        }
 
-            if (bRet)
-            {
-                if (b.byteData == null || byteData == null || b.byteData.Length != byteData.Length)
-                {
-                    bRet = false;
-                }
-                else
-                {
-                    for (int x = 0; x < b.byteData.Length; x++)
-                    {
-                        if (b.byteData[x] != byteData[x])
-                        {
-                            bRet = false;
-                            break;
-                        }
-                    }
-                }
-            }
+        public override bool Equals(object obj)
+        {
+            return this == (obj as WaveFormatExWithData);
+        }
 
-            return bRet;
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 
@@ -1068,18 +1089,87 @@ namespace MediaFoundation.Misc
         [FieldOffset(6)]
         public Guid SubFormat;
 
-        public bool IsEqual(WaveFormatExtensible b)
+        public static bool operator ==(WaveFormatExtensible a, WaveFormatExtensible b)
         {
-            bool bRet = base.IsEqual(b);
+            bool bRet = ((WaveFormatEx)a) == ((WaveFormatEx)b);
 
             if (bRet)
             {
-                bRet = (wValidBitsPerSample == b.wValidBitsPerSample &&
-                    dwChannelMask == b.dwChannelMask &&
-                    SubFormat == b.SubFormat);
+                bRet = (a.wValidBitsPerSample == b.wValidBitsPerSample &&
+                    a.dwChannelMask == b.dwChannelMask &&
+                    a.SubFormat == b.SubFormat);
             }
 
             return bRet;
+        }
+
+        public static bool operator !=(WaveFormatExtensible a, WaveFormatExtensible b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this == (obj as WaveFormatExtensible);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("WAVEFORMATEX")]
+    public class WaveFormatExtensibleWithData : WaveFormatExtensible
+    {
+        public byte[] byteData;
+
+        public static bool operator ==(WaveFormatExtensibleWithData a, WaveFormatExtensibleWithData b)
+        {
+            bool bRet = ((WaveFormatExtensible)a) == ((WaveFormatExtensible)b);
+
+            if (bRet)
+            {
+                if (b.byteData == null)
+                {
+                    bRet = a.byteData == null;
+                }
+                else
+                {
+                    if (b.byteData.Length == a.byteData.Length)
+                    {
+                        for (int x = 0; x < b.byteData.Length; x++)
+                        {
+                            if (b.byteData[x] != a.byteData[x])
+                            {
+                                bRet = false;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        bRet = false;
+                    }
+                }
+            }
+
+            return bRet;
+        }
+
+        public static bool operator !=(WaveFormatExtensibleWithData a, WaveFormatExtensibleWithData b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this == (obj as WaveFormatExtensibleWithData);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 
@@ -1719,7 +1809,7 @@ namespace MediaFoundation.Misc
             {
                 string s = GetErrorText(hr);
 
-                // If a string is returned, build a com error from it
+                // If a string is returned, build a COM error from it
                 if (s != null)
                 {
                     throw new COMException(s, hr);

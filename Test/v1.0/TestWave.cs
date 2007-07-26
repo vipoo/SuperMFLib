@@ -13,6 +13,8 @@ namespace Testv10
     {
         public void DoTests()
         {
+            TestEqual();
+
             TestWaveFormatEx();
             TestWaveFormatExPCM();
             TestWaveFormatExWithData();
@@ -33,7 +35,7 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            Debug.Assert(w1.IsEqual(w2));
+            Debug.Assert(w1 == w2);
         }
 
         private void TestWaveFormatExtensible()
@@ -49,7 +51,7 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            Debug.Assert(w1.IsEqual(w2));
+            Debug.Assert(w1 == w2);
         }
 
         private void TestWaveFormatExWithData()
@@ -68,7 +70,7 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            Debug.Assert(w1.IsEqual(w2));
+            Debug.Assert(w1 == w2);
         }
 
         private void TestWaveFormatExPCM()
@@ -86,8 +88,8 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            // IsEqual won't work cuz of the cbSize issue
-            //Debug.Assert(w1.IsEqual(w2));
+            // Equals won't work cuz of the cbSize issue
+            //Debug.Assert(w1 == w2);
         }
 
         private void TestWaveFormatExWithData2()
@@ -106,7 +108,7 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            Debug.Assert(w1.IsEqual(w2));
+            Debug.Assert(w1 == w2);
         }
 
         private void TestWaveFormatExtensibleWithData()
@@ -125,7 +127,7 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            Debug.Assert(w1.IsEqual(w2));
+            Debug.Assert(w1 == w2);
         }
 
         private void TestWaveFormatExtensibleWithData2()
@@ -144,7 +146,150 @@ namespace Testv10
 
             Marshal.FreeCoTaskMem(ip);
 
-            Debug.Assert(w1.IsEqual(w2));
+            Debug.Assert(w1 == w2);
+        }
+
+        private void TestEqual()
+        {
+            WaveFormatEx a1 = new WaveFormatEx();
+            WaveFormatEx a2 = new WaveFormatEx();
+            WaveFormatEx a3 = new WaveFormatEx();
+            WaveFormatEx a4 = null;
+
+            WaveFormatExWithData b1 = new WaveFormatExWithData();
+            WaveFormatExWithData b2 = new WaveFormatExWithData();
+            WaveFormatExWithData b3 = new WaveFormatExWithData();
+            WaveFormatEx b4 = null;
+
+            WaveFormatExtensible c1 = new WaveFormatExtensible();
+            WaveFormatExtensible c2 = new WaveFormatExtensible();
+            WaveFormatExtensible c3 = new WaveFormatExtensible();
+            WaveFormatEx c4 = null;
+
+            WaveFormatExtensibleWithData d1 = new WaveFormatExtensibleWithData();
+            WaveFormatExtensibleWithData d2 = new WaveFormatExtensibleWithData();
+            WaveFormatExtensibleWithData d3 = new WaveFormatExtensibleWithData();
+            WaveFormatEx d4 = null;
+
+            FillWave(a1, 1);
+            FillWave(a2, 1);
+            FillWave(a3, 2);
+
+            FillWave(b1, 1);
+            FillWave(b2, 1);
+            FillWave(b3, 2);
+
+            FillWave(c1, 1);
+            FillWave(c2, 1);
+            FillWave(c3, 2);
+
+            FillWave(d1, 1);
+            FillWave(d2, 1);
+            FillWave(d3, 2);
+
+            b1.byteData = new byte[3];
+            b2.byteData = new byte[3];
+
+            d1.byteData = new byte[3];
+            d2.byteData = new byte[3];
+
+            FillByteData(b1.byteData, 2);
+            FillByteData(b2.byteData, 2);
+
+            FillByteData(d1.byteData, 2);
+            FillByteData(d2.byteData, 2);
+
+            Debug.Assert(!a1.Equals(null));
+            Debug.Assert(!a1.Equals(this));
+            Debug.Assert(a1.Equals(a1));
+            Debug.Assert(a1.Equals(a2));
+            Debug.Assert(!a1.Equals(a3));
+            Debug.Assert(!a1.Equals(a4));
+            Debug.Assert(a1 != null);
+            Debug.Assert(null != a1);
+            Debug.Assert(a1 == a2);
+            Debug.Assert(a2 == a1);
+            Debug.Assert(a1 != a3);
+            Debug.Assert(a3 != a1);
+            Debug.Assert(a4 != a1);
+            Debug.Assert(a1 != a4);
+
+            Debug.Assert(!b1.Equals(null));
+            Debug.Assert(!b1.Equals(this));
+            Debug.Assert(b1.Equals(b1));
+            Debug.Assert(b1.Equals(b2));
+            Debug.Assert(!b1.Equals(b3));
+            Debug.Assert(!b1.Equals(b4));
+            Debug.Assert(b1 != null);
+            Debug.Assert(null != b1);
+            Debug.Assert(b1 == b2);
+            Debug.Assert(b2 == b1);
+            Debug.Assert(b1 != b3);
+            Debug.Assert(b3 != b1);
+            Debug.Assert(b4 != b1);
+            Debug.Assert(b1 != b4);
+
+            Debug.Assert(!c1.Equals(null));
+            Debug.Assert(!c1.Equals(this));
+            Debug.Assert(c1.Equals(c1));
+            Debug.Assert(c1.Equals(c2));
+            Debug.Assert(!c1.Equals(c3));
+            Debug.Assert(!c1.Equals(c4));
+            Debug.Assert(c1 != null);
+            Debug.Assert(null != c1);
+            Debug.Assert(c1 == c2);
+            Debug.Assert(c2 == c1);
+            Debug.Assert(c1 != c3);
+            Debug.Assert(c3 != c1);
+            Debug.Assert(c4 != c1);
+            Debug.Assert(c1 != c4);
+
+            Debug.Assert(!d1.Equals(null));
+            Debug.Assert(!d1.Equals(this));
+            Debug.Assert(d1.Equals(d1));
+            Debug.Assert(d1.Equals(d2));
+            Debug.Assert(!d1.Equals(d3));
+            Debug.Assert(!d1.Equals(d4));
+            Debug.Assert(d1 != null);
+            Debug.Assert(null != d1);
+            Debug.Assert(d1 == d2);
+            Debug.Assert(d2 == d1);
+            Debug.Assert(d1 != d3);
+            Debug.Assert(d3 != d1);
+            Debug.Assert(d4 != d1);
+            Debug.Assert(d1 != d4);
+
+            Debug.Assert(!a1.Equals(b1));
+            Debug.Assert(!a1.Equals(c1));
+            Debug.Assert(!a1.Equals(d1));
+
+            Debug.Assert(!b1.Equals(a1));
+            Debug.Assert(!b1.Equals(c1));
+            Debug.Assert(!b1.Equals(d1));
+
+            Debug.Assert(!c1.Equals(a1));
+            Debug.Assert(!c1.Equals(b1));
+            Debug.Assert(!c1.Equals(d1));
+
+            Debug.Assert(!d1.Equals(a1));
+            Debug.Assert(!d1.Equals(b1));
+            Debug.Assert(!d1.Equals(c1));
+
+            Debug.Assert(a1 != b1);
+            Debug.Assert(a1 != c1);
+            Debug.Assert(a1 != d1);
+
+            Debug.Assert(b1 != a1);
+            Debug.Assert(b1 != c1);
+            Debug.Assert(b1 != d1);
+
+            Debug.Assert(c1 != a1);
+            Debug.Assert(c1 != b1);
+            Debug.Assert(c1 != d1);
+
+            Debug.Assert(d1 != a1);
+            Debug.Assert(d1 != b1);
+            Debug.Assert(d1 != c1);
         }
 
         private void FillWave(WaveFormatEx w1, short iOffset)

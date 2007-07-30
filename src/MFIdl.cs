@@ -627,32 +627,6 @@ namespace MediaFoundation
         ATSC_HD720p = (ATSC_HD1080i + 1)
     }
 
-    [UnmanagedName("MF_FILE_FLAGS")]
-    public enum MFFileFlags
-    {
-        None = 0,
-        NoBuffering = 0x1
-    }
-
-    [UnmanagedName("MF_FILE_ACCESSMODE")]
-    public enum MFFileAccessMode
-    {
-        None = 0,
-        Read = 1,
-        Write = 2,
-        ReadWrite = 3
-    }
-
-    [UnmanagedName("MF_FILE_OPENMODE")]
-    public enum MFFileOpenMode
-    {
-        FailIfNotExist = 0,
-        FailIfExist = 1,
-        ResetIfExist = 2,
-        AppendIfExist = 3,
-        DeleteIfExist = 4
-    }
-
     [UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
     public enum MFPMPSESSION_CREATION_FLAGS
     {
@@ -1006,6 +980,39 @@ namespace MediaFoundation
         CanSeek = 0x2,
         CanPause = 0x4,
         HasSlowSeek = 0x8
+    }
+
+    [UnmanagedName("MF_ATTRIBUTE_SERIALIZE_OPTIONS"), Flags]
+    public enum MFAttributeSerializeOptions
+    {
+        None = 0,
+        UnknownByRef = 0x00000001
+    }
+
+    [UnmanagedName("MF_FILE_ACCESSMODE")]
+    public enum MFFileAccessMode
+    {
+        None = 0,
+        Read = 1,
+        Write = 2,
+        ReadWrite = 3
+    }
+
+    [UnmanagedName("MF_FILE_OPENMODE")]
+    public enum MFFileOpenMode
+    {
+        FailIfNotExist = 0,
+        FailIfExist = 1,
+        ResetIfExist = 2,
+        AppendIfExist = 3,
+        DeleteIfExist = 4
+    }
+
+    [Flags, UnmanagedName("MF_FILE_FLAGS")]
+    public enum MFFileFlags
+    {
+        None = 0,
+        NoBuffering = 0x1
     }
 
     #endregion

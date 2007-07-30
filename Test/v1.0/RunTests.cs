@@ -15,6 +15,7 @@ namespace Testv10
             try
             {
                 MFExtern.MFStartup(0x10070, MFStartup.Full);
+                MFExtern.MFLockPlatform();
 
                 //TestPropVariant tpv = new TestPropVariant();
                 //tpv.DoTests();
@@ -96,12 +97,26 @@ namespace Testv10
 
                 //INamedPropertyStoreTest t24 = new INamedPropertyStoreTest();
                 //t24.DoTests();
+
+                //TestExtern t25 = new TestExtern();
+                //t25.DoTests();
             }
             catch (Exception e)
             {
                 int hr = Marshal.GetHRForException(e);
+                string s = MFError.GetErrorText(hr);
 
-                System.Windows.Forms.MessageBox.Show(string.Format("0x{0:x}: {1}", hr, MFError.GetErrorText(hr)), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                if (s == null)
+                {
+                    s = e.Message;
+                }
+
+                System.Windows.Forms.MessageBox.Show(string.Format("0x{0:x}: {1}", hr, s), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+            }
+            finally
+            {
+                MFExtern.MFUnlockPlatform();
+                MFExtern.MFShutdown();
             }
         }
     }

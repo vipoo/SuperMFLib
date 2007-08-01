@@ -48,7 +48,7 @@ namespace Testv10
             Debug.Assert(mb != null);
 
             long l = MFExtern.MFGetSystemTime();
-            Debug.Assert(l > 1243466238863);
+            Debug.Assert(l > 206563752489);
 
             MFExtern.MFGetSupportedSchemes(p);
             sa = p.GetStringArray();
@@ -158,8 +158,7 @@ namespace Testv10
             MFExtern.MFInitAMMediaTypeFromMFMediaType(mt, Guid.Empty, amt);
 
             AMMediaType amt2;
-            Guid VideoInfo2 = new Guid(0xf72a76A0, 0xeb0a, 0x11d0, 0xac, 0xe4, 0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
-            MFExtern.MFCreateAMMediaTypeFromMFMediaType(mt, VideoInfo2, out amt2);
+            MFExtern.MFCreateAMMediaTypeFromMFMediaType(mt, MFRepresentation.VideoInfo2, out amt2);
 
             MFExtern.MFCreateMediaType(out mt3);
             MFExtern.MFInitMediaTypeFromAMMediaType(mt3, amt2);
@@ -190,7 +189,16 @@ namespace Testv10
             Debug.Assert(iRet == 0);
 
             IntPtr ip;
+            vmt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
+            vmt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+
+            vf = vmt.GetVideoFormat();
             vmt.GetVideoRepresentation(MFRepresentation.VideoInfo, out ip, 10);
+
+            AMMediaType amt5 = new AMMediaType();
+            Marshal.PtrToStructure(ip, amt5);
+            Debug.Assert(amt5.formatType == MFRepresentation.VideoInfo);
+            vmt.FreeRepresentation(MFRepresentation.VideoInfo, ip);
         }
 
         private void TestQM()

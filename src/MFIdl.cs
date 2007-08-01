@@ -1677,7 +1677,7 @@ namespace MediaFoundation
 
         void GenerateRequiredSchemas(
             [In] int dwAttributes,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidOutputSubType,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidOutputSubType,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid rgGuidProtectionSchemasSupported,
             [In] int cProtectionSchemasSupported,
             [MarshalAs(UnmanagedType.Interface)] out IMFCollection ppRequiredProtectionSchemas

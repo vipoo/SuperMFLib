@@ -599,7 +599,7 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFValidateMediaTypeSize(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid FormatType,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid FormatType,
             IntPtr pBlock,
             [In] int cbSize
             );
@@ -748,7 +748,7 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateMediaTypeFromRepresentation(
-            [MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             IntPtr pvRepresentation,
             out IMFMediaType ppIMediaType
             );

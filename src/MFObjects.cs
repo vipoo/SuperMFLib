@@ -602,12 +602,12 @@ namespace MediaFoundation
             );
 
         new void GetRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation
             );
 
         new void FreeRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             [In] IntPtr pvRepresentation
             );
 
@@ -1240,7 +1240,7 @@ namespace MediaFoundation
             );
 
         void FreeRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             [In] IntPtr pvRepresentation
             );
     }
@@ -1805,12 +1805,12 @@ namespace MediaFoundation
             );
 
         new void GetRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation
             );
 
         new void FreeRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             [In] IntPtr pvRepresentation
             );
 
@@ -1818,7 +1818,7 @@ namespace MediaFoundation
 
         [Obsolete("This method is deprecated")]
         void GetVideoRepresentation(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidRepresentation,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation,
             [In] int lStride
             );

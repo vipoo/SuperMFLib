@@ -39,7 +39,7 @@ namespace MediaFoundation.Transform
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_REGISTER_TYPE_INFO")]
-    public struct MFTRegisterTypeInfo
+    public class MFTRegisterTypeInfo
     {
         public Guid guidMajorType;
         public Guid guidSubtype;

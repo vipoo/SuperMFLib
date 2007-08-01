@@ -23,11 +23,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endregion
 
 using System;
+using System.Collections;
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using MediaFoundation.Misc;
+using MediaFoundation.Transform;
 
 namespace MediaFoundation.Misc
 {
@@ -640,7 +642,7 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public class FourCC
     {
-        const string m_SubTypeExtension = "-0000-0010-8000-00aa00389b71";
+        protected const string m_SubTypeExtension = "-0000-0010-8000-00aa00389b71";
         private int m_fourCC;
 
         public FourCC(string fcc)
@@ -671,7 +673,7 @@ namespace MediaFoundation.Misc
 
         public FourCC(Guid g)
         {
-            if (!g.ToString().Contains(m_SubTypeExtension))
+            if (!IsA4ccSubtype(g))
             {
                 throw new Exception("Not a FourCC Guid");
             }
@@ -776,6 +778,11 @@ namespace MediaFoundation.Misc
             string s = new string(ca);
 
             return s;
+        }
+
+        public static bool IsA4ccSubtype(Guid g)
+        {
+            return (g.ToString().Contains(m_SubTypeExtension));
         }
     }
 
@@ -1883,10 +1890,6 @@ namespace MediaFoundation.Misc
         // The managed object passed in to MarshalManagedToNative
         protected PropVariant m_prop;
 
-        public PVMarshaler()
-        {
-        }
-
         public IntPtr MarshalManagedToNative(object managedObj)
         {
             IntPtr p;
@@ -1959,13 +1962,323 @@ namespace MediaFoundation.Misc
         }
     }
 
-    // Class to handle WAVEFORMATEXTENSIBLE
-    internal class WEMarshaler : ICustomMarshaler
+    // Used by MFTGetInfo
+    internal class RTIMarshaler : ICustomMarshaler
     {
-        public WEMarshaler()
+        private ArrayList m_array;
+        private MFInt m_int;
+        private IntPtr m_MFIntPtr;
+        private IntPtr m_ArrayPtr;
+
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            IntPtr p;
+
+            // We get called twice: Once for the MFInt, and once for the array.
+            // Figure out which call this is.
+            if (managedObj is MFInt)
+            {
+                // Save off the object.  We'll need to use Assign() on this later.
+                m_int = managedObj as MFInt;
+
+                // Allocate room for the int
+                p = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(MFInt)));
+                m_MFIntPtr = p;
+            }
+            else
+            {
+                // Save off the object.  We'll be calling methods on this in 
+                // MarshalNativeToManaged.
+                m_array = managedObj as ArrayList;
+
+                if (m_array != null)
+                {
+                    m_array.Clear();
+                }
+
+                // All we need is room for the pointer
+                p = Marshal.AllocCoTaskMem(IntPtr.Size);
+
+                // Belt-and-suspenders.  Set this to null.
+                Marshal.WriteIntPtr(p, IntPtr.Zero);
+                m_ArrayPtr = p;
+            }
+
+            return p;
+        }
+
+        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
+        // from MarshalManagedToNative.  The return value is unused.
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            // When we are called with pNativeData == m_ArrayPtr, do nothing.  All the
+            // work is done when:
+            if (pNativeData == m_MFIntPtr)
+            {
+                // Read the count
+                int count = Marshal.ReadInt32(pNativeData);
+
+                // If we have an array to return things in (ie MFTGetInfo wasn't passed
+                // nulls)
+                if (m_array != null)
+                {
+                    IntPtr ip2 = Marshal.ReadIntPtr(m_ArrayPtr);
+
+                    // I don't know why this might happen, but it seems worth the check
+                    if (ip2 != IntPtr.Zero)
+                    {
+                        try
+                        {
+                            int iSize = Marshal.SizeOf(typeof(MFTRegisterTypeInfo));
+
+                            // Size the array
+                            m_array.Capacity = count;
+
+                            // Copy in the values
+                            for (int x = 0; x < count; x++)
+                            {
+                                MFTRegisterTypeInfo rti = new MFTRegisterTypeInfo();
+                                Marshal.PtrToStructure(new IntPtr(ip2.ToInt64() + (x * iSize)), rti);
+                                m_array.Add(rti);
+                            }
+                        }
+                        finally
+                        {
+                            // Free the array we got back
+                            Marshal.FreeCoTaskMem(ip2);
+                        }
+                    }
+                }
+
+                // Don't forget to assign the value
+                m_int.Assign(count);
+
+                m_int = null;
+                m_array = null;
+            }
+
+            // This value isn't actually used
+            return null;
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
         {
         }
 
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            Marshal.FreeCoTaskMem(pNativeData);
+        }
+
+        // The number of bytes to marshal out
+        public int GetNativeDataSize()
+        {
+            return -1;
+        }
+
+        // When used with MFTGetInfo, there are 2 parameter pairs (ppInputTypes + pcInputTypes,
+        // ppOutputTypes + pcOutputTypes).  Each need their own instance
+        static RTIMarshaler[] s_rti = new RTIMarshaler[2];
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            // Probably not an issue, but just to be safe
+            lock (s_rti)
+            {
+                if (s_rti[0] == null)
+                {
+                    s_rti[0] = new RTIMarshaler();
+                    s_rti[1] = new RTIMarshaler();
+                }
+            }
+
+            int i = Convert.ToInt32(cookie);
+            return s_rti[i];
+        }
+    }
+
+    // Used by MFTRegister
+    internal class RTAMarshaler : ICustomMarshaler
+    {
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            IntPtr p;
+
+            int iSize = Marshal.SizeOf(typeof(MFTRegisterTypeInfo));
+
+            // Save off the object.  We'll be calling methods on this in 
+            // MarshalNativeToManaged.
+            MFTRegisterTypeInfo[] array = managedObj as MFTRegisterTypeInfo[];
+
+            // All we need is room for the pointer
+            p = Marshal.AllocCoTaskMem(array.Length * iSize);
+
+            for (int x = 0; x < array.Length; x++)
+            {
+                Marshal.StructureToPtr(array[x], new IntPtr(p.ToInt64() + (x * iSize)), false);
+            }
+
+            return p;
+        }
+
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            // This value isn't actually used
+            return null;
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
+        {
+        }
+
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            Marshal.FreeCoTaskMem(pNativeData);
+        }
+
+        // The number of bytes to marshal out
+        public int GetNativeDataSize()
+        {
+            return -1;
+        }
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            return new RTAMarshaler();
+        }
+    }
+
+    // Used by MFTEnum
+    internal class GAMarshaler : ICustomMarshaler
+    {
+        private ArrayList m_array;
+        private MFInt m_int;
+        private IntPtr m_MFIntPtr;
+        private IntPtr m_ArrayPtr;
+
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            IntPtr p;
+
+            // We get called twice: Once for the MFInt, and once for the array.
+            // Figure out which call this is.
+            if (managedObj is MFInt)
+            {
+                // Save off the object.  We'll need to use Assign() on this later.
+                m_int = managedObj as MFInt;
+
+                // Allocate room for the int
+                p = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(MFInt)));
+                m_MFIntPtr = p;
+            }
+            else
+            {
+                // Save off the object.  We'll be calling methods on this in 
+                // MarshalNativeToManaged.
+                m_array = managedObj as ArrayList;
+
+                if (m_array != null)
+                {
+                    m_array.Clear();
+                }
+
+                // All we need is room for the pointer
+                p = Marshal.AllocCoTaskMem(IntPtr.Size);
+
+                // Belt-and-suspenders.  Set this to null.
+                Marshal.WriteIntPtr(p, IntPtr.Zero);
+                m_ArrayPtr = p;
+            }
+
+            return p;
+        }
+
+        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
+        // from MarshalManagedToNative.  The return value is unused.
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            // When we are called with pNativeData == m_ArrayPtr, do nothing.  All the
+            // work is done when:
+            if (pNativeData == m_MFIntPtr)
+            {
+                // Read the count
+                int count = Marshal.ReadInt32(pNativeData);
+
+                // If we have an array to return things in (ie MFTGetInfo wasn't passed
+                // nulls)
+                if (m_array != null)
+                {
+                    IntPtr ip2 = Marshal.ReadIntPtr(m_ArrayPtr);
+
+                    // I don't know why this might happen, but it seems worth the check
+                    if (ip2 != IntPtr.Zero)
+                    {
+                        try
+                        {
+                            int iSize = Marshal.SizeOf(typeof(Guid));
+                            // Size the array
+                            m_array.Capacity = count;
+                            byte[] b = new byte[iSize];
+
+                            // Copy in the values
+                            for (int x = 0; x < count; x++)
+                            {
+                                Marshal.Copy(new IntPtr(ip2.ToInt64() + (x * iSize)), b, 0, iSize);
+                                m_array.Add(new Guid(b));
+                            }
+                        }
+                        finally
+                        {
+                            // Free the array we got back
+                            Marshal.FreeCoTaskMem(ip2);
+                        }
+                    }
+                }
+
+                // Don't forget to assign the value
+                m_int.Assign(count);
+
+                m_array = null;
+                m_int = null;
+            }
+
+            // This value isn't actually used
+            return null;
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
+        {
+        }
+
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            Marshal.FreeCoTaskMem(pNativeData);
+        }
+
+        // The number of bytes to marshal out
+        public int GetNativeDataSize()
+        {
+            return -1;
+        }
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            return new GAMarshaler();
+        }
+    }
+
+    // Class to handle WAVEFORMATEXTENSIBLE
+    internal class WEMarshaler : ICustomMarshaler
+    {
         public IntPtr MarshalManagedToNative(object managedObj)
         {
             WaveFormatEx wfe = managedObj as WaveFormatEx;
@@ -2012,10 +2325,6 @@ namespace MediaFoundation.Misc
     internal class BMMarshaler : ICustomMarshaler
     {
         protected BitmapInfoHeader m_bmi;
-
-        public BMMarshaler()
-        {
-        }
 
         public IntPtr MarshalManagedToNative(object managedObj)
         {

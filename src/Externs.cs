@@ -23,11 +23,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endregion
 
 using System;
+using System.Collections;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 
 using MediaFoundation.Misc;
 using MediaFoundation.Transform;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace MediaFoundation
 {
@@ -191,30 +192,36 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTRegister(
-            [In] Guid clsidMFT,
-            [In] Guid guidCategory,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid clsidMFT,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidCategory,
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In] int Flags, // Must be zero
             [In] int cInputTypes,
-            [In, MarshalAs(UnmanagedType.LPArray)] MFTRegisterTypeInfo[] pInputTypes,
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(RTAMarshaler))] 
+            object pInputTypes, // should be MFTRegisterTypeInfo[], but .Net bug prevents in x64
             [In] int cOutputTypes,
-            [In, MarshalAs(UnmanagedType.LPArray)] MFTRegisterTypeInfo[] pOutputTypes,
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(RTAMarshaler))] 
+            object pOutputTypes, // should be MFTRegisterTypeInfo[], but .Net bug prevents in x64
             [In] IMFAttributes pAttributes
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTUnregister(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT
+            [In, MarshalAs(UnmanagedType.Struct)] Guid clsidMFT
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFTGetInfo(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid clsidMFT,
             [MarshalAs(UnmanagedType.LPWStr)] out string pszName,
-            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 3)] MFTRegisterTypeInfo[] ppInputTypes,
-            out int pcInputTypes,
-            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 5)] MFTRegisterTypeInfo[] ppOutputTypes,
-            out int pcOutputTypes,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(RTIMarshaler))] 
+            ArrayList ppInputTypes,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(RTIMarshaler))] 
+            MFInt pcInputTypes,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "1", MarshalTypeRef = typeof(RTIMarshaler))] 
+            ArrayList ppOutputTypes,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "1", MarshalTypeRef = typeof(RTIMarshaler))] 
+            MFInt pcOutputTypes,
             IntPtr ip // Must be IntPtr.Zero due to MF bug, but should be out IMFAttributes ppAttributes
             );
 
@@ -376,14 +383,14 @@ namespace MediaFoundation
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFInitAMMediaTypeFromMFMediaType(
             [In] IMFMediaType pMFType,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidFormatBlockType,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidFormatBlockType,
             [Out] AMMediaType pAMType
             );
 
         [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFCreateAMMediaTypeFromMFMediaType(
             [In] IMFMediaType pMFType,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidFormatBlockType,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidFormatBlockType,
             out AMMediaType ppAMType // delete with DeleteMediaType
             );
 
@@ -467,6 +474,19 @@ namespace MediaFoundation
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFIndexer(
             out IMFASFIndexer ppIIndexer);
+
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFTEnum(
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidCategory,
+            [In] int Flags, // Must be zero
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pInputType,
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pOutputType,
+            [In] IMFAttributes pAttributes,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
+            ArrayList ppclsidMFT,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
+            MFInt pcMFTs
+            );
 
         #endregion
 
@@ -574,18 +594,6 @@ namespace MediaFoundation
             [In] [MarshalAs(UnmanagedType.IUnknown)] object punkSurface,
             [In] bool fBottomUpWhenLinear,
             out IMFMediaBuffer ppBuffer);
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFTEnum(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidCategory,
-            [In] int Flags, // Must be zero
-            [In] MFTRegisterTypeInfo pInputType,
-            [In] MFTRegisterTypeInfo pOutputType,
-            [In] IMFAttributes pAttributes,
-            //[Out, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStruct)] Guid [] ppclsidMFT,
-            out IntPtr ppclsidMFT,
-            out int pcMFTs
-            );
 
         // --------------------------------------------------
 

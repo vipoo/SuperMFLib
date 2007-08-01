@@ -422,6 +422,19 @@ namespace MediaFoundation
             out IMFVideoMediaType ppIVideoMediaType
             );
 
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFTEnum(
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidCategory,
+            [In] int Flags, // Must be zero
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pInputType,
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pOutputType,
+            [In] IMFAttributes pAttributes,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
+            ArrayList ppclsidMFT,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
+            MFInt pcMFTs
+            );
+
 #if ALLOW_UNTESTED_INTERFACES
 
         #region Tested
@@ -474,19 +487,6 @@ namespace MediaFoundation
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFIndexer(
             out IMFASFIndexer ppIIndexer);
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFTEnum(
-            [In, MarshalAs(UnmanagedType.Struct)] Guid guidCategory,
-            [In] int Flags, // Must be zero
-            [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pInputType,
-            [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pOutputType,
-            [In] IMFAttributes pAttributes,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
-            ArrayList ppclsidMFT,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
-            MFInt pcMFTs
-            );
 
         #endregion
 

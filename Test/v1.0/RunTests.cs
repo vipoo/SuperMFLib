@@ -110,6 +110,10 @@ namespace Testv10
                 {
                     s = e.Message;
                 }
+                else
+                {
+                    s = string.Format("{0} ({1})", s, e.Message);
+                }
 
                 System.Windows.Forms.MessageBox.Show(string.Format("0x{0:x}: {1}", hr, s), "Exception", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             }

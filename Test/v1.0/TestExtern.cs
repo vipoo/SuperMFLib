@@ -1,13 +1,15 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
-using MediaFoundation.Transform;
+using System.Runtime.InteropServices.ComTypes;
+
 
 using MediaFoundation;
 using MediaFoundation.EVR;
 using MediaFoundation.Misc;
-using System.Runtime.InteropServices.ComTypes;
+using MediaFoundation.Transform;
 
 namespace Testv10
 {
@@ -24,9 +26,8 @@ namespace Testv10
 
         public void DoTests()
         {
-            //TestQM();
+            TestQM();
             TestVF();
-            TestMFT();
             TestMisc();
             TestFile();
             TestBlob();
@@ -206,57 +207,6 @@ namespace Testv10
             pq.NotifyPresentationClock(pc);
             pq.NotifyProcessInput(null, 0, null);
 #endif
-        }
-
-        private void TestMFT()
-        {
-#if false
-            int i;
-            Guid[] ga = new Guid[8];
-            MFTRegisterTypeInfo rin = new MFTRegisterTypeInfo();
-            MFTRegisterTypeInfo rout = new MFTRegisterTypeInfo();
-
-            IntPtr ip = IntPtr.Zero;
-            MFExtern.MFTEnum(MFTransformCategory.MFT_CATEGORY_VIDEO_DECODER, 0, null, null, null, out ip, out i);
-            ga = ParseGuidArray(ip, i);
-
-            int itypescnt, otypescnt;
-            string s;
-            MFTRegisterTypeInfo[] itypes, otypes;
-            itypes = null; // new MFTRegisterTypeInfo[10];
-            otypes = null; // new MFTRegisterTypeInfo[11];
-
-            for (int x = 0; x < ga.Length; x++)
-            {
-                itypescnt = 33;
-                otypescnt = 34;
-                MFExtern.MFTGetInfo(ga[x], out s, itypes, out itypescnt, otypes, out otypescnt, IntPtr.Zero);
-            }
-#endif
-        }
-
-        private Guid[] ParseGuidArray(IntPtr ip, int iSize)
-        {
-            const int iGuidSize = 16;
-            Guid[] ga;
-
-            try
-            {
-                byte[] ba = new byte[iGuidSize];
-                ga = new Guid[iSize];
-
-                for (int x = 0; x < iSize; x++)
-                {
-                    Marshal.Copy(new IntPtr(ip.ToInt64() + (x * iGuidSize)), ba, 0, ba.Length);
-                    ga[x] = new Guid(ba);
-                }
-            }
-            finally
-            {
-                Marshal.FreeCoTaskMem(ip);
-            }
-
-            return ga;
         }
 
         private void TestFile()

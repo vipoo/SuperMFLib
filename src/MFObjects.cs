@@ -1816,6 +1816,9 @@ namespace MediaFoundation
 
         #endregion
 
+        [PreserveSig]
+        MFVideoFormat GetVideoFormat();
+
         [Obsolete("This method is deprecated")]
         void GetVideoRepresentation(
             [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,

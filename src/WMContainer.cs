@@ -665,7 +665,7 @@ namespace MediaFoundation
             out int pcbExtensionSystemInfo);
         
         void AddPayloadExtension( 
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtensionSystemID,
+            [In, MarshalAs(UnmanagedType.Struct)] Guid guidExtensionSystemID,
             [In] short cbExtensionDataSize,
             IntPtr pbExtensionSystemInfo,
             [In] int cbExtensionSystemInfo);

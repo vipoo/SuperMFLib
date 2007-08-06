@@ -56,6 +56,7 @@ namespace MF_BasicPlayback
 
                 case WM_APP_ERROR:
                     NotifyError(m.HWnd, "An error occurred.", (int)m.WParam);
+                    UpdateUI(m.HWnd, CPlayer.PlayerState.Ready);
                     break;
 
                 default:

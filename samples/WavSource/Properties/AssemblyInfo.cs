@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 
 
 [assembly: AssemblyTitle("WavSource")]
-[assembly: AssemblyDescription(".NET sample using MediaFoundation.  See http://directshownet.sourceforge.net/")]
+[assembly: AssemblyDescription(".NET sample using MediaFoundation.  See http://mfnet.sourceforge.net/")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: Guid("d34f4f5e-81cd-427e-8777-6c378934af4a")]

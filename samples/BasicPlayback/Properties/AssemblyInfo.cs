@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 
 [assembly: AssemblyTitle("MF_BasicPlayback")]
-[assembly: AssemblyDescription(".NET sample using MediaFoundation.  See http://directshownet.sourceforge.net/")]
+[assembly: AssemblyDescription(".NET sample using MediaFoundation.  See http://mfnet.sourceforge.net/")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: Guid("1b318f25-650a-4b63-b9fc-1029f0ea35e9")]

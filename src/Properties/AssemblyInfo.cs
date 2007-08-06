@@ -3,7 +3,7 @@
 /*
 MediaFoundationLib - Provide access to MediaFoundation interfaces via .NET
 Copyright (C) 2007
-http://sourceforge.net/projects/directshownet/
+http://mfnet.sourceforge.net
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ using System.Security.Permissions;
 
 
 [assembly: AssemblyTitle("MediaFoundation Net Library")]
-[assembly: AssemblyDescription(".NET Interfaces for calling MediaFoundation.  See http://directshownet.sourceforge.net/")]
+[assembly: AssemblyDescription(".NET Interfaces for calling MediaFoundation.  See http://mfnet.sourceforge.net/")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: Guid("106ce403-2382-4c3d-ab55-fcb43e09f245")]

@@ -3,7 +3,7 @@
 /*
 MediaFoundationLib - Provide access to MediaFoundation interfaces via .NET
 Copyright (C) 2007
-http://sourceforge.net/projects/directshownet/
+http://mfnet.sourceforge.net
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -656,7 +656,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_URL_TRUST_STATUS")]
-    public enum MF_URLTrustStatus
+    public enum MFURLTrustStatus
     {
         Untrusted,
         Trusted,
@@ -1122,12 +1122,16 @@ namespace MediaFoundation
         void GetEnableURL(
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszURL,
             out int pcchURL,
-            [In, Out] ref MF_URLTrustStatus pTrustStatus
+            out MFURLTrustStatus pTrustStatus
             );
 
-        void GetEnableData([Out] IntPtr ppbData, out int pcbData);
+        void GetEnableData(
+            [Out] out IntPtr ppbData, 
+            out int pcbData);
 
-        void IsAutomaticSupported(out int pfAutomatic);
+        void IsAutomaticSupported(
+            [MarshalAs(UnmanagedType.Bool)] out bool pfAutomatic
+            );
 
         void AutomaticEnable();
 
@@ -1301,17 +1305,6 @@ namespace MediaFoundation
     {
         void ForceEndOfPresentation(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-    Guid("0E1D6009-C9F3-442D-8C51-A42D2D49452F")]
-    public interface IMFMediaSourceTopologyProvider
-    {
-        void GetMediaSourceTopology(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
-            [MarshalAs(UnmanagedType.Interface)] out IMFTopology ppTopology
             );
     }
 
@@ -3879,6 +3872,17 @@ namespace MediaFoundation
 
         void GetUnderlyingClock(
             [MarshalAs(UnmanagedType.Interface)] out IMFClock ppClock
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("0E1D6009-C9F3-442D-8C51-A42D2D49452F")]
+    public interface IMFMediaSourceTopologyProvider
+    {
+        void GetMediaSourceTopology(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
+            [MarshalAs(UnmanagedType.Interface)] out IMFTopology ppTopology
             );
     }
 

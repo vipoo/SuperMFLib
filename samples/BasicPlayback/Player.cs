@@ -20,7 +20,7 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     [DllImport("user32", CharSet = CharSet.Auto)]
     private extern static int PostMessage(
-        IntPtr handle, int msg, int wParam, IntPtr lParam);
+        IntPtr handle, int msg, IntPtr wParam, IntPtr lParam);
 
     #endregion
 
@@ -367,15 +367,15 @@ class CPlayer : COMBase, IMFAsyncCallback
     // NotifyState: Notifies the application when the state changes.
     protected void NotifyState()
     {
-        PostMessage(m_hwndEvent, WM_APP_NOTIFY, (int)m_state, IntPtr.Zero);
+        PostMessage(m_hwndEvent, WM_APP_NOTIFY, new IntPtr((int)m_state), IntPtr.Zero);
     }
 
     // NotifyState: Notifies the application when an error occurs.
     protected void NotifyError(int hr)
     {
-        TRACE("NotifyError: " + hr.ToString());
+        TRACE("NotifyError: 0x" + hr.ToString("X"));
         m_state = PlayerState.Ready;
-        PostMessage(m_hwndEvent, WM_APP_ERROR, hr, IntPtr.Zero);
+        PostMessage(m_hwndEvent, WM_APP_ERROR, new IntPtr(hr), IntPtr.Zero);
     }
 
     protected void CreateSession()

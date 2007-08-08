@@ -627,8 +627,8 @@ namespace MediaFoundation
         ATSC_HD720p = (ATSC_HD1080i + 1)
     }
 
-    [UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
-    public enum MFPMPSESSION_CREATION_FLAGS
+    [Flags, UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
+    public enum MFPMPSessionCreationFlags
     {
         None = 0,
         UnprotectedProcess = 0x1
@@ -655,14 +655,6 @@ namespace MediaFoundation
         Last = 0x00000001
     }
 
-    [UnmanagedName("MF_URL_TRUST_STATUS")]
-    public enum MFURLTrustStatus
-    {
-        Untrusted,
-        Trusted,
-        Tampered
-    }
-
     [StructLayout(LayoutKind.Explicit, Pack = 8), UnmanagedName("unnamed internal struct")]
     public struct Unnamed1
     {
@@ -682,7 +674,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_QUALITY_DROP_MODE")]
-    public enum MF_QualitydropMode
+    public enum MFQualitydropMode
     {
         None,
         Mode1,
@@ -694,7 +686,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_QUALITY_LEVEL")]
-    public enum MF_QualityLevel
+    public enum MFQualityLevel
     {
         Normal,
         NormalMinus1,
@@ -1013,6 +1005,14 @@ namespace MediaFoundation
     {
         None = 0,
         NoBuffering = 0x1
+    }
+
+    [UnmanagedName("MF_URL_TRUST_STATUS")]
+    public enum MFURLTrustStatus
+    {
+        Untrusted,
+        Trusted,
+        Tampered
     }
 
     #endregion
@@ -1923,19 +1923,19 @@ namespace MediaFoundation
     public interface IMFQualityAdvise
     {
         void SetDropMode(
-            [In] MF_QualitydropMode eDropMode
+            [In] MFQualitydropMode eDropMode
             );
 
         void SetQualityLevel(
-            [In] MF_QualityLevel eQualityLevel
+            [In] MFQualityLevel eQualityLevel
             );
 
         void GetDropMode(
-            out MF_QualitydropMode peDropMode
+            out MFQualitydropMode peDropMode
             );
 
         void GetQualityLevel(
-            out MF_QualityLevel peQualityLevel
+            out MFQualityLevel peQualityLevel
             );
 
         void DropTime(

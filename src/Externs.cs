@@ -32,13 +32,6 @@ using MediaFoundation.Transform;
 
 namespace MediaFoundation
 {
-    [Flags, UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
-    public enum MFPMPSessionCreationFlags
-    {
-        None = 0x0,
-        UnprotectedProcess = 0x1
-    }
-
     public class MFExtern
     {
         [DllImport("MfPlat.dll", PreserveSig = false)]
@@ -755,14 +748,14 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreatePMPMediaSession(
-            MFPMPSESSION_CREATION_FLAGS dwCreationFlags,
+            MFPMPSessionCreationFlags dwCreationFlags,
             IMFAttributes pConfiguration,
             out IMFMediaSession ppMediaSession,
             out IMFActivate ppEnablerActivate
         );
 
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFRequireProtectedEnvironment(
+        [DllImport("mf.dll", PreserveSig = true)]
+        public static extern int MFRequireProtectedEnvironment(
             IMFPresentationDescriptor pPresentationDescriptor
         );
 

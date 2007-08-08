@@ -88,7 +88,7 @@ namespace MediaFoundation.EVR
     }
 
     [UnmanagedName("MFVP_MESSAGE_TYPE")]
-    public enum MFVP_MessageType
+    public enum MFVPMessageType
     {
         Flush,
         InvalidateMediaType,
@@ -299,7 +299,7 @@ namespace MediaFoundation.EVR
         #endregion
 
         void ProcessMessage(
-            MFVP_MessageType eMessage,
+            MFVPMessageType eMessage,
             int ulParam
             );
 

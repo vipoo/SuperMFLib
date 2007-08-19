@@ -38,7 +38,7 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Explicit)]
     public class PropVariant : IDisposable
     {
-        public enum VariantType
+        public enum VariantType : short
         {
             None = 0x0,
             Blob = 0x1011,

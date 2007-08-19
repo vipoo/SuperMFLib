@@ -428,6 +428,12 @@ namespace MediaFoundation
             MFInt pcMFTs
             );
 
+        [DllImport("mf.dll", PreserveSig = false)]
+        public static extern void MFCreateSequencerSource(
+            [MarshalAs(UnmanagedType.IUnknown)] object pReserved,
+            out IMFSequencerSource ppSequencerSource
+        );
+
 #if ALLOW_UNTESTED_INTERFACES
 
         #region Tested
@@ -447,12 +453,6 @@ namespace MediaFoundation
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateStandardQualityManager(
             out IMFQualityManager ppQualityManager
-        );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateSequencerSource(
-            [MarshalAs(UnmanagedType.IUnknown)] object pReserved,
-            out IMFSequencerSource ppSequencerSource
         );
 
         [DllImport("mf.dll", PreserveSig = false)]

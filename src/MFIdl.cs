@@ -648,13 +648,6 @@ namespace MediaFoundation
         Relative = 0x00000001
     }
 
-    [Flags, UnmanagedName("MFSequencerTopologyFlags")]
-    public enum MFSequencerTopologyFlags
-    {
-        None = 0,
-        Last = 0x00000001
-    }
-
     [StructLayout(LayoutKind.Explicit, Pack = 8), UnmanagedName("unnamed internal struct")]
     public struct Unnamed1
     {
@@ -806,6 +799,13 @@ namespace MediaFoundation
     }
 
 #endif
+
+    [Flags, UnmanagedName("MFSequencerTopologyFlags")]
+    public enum MFSequencerTopologyFlags
+    {
+        None = 0,
+        Last = 0x00000001
+    }
 
     [Flags, UnmanagedName("MFSESSION_GETFULLTOPOLOGY_FLAGS")]
     public enum MFSessionGetFullTopologyFlags
@@ -2224,38 +2224,6 @@ namespace MediaFoundation
         void SetupSession(
             [In] ref byte pbEncryptedSessionKey,
             [In] int cbSessionKey
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("197CD219-19CB-4DE1-A64C-ACF2EDCBE59E"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFSequencerSource
-    {
-        void AppendTopology(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFTopology pTopology,
-            [In] MFSequencerTopologyFlags dwFlags,
-            out int pdwId
-            );
-
-        void DeleteTopology(
-            [In] int dwId
-            );
-
-        void GetPresentationContext(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPD,
-            [Optional] out int pID,
-            [Optional, MarshalAs(UnmanagedType.Interface)] out IMFTopology ppTopology
-            );
-
-        void UpdateTopology(
-            [In] int dwId,
-            [In, MarshalAs(UnmanagedType.Interface)] IMFTopology pTopology
-            );
-
-        void UpdateTopologyFlags(
-            [In] int dwId,
-            [In] MFSequencerTopologyFlags dwFlags
             );
     }
 
@@ -3883,6 +3851,38 @@ namespace MediaFoundation
         void GetMediaSourceTopology(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [MarshalAs(UnmanagedType.Interface)] out IMFTopology ppTopology
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("197CD219-19CB-4DE1-A64C-ACF2EDCBE59E"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFSequencerSource
+    {
+        void AppendTopology(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFTopology pTopology,
+            [In] MFSequencerTopologyFlags dwFlags,
+            out int pdwId
+            );
+
+        void DeleteTopology(
+            [In] int dwId
+            );
+
+        void GetPresentationContext(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPD,
+            out int pID,
+            [MarshalAs(UnmanagedType.Interface)] out IMFTopology ppTopology
+            );
+
+        void UpdateTopology(
+            [In] int dwId,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFTopology pTopology
+            );
+
+        void UpdateTopologyFlags(
+            [In] int dwId,
+            [In] MFSequencerTopologyFlags dwFlags
             );
     }
 

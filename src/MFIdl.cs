@@ -974,6 +974,18 @@ namespace MediaFoundation
         HasSlowSeek = 0x8
     }
 
+    [Flags, UnmanagedName("MEDIASINK_ defines")]
+    public enum MFMediaSinkCharacteristics
+    {
+        None = 0,
+        FixedStreams = 0x00000001,
+        CannotMatchClock = 0x00000002,
+        Rateless = 0x00000004,
+        ClockRequired = 0x00000008,
+        CanPreroll = 0x00000010,
+        RequireReferenceMediaType = 0x00000020
+    }
+
     [UnmanagedName("MF_ATTRIBUTE_SERIALIZE_OPTIONS"), Flags]
     public enum MFAttributeSerializeOptions
     {
@@ -1165,7 +1177,7 @@ namespace MediaFoundation
         #region IMFMediaSink methods
 
         new void GetCharacteristics(
-            out MFMediaSourceCharacteristics pdwCharacteristics);
+            out MFMediaSinkCharacteristics pdwCharacteristics);
 
         new void AddStreamSink(
             [In] int dwStreamSinkIdentifier,
@@ -1250,7 +1262,7 @@ namespace MediaFoundation
     public interface IMFMediaSink
     {
         void GetCharacteristics(
-            out MFMediaSourceCharacteristics pdwCharacteristics
+            out MFMediaSinkCharacteristics pdwCharacteristics
             );
 
         void AddStreamSink(
@@ -2877,7 +2889,7 @@ namespace MediaFoundation
     {
         void IsMediaTypeSupported(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
-            [MarshalAs(UnmanagedType.Interface)] out IMFMediaType ppMediaType
+            IntPtr ppMediaType  //[MarshalAs(UnmanagedType.Interface)] out IMFMediaType ppMediaType
             );
 
         void GetMediaTypeCount(

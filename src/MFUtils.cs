@@ -51,9 +51,15 @@ namespace MediaFoundation.Misc
             StringArray = 0x1000 + 0x1f
         }
 
-        [DllImport("ole32.dll", PreserveSig=false)]
+        [DllImport("ole32.dll", PreserveSig = false)]
         private static extern void PropVariantClear(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvar
+            );
+
+        [DllImport("ole32.dll", PreserveSig = false)]
+        private static extern void PropVariantCopy(
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarDest,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarSource
             );
 
         #region Member variables
@@ -227,6 +233,12 @@ namespace MediaFoundation.Misc
         public void Clear()
         {
             PropVariantClear(this);
+        }
+
+        public void Copy(out PropVariant pval)
+        {
+            pval = new PropVariant();
+            PropVariantCopy(pval, this);
         }
 
         public string[] GetStringArray()
@@ -1872,6 +1884,11 @@ namespace MediaFoundation.Misc
                     }
                 }
             }
+        }
+
+        public static void TRACE(string s)
+        {
+            Debug.WriteLine(s);
         }
     }
 

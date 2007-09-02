@@ -35,8 +35,18 @@ namespace MediaFoundation.Misc
 {
     #region Wrapper classes
 
+    /// <summary>
+    /// ConstPropVariant is used for [In] parameters.  This is important since
+    /// for [In] parameters, you must *not* clear the PropVariant.  The caller
+    /// will need to do that himself.
+    /// 
+    /// Likewise, if you want to store a copy of a ConstPropVariant, you should
+    /// store it to a PropVariant using the PropVariant constructor that takes a
+    /// ConstPropVariant.  If you try to store the ConstPropVariant, when the 
+    /// caller frees his copy, yours will no longer be valid.
+    /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    public class PropVariant : IDisposable
+    public class ConstPropVariant : IDisposable
     {
         public enum VariantType : short
         {
@@ -50,17 +60,6 @@ namespace MediaFoundation.Misc
             Uint64 = 0x15,
             StringArray = 0x1000 + 0x1f
         }
-
-        [DllImport("ole32.dll", PreserveSig = false)]
-        private static extern void PropVariantClear(
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvar
-            );
-
-        [DllImport("ole32.dll", PreserveSig = false)]
-        private static extern void PropVariantCopy(
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarDest,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarSource
-            );
 
         #region Member variables
 
@@ -96,111 +95,47 @@ namespace MediaFoundation.Misc
 
         #endregion
 
-        public PropVariant()
+        public ConstPropVariant()
         {
             type = VariantType.None;
         }
 
-        public PropVariant(string value)
+        ~ConstPropVariant()
         {
-            type = VariantType.String;
-            ptr = Marshal.StringToCoTaskMemUni(value);
+            Dispose();
         }
 
-        public PropVariant(string[] value)
-        {
-            type = VariantType.StringArray;
-
-            calpwstr.cElems = value.Length;
-            calpwstr.pElems = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
-
-            for (int x = 0; x < value.Length; x++)
-            {
-                Marshal.WriteIntPtr(calpwstr.pElems, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
-            }
-        }
-
-        public PropVariant(int value)
-        {
-            type = VariantType.Uint32;
-            intValue = value;
-        }
-
-        public PropVariant(double value)
-        {
-            type = VariantType.Double;
-            doubleValue = value;
-        }
-
-        public PropVariant(long value)
-        {
-            type = VariantType.Uint64;
-            longValue = value;
-        }
-
-        public PropVariant(Guid value)
-        {
-            type = VariantType.Guid;
-            ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(value));
-            Marshal.StructureToPtr(value, ptr, false);
-        }
-
-        public PropVariant(byte[] value)
-        {
-            type = VariantType.Blob;
-
-            blobValue.cbSize = value.Length;
-            blobValue.pBlobData = Marshal.AllocCoTaskMem(value.Length);
-            Marshal.Copy(value, 0, blobValue.pBlobData, value.Length);
-        }
-
-        public PropVariant(object value)
-        {
-            type = VariantType.IUnknown;
-            ptr = Marshal.GetIUnknownForObject(value);
-        }
-
-        public PropVariant(IntPtr value)
-        {
-            Marshal.PtrToStructure(value, this);
-        }
-
-        ~PropVariant()
-        {
-            Clear();
-        }
-
-        public static explicit operator string(PropVariant f)
+        public static explicit operator string(ConstPropVariant f)
         {
             return f.GetString();
         }
 
-        public static explicit operator string[](PropVariant f)
+        public static explicit operator string[](ConstPropVariant f)
         {
             return f.GetStringArray();
         }
 
-        public static explicit operator int(PropVariant f)
+        public static explicit operator int(ConstPropVariant f)
         {
             return f.GetInt();
         }
 
-        public static explicit operator double(PropVariant f)
+        public static explicit operator double(ConstPropVariant f)
         {
             return f.GetDouble();
         }
 
-        public static explicit operator long(PropVariant f)
+        public static explicit operator long(ConstPropVariant f)
         {
             return f.GetLong();
         }
 
-        public static explicit operator Guid(PropVariant f)
+        public static explicit operator Guid(ConstPropVariant f)
         {
             return f.GetGuid();
         }
 
-        public static explicit operator byte[](PropVariant f)
+        public static explicit operator byte[](ConstPropVariant f)
         {
             return f.GetBlob();
         }
@@ -228,23 +163,6 @@ namespace MediaFoundation.Misc
                 return type;
             }
             throw new Exception("Type is not a MFAttributeType");
-        }
-
-        public void Clear()
-        {
-            PropVariantClear(this);
-        }
-
-        public void Copy(PropVariant pval)
-        {
-            if (pval == null)
-            {
-                throw new Exception("Null PropVariant sent to Copy");
-            }
-
-            pval.Clear();
-
-            PropVariantCopy(pval, this);
         }
 
         public string[] GetStringArray()
@@ -624,7 +542,7 @@ namespace MediaFoundation.Misc
             return bRet;
         }
 
-        public static bool operator ==(PropVariant pv1, PropVariant pv2)
+        public static bool operator ==(ConstPropVariant pv1, ConstPropVariant pv2)
         {
             // If both are null, or both are same instance, return true.
             if (System.Object.ReferenceEquals(pv1, pv2))
@@ -641,7 +559,7 @@ namespace MediaFoundation.Misc
             return pv1.Equals(pv2);
         }
 
-        public static bool operator !=(PropVariant pv1, PropVariant pv2)
+        public static bool operator !=(ConstPropVariant pv1, ConstPropVariant pv2)
         {
             return !(pv1 == pv2);
         }
@@ -649,6 +567,142 @@ namespace MediaFoundation.Misc
         #region IDisposable Members
 
         public void Dispose()
+        {
+            // If we are a ConstPropVariant, we must *not* call PropVariantClear.  That 
+            // would release the *caller's* copy of the data, which would probably make
+            // him cranky.  If we are a PropVariant, the PropVariant.Dispose gets called
+            // instead (which *does* do a PropVariantClear).
+            type = VariantType.None;
+            longValue = 0;
+        }
+
+        #endregion
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public class PropVariant : ConstPropVariant
+    {
+        #region Declarations
+
+        [DllImport("ole32.dll", PreserveSig = false)]
+        protected static extern void PropVariantCopy(
+            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarDest,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarSource
+            );
+
+        [DllImport("ole32.dll", PreserveSig = false)]
+        protected static extern void PropVariantClear(
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvar
+            );
+
+        #endregion
+
+        public PropVariant()
+        {
+            type = VariantType.None;
+        }
+
+        public PropVariant(string value)
+        {
+            type = VariantType.String;
+            ptr = Marshal.StringToCoTaskMemUni(value);
+        }
+
+        public PropVariant(string[] value)
+        {
+            type = VariantType.StringArray;
+
+            calpwstr.cElems = value.Length;
+            calpwstr.pElems = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
+
+            for (int x = 0; x < value.Length; x++)
+            {
+                Marshal.WriteIntPtr(calpwstr.pElems, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
+            }
+        }
+
+        public PropVariant(int value)
+        {
+            type = VariantType.Uint32;
+            intValue = value;
+        }
+
+        public PropVariant(double value)
+        {
+            type = VariantType.Double;
+            doubleValue = value;
+        }
+
+        public PropVariant(long value)
+        {
+            type = VariantType.Uint64;
+            longValue = value;
+        }
+
+        public PropVariant(Guid value)
+        {
+            type = VariantType.Guid;
+            ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(value));
+            Marshal.StructureToPtr(value, ptr, false);
+        }
+
+        public PropVariant(byte[] value)
+        {
+            type = VariantType.Blob;
+
+            blobValue.cbSize = value.Length;
+            blobValue.pBlobData = Marshal.AllocCoTaskMem(value.Length);
+            Marshal.Copy(value, 0, blobValue.pBlobData, value.Length);
+        }
+
+        public PropVariant(object value)
+        {
+            type = VariantType.IUnknown;
+            ptr = Marshal.GetIUnknownForObject(value);
+        }
+
+        public PropVariant(IntPtr value)
+        {
+            Marshal.PtrToStructure(value, this);
+        }
+
+        public PropVariant(ConstPropVariant value)
+        {
+            if (value != null)
+            {
+                PropVariantCopy(this, value);
+            }
+            else
+            {
+                throw new NullReferenceException("null passed to PropVariant constructor");
+            }
+        }
+
+        ~PropVariant()
+        {
+            Clear();
+        }
+
+        public void Copy(PropVariant pval)
+        {
+            if (pval == null)
+            {
+                throw new Exception("Null PropVariant sent to Copy");
+            }
+
+            pval.Clear();
+
+            PropVariantCopy(pval, this);
+        }
+
+        public void Clear()
+        {
+            PropVariantClear(this);
+        }
+
+        #region IDisposable Members
+
+        new public void Dispose()
         {
             Clear();
             GC.SuppressFinalize(this);

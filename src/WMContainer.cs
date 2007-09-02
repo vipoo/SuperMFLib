@@ -149,7 +149,7 @@ namespace MediaFoundation
             [In] bool fGenerateIndex);
 
         void GetSeekPositionForValue(
-            [In] PropVariant pvarValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarValue,
             [In] ASFIndexIdentifier pIndexIdentifier,
             out long pcbOffsetWithinData,
             out long phnsApproxTime,
@@ -247,7 +247,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFProfile : IMFAttributes
     {
-        #region IMFAttributes methods
+    #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -261,7 +261,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -336,7 +336,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -399,7 +399,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        #endregion
+    #endregion
 
         void GetStreamCount(
             out int pcStreams);
@@ -497,7 +497,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFStreamConfig : IMFAttributes
     {
-        #region IMFAttributes methods
+    #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -511,7 +511,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -586,7 +586,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -649,7 +649,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        #endregion
+    #endregion
 
         void GetStreamType(
             out Guid pguidStreamType);

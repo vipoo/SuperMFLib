@@ -205,7 +205,7 @@ namespace MediaFoundation.Misc
         
         void SetNamedValue( 
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
-            PropVariant propvar);
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant propvar);
         
         void GetNameCount( 
             out int pdwCount);
@@ -236,7 +236,7 @@ namespace MediaFoundation.Misc
 
         void SetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant propvar
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant propvar
             );
 
         void Commit();

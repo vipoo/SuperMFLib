@@ -122,7 +122,7 @@ namespace MediaFoundation
             MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue,
             out IMFMediaEvent ppEvent
         );
 
@@ -434,6 +434,20 @@ namespace MediaFoundation
             out IMFSequencerSource ppSequencerSource
         );
 
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFAllocateWorkQueue(
+            out int pdwWorkQueue);
+
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFUnlockWorkQueue(
+            [In] int dwWorkQueue);
+
+        [DllImport("mfplat.dll", PreserveSig = false)]
+        public static extern void MFPutWorkItem(
+            int dwQueue,
+            IMFAsyncCallback pCallback,
+            [MarshalAs(UnmanagedType.IUnknown)] object pState);
+
 #if ALLOW_UNTESTED_INTERFACES
 
         #region Tested
@@ -486,12 +500,6 @@ namespace MediaFoundation
         #region Work Queue
 
         [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFPutWorkItem(
-            int dwQueue,
-            IMFAsyncCallback pCallback,
-            [MarshalAs(UnmanagedType.IUnknown)] object pState);
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFPutWorkItemEx(
             int dwQueue,
             IMFAsyncResult pResult);
@@ -524,15 +532,7 @@ namespace MediaFoundation
             int dwKey);
 
         [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFAllocateWorkQueue(
-            out int pdwWorkQueue);
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
         public static extern void MFLockWorkQueue(
-            [In] int dwWorkQueue);
-
-        [DllImport("mfplat.dll", PreserveSig = false)]
-        public static extern void MFUnlockWorkQueue(
             [In] int dwWorkQueue);
 
         [DllImport("mfplat.dll", PreserveSig = false)]

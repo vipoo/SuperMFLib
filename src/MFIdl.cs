@@ -1334,17 +1334,17 @@ namespace MediaFoundation
             );
 
         void GetAllLanguages(
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvLanguages
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvLanguages
             );
 
         void SetProperty(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant ppvValue
             );
 
         void GetProperty(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvValue
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvValue
             );
 
         void DeleteProperty(
@@ -1352,7 +1352,7 @@ namespace MediaFoundation
             );
 
         void GetAllPropertyNames(
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant ppvNames
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvNames
             );
     }
 
@@ -1526,7 +1526,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFOutputPolicy : IMFAttributes
     {
-        #region IMFAttributes methods
+    #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1540,7 +1540,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -1615,7 +1615,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -1678,7 +1678,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        #endregion
+    #endregion
 
         void GenerateRequiredSchemas(
             [In] int dwAttributes,
@@ -1702,7 +1702,7 @@ namespace MediaFoundation
     Guid("7BE0FC5B-ABD9-44FB-A5C8-F50136E71599")]
     public interface IMFOutputSchema : IMFAttributes
     {
-        #region IMFAttributes methods
+    #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1716,7 +1716,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -1791,7 +1791,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -1854,7 +1854,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-        #endregion
+    #endregion
 
         void GetSchemaType(
             out Guid pguidSchemaType
@@ -2081,7 +2081,7 @@ namespace MediaFoundation
             );
 
         void GetStyles(
-            [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pPropVarStyleArray
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pPropVarStyleArray
             );
 
         void SetSelectedStyle(
@@ -2098,7 +2098,7 @@ namespace MediaFoundation
     Guid("8C7B80BF-EE42-4B59-B1DF-55668E1BDCA8")]
     public interface IMFSampleGrabberSinkCallback : IMFClockStateSink
     {
-        #region IMFClockStateSink methods
+    #region IMFClockStateSink methods
 
         new void OnClockStart(
             [In] long hnsSystemTime,
@@ -2122,7 +2122,7 @@ namespace MediaFoundation
             [In] float flRate
             );
 
-        #endregion
+    #endregion
 
         void OnSetPresentationClock(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
@@ -2288,7 +2288,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFStreamSink : IMFMediaEventGenerator
     {
-        #region IMFMediaEventGenerator methods
+    #region IMFMediaEventGenerator methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -2307,10 +2307,10 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
-        #endregion
+    #endregion
 
         void GetMediaSink(
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaSink ppMediaSink
@@ -2330,8 +2330,8 @@ namespace MediaFoundation
 
         void PlaceMarker(
             [In] MFStreamSinkMarkerType eMarkerType,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarMarkerValue,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarContextValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarMarkerValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarContextValue
             );
 
         void Flush();
@@ -2506,7 +2506,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         #endregion
@@ -2522,7 +2522,7 @@ namespace MediaFoundation
         void Start(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarStartPosition
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarStartPosition
             );
 
         void Stop();
@@ -2551,7 +2551,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -2626,7 +2626,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -2733,7 +2733,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -2808,7 +2808,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -2933,7 +2933,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3008,7 +3008,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -3133,7 +3133,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3208,7 +3208,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(
@@ -3373,7 +3373,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         #endregion
@@ -3387,7 +3387,7 @@ namespace MediaFoundation
 
         void Start(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarStartPosition
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarStartPosition
             );
 
         void Pause();
@@ -3438,7 +3438,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         #endregion
@@ -3533,7 +3533,7 @@ namespace MediaFoundation
 
         new void CompareItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value,
             [MarshalAs(UnmanagedType.Bool)] out bool pbResult
             );
 
@@ -3608,7 +3608,7 @@ namespace MediaFoundation
 
         new void SetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant Value
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant Value
             );
 
         new void DeleteItem(

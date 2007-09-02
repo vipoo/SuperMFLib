@@ -72,7 +72,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
     }
 
@@ -104,7 +104,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         #endregion
@@ -152,7 +152,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In, MarshalAs(UnmanagedType.Error)] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         void QueueEventParamUnk(
@@ -193,7 +193,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         #endregion
@@ -209,7 +209,7 @@ namespace MediaFoundation
         void Start(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarStartPosition
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarStartPosition
             );
 
         void Stop();
@@ -245,7 +245,7 @@ namespace MediaFoundation
             [In] MediaEventType met,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
         #endregion
@@ -268,8 +268,8 @@ namespace MediaFoundation
 
         void PlaceMarker(
             [In] MFStreamSinkMarkerType eMarkerType,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarMarkerValue,
-            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarContextValue
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarMarkerValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarContextValue
             );
 
         void Flush();

@@ -780,15 +780,6 @@ namespace MediaFoundation
         Completed
     }
 
-    [UnmanagedName("MFSTREAMSINK_MARKER_TYPE")]
-    public enum MFStreamSinkMarkerType
-    {
-        Default,
-        EndOfSegment,
-        Tick,
-        Event
-    }
-
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFTOPONODE_ATTRIBUTE_UPDATE")]
     public struct MFTopoNodeAttributeUpdate
     {
@@ -799,6 +790,15 @@ namespace MediaFoundation
     }
 
 #endif
+
+    [UnmanagedName("MFSTREAMSINK_MARKER_TYPE")]
+    public enum MFStreamSinkMarkerType
+    {
+        Default,
+        EndOfSegment,
+        Tick,
+        Event
+    }
 
     [Flags, UnmanagedName("MFSequencerTopologyFlags")]
     public enum MFSequencerTopologyFlags

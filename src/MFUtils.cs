@@ -235,9 +235,15 @@ namespace MediaFoundation.Misc
             PropVariantClear(this);
         }
 
-        public void Copy(out PropVariant pval)
+        public void Copy(PropVariant pval)
         {
-            pval = new PropVariant();
+            if (pval == null)
+            {
+                throw new Exception("Null PropVariant sent to Copy");
+            }
+
+            pval.Clear();
+
             PropVariantCopy(pval, this);
         }
 

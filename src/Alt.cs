@@ -38,7 +38,7 @@ using MediaFoundation.Misc;
 
 namespace MediaFoundation
 {
-    public class MFDllAlt
+    public class MFExternAlt
     {
         [DllImport("MFPlat.dll")]
         public static extern int MFCreateEventQueue(
@@ -217,6 +217,162 @@ namespace MediaFoundation
         void Pause();
 
         void Shutdown();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("0A97B3CF-8E7C-4A3D-8F8C-0C843DC247FB"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFStreamSinkAlt : IMFMediaEventGeneratorAlt
+    {
+        #region IMFMediaEventGenerator methods
+
+        new void GetEvent(
+            [In] MFEventFlag dwFlags,
+            [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
+            );
+
+        new void BeginGetEvent(
+            //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
+            IntPtr pCallback,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object o);
+
+        new void EndGetEvent(
+            //IMFAsyncResult pResult,
+            IntPtr pResult,
+            out IMFMediaEvent ppEvent);
+
+        new void QueueEvent(
+            [In] MediaEventType met,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
+            [In] int hrStatus,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvValue
+            );
+
+        #endregion
+
+        void GetMediaSink(
+            [MarshalAs(UnmanagedType.Interface)] out IMFMediaSinkAlt ppMediaSink
+            );
+
+        void GetIdentifier(
+            out int pdwIdentifier
+            );
+
+        void GetMediaTypeHandler(
+            [MarshalAs(UnmanagedType.Interface)] out IMFMediaTypeHandler ppHandler
+            );
+
+        void ProcessSample(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFSample pSample
+            );
+
+        void PlaceMarker(
+            [In] MFStreamSinkMarkerType eMarkerType,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarMarkerValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarContextValue
+            );
+
+        void Flush();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("6EF2A660-47C0-4666-B13D-CBB717F2FA2C"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFMediaSinkAlt
+    {
+        void GetCharacteristics(
+            out MFMediaSinkCharacteristics pdwCharacteristics
+            );
+
+        void AddStreamSink(
+            [In] int dwStreamSinkIdentifier,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSinkAlt ppStreamSink
+            );
+
+        void RemoveStreamSink(
+            [In] int dwStreamSinkIdentifier
+            );
+
+        void GetStreamSinkCount(
+            out int pcStreamSinkCount
+            );
+
+        void GetStreamSinkByIndex(
+            [In] int dwIndex,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSinkAlt ppStreamSink
+            );
+
+        void GetStreamSinkById(
+            [In] int dwStreamSinkIdentifier,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSinkAlt ppStreamSink
+            );
+
+        void SetPresentationClock(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
+            );
+
+        void GetPresentationClock(
+            [MarshalAs(UnmanagedType.Interface)] out IMFPresentationClock ppPresentationClock
+            );
+
+        void Shutdown();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("EAECB74A-9A50-42CE-9541-6A7F57AA4AD7"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFFinalizableMediaSinkAlt : IMFMediaSinkAlt
+    {
+        #region IMFMediaSink methods
+
+        new void GetCharacteristics(
+            out MFMediaSinkCharacteristics pdwCharacteristics);
+
+        new void AddStreamSink(
+            [In] int dwStreamSinkIdentifier,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSinkAlt ppStreamSink
+            );
+
+        new void RemoveStreamSink(
+            [In] int dwStreamSinkIdentifier
+            );
+
+        new void GetStreamSinkCount(
+            out int pcStreamSinkCount
+            );
+
+        new void GetStreamSinkByIndex(
+            [In] int dwIndex,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSinkAlt ppStreamSink
+            );
+
+        new void GetStreamSinkById(
+            [In] int dwStreamSinkIdentifier,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSinkAlt ppStreamSink
+            );
+
+        new void SetPresentationClock(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
+            );
+
+        new void GetPresentationClock(
+            [MarshalAs(UnmanagedType.Interface)] out IMFPresentationClock ppPresentationClock
+            );
+
+        new void Shutdown();
+
+        #endregion
+
+        void BeginFinalize(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
+            );
+
+        void EndFinalize(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult
+            );
     }
 
 

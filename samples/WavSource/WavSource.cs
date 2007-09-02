@@ -106,7 +106,7 @@ namespace WavSourceFilter
             m_Riff = pRiff;
 
             // Create the media event queue.
-            int hr = MFDllAlt.MFCreateEventQueue(out m_pEventQueue);
+            int hr = MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
             MFError.ThrowExceptionForHR(hr);
 
         }
@@ -167,7 +167,7 @@ namespace WavSourceFilter
             //not needed SAFE_RELEASE(pQueue);
         }
 
-        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, PropVariant pvValue)
+        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
             m_Log.WriteLine("-QueueEvent");
 
@@ -606,7 +606,7 @@ namespace WavSourceFilter
             // not needed SAFE_RELEASE(pQueue);
         }
 
-        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, PropVariant pvValue)
+        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
             m_Log.WriteLine("-QueueEvent");
 
@@ -669,7 +669,7 @@ namespace WavSourceFilter
         public void Start(
            IMFPresentationDescriptor pPresentationDescriptor,
            Guid pguidTimeFormat,
-           PropVariant pvarStartPosition
+           ConstPropVariant pvarStartPosition
            )
         {
             m_Log.WriteLine("-Start");
@@ -1130,7 +1130,7 @@ namespace WavSourceFilter
                 throw new COMException("bad format or waveformat", MFError.MF_E_INVALIDMEDIATYPE);
             }
 
-            if (!pFormat.IsEqual(WaveFormat()))
+            if (!pFormat.Equals(WaveFormat()))
             {
                 throw new COMException("wave formats don't match", MFError.MF_E_INVALIDMEDIATYPE);
             }

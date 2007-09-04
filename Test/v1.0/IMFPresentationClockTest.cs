@@ -9,9 +9,12 @@ namespace Testv10
         // Tested by adding this code to BasicPlayer's pause
 
 #if false
+            IMFPresentationClock m_pc;
             long lTime;
             IMFPresentationTimeSource pts;
             IMFClockStateSink pSink = new Test();
+            IMFClock m_c;
+            m_pSession.GetClock(out m_c);
 
             m_pc = m_c as IMFPresentationClock;
             m_pc.AddClockStateSink(pSink);
@@ -24,11 +27,14 @@ namespace Testv10
             m_pc.Stop();
             m_pc.RemoveClockStateSink(pSink);
 
+            m_state = PlayerState.PausePending;
+            NotifyState();
+
 class Test : COMBase, IMFClockStateSink
 {
     public int iVal = 0;
 
-    #region IMFClockStateSink Members
+        #region IMFClockStateSink Members
 
     public void OnClockStart(long hnsSystemTime, long llClockStartOffset)
     {
@@ -55,7 +61,7 @@ class Test : COMBase, IMFClockStateSink
         iVal |= 16;
     }
 
-    #endregion
+        #endregion
 }
 
 #endif

@@ -100,6 +100,18 @@ namespace Testv10
 
                 //TestExtern t25 = new TestExtern();
                 //t25.DoTests();
+
+                //IMFASFStreamSelectorTest t27 = new IMFASFStreamSelectorTest();
+                //t27.DoTests();
+
+                //IMFMediaSourceTopologyProviderTest t29 = new IMFMediaSourceTopologyProviderTest();
+                //t29.DoTests();
+
+                //IMFContentEnablerTest t30 = new IMFContentEnablerTest();
+                //t30.DoTests();
+
+                //IMFASFStreamConfigTest t31 = new IMFASFStreamConfigTest();
+                //t31.DoTests();
             }
             catch (Exception e)
             {

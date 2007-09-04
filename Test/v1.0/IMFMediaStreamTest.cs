@@ -15,32 +15,9 @@ namespace Testv10
 {
     class IMFMediaStreamTest
     {
-        IMFMediaStream m_ms;
-
         public void DoTests()
         {
-            GetInterface();
-        }
-
-        private void GetInterface()
-        {
-            IMFSourceResolver pSourceResolver = null;
-            MFObjectType ObjectType;
-            object pSource = null;
-
-            // Create the source resolver.
-            MFExtern.MFCreateSourceResolver(out pSourceResolver);
-
-            pSourceResolver.CreateObjectFromURL(
-                    @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
-                    MFResolution.ByteStream,	// Create a source object.
-                    null,						// Optional property store.
-                    out ObjectType,				// Receives the created object type. 
-                    out pSource					// Receives a pointer to the media source.
-                );
-
-            // Get the IMFMediaSource interface from the media source.
-            m_ms = (IMFMediaStream)pSource;
+            Debug.Assert(false, "Tested in WavSource");
         }
     }
 }

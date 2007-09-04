@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ALLOW_UNTESTED_INTERFACES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -30,7 +30,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ALLOW_UNTESTED_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -46,7 +46,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ALLOW_UNTESTED_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -67,16 +67,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IMFActivateTest.cs" />
+    <Compile Include="IMFASFStreamConfigTest.cs" />
+    <Compile Include="IMFASFStreamSelectorTest.cs" />
     <Compile Include="IMFAttributesTest.cs" />
     <Compile Include="IMFByteStreamHandlerTest.cs" />
     <Compile Include="IMFByteStreamTest.cs" />
     <Compile Include="IMFClockTest.cs" />
     <Compile Include="IMFCollectionTest.cs" />
+    <Compile Include="IMFContentEnablerTest.cs" />
     <Compile Include="IMFMediaBufferTest.cs" />
     <Compile Include="IMFMediaEventGeneratorTest.cs" />
     <Compile Include="IMFMediaEventQueueTest.cs" />
     <Compile Include="IMFMediaEventTest.cs" />
     <Compile Include="IMFMediaSessionTest.cs" />
+    <Compile Include="IMFMediaSourceTopologyProviderTest.cs" />
     <Compile Include="IMFMediaStreamTest.cs" />
     <Compile Include="IMFMediaTypeHandlerTest.cs" />
     <Compile Include="IMFMediaTypeTest.cs" />

@@ -118,7 +118,7 @@ namespace Testv10
             rout.guidMajorType = MFMediaType.Video;
             rout.guidSubtype = new FourCC("NV12").ToMediaSubtype();
 
-            MFExtern.MFTEnum(Guid.Empty, 0, null, null, null, null, i1);
+            MFExtern.MFTEnum(Guid.Empty, 0, null, null, null, a1, i1);
             MFExtern.MFTEnum(MFTransformCategory.MFT_CATEGORY_VIDEO_EFFECT, 0, null, null, null, a1, i2);
             MFExtern.MFTEnum(MFTransformCategory.MFT_CATEGORY_VIDEO_EFFECT, 0, rin, null, null, a1, i3);
             MFExtern.MFTEnum(MFTransformCategory.MFT_CATEGORY_VIDEO_EFFECT, 0, rin, rout, null, a1, i4);

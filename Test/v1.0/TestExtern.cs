@@ -193,6 +193,10 @@ namespace Testv10
             vmt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
             vf = vmt.GetVideoFormat();
+
+            // This statement seems to cause crashes in 64bit code.  The crash comes on leaving DoTests.
+            // Since this doesn't occur in 32 bit, and since this is a deprecated method, I don't think
+            // I care.
             vmt.GetVideoRepresentation(MFRepresentation.VideoInfo, out ip, 10);
 
             AMMediaType amt5 = new AMMediaType();

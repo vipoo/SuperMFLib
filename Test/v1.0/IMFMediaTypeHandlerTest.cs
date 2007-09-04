@@ -34,7 +34,21 @@ namespace Testv10
 
             mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
-            m_mth.IsMediaTypeSupported(mt, out mt2);
+            IntPtr ip = Marshal.AllocCoTaskMem(IntPtr.Size);
+
+            try
+            {
+                m_mth.IsMediaTypeSupported(mt, ip);
+
+                if (Marshal.ReadIntPtr(ip) != IntPtr.Zero)
+                {
+                    mt2 = (IMFMediaType)Marshal.GetObjectForIUnknown(ip);
+                }
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(ip);
+            }
         }
 
         void TestGetMediaTypeCount()

@@ -375,5 +375,4 @@ namespace MediaFoundation
             );
     }
 
-
 }

@@ -43,22 +43,6 @@ namespace MediaFoundation
         WriteForLiveRead = 0x00000008
     }
 
-    [Flags, UnmanagedName("MFASF_STREAMSELECTORFLAGS")]
-    public enum MFAsfStreamSelectorFlags
-    {
-        None = 0x00000000,
-        DisableThinning = 0x00000001,
-        UseAverageBitrate = 0x00000002
-    }
-
-    [UnmanagedName("ASF_SELECTION_STATUS")]
-    public enum ASFSelectionStatus
-    {	
-        NotSelected	= 0,
-	    CleanPointsOnly	= 1,
-	    AllDataUnits	= 2
-    }
-
     [StructLayout(LayoutKind.Sequential), UnmanagedName("ASF_MUX_STATISTICS")]
     public struct ASFMuxStatistics
     {
@@ -74,6 +58,34 @@ namespace MediaFoundation
     }
 
 #endif
+
+    [Flags, UnmanagedName("MFASF_STREAMSELECTORFLAGS")]
+    public enum MFAsfStreamSelectorFlags
+    {
+        None = 0x00000000,
+        DisableThinning = 0x00000001,
+        UseAverageBitrate = 0x00000002
+    }
+
+    [UnmanagedName("ASF_SELECTION_STATUS")]
+    public enum ASFSelectionStatus
+    {
+        NotSelected = 0,
+        CleanPointsOnly = 1,
+        AllDataUnits = 2
+    }
+
+    public sealed class MFASFSampleExtension
+    {
+        public static readonly Guid SampleDuration = new Guid(0xc6bd9450, 0x867f, 0x4907, 0x83, 0xa3, 0xc7, 0x79, 0x21, 0xb7, 0x33, 0xad);
+        public static readonly Guid OutputCleanPoint = new Guid(0xf72a3c6f, 0x6eb4, 0x4ebc, 0xb1, 0x92, 0x9, 0xad, 0x97, 0x59, 0xe8, 0x28);
+        public static readonly Guid SMPTE = new Guid(0x399595ec, 0x8667, 0x4e2d, 0x8f, 0xdb, 0x98, 0x81, 0x4c, 0xe7, 0x6c, 0x1e);
+        public static readonly Guid FileName = new Guid(0xe165ec0e, 0x19ed, 0x45d7, 0xb4, 0xa7, 0x25, 0xcb, 0xd1, 0xe2, 0x8e, 0x9b);
+        public static readonly Guid ContentType = new Guid(0xd590dc20, 0x07bc, 0x436c, 0x9c, 0xf7, 0xf3, 0xbb, 0xfb, 0xf1, 0xa4, 0xdc);
+        public static readonly Guid PixelAspectRatio = new Guid(0x1b1ee554, 0xf9ea, 0x4bc8, 0x82, 0x1a, 0x37, 0x6b, 0x74, 0xe4, 0xc4, 0xb8);
+        public static readonly Guid Encryption_SampleID = new Guid(0x6698B84E, 0x0AFA, 0x4330, 0xAE, 0xB2, 0x1C, 0x0A, 0x98, 0xD7, 0xA4, 0x4D);
+        public static readonly Guid Encryption_KeyID = new Guid(0x76376591, 0x795f, 0x4da1, 0x86, 0xed, 0x9d, 0x46, 0xec, 0xa1, 0x09, 0xa9);
+    }
 
     #endregion
 
@@ -247,7 +259,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFProfile : IMFAttributes
     {
-    #region IMFAttributes methods
+        #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -399,7 +411,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-    #endregion
+        #endregion
 
         void GetStreamCount(
             out int pcStreams);
@@ -493,11 +505,37 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("699bdc27-bbaf-49ff-8e38-9c39c9b5e088"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFASFStreamPrioritization
+    {
+        void GetStreamCount(
+            out int pdwStreamCount);
+
+        void GetStream(
+            [In] int dwStreamIndex,
+            out short pwStreamNumber,
+            out short pwStreamFlags);
+
+        void AddStream(
+            [In] short wStreamNumber,
+            [In] short wStreamFlags);
+
+        void RemoveStream(
+            [In] int dwStreamIndex);
+
+        void Clone(
+            out IMFASFStreamPrioritization ppIStreamPrioritization);
+    }
+
+#endif
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("9E8AE8D2-DBBD-4200-9ACA-06E6DF484913"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFASFStreamConfig : IMFAttributes
     {
-    #region IMFAttributes methods
+        #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -649,13 +687,13 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-    #endregion
+        #endregion
 
         void GetStreamType(
             out Guid pguidStreamType);
 
         [PreserveSig]
-        short GetStreamNumber( );
+        short GetStreamNumber();
 
         void SetStreamNumber(
             [In] short wStreamNum);
@@ -674,7 +712,7 @@ namespace MediaFoundation
             out Guid pguidExtensionSystemID,
             out short pcbExtensionDataSize,
             IntPtr pbExtensionSystemInfo,
-            out int pcbExtensionSystemInfo);
+            ref int pcbExtensionSystemInfo);
 
         void AddPayloadExtension(
             [In, MarshalAs(UnmanagedType.Struct)] Guid guidExtensionSystemID,
@@ -682,34 +720,10 @@ namespace MediaFoundation
             IntPtr pbExtensionSystemInfo,
             [In] int cbExtensionSystemInfo);
 
-        void RemoveAllPayloadExtensions( );
+        void RemoveAllPayloadExtensions();
 
         void Clone(
             out IMFASFStreamConfig ppIStreamConfig);
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("699bdc27-bbaf-49ff-8e38-9c39c9b5e088"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFASFStreamPrioritization
-    {
-        void GetStreamCount(
-            out int pdwStreamCount);
-
-        void GetStream(
-            [In] int dwStreamIndex,
-            out short pwStreamNumber,
-            out short pwStreamFlags);
-
-        void AddStream(
-            [In] short wStreamNumber,
-            [In] short wStreamFlags);
-
-        void RemoveStream(
-            [In] int dwStreamIndex);
-
-        void Clone(
-            out IMFASFStreamPrioritization ppIStreamPrioritization);
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -729,7 +743,7 @@ namespace MediaFoundation
 
         void GetOutputStreamNumbers(
             [In] int dwOutputNum,
-            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.I2)] short [] rgwStreamNumbers);
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.I2)] short[] rgwStreamNumbers);
 
         void GetOutputFromStream(
             [In] short wStreamNum,
@@ -763,8 +777,8 @@ namespace MediaFoundation
         void GetBandwidthStep(
             [In] int dwStepNum,
             out int pdwBitrate,
-            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.I2)] short [] rgwStreamNumbers,
-            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.I4)] ASFSelectionStatus [] rgSelections);
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.I2)] short[] rgwStreamNumbers,
+            [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.I4)] ASFSelectionStatus[] rgSelections);
 
         void BitrateToStepNumber(
             [In] int dwBitrate,
@@ -773,8 +787,6 @@ namespace MediaFoundation
         void SetStreamSelectorFlags(
             [In] MFAsfStreamSelectorFlags dwStreamSelectorFlags);
     }
-
-#endif
 
     #endregion
 }

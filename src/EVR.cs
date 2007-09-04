@@ -172,7 +172,7 @@ namespace MediaFoundation.EVR
     {
         void GetAvailableVideoProcessorModes( 
             out int lpdwNumProcessingModes,
-            out Guid [] ppVideoProcessingModes);
+            out IntPtr ppVideoProcessingModes);
         
         void GetVideoProcessorCaps( 
             [In] Guid lpVideoProcessorMode,

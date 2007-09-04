@@ -627,13 +627,6 @@ namespace MediaFoundation
         ATSC_HD720p = (ATSC_HD1080i + 1)
     }
 
-    [Flags, UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
-    public enum MFPMPSessionCreationFlags
-    {
-        None = 0,
-        UnprotectedProcess = 0x1
-    }
-
     [UnmanagedName("MFNetCredentialRequirements")]
     public enum MFNetCredentialRequirements
     {
@@ -1027,6 +1020,13 @@ namespace MediaFoundation
         Tampered
     }
 
+    [Flags, UnmanagedName("MFPMPSESSION_CREATION_FLAGS")]
+    public enum MFPMPSessionCreationFlags
+    {
+        None = 0,
+        UnprotectedProcess = 0x1
+    }
+
     #endregion
 
     #region Interfaces
@@ -1122,51 +1122,6 @@ namespace MediaFoundation
         void EnableBuffering([In] int fEnable);
 
         void StopBuffering();
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("D3C4EF59-49CE-4381-9071-D5BCD044C770"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFContentEnabler
-    {
-        void GetEnableType(out Guid pType);
-
-        void GetEnableURL(
-            [MarshalAs(UnmanagedType.LPWStr)] out string ppwszURL,
-            out int pcchURL,
-            out MFURLTrustStatus pTrustStatus
-            );
-
-        void GetEnableData(
-            [Out] out IntPtr ppbData, 
-            out int pcbData);
-
-        void IsAutomaticSupported(
-            [MarshalAs(UnmanagedType.Bool)] out bool pfAutomatic
-            );
-
-        void AutomaticEnable();
-
-        void MonitorEnable();
-
-        void Cancel();
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("ACF92459-6A61-42BD-B57C-B43E51203CB0"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFContentProtectionManager
-    {
-        void BeginEnableContent(
-            IMFActivate pEnablerActivate,
-            IMFTopology pTopo,
-            IMFAsyncCallback pCallback,
-            [MarshalAs(UnmanagedType.Interface)] object punkState
-            );
-
-        void EndEnableContent(
-            IMFAsyncResult pResult
-            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -3898,7 +3853,51 @@ namespace MediaFoundation
             );
     }
 
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("ACF92459-6A61-42BD-B57C-B43E51203CB0"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFContentProtectionManager
+    {
+        void BeginEnableContent(
+            IMFActivate pEnablerActivate,
+            IMFTopology pTopo,
+            IMFAsyncCallback pCallback,
+            [MarshalAs(UnmanagedType.Interface)] object punkState
+            );
+
+        void EndEnableContent(
+            IMFAsyncResult pResult
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("D3C4EF59-49CE-4381-9071-D5BCD044C770"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFContentEnabler
+    {
+        void GetEnableType(out Guid pType);
+
+        void GetEnableURL(
+            [MarshalAs(UnmanagedType.LPWStr)] out string ppwszURL,
+            out int pcchURL,
+            out MFURLTrustStatus pTrustStatus
+            );
+
+        void GetEnableData(
+            [Out] out IntPtr ppbData,
+            out int pcbData);
+
+        void IsAutomaticSupported(
+            [MarshalAs(UnmanagedType.Bool)] out bool pfAutomatic
+            );
+
+        void AutomaticEnable();
+
+        void MonitorEnable();
+
+        void Cancel();
+    }
+
     #endregion
 
 }
-

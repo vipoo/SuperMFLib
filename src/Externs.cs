@@ -448,6 +448,14 @@ namespace MediaFoundation
             IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState);
 
+        [DllImport("mf.dll", PreserveSig = false)]
+        public static extern void MFCreatePMPMediaSession(
+            MFPMPSessionCreationFlags dwCreationFlags,
+            IMFAttributes pConfiguration,
+            out IMFMediaSession ppMediaSession,
+            out IMFActivate ppEnablerActivate
+        );
+
 #if ALLOW_UNTESTED_INTERFACES
 
         #region Tested
@@ -746,14 +754,6 @@ namespace MediaFoundation
             out IMFMediaType ppIMediaType
             );
 
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreatePMPMediaSession(
-            MFPMPSessionCreationFlags dwCreationFlags,
-            IMFAttributes pConfiguration,
-            out IMFMediaSession ppMediaSession,
-            out IMFActivate ppEnablerActivate
-        );
-
         [DllImport("mf.dll", PreserveSig = true)]
         public static extern int MFRequireProtectedEnvironment(
             IMFPresentationDescriptor pPresentationDescriptor
@@ -859,7 +859,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.IUnknown)] object pOwner,
             [MarshalAs(UnmanagedType.LPStruct)] Guid riidDevice,
             [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            out IntPtr ppVideoMixer
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppVideoMixer
             );
 
         [DllImport("evr.dll", PreserveSig = false)]

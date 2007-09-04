@@ -828,15 +828,6 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     #endregion
 
-    #region Private Methods
-
-    private static void TRACE(string s)
-    {
-        Debug.WriteLine(s);
-    }
-
-    #endregion
-
     #region Member Variables
 
     protected IMFMediaSession           m_pSession;

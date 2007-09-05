@@ -456,6 +456,18 @@ namespace MediaFoundation
             out IMFActivate ppEnablerActivate
         );
 
+        [DllImport("mf.dll", PreserveSig = false)]
+        public static extern void MFCreateASFContentInfo(
+            out IMFASFContentInfo ppIContentInfo);
+
+        [DllImport("mf.dll", PreserveSig = false)]
+        public static extern void MFCreateASFSplitter(
+            out IMFASFSplitter ppISplitter);
+
+        [DllImport("mf.dll", PreserveSig = false)]
+        public static extern void MFCreateASFProfile(
+            out IMFASFProfile ppIProfile);
+
 #if ALLOW_UNTESTED_INTERFACES
 
         #region Tested
@@ -482,18 +494,6 @@ namespace MediaFoundation
             MFPMPSessionCreationFlags dwCreationFlags,
             out IMFPMPServer ppPMPServer
         );
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateASFContentInfo(
-            out IMFASFContentInfo ppIContentInfo);
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateASFProfile(
-            out IMFASFProfile ppIProfile);
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateASFSplitter(
-            out IMFASFSplitter ppISplitter);
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFMultiplexer(

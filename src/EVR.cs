@@ -397,20 +397,6 @@ namespace MediaFoundation.EVR
             );
     }
 
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-    Guid("83E91E85-82C1-4ea7-801D-85DC50B75086")]
-    public interface IEVRFilterConfig
-    {
-        void SetNumberOfStreams(
-            int dwMaxStreams
-            );
-
-        void GetNumberOfStreams(
-            out int pdwMaxStreams
-            );
-    }
-
 #endif
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -485,6 +471,20 @@ namespace MediaFoundation.EVR
 
         void GetFullscreen(
             [MarshalAs(UnmanagedType.Bool)] out bool pfFullscreen
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("83E91E85-82C1-4ea7-801D-85DC50B75086")]
+    public interface IEVRFilterConfig
+    {
+        void SetNumberOfStreams(
+            int dwMaxStreams
+            );
+
+        void GetNumberOfStreams(
+            out int pdwMaxStreams
             );
     }
 

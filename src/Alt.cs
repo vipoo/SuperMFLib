@@ -40,8 +40,8 @@ namespace MediaFoundation
 {
     public class MFExternAlt
     {
-        [DllImport("MFPlat.dll")]
-        public static extern int MFCreateEventQueue(
+        [DllImport("MFPlat.dll", PreserveSig = false)]
+        public static extern void MFCreateEventQueue(
             out IMFMediaEventQueueAlt ppMediaEventQueue
         );
     }

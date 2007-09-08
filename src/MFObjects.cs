@@ -32,22 +32,6 @@ namespace MediaFoundation
 {
     #region Declarations
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoCompressedInfo")]
-    public struct MFVideoCompressedInfo
-    {
-        public long AvgBitrate;
-        public long AvgBitErrorRate;
-        public int MaxKeyFrameSpacing;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoSurfaceInfo")]
-    public struct MFVideoSurfaceInfo
-    {
-        public int Format;
-        public int PaletteEntries;
-        public MFPaletteEntry[] Palette;
-    }
-
     [Flags, UnmanagedName("MFVideoFlags")]
     public enum MFVideoFlags : long
     {
@@ -71,13 +55,6 @@ namespace MediaFoundation
         DXVASurface = 0x100000,
         RenderTargetSurface = 0x400000,
         ForceQWORD = 0x7FFFFFFF
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFRatio")]
-    public struct MFRatio
-    {
-        public int Numerator;
-        public int Denominator;
     }
 
     [UnmanagedName("MFVideoChromaSubsampling")]
@@ -176,51 +153,6 @@ namespace MediaFoundation
         MFNominalRange_Normal = 1,
         MFNominalRange_Unknown = 0,
         MFNominalRange_Wide = 2
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoArea")]
-    public struct MFVideoArea
-    {
-        public MFOffset OffsetX;
-        public MFOffset OffsetY;
-        public SIZE Area;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 2), UnmanagedName("MFOffset")]
-    public struct MFOffset
-    {
-        public short fract;
-        public short Value;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoInfo")]
-    public struct MFVideoInfo
-    {
-        public int dwWidth;
-        public int dwHeight;
-        public MFRatio PixelAspectRatio;
-        public MFVideoChromaSubsampling SourceChromaSubsampling;
-        public MFVideoInterlaceMode InterlaceMode;
-        public MFVideoTransferFunction TransferFunction;
-        public MFVideoPrimaries ColorPrimaries;
-        public MFVideoTransferMatrix TransferMatrix;
-        public MFVideoLighting SourceLighting;
-        public MFRatio FramesPerSecond;
-        public MFNominalRange NominalRange;
-        public MFVideoArea GeometricAperture;
-        public MFVideoArea MinimumDisplayAperture;
-        public MFVideoArea PanScanAperture;
-        public MFVideoFlags VideoFlags;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVIDEOFORMAT")]
-    public class MFVideoFormat
-    {
-        public int dwSize;
-        public MFVideoInfo videoInfo;
-        public Guid guidFormat;
-        public MFVideoCompressedInfo compressedInfo;
-        public MFVideoSurfaceInfo surfaceInfo;
     }
 
     [Flags, UnmanagedName("MFBYTESTREAM_SEEK_FLAG_ defines")]
@@ -409,6 +341,74 @@ namespace MediaFoundation
         MEReservedMax = 10000
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoCompressedInfo")]
+    public struct MFVideoCompressedInfo
+    {
+        public long AvgBitrate;
+        public long AvgBitErrorRate;
+        public int MaxKeyFrameSpacing;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoSurfaceInfo")]
+    public struct MFVideoSurfaceInfo
+    {
+        public int Format;
+        public int PaletteEntries;
+        public MFPaletteEntry[] Palette;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFRatio")]
+    public struct MFRatio
+    {
+        public int Numerator;
+        public int Denominator;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoArea")]
+    public struct MFVideoArea
+    {
+        public MFOffset OffsetX;
+        public MFOffset OffsetY;
+        public SIZE Area;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2), UnmanagedName("MFOffset")]
+    public struct MFOffset
+    {
+        public short fract;
+        public short Value;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoInfo")]
+    public struct MFVideoInfo
+    {
+        public int dwWidth;
+        public int dwHeight;
+        public MFRatio PixelAspectRatio;
+        public MFVideoChromaSubsampling SourceChromaSubsampling;
+        public MFVideoInterlaceMode InterlaceMode;
+        public MFVideoTransferFunction TransferFunction;
+        public MFVideoPrimaries ColorPrimaries;
+        public MFVideoTransferMatrix TransferMatrix;
+        public MFVideoLighting SourceLighting;
+        public MFRatio FramesPerSecond;
+        public MFNominalRange NominalRange;
+        public MFVideoArea GeometricAperture;
+        public MFVideoArea MinimumDisplayAperture;
+        public MFVideoArea PanScanAperture;
+        public MFVideoFlags VideoFlags;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVIDEOFORMAT")]
+    public class MFVideoFormat
+    {
+        public int dwSize;
+        public MFVideoInfo videoInfo;
+        public Guid guidFormat;
+        public MFVideoCompressedInfo compressedInfo;
+        public MFVideoSurfaceInfo surfaceInfo;
+    }
+
     #endregion
 
     #region Interfaces
@@ -586,7 +586,7 @@ namespace MediaFoundation
 
         #endregion
 
-    #region IMFMediaType methods
+        #region IMFMediaType methods
 
         new void GetMajorType(
             out Guid pguidMajorType
@@ -611,7 +611,7 @@ namespace MediaFoundation
             [In] IntPtr pvRepresentation
             );
 
-    #endregion
+        #endregion
 
         [PreserveSig, Obsolete("To get the properties of the audio format, applications should use the media type attributes. If you need to convert the media type into a WAVEFORMATEX structure, call MFCreateWaveFormatExFromMFMediaType")]
         IntPtr GetAudioFormat();

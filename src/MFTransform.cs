@@ -38,13 +38,6 @@ namespace MediaFoundation.Transform
         NoTails = 0x00000001
     }
 
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_REGISTER_TYPE_INFO")]
-    public class MFTRegisterTypeInfo
-    {
-        public Guid guidMajorType;
-        public Guid guidSubtype;
-    }
-
     [Flags, UnmanagedName("_MFT_PROCESS_OUTPUT_FLAGS")]
     public enum MFTProcessOutputFlags
     {
@@ -101,16 +94,6 @@ namespace MediaFoundation.Transform
         ProcessesInPlace = 0x800
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFT_INPUT_STREAM_INFO")]
-    public struct MFTInputStreamInfo
-    {
-        public long hnsMaxLatency;
-        public MFTInputStreamInfoFlags dwFlags;
-        public int cbSize;
-        public int cbMaxLookahead;
-        public int cbAlignment;
-    }
-
     [UnmanagedName("MFT_MESSAGE_TYPE")]
     public enum MFTMessageType
     {
@@ -121,23 +104,6 @@ namespace MediaFoundation.Transform
         NotifyEndStreaming = 0x10000001,
         NotifyStartOfStream = 0x10000003,
         SetD3DManager = 2
-    }
-
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_OUTPUT_DATA_BUFFER")]
-    public struct MFTOutputDataBuffer
-    {
-        public int dwStreamID;
-        public IntPtr pSample; // Doesn't release correctly when marshaled as IMFSample
-        public MFTOutputDataBufferFlags dwStatus;
-        [MarshalAs(UnmanagedType.Interface)] public IMFCollection pEvents;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
-    public struct MFTOutputStreamInfo
-    {
-        public MFTOutputStreamInfoFlags dwFlags;
-        public int cbSize;
-        public int cbAlignment;
     }
 
     [Flags, UnmanagedName("_MFT_OUTPUT_DATA_BUFFER_FLAGS")]
@@ -155,6 +121,41 @@ namespace MediaFoundation.Transform
     {
         None = 0,
         NewStreams = 0x00000100
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFT_INPUT_STREAM_INFO")]
+    public struct MFTInputStreamInfo
+    {
+        public long hnsMaxLatency;
+        public MFTInputStreamInfoFlags dwFlags;
+        public int cbSize;
+        public int cbMaxLookahead;
+        public int cbAlignment;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_OUTPUT_DATA_BUFFER")]
+    public struct MFTOutputDataBuffer
+    {
+        public int dwStreamID;
+        public IntPtr pSample; // Doesn't release correctly when marshaled as IMFSample
+        public MFTOutputDataBufferFlags dwStatus;
+        [MarshalAs(UnmanagedType.Interface)]
+        public IMFCollection pEvents;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFT_OUTPUT_STREAM_INFO")]
+    public struct MFTOutputStreamInfo
+    {
+        public MFTOutputStreamInfoFlags dwFlags;
+        public int cbSize;
+        public int cbAlignment;
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_REGISTER_TYPE_INFO")]
+    public class MFTRegisterTypeInfo
+    {
+        public Guid guidMajorType;
+        public Guid guidSubtype;
     }
 
     #endregion

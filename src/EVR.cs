@@ -35,6 +35,30 @@ namespace MediaFoundation.EVR
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [UnmanagedName("MFVP_MESSAGE_TYPE")]
+    public enum MFVPMessageType
+    {
+        Flush,
+        InvalidateMediaType,
+        ProcessInputNotify,
+        BeginStreaming,
+        EndStreaming,
+        EndOfStream,
+        Step,
+        CancelStep
+    }
+
+    [UnmanagedName("MF_SERVICE_LOOKUP_TYPE")]
+    public enum MFServiceLookupType
+    {
+        Upstream,
+        UpstreamDirect,
+        Downstream,
+        DownstreamDirect,
+        All,
+        Global
+    }
+
     [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_ProcAmpValues")]
     public struct DXVA2ProcAmpValues
     {
@@ -85,30 +109,6 @@ namespace MediaFoundation.EVR
         bool GetBitmapFromDC;
         IntPtr stru;
         MFVideoAlphaBitmapParams paras;
-    }
-
-    [UnmanagedName("MFVP_MESSAGE_TYPE")]
-    public enum MFVPMessageType
-    {
-        Flush,
-        InvalidateMediaType,
-        ProcessInputNotify,
-        BeginStreaming,
-        EndStreaming,
-        EndOfStream,
-        Step,
-        CancelStep
-    }
-
-    [UnmanagedName("MF_SERVICE_LOOKUP_TYPE")]
-    public enum MFServiceLookupType
-    {
-        Upstream,
-        UpstreamDirect,
-        Downstream,
-        DownstreamDirect,
-        All,
-        Global
     }
 
 #endif

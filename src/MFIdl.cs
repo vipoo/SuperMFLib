@@ -598,20 +598,6 @@ namespace MediaFoundation
 
 #if ALLOW_UNTESTED_INTERFACES
 
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("MPEG2VIDEOINFO")]
-    public struct Mpeg2VideoInfo
-    {
-        VideoInfoHeader2 hdr;
-        int dwStartTimeCode;        //  ?? not used for DVD ??
-        int cbSequenceHeader;       // is 0 for DVD (no sequence header)
-        int dwProfile;              // use enum MPEG2Profile
-        int dwLevel;                // use enum MPEG2Level
-        int dwFlags;                // use AMMPEG2_* defines.  Reject connection if undefined bits are not 0
-        int[] dwSequenceHeader;    // DWORD instead of Byte for alignment purposes
-        //   For MPEG-2, if a sequence_header is included, the sequence_extension
-        //   should also be included
-    }
-
     [UnmanagedName("MFStandardVideoFormat")]
     public enum MFStandardVideoFormat
     {
@@ -641,24 +627,6 @@ namespace MediaFoundation
         Relative = 0x00000001
     }
 
-    [StructLayout(LayoutKind.Explicit, Pack = 8), UnmanagedName("unnamed internal struct")]
-    public struct Unnamed1
-    {
-        [FieldOffset(0)]
-        public double d;
-        [FieldOffset(0)]
-        public int u32;
-        [FieldOffset(0)]
-        public long u64;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MF_LEAKY_BUCKET_PAIR")]
-    public struct MF_LeakyBucketPair
-    {
-        public int dwBitrate;
-        public int msBufferWindow;
-    }
-
     [UnmanagedName("MF_QUALITY_DROP_MODE")]
     public enum MFQualitydropMode
     {
@@ -681,6 +649,75 @@ namespace MediaFoundation
         NormalMinus4,
         NormalMinus5,
         NumQualityLevels
+    }
+
+    [UnmanagedName("MFNETSOURCE_PROTOCOL_TYPE")]
+    public enum MFNetSourceProtocolType
+    {
+        Undefined,
+        Http,
+        Rtsp,
+        File
+    }
+
+    [UnmanagedName("MFPolicyManagerAction")]
+    public enum MFPolicyManagerAction
+    {
+        Copy = 2,
+        Export = 3,
+        Extract = 4,
+        Last = 7,
+        No = 0,
+        Play = 1,
+        Reserved1 = 5,
+        Reserved2 = 6,
+        Reserved3 = 7
+    }
+
+    [UnmanagedName("MFRATE_DIRECTION")]
+    public enum MFRateDirection
+    {
+        Forward,
+        Reverse
+    }
+
+    [UnmanagedName("MFSHUTDOWN_STATUS")]
+    public enum MFShutdownStatus
+    {
+        Initiated,
+        Completed
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MPEG2VIDEOINFO")]
+    public struct Mpeg2VideoInfo
+    {
+        VideoInfoHeader2 hdr;
+        int dwStartTimeCode;        //  ?? not used for DVD ??
+        int cbSequenceHeader;       // is 0 for DVD (no sequence header)
+        int dwProfile;              // use enum MPEG2Profile
+        int dwLevel;                // use enum MPEG2Level
+        int dwFlags;                // use AMMPEG2_* defines.  Reject connection if undefined bits are not 0
+        int[] dwSequenceHeader;    // DWORD instead of Byte for alignment purposes
+        //   For MPEG-2, if a sequence_header is included, the sequence_extension
+        //   should also be included
+    }
+
+    [StructLayout(LayoutKind.Explicit, Pack = 8), UnmanagedName("unnamed internal struct")]
+    public struct Unnamed1
+    {
+        [FieldOffset(0)]
+        public double d;
+        [FieldOffset(0)]
+        public int u32;
+        [FieldOffset(0)]
+        public long u64;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MF_LEAKY_BUCKET_PAIR")]
+    public struct MF_LeakyBucketPair
+    {
+        public int dwBitrate;
+        public int msBufferWindow;
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("MFBYTESTREAM_BUFFERING_PARAMS")]
@@ -734,43 +771,6 @@ namespace MediaFoundation
         [MarshalAs(UnmanagedType.LPWStr)]
         public string pszPackage;
         public int nRetries;
-    }
-
-    [UnmanagedName("MFNETSOURCE_PROTOCOL_TYPE")]
-    public enum MFNetSourceProtocolType
-    {
-        Undefined,
-        Http,
-        Rtsp,
-        File
-    }
-
-    [UnmanagedName("MFPolicyManagerAction")]
-    public enum MFPolicyManagerAction
-    {
-        Copy = 2,
-        Export = 3,
-        Extract = 4,
-        Last = 7,
-        No = 0,
-        Play = 1,
-        Reserved1 = 5,
-        Reserved2 = 6,
-        Reserved3 = 7
-    }
-
-    [UnmanagedName("MFRATE_DIRECTION")]
-    public enum MFRateDirection
-    {
-        Forward,
-        Reverse
-    }
-
-    [UnmanagedName("MFSHUTDOWN_STATUS")]
-    public enum MFShutdownStatus
-    {
-        Initiated,
-        Completed
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFTOPONODE_ATTRIBUTE_UPDATE")]
@@ -833,33 +833,6 @@ namespace MediaFoundation
         ForceExtensible = 1
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("MFAYUVSample")]
-    public struct MFAYUVSample
-    {
-        public byte bCrValue;
-        public byte bCbValue;
-        public byte bYValue;
-        public byte bSampleAlpha8;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("MFARGB")]
-    public struct MFARGB
-    {
-        public byte rgbBlue;
-        public byte rgbGreen;
-        public byte rgbRed;
-        public byte rgbAlpha;
-    }
-
-    [StructLayout(LayoutKind.Explicit, Pack = 1), UnmanagedName("MFPaletteEntry")]
-    public struct MFPaletteEntry
-    {
-        [FieldOffset(0)]
-        public MFARGB ARGB;
-        [FieldOffset(0)]
-        public MFAYUVSample AYCbCr;
-    }
-
     [UnmanagedName("MF_OBJECT_TYPE")]
     public enum MFObjectType
     {
@@ -916,17 +889,6 @@ namespace MediaFoundation
         NoSocket = 0x1,
         Lite = 0x1,
         Full = 0
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("_MFCLOCK_PROPERTIES")]
-    public struct MFClockProperties
-    {
-        public long qwCorrelationRate;
-        public Guid guidClockId;
-        public int dwClockFlags;
-        public long qwClockFrequency;
-        public int dwClockTolerance;
-        public int dwClockJitter;
     }
 
     [UnmanagedName("MFCLOCK_STATE")]
@@ -1025,6 +987,44 @@ namespace MediaFoundation
     {
         None = 0,
         UnprotectedProcess = 0x1
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("MFAYUVSample")]
+    public struct MFAYUVSample
+    {
+        public byte bCrValue;
+        public byte bCbValue;
+        public byte bYValue;
+        public byte bSampleAlpha8;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("MFARGB")]
+    public struct MFARGB
+    {
+        public byte rgbBlue;
+        public byte rgbGreen;
+        public byte rgbRed;
+        public byte rgbAlpha;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Pack = 1), UnmanagedName("MFPaletteEntry")]
+    public struct MFPaletteEntry
+    {
+        [FieldOffset(0)]
+        public MFARGB ARGB;
+        [FieldOffset(0)]
+        public MFAYUVSample AYCbCr;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("_MFCLOCK_PROPERTIES")]
+    public struct MFClockProperties
+    {
+        public long qwCorrelationRate;
+        public Guid guidClockId;
+        public int dwClockFlags;
+        public long qwClockFrequency;
+        public int dwClockTolerance;
+        public int dwClockJitter;
     }
 
     #endregion
@@ -1481,7 +1481,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFOutputPolicy : IMFAttributes
     {
-    #region IMFAttributes methods
+        #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1633,7 +1633,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-    #endregion
+        #endregion
 
         void GenerateRequiredSchemas(
             [In] int dwAttributes,
@@ -1657,7 +1657,7 @@ namespace MediaFoundation
     Guid("7BE0FC5B-ABD9-44FB-A5C8-F50136E71599")]
     public interface IMFOutputSchema : IMFAttributes
     {
-    #region IMFAttributes methods
+        #region IMFAttributes methods
 
         new void GetItem(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
@@ -1809,7 +1809,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pDest
             );
 
-    #endregion
+        #endregion
 
         void GetSchemaType(
             out Guid pguidSchemaType
@@ -2053,7 +2053,7 @@ namespace MediaFoundation
     Guid("8C7B80BF-EE42-4B59-B1DF-55668E1BDCA8")]
     public interface IMFSampleGrabberSinkCallback : IMFClockStateSink
     {
-    #region IMFClockStateSink methods
+        #region IMFClockStateSink methods
 
         new void OnClockStart(
             [In] long hnsSystemTime,
@@ -2077,7 +2077,7 @@ namespace MediaFoundation
             [In] float flRate
             );
 
-    #endregion
+        #endregion
 
         void OnSetPresentationClock(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
@@ -2243,7 +2243,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFStreamSink : IMFMediaEventGenerator
     {
-    #region IMFMediaEventGenerator methods
+        #region IMFMediaEventGenerator methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -2265,7 +2265,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
             );
 
-    #endregion
+        #endregion
 
         void GetMediaSink(
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaSink ppMediaSink
@@ -3701,15 +3701,28 @@ namespace MediaFoundation
     Guid("2EB1E945-18B8-4139-9B1A-D5D584818530")]
     public interface IMFClock
     {
-        void GetClockCharacteristics(out MFClockCharacteristicsFlags pdwCharacteristics);
+        void GetClockCharacteristics(
+            out MFClockCharacteristicsFlags pdwCharacteristics
+            );
 
-        void GetCorrelatedTime([In] int dwReserved, out long pllClockTime, out long phnsSystemTime);
+        void GetCorrelatedTime(
+            [In] int dwReserved, 
+            out long pllClockTime, 
+            out long phnsSystemTime
+            );
 
-        void GetContinuityKey(out int pdwContinuityKey);
+        void GetContinuityKey(
+            out int pdwContinuityKey
+            );
 
-        void GetState([In] int dwReserved, out MFClockState peClockState);
+        void GetState(
+            [In] int dwReserved, 
+            out MFClockState peClockState
+            );
 
-        void GetProperties(out MFClockProperties pClockProperties);
+        void GetProperties(
+            out MFClockProperties pClockProperties
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,

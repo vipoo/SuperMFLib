@@ -51,7 +51,7 @@ namespace MediaFoundation
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("ASF_INDEX_IDENTIFIER")]
-    public struct ASFIndexIdentifier
+    public class ASFIndexIdentifier
     {
         public Guid guidIndexType;
         public short wStreamNumber;
@@ -151,16 +151,16 @@ namespace MediaFoundation
             out long pcbIndexOffset);
 
         void SetIndexByteStreams(
-            [In] IMFByteStream[] ppIByteStreams,
+            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.IUnknown)] IMFByteStream[] ppIByteStreams,
             [In] int cByteStreams);
 
         void GetIndexByteStreamCount(
             out int pcByteStreams);
 
         void GetIndexStatus(
-            [In] ASFIndexIdentifier pIndexIdentifier,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ASFIndexIdentifier pIndexIdentifier,
             out bool pfIsIndexed,
-            out IntPtr pbIndexDescriptor,
+            IntPtr pbIndexDescriptor,
             ref int pcbIndexDescriptor);
 
         void SetIndexStatus(
@@ -170,9 +170,9 @@ namespace MediaFoundation
 
         void GetSeekPositionForValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarValue,
-            [In] ASFIndexIdentifier pIndexIdentifier,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ASFIndexIdentifier pIndexIdentifier,
             out long pcbOffsetWithinData,
-            out long phnsApproxTime,
+            IntPtr phnsApproxTime,
             out int pdwPayloadNumberOfStreamWithinPacket);
 
         void GenerateIndexEntries(

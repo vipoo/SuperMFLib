@@ -104,6 +104,9 @@ namespace Testv10
                 //IMFASFStreamSelectorTest t27 = new IMFASFStreamSelectorTest();
                 //t27.DoTests();
 
+                //IMFASFProfileTest t28 = new IMFASFProfileTest();
+                //t28.DoTests();
+
                 //IMFMediaSourceTopologyProviderTest t29 = new IMFMediaSourceTopologyProviderTest();
                 //t29.DoTests();
 
@@ -112,6 +115,12 @@ namespace Testv10
 
                 //IMFASFStreamConfigTest t31 = new IMFASFStreamConfigTest();
                 //t31.DoTests();
+
+                //IEVRFilterConfigTest t32 = new IEVRFilterConfigTest();
+                //t32.DoTests();
+
+                //IMFASFMutualExclusionTest t33 = new IMFASFMutualExclusionTest();
+                //t33.DoTests();
             }
             catch (Exception e)
             {

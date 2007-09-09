@@ -66,7 +66,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IEVRFilterConfigTest.cs" />
     <Compile Include="IMFActivateTest.cs" />
+    <Compile Include="IMFASFIndexerTest.cs" />
+    <Compile Include="IMFASFMutualExclusionTest.cs" />
+    <Compile Include="IMFASFProfileTest.cs" />
+    <Compile Include="IMFASFSplitterTest.cs" />
     <Compile Include="IMFASFStreamConfigTest.cs" />
     <Compile Include="IMFASFStreamSelectorTest.cs" />
     <Compile Include="IMFAttributesTest.cs" />

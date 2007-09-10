@@ -33,9 +33,10 @@ namespace Utils
 #endif
         }
 
+#if DEBUG
+
         ~xLog()
         {
-#if DEBUG
             if (tw != null)
             {
                 try
@@ -46,9 +47,10 @@ namespace Utils
 
                 tw = null;
             }
-#endif
 
         }
+
+#endif
 
         public void WriteLine(string s)
         {

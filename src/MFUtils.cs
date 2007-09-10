@@ -681,9 +681,11 @@ namespace MediaFoundation.Misc
             // If we are a ConstPropVariant, we must *not* call PropVariantClear.  That 
             // would release the *caller's* copy of the data, which would probably make
             // him cranky.  If we are a PropVariant, the PropVariant.Dispose gets called
-            // instead (which *does* do a PropVariantClear).
+            // as well, which *does* do a PropVariantClear.
             type = VariantType.None;
+#if DEBUG
             longValue = 0;
+#endif
         }
 
         #endregion

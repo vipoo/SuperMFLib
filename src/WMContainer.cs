@@ -34,6 +34,13 @@ namespace MediaFoundation
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [Flags, UnmanagedName("MFASF_MULTIPLEXERFLAGS")]
+    public enum MFASFMultiplexerFlags
+    {
+        None = 0,
+        AutoAdjustBitrate = 0x00000001
+    }
+
     [Flags, UnmanagedName("MFASF_INDEXERFLAGS")]
     public enum MFAsfIndexerFlags
     {
@@ -55,13 +62,6 @@ namespace MediaFoundation
     {
         public Guid guidIndexType;
         public short wStreamNumber;
-    }
-
-    [Flags, UnmanagedName("MFASF_MULTIPLEXERFLAGS")]
-    public enum MFASFMultiplexerFlags
-    {
-        None = 0,
-        AutoAdjustBitrate = 0x00000001
     }
 
 #endif

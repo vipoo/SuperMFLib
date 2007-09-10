@@ -109,10 +109,14 @@ namespace WavSourceFilter
             MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
         }
 
+#if DEBUG
+
         ~WavStream()
         {
             Debug.Assert(m_IsShutdown);
         }
+
+#endif
 
         #region IMFMediaEventGenerator methods
 
@@ -1347,10 +1351,6 @@ namespace WavSourceFilter
 
         CWavRiffParser(IMFByteStream pStream)
             : base(pStream, new FourCC("RIFF"), 0)
-        {
-        }
-
-        ~CWavRiffParser()
         {
         }
 

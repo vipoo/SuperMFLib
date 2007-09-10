@@ -89,6 +89,16 @@ namespace MediaFoundation.EVR
         BitMask = 0x0000003f
     }
 
+    [Flags, UnmanagedName("DXVA2_ProcAmp_* defines")]
+    public enum DXVA2ProcAmp
+    {
+        None = 0,
+        Brightness = 0x0001,
+        Contrast = 0x0002,
+        Hue = 0x0004,
+        Saturation = 0x0008
+    }
+
     [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_ProcAmpValues")]
     public struct DXVA2ProcAmpValues
     {
@@ -139,16 +149,6 @@ namespace MediaFoundation.EVR
         bool GetBitmapFromDC;
         IntPtr stru;
         MFVideoAlphaBitmapParams paras;
-    }
-
-    [Flags, UnmanagedName("DXVA2_ProcAmp_* defines")]
-    public enum DXVA2ProcAmp
-    {
-        None = 0,
-        Brightness = 0x0001,
-        Contrast = 0x0002,
-        Hue = 0x0004,
-        Saturation = 0x0008
     }
 
 #endif

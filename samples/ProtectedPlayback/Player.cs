@@ -65,11 +65,15 @@ class CPlayer : COMBase, IMFAsyncCallback
         MFExtern.MFStartup(0x10070, MFStartup.Full);
     }
 
+#if DEBUG
+
     // Destructor is private. Caller should call Release.
     ~CPlayer()
     {
         Debug.Assert(m_pSession == null);  // If FALSE, the app did not call Shutdown().
     }
+
+#endif
 
     #region Public methods
 

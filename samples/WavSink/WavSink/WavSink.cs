@@ -131,6 +131,8 @@ namespace WavSinkNS
         // CWavSink destructor.
         //-------------------------------------------------------------------
 
+#if DEBUG
+
         ~CWavSink()
         {
             // Most cleanup happens in Shutdown
@@ -138,6 +140,8 @@ namespace WavSinkNS
             TRACE("CWavSink::~CWavSink");
             Debug.Assert(m_IsShutdown);
         }
+
+#endif
 
         #region IMFMediaSink methods.
 

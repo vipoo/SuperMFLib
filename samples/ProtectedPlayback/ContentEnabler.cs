@@ -71,6 +71,8 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
     //  ContentProtectionManager destructor
     /////////////////////////////////////////////////////////////////////////
 
+#if DEBUG
+
     ~ContentProtectionManager()
     {
         Debug.WriteLine("~ContentProtectionManager");
@@ -81,6 +83,8 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
         m_pCallback = null;
         m_punkState = null;
     }
+
+#endif
 
     #region IMFContentProtectionManager methods
 

@@ -95,7 +95,7 @@ namespace Testv10
             bool b;
             int id = 10000;
             IntPtr ip = Marshal.AllocCoTaskMem(id);
-            m_index.GetIndexStatus(ii, out b, out ip, ref id);
+            m_index.GetIndexStatus(ii, out b, ip, ref id);
         }
 
 #if false

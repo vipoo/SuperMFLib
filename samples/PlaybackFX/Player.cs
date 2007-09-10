@@ -710,11 +710,6 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     #region Private Methods
 
-    private static void TRACE(string s)
-    {
-        Debug.WriteLine(s);
-    }
-
     ///////////////////////////////////////////////////////////////////////
     //  Name:  AddBranchToPartialTopology
     //  Description:  Adds a topology branch for one stream.

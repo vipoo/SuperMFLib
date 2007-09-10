@@ -1080,11 +1080,6 @@ namespace MFT_Grayscale
         // HasPendingOutput: Returns TRUE if the MFT is holding an input sample.
         private bool HasPendingOutput() { return m_pSample != null; }
 
-        private void TRACE(string s)
-        {
-            Debug.WriteLine(s);
-        }
-
         private void TraceSubtype(Guid g)
         {
 #if DEBUG

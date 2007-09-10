@@ -106,9 +106,7 @@ namespace WavSourceFilter
             m_Riff = pRiff;
 
             // Create the media event queue.
-            int hr = MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
-            MFError.ThrowExceptionForHR(hr);
-
+            MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
         }
 
         ~WavStream()
@@ -175,26 +173,7 @@ namespace WavSourceFilter
             {
                 CheckShutdown();
 
-                int iObjectSize;
-
-                if (IntPtr.Size == 4)
-                {
-                    iObjectSize = 16;
-                }
-                else
-                {
-                    iObjectSize = 24;
-                }
-
-                IntPtr ip = Marshal.AllocCoTaskMem(iObjectSize);
-                try
-                {
-                    m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
-                }
-                finally
-                {
-                    Marshal.FreeCoTaskMem(ip);
-                }
+                m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
             }
         }
 

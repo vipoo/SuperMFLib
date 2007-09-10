@@ -598,6 +598,37 @@ namespace MediaFoundation
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [Flags, UnmanagedName("MFOUTPUTATTRIBUTE_ *")]
+    public enum MFOutputAttribute
+    {
+        None = 0,
+        Digital = 0x00000001,
+        NonstandardImplementation = 0x00000002,
+        Video = 0x00000004,
+        Compressed = 0x00000008,
+        Software = 0x00000010,
+        Bus = 0x00000020,
+        BusImplementation = 0x0000FF00
+    }
+
+    [Flags, UnmanagedName("MFNetAuthenticationFlags")]
+    public enum MFNetAuthenticationFlags
+    {
+        None = 0,
+        Proxy = 0x00000001,
+        ClearText = 0x00000002,
+        LoggedOnUser = 0x00000004
+    }
+
+    [Flags, UnmanagedName("MFNetCredentialOptions")]
+    public enum MFNetCredentialOptions
+    {
+        None = 0,
+        Save = 0x00000001,
+        DontCache = 0x00000002,
+        AllowClearText = 0x00000004,
+    }
+
     [UnmanagedName("MFStandardVideoFormat")]
     public enum MFStandardVideoFormat
     {
@@ -989,6 +1020,13 @@ namespace MediaFoundation
         UnprotectedProcess = 0x1
     }
 
+    [Flags, UnmanagedName("MFCLOCK_RELATIONAL_FLAGS")]
+    public enum MFClockRelationalFlags
+    {
+        None = 0,
+        JitterNeverAhead = 0x1
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("MFAYUVSample")]
     public struct MFAYUVSample
     {
@@ -1016,12 +1054,12 @@ namespace MediaFoundation
         public MFAYUVSample AYCbCr;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("_MFCLOCK_PROPERTIES")]
+    [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFCLOCK_PROPERTIES")]
     public struct MFClockProperties
     {
         public long qwCorrelationRate;
         public Guid guidClockId;
-        public int dwClockFlags;
+        public MFClockRelationalFlags dwClockFlags;
         public long qwClockFrequency;
         public int dwClockTolerance;
         public int dwClockJitter;
@@ -1063,7 +1101,9 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid rguidClass
             );
 
-        void GetGroupingParam(out Guid pguidClass);
+        void GetGroupingParam(
+            out Guid pguidClass
+            );
 
         void SetDisplayName(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName
@@ -1117,9 +1157,13 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFByteStreamBuffering
     {
-        void SetBufferingParams([In] ref MFByteStreamBufferingParams pParams);
+        void SetBufferingParams(
+            [In] ref MFByteStreamBufferingParams pParams
+            );
 
-        void EnableBuffering([In] int fEnable);
+        void EnableBuffering(
+            [In] int fEnable
+            );
 
         void StopBuffering();
     }
@@ -1212,50 +1256,6 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("6EF2A660-47C0-4666-B13D-CBB717F2FA2C"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFMediaSink
-    {
-        void GetCharacteristics(
-            out MFMediaSinkCharacteristics pdwCharacteristics
-            );
-
-        void AddStreamSink(
-            [In] int dwStreamSinkIdentifier,
-            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
-            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
-            );
-
-        void RemoveStreamSink(
-            [In] int dwStreamSinkIdentifier
-            );
-
-        void GetStreamSinkCount(
-            out int pcStreamSinkCount
-            );
-
-        void GetStreamSinkByIndex(
-            [In] int dwIndex,
-            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
-            );
-
-        void GetStreamSinkById(
-            [In] int dwStreamSinkIdentifier,
-            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
-            );
-
-        void SetPresentationClock(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
-            );
-
-        void GetPresentationClock(
-            [MarshalAs(UnmanagedType.Interface)] out IMFPresentationClock ppPresentationClock
-            );
-
-        void Shutdown();
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("5DFD4B2A-7674-4110-A4E6-8A68FD5F3688"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFMediaSinkPreroll
@@ -1320,7 +1320,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.Interface)]
             IMFPresentationDescriptor pPresentationDescriptor,
             [In] int dwStreamIdentifier,
-            [In] int dwFlags,
+            [In] int dwFlags, // must be zero
             [MarshalAs(UnmanagedType.Interface)] out IMFMetadata ppMFMetadata
             );
     }
@@ -1351,11 +1351,11 @@ namespace MediaFoundation
         void GetPassword(
             out byte pbData,
             [In, Out] ref int pcbData,
-            [In] int fEncryptData
+            [In, MarshalAs(UnmanagedType.Bool)] bool fEncryptData
             );
 
         void LoggedOnUser(
-            ref int pfLoggedOnUser
+            [MarshalAs(UnmanagedType.Bool)] out bool pfLoggedOnUser
             );
     }
 
@@ -1367,19 +1367,19 @@ namespace MediaFoundation
         void GetCredential(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszUrl,
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszRealm,
-            [In] int dwAuthenticationFlags,
+            [In] MFNetAuthenticationFlags dwAuthenticationFlags,
             [MarshalAs(UnmanagedType.Interface)] out IMFNetCredential ppCred,
             out MFNetCredentialRequirements pdwRequirementsFlags
             );
 
         void SetGood(
             [In, MarshalAs(UnmanagedType.Interface)] IMFNetCredential pCred,
-            [In] int fGood
+            [In] bool fGood
             );
 
         void SetUserOptions(
             [In, MarshalAs(UnmanagedType.Interface)] IMFNetCredential pCred,
-            [In] int dwOptionsFlags
+            [In] MFNetCredentialOptions dwOptionsFlags
             );
     }
 
@@ -1401,7 +1401,7 @@ namespace MediaFoundation
 
         void SetGood(
             [In, MarshalAs(UnmanagedType.Interface)] IMFNetCredential pCred,
-            [In] int fGood
+            [In] bool fGood
             );
     }
 
@@ -1413,7 +1413,7 @@ namespace MediaFoundation
         void FindFirstProxy(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszHost,
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszUrl,
-            [In] int fReserved
+            [In, MarshalAs(UnmanagedType.Bool)] bool fReserved
             );
 
         void FindNextProxy();
@@ -1636,7 +1636,7 @@ namespace MediaFoundation
         #endregion
 
         void GenerateRequiredSchemas(
-            [In] int dwAttributes,
+            [In] MFOutputAttribute dwAttributes,
             [In, MarshalAs(UnmanagedType.Struct)] Guid guidOutputSubType,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid rgGuidProtectionSchemasSupported,
             [In] int cProtectionSchemasSupported,
@@ -1949,12 +1949,12 @@ namespace MediaFoundation
     public interface IMFRateControl
     {
         void SetRate(
-            [In] int fThin,
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
             [In] float flRate
             );
 
         void GetRate(
-            [In, Out] ref int pfThin,
+            [In, Out, MarshalAs(UnmanagedType.Bool)] ref bool pfThin,
             [In, Out] ref float pflRate
             );
     }
@@ -1966,18 +1966,18 @@ namespace MediaFoundation
     {
         void GetSlowestRate(
             [In] MFRateDirection eDirection,
-            [In] int fThin,
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
             out float pflRate
             );
 
         void GetFastestRate(
             [In] MFRateDirection eDirection,
-            [In] int fThin,
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
             out float pflRate
             );
 
         void IsRateSupported(
-            [In] int fThin,
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
             [In] float flRate,
             [In, Out] ref float pflNearestSupportedRate
             );
@@ -2085,7 +2085,7 @@ namespace MediaFoundation
 
         void OnProcessSample(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidMajorMediaType,
-            [In] int dwSampleFlags,
+            [In] int dwSampleFlags, // must be zero
             [In] long llSampleTime,
             [In] long llSampleDuration,
             [In] ref byte pSampleBuffer,
@@ -2220,11 +2220,11 @@ namespace MediaFoundation
             );
 
         void SetMute(
-            [In] int bMute
+            [In, MarshalAs(UnmanagedType.Bool)] bool bMute
             );
 
         void GetMute(
-            out int pbMute
+            [MarshalAs(UnmanagedType.Bool)] out bool pbMute
             );
     }
 
@@ -2236,60 +2236,6 @@ namespace MediaFoundation
         void OnSourceEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent
             );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("0A97B3CF-8E7C-4A3D-8F8C-0C843DC247FB"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFStreamSink : IMFMediaEventGenerator
-    {
-        #region IMFMediaEventGenerator methods
-
-        new void GetEvent(
-            [In] MFEventFlag dwFlags,
-            [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
-            );
-
-        new void BeginGetEvent(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
-            [In, MarshalAs(UnmanagedType.IUnknown)] object o);
-
-        new void EndGetEvent(
-            IMFAsyncResult pResult,
-            out IMFMediaEvent ppEvent);
-
-        new void QueueEvent(
-            [In] MediaEventType met,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
-            [In] int hrStatus,
-            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
-            );
-
-        #endregion
-
-        void GetMediaSink(
-            [MarshalAs(UnmanagedType.Interface)] out IMFMediaSink ppMediaSink
-            );
-
-        void GetIdentifier(
-            out int pdwIdentifier
-            );
-
-        void GetMediaTypeHandler(
-            [MarshalAs(UnmanagedType.Interface)] out IMFMediaTypeHandler ppHandler
-            );
-
-        void ProcessSample(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFSample pSample
-            );
-
-        void PlaceMarker(
-            [In] MFStreamSinkMarkerType eMarkerType,
-            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarMarkerValue,
-            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarContextValue
-            );
-
-        void Flush();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -2361,7 +2307,7 @@ namespace MediaFoundation
             );
 
         void IsFinal(
-            out int pfIsFinal
+            [MarshalAs(UnmanagedType.Bool)] out bool pfIsFinal
             );
     }
 
@@ -3685,15 +3631,27 @@ namespace MediaFoundation
     Guid("F6696E82-74F7-4F3D-A178-8A5E09C3659F")]
     public interface IMFClockStateSink
     {
-        void OnClockStart([In] long hnsSystemTime, [In] long llClockStartOffset);
+        void OnClockStart(
+            [In] long hnsSystemTime, 
+            [In] long llClockStartOffset
+            );
 
-        void OnClockStop([In] long hnsSystemTime);
+        void OnClockStop(
+            [In] long hnsSystemTime
+            );
 
-        void OnClockPause([In] long hnsSystemTime);
+        void OnClockPause(
+            [In] long hnsSystemTime
+            );
 
-        void OnClockRestart([In] long hnsSystemTime);
+        void OnClockRestart(
+            [In] long hnsSystemTime
+            );
 
-        void OnClockSetRate([In] long hnsSystemTime, [In] float flRate);
+        void OnClockSetRate(
+            [In] long hnsSystemTime, 
+            [In] float flRate
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -3909,6 +3867,104 @@ namespace MediaFoundation
         void MonitorEnable();
 
         void Cancel();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("6EF2A660-47C0-4666-B13D-CBB717F2FA2C"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFMediaSink
+    {
+        void GetCharacteristics(
+            out MFMediaSinkCharacteristics pdwCharacteristics
+            );
+
+        void AddStreamSink(
+            [In] int dwStreamSinkIdentifier,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
+            );
+
+        void RemoveStreamSink(
+            [In] int dwStreamSinkIdentifier
+            );
+
+        void GetStreamSinkCount(
+            out int pcStreamSinkCount
+            );
+
+        void GetStreamSinkByIndex(
+            [In] int dwIndex,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
+            );
+
+        void GetStreamSinkById(
+            [In] int dwStreamSinkIdentifier,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
+            );
+
+        void SetPresentationClock(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
+            );
+
+        void GetPresentationClock(
+            [MarshalAs(UnmanagedType.Interface)] out IMFPresentationClock ppPresentationClock
+            );
+
+        void Shutdown();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("0A97B3CF-8E7C-4A3D-8F8C-0C843DC247FB"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFStreamSink : IMFMediaEventGenerator
+    {
+        #region IMFMediaEventGenerator methods
+
+        new void GetEvent(
+            [In] MFEventFlag dwFlags,
+            [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
+            );
+
+        new void BeginGetEvent(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object o);
+
+        new void EndGetEvent(
+            IMFAsyncResult pResult,
+            out IMFMediaEvent ppEvent);
+
+        new void QueueEvent(
+            [In] MediaEventType met,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
+            [In] int hrStatus,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
+            );
+
+        #endregion
+
+        void GetMediaSink(
+            [MarshalAs(UnmanagedType.Interface)] out IMFMediaSink ppMediaSink
+            );
+
+        void GetIdentifier(
+            out int pdwIdentifier
+            );
+
+        void GetMediaTypeHandler(
+            [MarshalAs(UnmanagedType.Interface)] out IMFMediaTypeHandler ppHandler
+            );
+
+        void ProcessSample(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFSample pSample
+            );
+
+        void PlaceMarker(
+            [In] MFStreamSinkMarkerType eMarkerType,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarMarkerValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarContextValue
+            );
+
+        void Flush();
     }
 
     #endregion

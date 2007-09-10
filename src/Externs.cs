@@ -468,16 +468,16 @@ namespace MediaFoundation
         public static extern void MFCreateASFProfile(
             out IMFASFProfile ppIProfile);
 
-#if ALLOW_UNTESTED_INTERFACES
-
-        #region Tested
-        // While these methods are tested, the interfaces they use are not
-
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateAudioRenderer(
             IMFAttributes pAudioAttributes,
             out IMFMediaSink ppSink
         );
+
+#if ALLOW_UNTESTED_INTERFACES
+
+        #region Tested
+        // While these methods are tested, the interfaces they use are not
 
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateTopoLoader(

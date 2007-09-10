@@ -81,7 +81,7 @@ namespace MediaFoundation
     Guid("D182108F-4EC6-443F-AA42-A71106EC825F")]
     public interface IMFMediaStreamAlt : IMFMediaEventGeneratorAlt
     {
-        #region IMFMediaEventGenerator methods
+        #region IMFMediaEventGeneratorAlt methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -170,7 +170,7 @@ namespace MediaFoundation
     Guid("279A808D-AEC7-40C8-9C6B-A6B492C78A66")]
     public interface IMFMediaSourceAlt : IMFMediaEventGeneratorAlt
     {
-        #region IMFMediaEventGenerator methods
+        #region IMFMediaEventGeneratorAlt methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -224,7 +224,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFStreamSinkAlt : IMFMediaEventGeneratorAlt
     {
-        #region IMFMediaEventGenerator methods
+        #region IMFMediaEventGeneratorAlt methods
 
         new void GetEvent(
             [In] MFEventFlag dwFlags,
@@ -324,7 +324,7 @@ namespace MediaFoundation
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFFinalizableMediaSinkAlt : IMFMediaSinkAlt
     {
-        #region IMFMediaSink methods
+        #region IMFMediaSinkAlt methods
 
         new void GetCharacteristics(
             out MFMediaSinkCharacteristics pdwCharacteristics);

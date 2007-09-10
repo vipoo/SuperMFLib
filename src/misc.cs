@@ -152,20 +152,6 @@ namespace MediaFoundation.Misc
         TopBackRight = 0x20000
     }
 
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("BLOB")]
-    public struct Blob
-    {
-        public int cbSize;
-        public IntPtr pBlobData;
-    }
-
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("CALPWSTR")]
-    public struct CALPWstr
-    {
-        public int cElems;
-        public IntPtr pElems;
-    }
-
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("PROPERTYKEY")]
     public class PropertyKey
     {

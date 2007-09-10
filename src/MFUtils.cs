@@ -50,15 +50,34 @@ namespace MediaFoundation.Misc
     {
         public enum VariantType : short
         {
-            None = 0x0,
-            Blob = 0x1011,
-            Double = 0x5,
-            Guid = 0x48,
+            None = 0,
+            Short = 2,
+            Int32 = 3,
+            Float = 4,
+            Double = 5,
             IUnknown = 13,
-            String = 0x1f,
-            Uint32 = 0x13,
-            Uint64 = 0x15,
-            StringArray = 0x1000 + 0x1f
+            UShort = 18,
+            Uint32 = 19,
+            Int64 = 20,
+            Uint64 = 21,
+            String = 31,
+            Guid = 72,
+            Blob = 0x1000 + 17,
+            StringArray = 0x1000 + 31
+        }
+
+        [StructLayout(LayoutKind.Sequential), UnmanagedName("BLOB")]
+        protected struct Blob
+        {
+            public int cbSize;
+            public IntPtr pBlobData;
+        }
+
+        [StructLayout(LayoutKind.Sequential), UnmanagedName("CALPWSTR")]
+        protected struct CALPWstr
+        {
+            public int cElems;
+            public IntPtr pElems;
         }
 
         #region Member variables
@@ -76,10 +95,25 @@ namespace MediaFoundation.Misc
         protected short reserved3;
 
         [FieldOffset(8)]
+        protected short iVal;
+
+        [FieldOffset(8), CLSCompliant(false)]
+        protected ushort uiVal;
+
+        [FieldOffset(8)]
         protected int intValue;
+
+        [FieldOffset(8), CLSCompliant(false)]
+        protected uint uintVal;
+
+        [FieldOffset(8)]
+        protected float fltVal;
 
         [FieldOffset(8)]
         protected long longValue;
+
+        [FieldOffset(8), CLSCompliant(false)]
+        protected ulong ulongValue;
 
         [FieldOffset(8)]
         protected double doubleValue;
@@ -91,7 +125,7 @@ namespace MediaFoundation.Misc
         protected IntPtr ptr;
 
         [FieldOffset(8)]
-        protected CALPWstr calpwstr;
+        protected CALPWstr calpwstrVal;
 
         #endregion
 
@@ -115,9 +149,31 @@ namespace MediaFoundation.Misc
             return f.GetStringArray();
         }
 
+        public static explicit operator short(ConstPropVariant f)
+        {
+            return f.GetShort();
+        }
+
+        [CLSCompliant(false)]
+        public static explicit operator ushort(ConstPropVariant f)
+        {
+            return f.GetUShort();
+        }
+
         public static explicit operator int(ConstPropVariant f)
         {
             return f.GetInt();
+        }
+
+        [CLSCompliant(false)]
+        public static explicit operator uint(ConstPropVariant f)
+        {
+            return f.GetUInt();
+        }
+
+        public static explicit operator float(ConstPropVariant f)
+        {
+            return f.GetFloat();
         }
 
         public static explicit operator double(ConstPropVariant f)
@@ -128,6 +184,12 @@ namespace MediaFoundation.Misc
         public static explicit operator long(ConstPropVariant f)
         {
             return f.GetLong();
+        }
+
+        [CLSCompliant(false)]
+        public static explicit operator ulong(ConstPropVariant f)
+        {
+            return f.GetULong();
         }
 
         public static explicit operator Guid(ConstPropVariant f)
@@ -171,12 +233,12 @@ namespace MediaFoundation.Misc
             {
                 string[] sa;
 
-                int iCount = calpwstr.cElems;
+                int iCount = calpwstrVal.cElems;
                 sa = new string[iCount];
 
                 for (int x = 0; x < iCount; x++)
                 {
-                    sa[x] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(calpwstr.pElems, x * IntPtr.Size));
+                    sa[x] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(calpwstrVal.pElems, x * IntPtr.Size));
                 }
 
                 return sa;
@@ -193,22 +255,70 @@ namespace MediaFoundation.Misc
             throw new ArgumentException("PropVariant contents not a string");
         }
 
+        public short GetShort()
+        {
+            if (type == VariantType.Short)
+            {
+                return iVal;
+            }
+            throw new ArgumentException("PropVariant contents not an Short");
+        }
+
+        [CLSCompliant(false)]
+        public ushort GetUShort()
+        {
+            if (type == VariantType.UShort)
+            {
+                return uiVal;
+            }
+            throw new ArgumentException("PropVariant contents not an UShort");
+        }
+
         public int GetInt()
         {
-            if (type == VariantType.Uint32)
+            if (type == VariantType.Int32)
             {
                 return intValue;
             }
             throw new ArgumentException("PropVariant contents not an int32");
         }
 
+        [CLSCompliant(false)]
+        public uint GetUInt()
+        {
+            if (type == VariantType.Uint32)
+            {
+                return this.uintVal;
+            }
+            throw new ArgumentException("PropVariant contents not an uint32");
+        }
+
         public long GetLong()
         {
-            if (type == VariantType.Uint64)
+            if (type == VariantType.Int64)
             {
                 return longValue;
             }
             throw new ArgumentException("PropVariant contents not an int64");
+        }
+
+        [CLSCompliant(false)]
+        public ulong GetULong()
+        {
+            if (type == VariantType.Uint64)
+            {
+                return ulongValue;
+            }
+            throw new ArgumentException("PropVariant contents not an uint64");
+        }
+
+        public float GetFloat()
+        {
+            if (type == VariantType.Float)
+            {
+                return fltVal;
+            }
+            throw new ArgumentException("PropVariant contents not a Float");
         }
 
         public double GetDouble()
@@ -612,19 +722,45 @@ namespace MediaFoundation.Misc
         {
             type = VariantType.StringArray;
 
-            calpwstr.cElems = value.Length;
-            calpwstr.pElems = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
+            calpwstrVal.cElems = value.Length;
+            calpwstrVal.pElems = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
 
             for (int x = 0; x < value.Length; x++)
             {
-                Marshal.WriteIntPtr(calpwstr.pElems, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
+                Marshal.WriteIntPtr(calpwstrVal.pElems, x * IntPtr.Size, Marshal.StringToCoTaskMemUni(value[x]));
             }
+        }
+
+        public PropVariant(short value)
+        {
+            type = VariantType.Short;
+            iVal = value;
+        }
+
+        [CLSCompliant(false)]
+        public PropVariant(ushort value)
+        {
+            type = VariantType.UShort;
+            uiVal = value;
         }
 
         public PropVariant(int value)
         {
-            type = VariantType.Uint32;
+            type = VariantType.Int32;
             intValue = value;
+        }
+
+        [CLSCompliant(false)]
+        public PropVariant(uint value)
+        {
+            type = VariantType.Uint32;
+            uintVal = value;
+        }
+
+        public PropVariant(float value)
+        {
+            type = VariantType.Float;
+            fltVal = value;
         }
 
         public PropVariant(double value)
@@ -635,8 +771,15 @@ namespace MediaFoundation.Misc
 
         public PropVariant(long value)
         {
-            type = VariantType.Uint64;
+            type = VariantType.Int64;
             longValue = value;
+        }
+
+        [CLSCompliant(false)]
+        public PropVariant(ulong value)
+        {
+            type = VariantType.Uint64;
+            ulongValue = value;
         }
 
         public PropVariant(Guid value)
@@ -1154,7 +1297,7 @@ namespace MediaFoundation.Misc
         }
     }
 
-    [StructLayout(LayoutKind.Explicit, Pack = 1), UnmanagedName("WAVEFORMATEX")]
+    [StructLayout(LayoutKind.Explicit, Pack = 1), UnmanagedName("WAVEFORMATEXTENSIBLE")]
     public class WaveFormatExtensible : WaveFormatEx
     {
         [FieldOffset(0)]

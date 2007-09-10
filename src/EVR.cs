@@ -35,6 +35,23 @@ namespace MediaFoundation.EVR
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [UnmanagedName("Unnamed enum")]
+    public enum DXVA2Filters
+    {
+        NoiseFilterLumaLevel = 1,
+        NoiseFilterLumaThreshold = 2,
+        NoiseFilterLumaRadius = 3,
+        NoiseFilterChromaLevel = 4,
+        NoiseFilterChromaThreshold = 5,
+        NoiseFilterChromaRadius = 6,
+        DetailFilterLumaLevel = 7,
+        DetailFilterLumaThreshold = 8,
+        DetailFilterLumaRadius = 9,
+        DetailFilterChromaLevel = 10,
+        DetailFilterChromaThreshold = 11,
+        DetailFilterChromaRadius = 12
+    }
+
     [UnmanagedName("MFVP_MESSAGE_TYPE")]
     public enum MFVPMessageType
     {
@@ -57,6 +74,19 @@ namespace MediaFoundation.EVR
         DownstreamDirect,
         All,
         Global
+    }
+
+    [Flags, UnmanagedName("MFVideoAlphaBitmapFlags")]
+    public enum MFVideoAlphaBitmapFlags
+    {
+        None = 0,
+        EntireDDS = 0x00000001,
+        SrcColorKey = 0x00000002,
+        SrcRect = 0x00000004,
+        DestRect = 0x00000008,
+        FilterMode = 0x00000010,
+        Alpha = 0x00000020,
+        BitMask = 0x0000003f
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_ProcAmpValues")]
@@ -95,7 +125,7 @@ namespace MediaFoundation.EVR
     [StructLayout(LayoutKind.Sequential), UnmanagedName("MFVideoAlphaBitmapParams")]
     public struct MFVideoAlphaBitmapParams
     {
-        int dwFlags;
+        MFVideoAlphaBitmapFlags dwFlags;
         int clrSrcKey;
         RECT rcSrc;
         MFVideoNormalizedRect nrcDest;
@@ -109,6 +139,16 @@ namespace MediaFoundation.EVR
         bool GetBitmapFromDC;
         IntPtr stru;
         MFVideoAlphaBitmapParams paras;
+    }
+
+    [Flags, UnmanagedName("DXVA2_ProcAmp_* defines")]
+    public enum DXVA2ProcAmp
+    {
+        None = 0,
+        Brightness = 0x0001,
+        Contrast = 0x0002,
+        Hue = 0x0004,
+        Saturation = 0x0008
     }
 
 #endif
@@ -188,32 +228,31 @@ namespace MediaFoundation.EVR
             int dwProperty,
             out DXVA2ValueRange pPropRange);
         
-        void GetProcAmpValues( 
-            int dwFlags,
+        void GetProcAmpValues(
+            DXVA2ProcAmp dwFlags,
             out DXVA2ProcAmpValues Values);
         
-        void SetProcAmpValues( 
-            int dwFlags,
+        void SetProcAmpValues(
+            DXVA2ProcAmp dwFlags,
             [In] DXVA2ProcAmpValues pValues);
         
         void GetFilteringRange( 
-            int dwProperty,
+            DXVA2Filters dwProperty,
             out DXVA2ValueRange pPropRange);
         
-        void GetFilteringValue( 
-            int dwProperty,
+        void GetFilteringValue(
+            DXVA2Filters dwProperty,
             out int pValue);
         
-        void SetFilteringValue( 
-            int dwProperty,
+        void SetFilteringValue(
+            DXVA2Filters dwProperty,
             [In] int pValue);
         
         void GetBackgroundColor( 
             out int lpClrBkg);
         
         void SetBackgroundColor( 
-            int ClrBkg);
-        
+            int ClrBkg);        
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -300,7 +339,7 @@ namespace MediaFoundation.EVR
 
         void ProcessMessage(
             MFVPMessageType eMessage,
-            int ulParam
+            IntPtr ulParam
             );
 
         void GetCurrentMediaType(

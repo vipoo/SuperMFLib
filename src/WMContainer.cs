@@ -57,6 +57,13 @@ namespace MediaFoundation
         public short wStreamNumber;
     }
 
+    [Flags, UnmanagedName("MFASF_MULTIPLEXERFLAGS")]
+    public enum MFASFMultiplexerFlags
+    {
+        None = 0,
+        AutoAdjustBitrate = 0x00000001
+    }
+
 #endif
 
     [Flags, UnmanagedName("MFASF_SPLITTERFLAGS")]
@@ -198,10 +205,10 @@ namespace MediaFoundation
             [In] IMFASFContentInfo pIContentInfo);
 
         void SetFlags(
-            [In] int dwFlags);
+            [In] MFASFMultiplexerFlags dwFlags);
 
         void GetFlags(
-            out int pdwFlags);
+            out MFASFMultiplexerFlags pdwFlags);
 
         void ProcessSample(
             [In] short wStreamNumber,
@@ -209,7 +216,7 @@ namespace MediaFoundation
             [In] long hnsTimestampAdjust);
 
         void GetNextPacket(
-            out int pdwStatusFlags,
+            out ASFStatusFlags pdwStatusFlags,
             out IMFSample ppIPacket);
 
         void Flush( );

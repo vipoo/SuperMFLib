@@ -126,11 +126,11 @@ namespace MediaFoundation
         void GetStream(
             [In] int dwStreamIndex,
             out short pwStreamNumber,
-            out short pwStreamFlags);
+            out short pwStreamFlags); // bool
 
         void AddStream(
             [In] short wStreamNumber,
-            [In] short wStreamFlags);
+            [In] short wStreamFlags); // bool
 
         void RemoveStream(
             [In] int dwStreamIndex);

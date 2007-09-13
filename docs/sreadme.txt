@@ -36,5 +36,41 @@ you to use MF to play various media files.
 Samples\WavSource
 --------------------
 A c# implementation of the WavSource sample that ships with the Vista PSDK.  It extends
-Mediafoundation to include support for .wav files.
+Mediafoundation to include support for reading .wav files.
+
+
+MFT_Grayscale
+--------------------
+A c# implementation of the MFT_Grayscale sample that ships with the Vista PSDK.  It allows
+you to modify data as it passes down the topology.
+
+
+PlaybackFX
+--------------------
+A c# implementation of the PlaybackFX sample that ships with the Vista PSDK.  It is the
+same as the BasicPlayer sample, except that it loads the Grayscale MFT into the topology.
+
+
+Playlist
+--------------------
+A c# implementation of the PlaybackFX sample that ships with the Vista PSDK.  It plays a
+collection of media files, one after the other.
+
+
+ProtectedPlayback
+--------------------
+A c# implementation of the ProtectedPlayback sample that ships with the Vista PSDK.  It is the
+same as the BasicPlayer sample, except that it allows for playing protected content.
+
+
+Splitter
+--------------------
+A c# implementation of the code on http://msdn2.microsoft.com/en-us/library/bb530124.aspx.  It
+shows how to parse/process data from WM files.
+
+
+WavSink
+--------------------
+A c# implementation of the WavSink sample that ships with the Vista PSDK.  Is the opposite
+of the WavSource sample: It writes audio output to a .wav file.
 

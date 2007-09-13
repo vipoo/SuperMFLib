@@ -1,4 +1,30 @@
 -----------------------------------------------------------------
+v1.0 Release 1
+
+Interfaces
+
+122 defined
+ 53 tested
+ 11 untestable
+
+Externs
+
+156 defined
+ 70 tested
+ 21 untestable
+
+See interfaces.txt for details.
+
+There have been *significant* changes since beta 2.  Commenting,
+more enums, and some serious re-working of the PropVariant class,
+which affects a number methods.
+
+In addition to testing a bunch more interfaces and externs, I have 
+finished translating 7 of the 8 samples that ship with the the PSDK, 
+plus 1 sample that only exists in the mf sdk docs.  Note: The samples 
+are in a separate download.  Make sure you grab it too!
+
+-----------------------------------------------------------------
 v.091 beta 2
 
 A few more tested externs (for the GrayScale sample)

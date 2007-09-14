@@ -3632,7 +3632,7 @@ namespace MediaFoundation
     public interface IMFClockStateSink
     {
         void OnClockStart(
-            [In] long hnsSystemTime, 
+            [In] long hnsSystemTime,
             [In] long llClockStartOffset
             );
 
@@ -3649,7 +3649,7 @@ namespace MediaFoundation
             );
 
         void OnClockSetRate(
-            [In] long hnsSystemTime, 
+            [In] long hnsSystemTime,
             [In] float flRate
             );
     }
@@ -3664,8 +3664,8 @@ namespace MediaFoundation
             );
 
         void GetCorrelatedTime(
-            [In] int dwReserved, 
-            out long pllClockTime, 
+            [In] int dwReserved,
+            out long pllClockTime,
             out long phnsSystemTime
             );
 
@@ -3674,7 +3674,7 @@ namespace MediaFoundation
             );
 
         void GetState(
-            [In] int dwReserved, 
+            [In] int dwReserved,
             out MFClockState peClockState
             );
 

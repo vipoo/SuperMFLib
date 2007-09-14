@@ -39,10 +39,10 @@ namespace MediaFoundation.Misc
     /// ConstPropVariant is used for [In] parameters.  This is important since
     /// for [In] parameters, you must *not* clear the PropVariant.  The caller
     /// will need to do that himself.
-    /// 
+    ///
     /// Likewise, if you want to store a copy of a ConstPropVariant, you should
     /// store it to a PropVariant using the PropVariant constructor that takes a
-    /// ConstPropVariant.  If you try to store the ConstPropVariant, when the 
+    /// ConstPropVariant.  If you try to store the ConstPropVariant, when the
     /// caller frees his copy, yours will no longer be valid.
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
@@ -56,10 +56,11 @@ namespace MediaFoundation.Misc
             Float = 4,
             Double = 5,
             IUnknown = 13,
+            UByte = 17,
             UShort = 18,
-            Uint32 = 19,
+            UInt32 = 19,
             Int64 = 20,
-            Uint64 = 21,
+            UInt64 = 21,
             String = 31,
             Guid = 72,
             Blob = 0x1000 + 17,
@@ -100,6 +101,9 @@ namespace MediaFoundation.Misc
         [FieldOffset(8), CLSCompliant(false)]
         protected ushort uiVal;
 
+        [FieldOffset(8), CLSCompliant(false)]
+        protected byte bVal;
+
         [FieldOffset(8)]
         protected int intValue;
 
@@ -134,11 +138,6 @@ namespace MediaFoundation.Misc
             type = VariantType.None;
         }
 
-        ~ConstPropVariant()
-        {
-            Dispose();
-        }
-
         public static explicit operator string(ConstPropVariant f)
         {
             return f.GetString();
@@ -147,6 +146,11 @@ namespace MediaFoundation.Misc
         public static explicit operator string[](ConstPropVariant f)
         {
             return f.GetStringArray();
+        }
+
+        public static explicit operator byte(ConstPropVariant f)
+        {
+            return f.GetUByte();
         }
 
         public static explicit operator short(ConstPropVariant f)
@@ -211,20 +215,29 @@ namespace MediaFoundation.Misc
 
         public MFAttributeType GetMFAttributeType()
         {
-            if (type != VariantType.StringArray)
+            switch (type)
             {
-                return (MFAttributeType)type;
+                case VariantType.None:
+                case VariantType.UInt32:
+                case VariantType.UInt64:
+                case VariantType.Double:
+                case VariantType.Guid:
+                case VariantType.String:
+                case VariantType.Blob:
+                case VariantType.IUnknown:
+                    {
+                        return (MFAttributeType)type;
+                    }
+                default:
+                    {
+                        throw new Exception("Type is not a MFAttributeType");
+                    }
             }
-            throw new Exception("Type is not a MFAttributeType");
         }
 
-        public VariantType GetAttributeType()
+        public VariantType GetVariantType()
         {
-            if (type != VariantType.StringArray)
-            {
-                return type;
-            }
-            throw new Exception("Type is not a MFAttributeType");
+            return type;
         }
 
         public string[] GetStringArray()
@@ -253,6 +266,15 @@ namespace MediaFoundation.Misc
                 return Marshal.PtrToStringUni(ptr);
             }
             throw new ArgumentException("PropVariant contents not a string");
+        }
+
+        public byte GetUByte()
+        {
+            if (type == VariantType.UByte)
+            {
+                return bVal;
+            }
+            throw new ArgumentException("PropVariant contents not a byte");
         }
 
         public short GetShort()
@@ -286,7 +308,7 @@ namespace MediaFoundation.Misc
         [CLSCompliant(false)]
         public uint GetUInt()
         {
-            if (type == VariantType.Uint32)
+            if (type == VariantType.UInt32)
             {
                 return this.uintVal;
             }
@@ -305,7 +327,7 @@ namespace MediaFoundation.Misc
         [CLSCompliant(false)]
         public ulong GetULong()
         {
-            if (type == VariantType.Uint64)
+            if (type == VariantType.UInt64)
             {
                 return ulongValue;
             }
@@ -377,7 +399,7 @@ namespace MediaFoundation.Misc
 
                 case VariantType.Blob:
                     {
-                        const string FormatString = "x2"; // Hex 2 digit format 
+                        const string FormatString = "x2"; // Hex 2 digit format
                         const int MaxEntries = 16;
 
                         byte[] blob = GetBlob();
@@ -407,6 +429,12 @@ namespace MediaFoundation.Misc
                         break;
                     }
 
+                case VariantType.Float:
+                    {
+                        sRet = GetFloat().ToString();
+                        break;
+                    }
+
                 case VariantType.Double:
                     {
                         sRet = GetDouble().ToString();
@@ -431,15 +459,45 @@ namespace MediaFoundation.Misc
                         break;
                     }
 
-                case VariantType.Uint32:
+                case VariantType.Short:
+                    {
+                        sRet = GetShort().ToString();
+                        break;
+                    }
+
+                case VariantType.UByte:
+                    {
+                        sRet = GetUByte().ToString();
+                        break;
+                    }
+
+                case VariantType.UShort:
+                    {
+                        sRet = GetUShort().ToString();
+                        break;
+                    }
+
+                case VariantType.Int32:
                     {
                         sRet = GetInt().ToString();
                         break;
                     }
 
-                case VariantType.Uint64:
+                case VariantType.UInt32:
+                    {
+                        sRet = GetUInt().ToString();
+                        break;
+                    }
+
+                case VariantType.Int64:
                     {
                         sRet = GetLong().ToString();
+                        break;
+                    }
+
+                case VariantType.UInt64:
+                    {
+                        sRet = GetULong().ToString();
                         break;
                     }
 
@@ -482,6 +540,12 @@ namespace MediaFoundation.Misc
                         break;
                     }
 
+                case VariantType.Float:
+                    {
+                        iRet = GetFloat().GetHashCode();
+                        break;
+                    }
+
                 case VariantType.Double:
                     {
                         iRet = GetDouble().GetHashCode();
@@ -506,15 +570,45 @@ namespace MediaFoundation.Misc
                         break;
                     }
 
-                case VariantType.Uint32:
+                case VariantType.UByte:
+                    {
+                        iRet = GetUByte().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Short:
+                    {
+                        iRet = GetShort().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.UShort:
+                    {
+                        iRet = GetUShort().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Int32:
                     {
                         iRet = GetInt().GetHashCode();
                         break;
                     }
 
-                case VariantType.Uint64:
+                case VariantType.UInt32:
+                    {
+                        iRet = GetUInt().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.Int64:
                     {
                         iRet = GetLong().GetHashCode();
+                        break;
+                    }
+
+                case VariantType.UInt64:
+                    {
+                        iRet = GetULong().GetHashCode();
                         break;
                     }
 
@@ -579,6 +673,12 @@ namespace MediaFoundation.Misc
                             break;
                         }
 
+                    case VariantType.Float:
+                        {
+                            bRet = GetFloat() == p.GetFloat();
+                            break;
+                        }
+
                     case VariantType.Double:
                         {
                             bRet = GetDouble() == p.GetDouble();
@@ -603,15 +703,45 @@ namespace MediaFoundation.Misc
                             break;
                         }
 
-                    case VariantType.Uint32:
+                    case VariantType.UByte:
+                        {
+                            bRet = GetUByte() == p.GetUByte();
+                            break;
+                        }
+
+                    case VariantType.Short:
+                        {
+                            bRet = GetShort() == p.GetShort();
+                            break;
+                        }
+
+                    case VariantType.UShort:
+                        {
+                            bRet = GetUShort() == p.GetUShort();
+                            break;
+                        }
+
+                    case VariantType.Int32:
                         {
                             bRet = GetInt() == p.GetInt();
                             break;
                         }
 
-                    case VariantType.Uint64:
+                    case VariantType.UInt32:
+                        {
+                            bRet = GetUInt() == p.GetUInt();
+                            break;
+                        }
+
+                    case VariantType.Int64:
                         {
                             bRet = GetLong() == p.GetLong();
+                            break;
+                        }
+
+                    case VariantType.UInt64:
+                        {
+                            bRet = GetULong() == p.GetULong();
                             break;
                         }
 
@@ -678,7 +808,7 @@ namespace MediaFoundation.Misc
 
         public void Dispose()
         {
-            // If we are a ConstPropVariant, we must *not* call PropVariantClear.  That 
+            // If we are a ConstPropVariant, we must *not* call PropVariantClear.  That
             // would release the *caller's* copy of the data, which would probably make
             // him cranky.  If we are a PropVariant, the PropVariant.Dispose gets called
             // as well, which *does* do a PropVariantClear.
@@ -733,6 +863,12 @@ namespace MediaFoundation.Misc
             }
         }
 
+        public PropVariant(byte value)
+        {
+            type = VariantType.UByte;
+            bVal = value;
+        }
+
         public PropVariant(short value)
         {
             type = VariantType.Short;
@@ -755,7 +891,7 @@ namespace MediaFoundation.Misc
         [CLSCompliant(false)]
         public PropVariant(uint value)
         {
-            type = VariantType.Uint32;
+            type = VariantType.UInt32;
             uintVal = value;
         }
 
@@ -780,7 +916,7 @@ namespace MediaFoundation.Misc
         [CLSCompliant(false)]
         public PropVariant(ulong value)
         {
-            type = VariantType.Uint64;
+            type = VariantType.UInt64;
             ulongValue = value;
         }
 
@@ -856,7 +992,7 @@ namespace MediaFoundation.Misc
         #endregion
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    [StructLayout(LayoutKind.Sequential)]
     public class FourCC
     {
         protected const string m_SubTypeExtension = "-0000-0010-8000-00aa00389b71";
@@ -963,7 +1099,7 @@ namespace MediaFoundation.Misc
         {
             char c;
             char[] ca = new char[4];
-            
+
             c = Convert.ToChar(m_fourCC & 255);
             if (!Char.IsLetterOrDigit(c))
             {
@@ -1034,7 +1170,7 @@ namespace MediaFoundation.Misc
 
                 int iExtraBytes = pData.cbSize - (iExtensibleSize - iWaveFormatExSize);
 
-                // Account for copying the array.  This may result in us allocating more bytes than we 
+                // Account for copying the array.  This may result in us allocating more bytes than we
                 // need (if cbSize < IntPtr.Size), but it prevents us from overrunning the buffer.
                 int iUseSize = Math.Max(iExtraBytes, IntPtr.Size);
 
@@ -1068,7 +1204,7 @@ namespace MediaFoundation.Misc
                 // WaveFormatExWithData - Have to copy the byte array too
                 WaveFormatExWithData pData = this as WaveFormatExWithData;
 
-                // Account for copying the array.  This may result in us allocating more bytes than we 
+                // Account for copying the array.  This may result in us allocating more bytes than we
                 // need (if cbSize < IntPtr.Size), but it prevents us from overrunning the buffer.
                 int iUseSize = Math.Max(pData.cbSize, IntPtr.Size);
 
@@ -1424,7 +1560,7 @@ namespace MediaFoundation.Misc
                 // BitmapInfoHeaderWithData - Have to copy the array too
                 BitmapInfoHeaderWithData pData = this as BitmapInfoHeaderWithData;
 
-                // Account for copying the array.  This may result in us allocating more bytes than we 
+                // Account for copying the array.  This may result in us allocating more bytes than we
                 // need (if cbSize < IntPtr.Size), but it prevents us from overrunning the buffer.
                 int iUseSize = Math.Max(pData.bmiColors.Length * 4, IntPtr.Size);
 
@@ -1560,7 +1696,7 @@ namespace MediaFoundation.Misc
             return m_value;
         }
 
-        // While I *could* enable this code, it almost certainly won't do what you 
+        // While I *could* enable this code, it almost certainly won't do what you
         // think it will.  Generally you don't want to create a *new* instance of
         // MFInt and assign a value to it.  You want to assign a value to an
         // existing instance.  In order to do this automatically, .Net would have
@@ -2124,7 +2260,7 @@ namespace MediaFoundation.Misc
                 // Release any memory currently allocated
                 m_prop.Clear();
 
-                // Create an appropriately sized buffer, blank it, and send it to 
+                // Create an appropriately sized buffer, blank it, and send it to
                 // the marshaler to make the COM call with.
                 int iSize = GetNativeDataSize();
                 p = Marshal.AllocCoTaskMem(iSize);
@@ -2209,7 +2345,7 @@ namespace MediaFoundation.Misc
             }
             else
             {
-                // Save off the object.  We'll be calling methods on this in 
+                // Save off the object.  We'll be calling methods on this in
                 // MarshalNativeToManaged.
                 m_array = managedObj as ArrayList;
 
@@ -2331,7 +2467,7 @@ namespace MediaFoundation.Misc
 
             int iSize = Marshal.SizeOf(typeof(MFTRegisterTypeInfo));
 
-            // Save off the object.  We'll be calling methods on this in 
+            // Save off the object.  We'll be calling methods on this in
             // MarshalNativeToManaged.
             MFTRegisterTypeInfo[] array = managedObj as MFTRegisterTypeInfo[];
 
@@ -2401,7 +2537,7 @@ namespace MediaFoundation.Misc
             }
             else
             {
-                // Save off the object.  We'll be calling methods on this in 
+                // Save off the object.  We'll be calling methods on this in
                 // MarshalNativeToManaged.
                 m_array = managedObj as ArrayList;
 

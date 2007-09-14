@@ -184,19 +184,19 @@ namespace MediaFoundation.Misc
     Guid("71604b0f-97b0-4764-8577-2f13e98a1422")]
     public interface INamedPropertyStore
     {
-        void GetNamedValue( 
+        void GetNamedValue(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
         );
-        
-        void SetNamedValue( 
+
+        void SetNamedValue(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant propvar);
-        
-        void GetNameCount( 
+
+        void GetNameCount(
             out int pdwCount);
-        
-        void GetNameAt( 
+
+        void GetNameAt(
             int iProp,
             [MarshalAs(UnmanagedType.BStr)] out string pbstrName);
     }

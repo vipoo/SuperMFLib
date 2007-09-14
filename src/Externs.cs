@@ -190,10 +190,10 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In] int Flags, // Must be zero
             [In] int cInputTypes,
-            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(RTAMarshaler))] 
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(RTAMarshaler))]
             object pInputTypes, // should be MFTRegisterTypeInfo[], but .Net bug prevents in x64
             [In] int cOutputTypes,
-            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(RTAMarshaler))] 
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(RTAMarshaler))]
             object pOutputTypes, // should be MFTRegisterTypeInfo[], but .Net bug prevents in x64
             [In] IMFAttributes pAttributes
             );
@@ -207,13 +207,13 @@ namespace MediaFoundation
         public static extern void MFTGetInfo(
             [In, MarshalAs(UnmanagedType.Struct)] Guid clsidMFT,
             [MarshalAs(UnmanagedType.LPWStr)] out string pszName,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(RTIMarshaler))] 
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(RTIMarshaler))]
             ArrayList ppInputTypes,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(RTIMarshaler))] 
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(RTIMarshaler))]
             MFInt pcInputTypes,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "1", MarshalTypeRef = typeof(RTIMarshaler))] 
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "1", MarshalTypeRef = typeof(RTIMarshaler))]
             ArrayList ppOutputTypes,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "1", MarshalTypeRef = typeof(RTIMarshaler))] 
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "1", MarshalTypeRef = typeof(RTIMarshaler))]
             MFInt pcOutputTypes,
             IntPtr ip // Must be IntPtr.Zero due to MF bug, but should be out IMFAttributes ppAttributes
             );
@@ -422,9 +422,9 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pInputType,
             [In, MarshalAs(UnmanagedType.LPStruct)] MFTRegisterTypeInfo pOutputType,
             [In] IMFAttributes pAttributes,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]
             ArrayList ppclsidMFT,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]             
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = "0", MarshalTypeRef = typeof(GAMarshaler))]
             MFInt pcMFTs
             );
 

@@ -192,67 +192,66 @@ namespace MediaFoundation.EVR
     Guid("814C7B20-0FDB-4eec-AF8F-F957C8F69EDC")]
     public interface IMFVideoMixerBitmap
     {
-        void SetAlphaBitmap( 
+        void SetAlphaBitmap(
             [In] MFVideoAlphaBitmap pBmpParms);
-        
+
         void ClearAlphaBitmap( );
-        
-        void UpdateAlphaBitmapParameters( 
+
+        void UpdateAlphaBitmapParameters(
             [In] MFVideoAlphaBitmapParams pBmpParms);
-        
-        void GetAlphaBitmapParameters( 
+
+        void GetAlphaBitmapParameters(
             out MFVideoAlphaBitmapParams pBmpParms);
-        
     }
-    
+
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("6AB0000C-FECE-4d1f-A2AC-A9573530656E")]
     public interface IMFVideoProcessor
     {
-        void GetAvailableVideoProcessorModes( 
+        void GetAvailableVideoProcessorModes(
             out int lpdwNumProcessingModes,
             out IntPtr ppVideoProcessingModes);
-        
-        void GetVideoProcessorCaps( 
+
+        void GetVideoProcessorCaps(
             [In] Guid lpVideoProcessorMode,
             out DXVA2VideoProcessorCaps lpVideoProcessorCaps);
-        
-        void GetVideoProcessorMode( 
+
+        void GetVideoProcessorMode(
             out Guid lpMode);
-        
+
         void SetVideoProcessorMode(
             [In] Guid lpMode);
-        
-        void GetProcAmpRange( 
+
+        void GetProcAmpRange(
             int dwProperty,
             out DXVA2ValueRange pPropRange);
-        
+
         void GetProcAmpValues(
             DXVA2ProcAmp dwFlags,
             out DXVA2ProcAmpValues Values);
-        
+
         void SetProcAmpValues(
             DXVA2ProcAmp dwFlags,
             [In] DXVA2ProcAmpValues pValues);
-        
-        void GetFilteringRange( 
+
+        void GetFilteringRange(
             DXVA2Filters dwProperty,
             out DXVA2ValueRange pPropRange);
-        
+
         void GetFilteringValue(
             DXVA2Filters dwProperty,
             out int pValue);
-        
+
         void SetFilteringValue(
             DXVA2Filters dwProperty,
             [In] int pValue);
-        
-        void GetBackgroundColor( 
+
+        void GetBackgroundColor(
             out int lpClrBkg);
-        
-        void SetBackgroundColor( 
-            int ClrBkg);        
+
+        void SetBackgroundColor(
+            int ClrBkg);
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,

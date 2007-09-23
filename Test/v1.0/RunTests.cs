@@ -121,6 +121,9 @@ namespace Testv10
 
                 //IMFASFMutualExclusionTest t33 = new IMFASFMutualExclusionTest();
                 //t33.DoTests();
+
+                //IMFAsfIndexerTest t34 = new IMFAsfIndexerTest();
+                //t34.DoTests();
             }
             catch (Exception e)
             {

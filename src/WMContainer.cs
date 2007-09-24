@@ -41,27 +41,11 @@ namespace MediaFoundation
         AutoAdjustBitrate = 0x00000001
     }
 
-    [Flags, UnmanagedName("MFASF_INDEXERFLAGS")]
-    public enum MFAsfIndexerFlags
-    {
-        None = 0x0,
-        WriteNewIndex = 0x00000001,
-        ReadForReversePlayback = 0x00000004,
-        WriteForLiveRead = 0x00000008
-    }
-
     [StructLayout(LayoutKind.Sequential), UnmanagedName("ASF_MUX_STATISTICS")]
     public struct ASFMuxStatistics
     {
         public int cFramesWritten;
         public int cFramesDropped;
-    }
-
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("ASF_INDEX_IDENTIFIER")]
-    public class ASFIndexIdentifier
-    {
-        public Guid guidIndexType;
-        public short wStreamNumber;
     }
 
 #endif
@@ -95,6 +79,22 @@ namespace MediaFoundation
         NotSelected = 0,
         CleanPointsOnly = 1,
         AllDataUnits = 2
+    }
+
+    [Flags, UnmanagedName("MFASF_INDEXERFLAGS")]
+    public enum MFAsfIndexerFlags
+    {
+        None = 0x0,
+        WriteNewIndex = 0x00000001,
+        ReadForReversePlayback = 0x00000004,
+        WriteForLiveRead = 0x00000008
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("ASF_INDEX_IDENTIFIER")]
+    public class ASFIndexIdentifier
+    {
+        public Guid guidIndexType;
+        public short wStreamNumber;
     }
 
     public sealed class MFASFSampleExtension
@@ -137,63 +137,6 @@ namespace MediaFoundation
 
         void Clone(
             out IMFASFStreamPrioritization ppIStreamPrioritization);
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("53590F48-DC3B-4297-813F-787761AD7B3E"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFASFIndexer
-    {
-        void SetFlags(
-            [In] MFAsfIndexerFlags dwFlags);
-
-        void GetFlags(
-            out MFAsfIndexerFlags pdwFlags);
-
-        void Initialize(
-            [In] IMFASFContentInfo pIContentInfo);
-
-        void GetIndexPosition(
-            [In] IMFASFContentInfo pIContentInfo,
-            out long pcbIndexOffset);
-
-        void SetIndexByteStreams(
-            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.IUnknown)] IMFByteStream[] ppIByteStreams,
-            [In] int cByteStreams);
-
-        void GetIndexByteStreamCount(
-            out int pcByteStreams);
-
-        void GetIndexStatus(
-            [In, MarshalAs(UnmanagedType.LPStruct)] ASFIndexIdentifier pIndexIdentifier,
-            out bool pfIsIndexed,
-            IntPtr pbIndexDescriptor,
-            ref int pcbIndexDescriptor);
-
-        void SetIndexStatus(
-            [In] IntPtr pbIndexDescriptor,
-            [In] int cbIndexDescriptor,
-            [In] bool fGenerateIndex);
-
-        void GetSeekPositionForValue(
-            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarValue,
-            [In, MarshalAs(UnmanagedType.LPStruct)] ASFIndexIdentifier pIndexIdentifier,
-            out long pcbOffsetWithinData,
-            IntPtr phnsApproxTime,
-            out int pdwPayloadNumberOfStreamWithinPacket);
-
-        void GenerateIndexEntries(
-            [In] IMFSample pIASFPacketSample);
-
-        void CommitIndex(
-            [In] IMFASFContentInfo pIContentInfo);
-
-        void GetIndexWriteSpace(
-            out long pcbIndexWriteSpace);
-
-        void GetCompletedIndex(
-            [In] IMFMediaBuffer pIIndexBuffer,
-            [In] long cbOffsetWithinIndex);
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -820,6 +763,63 @@ namespace MediaFoundation
         void GetEncodingConfigurationPropertyStore(
             [In] short wStreamNumber,
             out IPropertyStore ppIStore);
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("53590F48-DC3B-4297-813F-787761AD7B3E"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFASFIndexer
+    {
+        void SetFlags(
+            [In] MFAsfIndexerFlags dwFlags);
+
+        void GetFlags(
+            out MFAsfIndexerFlags pdwFlags);
+
+        void Initialize(
+            [In] IMFASFContentInfo pIContentInfo);
+
+        void GetIndexPosition(
+            [In] IMFASFContentInfo pIContentInfo,
+            out long pcbIndexOffset);
+
+        void SetIndexByteStreams(
+            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown)] IMFByteStream[] ppIByteStreams,
+            [In] int cByteStreams);
+
+        void GetIndexByteStreamCount(
+            out int pcByteStreams);
+
+        void GetIndexStatus(
+            [In, MarshalAs(UnmanagedType.LPStruct)] ASFIndexIdentifier pIndexIdentifier,
+            out bool pfIsIndexed,
+            IntPtr pbIndexDescriptor,
+            ref int pcbIndexDescriptor);
+
+        void SetIndexStatus(
+            [In] IntPtr pbIndexDescriptor,
+            [In] int cbIndexDescriptor,
+            [In] bool fGenerateIndex);
+
+        void GetSeekPositionForValue(
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarValue,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ASFIndexIdentifier pIndexIdentifier,
+            out long pcbOffsetWithinData,
+            IntPtr phnsApproxTime,
+            out int pdwPayloadNumberOfStreamWithinPacket);
+
+        void GenerateIndexEntries(
+            [In] IMFSample pIASFPacketSample);
+
+        void CommitIndex(
+            [In] IMFASFContentInfo pIContentInfo);
+
+        void GetIndexWriteSpace(
+            out long pcbIndexWriteSpace);
+
+        void GetCompletedIndex(
+            [In] IMFMediaBuffer pIIndexBuffer,
+            [In] long cbOffsetWithinIndex);
     }
 
     #endregion

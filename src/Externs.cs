@@ -474,6 +474,10 @@ namespace MediaFoundation
             out IMFMediaSink ppSink
         );
 
+        [DllImport("mf.dll", PreserveSig = false)]
+        public static extern void MFCreateASFIndexer(
+            out IMFASFIndexer ppIIndexer);
+
 #if ALLOW_UNTESTED_INTERFACES
 
         #region Tested
@@ -498,10 +502,6 @@ namespace MediaFoundation
         [DllImport("mf.dll", PreserveSig = false)]
         public static extern void MFCreateASFMultiplexer(
             out IMFASFMultiplexer ppIMultiplexer);
-
-        [DllImport("mf.dll", PreserveSig = false)]
-        public static extern void MFCreateASFIndexer(
-            out IMFASFIndexer ppIIndexer);
 
         #endregion
 

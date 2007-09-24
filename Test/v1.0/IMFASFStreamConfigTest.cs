@@ -15,7 +15,6 @@ namespace Testv10
     {
         private IMFASFStreamConfig m_sc;
 
-#if ALLOW_UNTESTED_INTERFACES
         public void DoTests()
         {
             GetInterface();
@@ -99,6 +98,6 @@ namespace Testv10
 
             ap.CreateStream(mt, out m_sc);
         }
-#endif
+
     }
 }

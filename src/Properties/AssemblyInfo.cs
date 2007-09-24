@@ -39,7 +39,7 @@ using System.Security.Permissions;
 #if DEBUG
 [assembly: AssemblyProduct("Debug Version")]
 #else
-[assembly : AssemblyProduct("BETA Release Version")]
+[assembly : AssemblyProduct("Release Version")]
 #endif
 [assembly: AssemblyCopyright("GNU Lesser General Public License v2.1")]
 [assembly: AssemblyTrademark("")]

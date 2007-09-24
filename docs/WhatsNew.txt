@@ -1,23 +1,23 @@
 -----------------------------------------------------------------
-v1.0 Release 1
+v1.0 Release 1 (2007-09-23)
 
 Interfaces
 
-122 defined
- 53 tested
+123 defined
+ 55 tested
  11 untestable
 
 Externs
 
 156 defined
- 70 tested
+ 71 tested
  21 untestable
 
 See interfaces.txt for details.
 
 There have been *significant* changes since beta 2.  Commenting,
 more enums, and some serious re-working of the PropVariant class,
-which affects a number methods.
+which affects a number of methods.
 
 In addition to testing a bunch more interfaces and externs, I have 
 finished translating 7 of the 8 samples that ship with the the PSDK, 

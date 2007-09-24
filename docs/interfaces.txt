@@ -6,12 +6,13 @@ This doc describes the status of each of these.
 
 ======================== Interfaces ====================================
 
-These 44 interfaces have been tested (7 of these are duplicates to deal with MF bug)
+These 46 interfaces have been tested (7 of these are duplicates to deal with MF bug)
 
 IEVRFilterConfig
 IMF2DBuffer
 IMFActivate
 IMFASFContentInfo
+IMFASFIndexer
 IMFASFMutualExclusion
 IMFASFProfile
 IMFASFSplitter
@@ -32,17 +33,12 @@ IMFGetService
 IMFMediaBuffer
 IMFMediaEvent
 IMFMediaEventGenerator
-IMFMediaEventGeneratorAlt
 IMFMediaEventQueue
-IMFMediaEventQueueAlt
 IMFMediaSession
 IMFMediaSink
-IMFMediaSinkAlt
 IMFMediaSource
-IMFMediaSourceAlt
 IMFMediaSourceTopologyProvider
 IMFMediaStream
-IMFMediaStreamAlt
 IMFMediaType
 IMFMediaTypeHandler
 IMFPresentationClock
@@ -53,7 +49,6 @@ IMFSequencerSource
 IMFSourceResolver
 IMFStreamDescriptor
 IMFStreamSink
-IMFStreamSinkAlt
 IMFTopology
 IMFTopologyNode
 IMFTransform
@@ -69,9 +64,8 @@ IPropertyStore
 INamedPropertyStore
 
 ------------------------------------------------------------------------------
-These 58 interfaces are defined in the library, but have not yet been tested.
+These 57 interfaces are defined in the library, but have not yet been tested.
 
-IMFASFIndexer
 IEVRTrustedVideoPlugin
 IMFASFMultiplexer
 IMFAudioPolicy
@@ -155,7 +149,7 @@ IDirectXVideoProcessorService
 
 ====================== Externs ===========================
 
-These 70 externs are tested
+These 71 externs are tested
 
 CreateNamedPropertyStore
 CreatePropertyStore
@@ -165,6 +159,7 @@ MFCancelCreateFile
 MFCreateAlignedMemoryBuffer
 MFCreateAMMediaTypeFromMFMediaType
 MFCreateASFContentInfo
+MFCreateASFIndexer
 MFCreateASFProfile
 MFCreateASFSplitter
 MFCreateAsyncResult
@@ -229,7 +224,7 @@ MFUnlockPlatform
 MFUnlockWorkQueue
 
 ------------------------------------------------------------------------------
-These 65 externs are defined in the library, but have not yet been tested.
+These 64 externs are defined in the library, but have not yet been tested.
 
 MFAddPeriodicCallback
 MFAverageTimePerFrameToFrameRate
@@ -244,7 +239,6 @@ MFConvertColorInfoToDXVA
 MFConvertFromFP16Array
 MFConvertToFP16Array
 MFCopyImage
-MFCreateASFIndexer
 MFCreateASFIndexerByteStream
 MFCreateASFMediaSink
 MFCreateASFMediaSinkActivate

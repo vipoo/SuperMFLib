@@ -1262,62 +1262,6 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("EAECB74A-9A50-42CE-9541-6A7F57AA4AD7"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFFinalizableMediaSink : IMFMediaSink
-    {
-        #region IMFMediaSink methods
-
-        new void GetCharacteristics(
-            out MFMediaSinkCharacteristics pdwCharacteristics);
-
-        new void AddStreamSink(
-            [In] int dwStreamSinkIdentifier,
-            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
-            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
-            );
-
-        new void RemoveStreamSink(
-            [In] int dwStreamSinkIdentifier
-            );
-
-        new void GetStreamSinkCount(
-            out int pcStreamSinkCount
-            );
-
-        new void GetStreamSinkByIndex(
-            [In] int dwIndex,
-            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
-            );
-
-        new void GetStreamSinkById(
-            [In] int dwStreamSinkIdentifier,
-            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
-            );
-
-        new void SetPresentationClock(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
-            );
-
-        new void GetPresentationClock(
-            [MarshalAs(UnmanagedType.Interface)] out IMFPresentationClock ppPresentationClock
-            );
-
-        new void Shutdown();
-
-        #endregion
-
-        void BeginFinalize(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
-            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
-            );
-
-        void EndFinalize(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("D19F8E98-B126-4446-890C-5DCB7AD71453"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFInputTrustAuthority
@@ -4058,6 +4002,62 @@ namespace MediaFoundation
             );
 
         void Flush();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("EAECB74A-9A50-42CE-9541-6A7F57AA4AD7"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFFinalizableMediaSink : IMFMediaSink
+    {
+        #region IMFMediaSink methods
+
+        new void GetCharacteristics(
+            out MFMediaSinkCharacteristics pdwCharacteristics);
+
+        new void AddStreamSink(
+            [In] int dwStreamSinkIdentifier,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
+            );
+
+        new void RemoveStreamSink(
+            [In] int dwStreamSinkIdentifier
+            );
+
+        new void GetStreamSinkCount(
+            out int pcStreamSinkCount
+            );
+
+        new void GetStreamSinkByIndex(
+            [In] int dwIndex,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
+            );
+
+        new void GetStreamSinkById(
+            [In] int dwStreamSinkIdentifier,
+            [MarshalAs(UnmanagedType.Interface)] out IMFStreamSink ppStreamSink
+            );
+
+        new void SetPresentationClock(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationClock pPresentationClock
+            );
+
+        new void GetPresentationClock(
+            [MarshalAs(UnmanagedType.Interface)] out IMFPresentationClock ppPresentationClock
+            );
+
+        new void Shutdown();
+
+        #endregion
+
+        void BeginFinalize(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState
+            );
+
+        void EndFinalize(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult
+            );
     }
 
     #endregion

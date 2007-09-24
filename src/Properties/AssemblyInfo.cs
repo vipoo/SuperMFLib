@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 using System.Security.Permissions;
 
 
-[assembly: AssemblyTitle("MediaFoundation Net Library")]
+[assembly: AssemblyTitle("MediaFoundation .Net Library")]
 [assembly: AssemblyDescription(".NET Interfaces for calling MediaFoundation.  See http://mfnet.sourceforge.net/")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]

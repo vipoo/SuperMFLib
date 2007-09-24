@@ -363,7 +363,6 @@ namespace Testv10
             int i1 = 100;
             IntPtr ip = Marshal.AllocCoTaskMem(i1);
             ai.GetIndexStatus(ii, out b, ip, ref i1);
-            //ai.SetIndexStatus(ip, i1, false);
             long l;
             PropVariant pv = new PropVariant(50000000L);
             ai.GetSeekPositionForValue(pv, ii, out l, IntPtr.Zero, out i1);

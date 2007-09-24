@@ -19,7 +19,7 @@ comments, or just want to say thanks to the people who have taken the time to
 create these, feel free to stop by.
 
 Also, if you have samples you think would be useful (or would like to write some), 
-that would be the place to get started.
+that forum would be the place to get started.
 
 =====================================================================================
 

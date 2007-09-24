@@ -9,8 +9,11 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 **************************************************************************/
 
 This sample is a c# version of the PlaybackFX sample included in the
-Media Foundation SDK.  It requires the MFT_GrayScale sample to have
-been built and registered (since that's the transform we use!).
+Media Foundation SDK.  It is the same as the BasicPlayer sample, except 
+that it loads the Grayscale MFT into the topology.
+
+This sample requires the MFT_GrayScale sample to have been built and 
+registered (since that's the transform we use!).
 
 The most significant difference has to do with how error handling is performed.
 See "Error handling" in docs\ReadMe.rtf for details.

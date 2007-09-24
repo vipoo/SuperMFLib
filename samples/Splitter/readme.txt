@@ -12,5 +12,7 @@ This sample is a c# version of the code from the MF docs on MSDN:
 
 http://msdn2.microsoft.com/en-us/library/bb530124.aspx
 
+It shows how to parse/process data from WM files.
+
 The most significant difference has to do with how error handling is performed.
 See "Error handling" in docs\ReadMe.rtf for details.

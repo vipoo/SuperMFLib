@@ -23,9 +23,3 @@ mucked with security.  Instead, I use this command line from a cmd window opened
 with "Run as administrator":
 
 c:\Windows\Microsoft.NET\Framework\v2.0.50727\regasm /tlb /codebase MFT_Grayscale.dll
-
-Also worth noting is that of the 3 different video types the original c++ supports,
-I have only translated 1.  This is solely due to the fact that I haven't yet found
-a video file that contains the other 2 types.  If you want to enable those routines,
-you'll also need to turn on "unsafe" code for the project.
-

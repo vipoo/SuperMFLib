@@ -9,7 +9,8 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 **************************************************************************/
 
 This sample is a c# version of the WavSink sample included in the
-Media Foundation SDK.
+Media Foundation SDK.  Is the opposite of the WavSource sample: It writes 
+audio output to a .wav file.
 
 The most significant difference has to do with how error handling is performed.
 See "Error handling" in docs\ReadMe.rtf for details.
@@ -22,7 +23,7 @@ with "Run as administrator":
 
 c:\Windows\Microsoft.NET\Framework\v2.0.50727\regasm /tlb /codebase WavSink.dll
 
-The way MF loads sinks seems strange (to me).  Look at this comments from the c++ code:
+The way MF loads sinks seems strange (to me).  Look at this comment from the c++ code:
 
 // To use the WavSink, include this header file in an application
 // and link to the library file created by this project.

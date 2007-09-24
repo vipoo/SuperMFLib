@@ -9,7 +9,8 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 **************************************************************************/
 
 This sample is a c# version of the WavSource sample included in the
-Media Foundation SDK.
+Media Foundation SDK.  It extends Mediafoundation to include support for 
+reading .wav files.
 
 The most significant difference has to do with how error handling is performed.
 See "Error handling" in docs\ReadMe.rtf for details.

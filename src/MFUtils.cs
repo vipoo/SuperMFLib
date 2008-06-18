@@ -35,6 +35,37 @@ namespace MediaFoundation.Misc
 {
     #region Wrapper classes
 
+    [StructLayout(LayoutKind.Sequential)]
+    public class MfFloat
+    {
+        private float Value;
+
+        public MfFloat(float Value)
+        {
+            this.Value = Value;
+        }
+
+        public override string ToString()
+        {
+            return this.Value.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Value.GetHashCode();
+        }
+
+        public static implicit operator float(MfFloat l)
+        {
+            return l.Value;
+        }
+
+        public static implicit operator MfFloat(float l)
+        {
+            return new MfFloat(l);
+        }
+    }
+
     /// <summary>
     /// ConstPropVariant is used for [In] parameters.  This is important since
     /// for [In] parameters, you must *not* clear the PropVariant.  The caller

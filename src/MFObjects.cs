@@ -370,6 +370,21 @@ namespace MediaFoundation
         public MFOffset OffsetX;
         public MFOffset OffsetY;
         public SIZE Area;
+
+        public MFVideoArea(float x, float y, int width, int height)
+        {
+            OffsetX = new MFOffset(x);
+            OffsetY = new MFOffset(y);
+            Area = new SIZE(width, height);
+        }
+
+        public void MakeArea(float x, float y, int width, int height)
+        {
+            OffsetX.MakeOffset(x);
+            OffsetY.MakeOffset(y);
+            Area.cx = width;
+            Area.cy = height;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2), UnmanagedName("MFOffset")]
@@ -377,6 +392,18 @@ namespace MediaFoundation
     {
         public short fract;
         public short Value;
+
+        public MFOffset(float v)
+        {
+            Value = (short)v;
+            fract = (short)(65536 * (v - Value));
+        }
+
+        public void MakeOffset(float v)
+        {
+            Value = (short)v;
+            fract = (short)(65536 * (v-Value));
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoInfo")]

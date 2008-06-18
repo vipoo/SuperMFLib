@@ -104,6 +104,35 @@ namespace MediaFoundation.Misc
         TopBackRight = 0x20000
     }
 
+    [UnmanagedName("MFVideoPadFlags")]
+    public enum MFVideoPadFlags
+    {
+        PAD_TO_None = 0,
+        PAD_TO_4x3 = 1,
+        PAD_TO_16x9 = 2
+    }
+
+    [UnmanagedName("MFVideoSrcContentHintFlags")]
+    public enum  MFVideoSrcContentHintFlags
+    {
+        None  = 0,
+        F16x9  = 1,
+        F235_1 = 2
+    }
+
+    [UnmanagedName("MT_CUSTOM_VIDEO_PRIMARIES"), StructLayout(LayoutKind.Sequential)]
+    public struct MT_CustomVideoPrimaries
+    {
+        public float fRx;
+        public float fRy;
+        public float fGx;
+        public float fGy;
+        public float fBx;
+        public float fBy;
+        public float fWx;
+        public float fWy;
+    }
+
     /// <summary>
     /// When you are done with an instance of this class,
     /// it should be released with FreeAMMediaType() to avoid leaking
@@ -164,6 +193,16 @@ namespace MediaFoundation.Misc
     {
         public int cx;
         public int cy;
+
+        public SIZE()
+        {
+        }
+
+        public SIZE(int width, int height)
+        {
+            cx = width;
+            cy = height;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("RECT")]
@@ -173,6 +212,26 @@ namespace MediaFoundation.Misc
         public int top;
         public int right;
         public int bottom;
+
+        public RECT()
+        {
+        }
+
+        public RECT(int l, int t, int r, int b)
+        {
+            left = l;
+            top = t;
+            right = r;
+            bottom = b;
+        }
+
+        public void Empty()
+        {
+            left = 0;
+            top = 0;
+            right = 0;
+            bottom = 0;
+        }
     }
 
     #endregion

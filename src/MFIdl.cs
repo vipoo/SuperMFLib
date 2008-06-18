@@ -2016,7 +2016,7 @@ namespace MediaFoundation
         void IsRateSupported(
             [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
             [In] float flRate,
-            [In, Out] ref float pflNearestSupportedRate
+            [In, Out] MfFloat pflNearestSupportedRate
             );
     }
 

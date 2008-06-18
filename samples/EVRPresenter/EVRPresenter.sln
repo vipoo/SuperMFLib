@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVRPresenter", "EVRPresenter.csproj", "{DF6E750F-49DC-4337-A115-4DD7898B56C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaFoundation", "..\..\src\MediaFoundation.csproj", "{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Release|x64.ActiveCfg = Release|Any CPU
+		{DF6E750F-49DC-4337-A115-4DD7898B56C0}.Release|x86.ActiveCfg = Release|Any CPU
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x64.ActiveCfg = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x64.Build.0 = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x86.ActiveCfg = Debug|x86
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x86.Build.0 = Debug|x86
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x64.ActiveCfg = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x64.Build.0 = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x86.ActiveCfg = Release|x86
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

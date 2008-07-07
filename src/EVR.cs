@@ -144,7 +144,7 @@ namespace MediaFoundation.EVR
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("MFVideoAlphaBitmap")]
-    public struct MFVideoAlphaBitmap
+    public class MFVideoAlphaBitmap
     {
         bool GetBitmapFromDC;
         IntPtr stru;
@@ -193,7 +193,7 @@ namespace MediaFoundation.EVR
     public interface IMFVideoMixerBitmap
     {
         void SetAlphaBitmap(
-            [In] MFVideoAlphaBitmap pBmpParms);
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFVideoAlphaBitmap pBmpParms);
 
         void ClearAlphaBitmap( );
 

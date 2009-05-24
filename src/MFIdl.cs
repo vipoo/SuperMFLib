@@ -34,7 +34,7 @@ namespace MediaFoundation
 {
     #region GUIDs, IIDs
 
-    public sealed class MFAttributesClsid
+    public static class MFAttributesClsid
     {
         // Audio Renderer Attributes
         public static readonly Guid MF_AUDIO_RENDERER_ATTRIBUTE_ENDPOINT_ID = new Guid(0xb10aaec3, 0xef71, 0x4cc3, 0xb8, 0x73, 0x5, 0xa9, 0xa0, 0x8b, 0x9f, 0x8e);
@@ -424,7 +424,7 @@ namespace MediaFoundation
         public static readonly Guid MF_ASFSTREAMCONFIG_LEAKYBUCKET2 = new Guid(0xc69b5902, 0xea1a, 0x4c9b, 0xb6, 0x92, 0xe2, 0xa0, 0xd2, 0x9a, 0x8a, 0xdd);
     }
 
-    public sealed class MFConnector
+    public static class MFConnector
     {
         public static readonly Guid MFCONNECTOR_AGP = new Guid(0xac3aef60, 0xce43, 0x11d9, 0x92, 0xdb, 0x00, 0x0b, 0xdb, 0x28, 0xff, 0x98);
         public static readonly Guid MFCONNECTOR_COMPONENT = new Guid(0x57cd596b, 0xce47, 0x11d9, 0x92, 0xdb, 0x00, 0x0b, 0xdb, 0x28, 0xff, 0x98);
@@ -446,7 +446,7 @@ namespace MediaFoundation
         public static readonly Guid MFCONNECTOR_VGA = new Guid(0x57cd5968, 0xce47, 0x11d9, 0x92, 0xdb, 0x00, 0x0b, 0xdb, 0x28, 0xff, 0x98);
     }
 
-    public sealed class MFTransformCategory
+    public static class MFTransformCategory
     {
         // {d6c02d4b-6833-45b4-971a-05a4b04bab91}   MFT_CATEGORY_VIDEO_DECODER
         public static readonly Guid MFT_CATEGORY_VIDEO_DECODER = new Guid(0xd6c02d4b, 0x6833, 0x45b4, 0x97, 0x1a, 0x05, 0xa4, 0xb0, 0x4b, 0xab, 0x91);
@@ -477,7 +477,7 @@ namespace MediaFoundation
 
     }
 
-    public sealed class MFEnabletype
+    public static class MFEnabletype
     {
         public static readonly Guid MFENABLETYPE_MF_RebootRequired = new Guid(0x6d4d3d4b, 0x0ece, 0x4652, 0x8b, 0x3a, 0xf2, 0xd2, 0x42, 0x60, 0xd8, 0x87);
         public static readonly Guid MFENABLETYPE_MF_UpdateRevocationInformation = new Guid(0xe558b0b5, 0xb3c4, 0x44a0, 0x92, 0x4c, 0x50, 0xd1, 0x78, 0x93, 0x23, 0x85);
@@ -487,7 +487,7 @@ namespace MediaFoundation
         public static readonly Guid MFENABLETYPE_WMDRMV7_LicenseAcquisition = new Guid(0x3306df, 0x4a06, 0x4884, 0xa0, 0x97, 0xef, 0x6d, 0x22, 0xec, 0x84, 0xa3);
     }
 
-    public sealed class MFRepresentation
+    public static class MFRepresentation
     {
         /// <summary> AM_MEDIA_TYPE_REPRESENTATION </summary>
         public static readonly Guid AMMediaType = new Guid(0xe2e42ad2, 0x132c, 0x491e, 0xa2, 0x68, 0x3c, 0x7c, 0x2d, 0xca, 0x18, 0x1f);
@@ -500,7 +500,7 @@ namespace MediaFoundation
 
     }
 
-    public sealed class MFProperties
+    public static class MFProperties
     {
         // Media Foundation Properties
         public static readonly Guid MFNETSOURCE_ACCELERATEDSTREAMINGDURATION = new Guid(0x3cb1f277, 0x0505, 0x4c5d, 0xae, 0x71, 0x0a, 0x55, 0x63, 0x44, 0xef, 0xa1);
@@ -542,13 +542,9 @@ namespace MediaFoundation
         public static readonly Guid MFNETSOURCE_THINNINGENABLED = new Guid(0x3cb1f27c, 0x0505, 0x4c5d, 0xae, 0x71, 0x0a, 0x55, 0x63, 0x44, 0xef, 0xa1);
         public static readonly Guid MFNETSOURCE_TRANSPORT = new Guid(0x3cb1f27e, 0x0505, 0x4c5d, 0xae, 0x71, 0x0a, 0x55, 0x63, 0x44, 0xef, 0xa1);
         public static readonly Guid MFNETSOURCE_UDP_PORT_RANGE = new Guid(0x3cb1f29a, 0x0505, 0x4c5d, 0xae, 0x71, 0x0a, 0x55, 0x63, 0x44, 0xef, 0xa1);
-        public static readonly Guid MFPKEY_CATEGORY = new Guid(0xc57a84c0, 0x1a80, 0x40a3, 0x97, 0xb5, 0x92, 0x72, 0xa4, 0x3, 0xc8, 0xae); // , 0x02
-        public static readonly Guid MFPKEY_CLSID = new Guid(0xc57a84c0, 0x1a80, 0x40a3, 0x97, 0xb5, 0x92, 0x72, 0xa4, 0x3, 0xc8, 0xae); // , 0x01
-        public static readonly Guid MFPKEY_EXATTRIBUTE_SUPPORTED = new Guid(0x456fe843, 0x3c87, 0x40c0, 0x94, 0x9d, 0x14, 0x9, 0xc9, 0x7d, 0xab, 0x2c); // , 0x01
-        public static readonly Guid MFPKEY_SourceOpenMonitor = new Guid(0x074d4637, 0xb5ae, 0x465d, 0xaf, 0x17, 0x1a, 0x53, 0x8d, 0x28, 0x59, 0xdd); // , 0x02
     }
 
-    public sealed class MFServices
+    public static class MFServices
     {
         public static readonly Guid MF_METADATA_PROVIDER_SERVICE = new Guid(0xdb214084, 0x58a4, 0x4d2e, 0xb8, 0x4f, 0x6f, 0x75, 0x5b, 0x2f, 0x7a, 0xd);
         public static readonly Guid MF_PMP_SERVER_CONTEXT = new Guid(0x2f00c910, 0xd2cf, 0x4278, 0x8b, 0x6a, 0xd0, 0x77, 0xfa, 0xc3, 0xa2, 0x5f);
@@ -570,11 +566,19 @@ namespace MediaFoundation
         public static readonly Guid MR_BUFFER_SERVICE = new Guid(0xa562248c, 0x9ac6, 0x4ffc, 0x9f, 0xba, 0x3a, 0xf8, 0xf8, 0xad, 0x1a, 0x4d);
     }
 
-    public sealed class CLSID
+    public static class MFPKEY
+    {
+        public static readonly PropertyKey MFPKEY_CATEGORY = new PropertyKey(new Guid(0xc57a84c0, 0x1a80, 0x40a3, 0x97, 0xb5, 0x92, 0x72, 0xa4, 0x3, 0xc8, 0xae), 0x02);
+        public static readonly PropertyKey MFPKEY_CLSID = new PropertyKey(new Guid(0xc57a84c0, 0x1a80, 0x40a3, 0x97, 0xb5, 0x92, 0x72, 0xa4, 0x3, 0xc8, 0xae), 0x01);
+        public static readonly PropertyKey MFPKEY_EXATTRIBUTE_SUPPORTED = new PropertyKey(new Guid(0x456fe843, 0x3c87, 0x40c0, 0x94, 0x9d, 0x14, 0x9, 0xc9, 0x7d, 0xab, 0x2c), 0x01);
+        public static readonly PropertyKey MFPKEY_SourceOpenMonitor = new PropertyKey(new Guid(0x074d4637, 0xb5ae, 0x465d, 0xaf, 0x17, 0x1a, 0x53, 0x8d, 0x28, 0x59, 0xdd), 0x02);
+        public static readonly PropertyKey MFPKEY_MULTICHANNEL_CHANNEL_MASK = new PropertyKey(new Guid(0x58bdaf8c, 0x3224, 0x4692, 0x86, 0xd0, 0x44, 0xd6, 0x5c, 0x5b, 0xf8, 0x2b), 0x01);
+    }
+
+    public static class CLSID
     {
         // Unknown
 
-        public static readonly Guid MFPKEY_MULTICHANNEL_CHANNEL_MASK = new Guid(0x58bdaf8c, 0x3224, 0x4692, 0x86, 0xd0, 0x44, 0xd6, 0x5c, 0x5b, 0xf8, 0x2b); // , 0x01
         public static readonly Guid MFCONNECTOR_SDI = new Guid(0x57cd5971, 0xce47, 0x11d9, 0x92, 0xdb, 0x00, 0x0b, 0xdb, 0x28, 0xff, 0x98);
         public static readonly Guid MFPROTECTION_ACP = new Guid(0xc3fd11c6, 0xf8b7, 0x4d20, 0xb0, 0x08, 0x1d, 0xb1, 0x7d, 0x61, 0xf2, 0xda);
         public static readonly Guid MFPROTECTION_CGMSA = new Guid(0xE57E69E9, 0x226B, 0x4d31, 0xB4, 0xE3, 0xD3, 0xDB, 0x00, 0x87, 0x36, 0xDD);
@@ -608,7 +612,7 @@ namespace MediaFoundation
         public static readonly Guid MF_TIME_FORMAT_SEGMENT_OFFSET = new Guid(0xc8b8be77, 0x869c, 0x431d, 0x81, 0x2e, 0x16, 0x96, 0x93, 0xf6, 0x5a, 0x39);
     }
 
-    public sealed class MFMediaType
+    public static class MFMediaType
     {
         /// <summary> From MFMediaType_Default </summary>
         public static readonly Guid Default = new Guid(0x81A412E6, 0x8103, 0x4B06, 0x85, 0x7F, 0x18, 0x62, 0x78, 0x10, 0x24, 0xAC);
@@ -650,37 +654,37 @@ namespace MediaFoundation
         public static readonly Guid RGB24 = new Guid(20, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
         public static readonly Guid RGB555 = new Guid(24, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
         public static readonly Guid RGB565 = new Guid(23, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid AI44 = new Guid(new FourCC("AI44").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid AYUV = new Guid(new FourCC("AYUV").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid YUY2 = new Guid(new FourCC("YUY2").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid UYVY = new Guid(new FourCC("UYVY").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid NV11 = new Guid(new FourCC("NV11").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid NV12 = new Guid(new FourCC("NV12").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid YV12 = new Guid(new FourCC("YV12").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid IYUV = new Guid(new FourCC("IYUV").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid Y210 = new Guid(new FourCC("Y210").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid Y216 = new Guid(new FourCC("Y216").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid Y410 = new Guid(new FourCC("Y410").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid Y416 = new Guid(new FourCC("Y416").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid P210 = new Guid(new FourCC("P210").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid P216 = new Guid(new FourCC("P216").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid P010 = new Guid(new FourCC("P010").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid P016 = new Guid(new FourCC("P016").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid v210 = new Guid(new FourCC("v210").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid v410 = new Guid(new FourCC("v410").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid MP43 = new Guid(new FourCC("MP43").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid MP4S = new Guid(new FourCC("MP4S").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid WMV1 = new Guid(new FourCC("WMV1").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid WMV2 = new Guid(new FourCC("WMV2").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid WMV3 = new Guid(new FourCC("WMV3").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid MSS1 = new Guid(new FourCC("MSS1").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid MSS2 = new Guid(new FourCC("MSS2").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid MPG1 = new Guid(new FourCC("MPG1").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid DVSL = new Guid(new FourCC("dvsl").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid DVSD = new Guid(new FourCC("dvsd").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid DV25 = new Guid(new FourCC("dv25").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid DV50 = new Guid(new FourCC("dv50").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
-        public static readonly Guid DVH1 = new Guid(new FourCC("dvh1").ToInt32(), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+        public static readonly Guid AI44 = new FourCC("AI44").ToMediaSubtype();
+        public static readonly Guid AYUV = new FourCC("AYUV").ToMediaSubtype();
+        public static readonly Guid YUY2 = new FourCC("YUY2").ToMediaSubtype();
+        public static readonly Guid UYVY = new FourCC("UYVY").ToMediaSubtype();
+        public static readonly Guid NV11 = new FourCC("NV11").ToMediaSubtype();
+        public static readonly Guid NV12 = new FourCC("NV12").ToMediaSubtype();
+        public static readonly Guid YV12 = new FourCC("YV12").ToMediaSubtype();
+        public static readonly Guid IYUV = new FourCC("IYUV").ToMediaSubtype();
+        public static readonly Guid Y210 = new FourCC("Y210").ToMediaSubtype();
+        public static readonly Guid Y216 = new FourCC("Y216").ToMediaSubtype();
+        public static readonly Guid Y410 = new FourCC("Y410").ToMediaSubtype();
+        public static readonly Guid Y416 = new FourCC("Y416").ToMediaSubtype();
+        public static readonly Guid P210 = new FourCC("P210").ToMediaSubtype();
+        public static readonly Guid P216 = new FourCC("P216").ToMediaSubtype();
+        public static readonly Guid P010 = new FourCC("P010").ToMediaSubtype();
+        public static readonly Guid P016 = new FourCC("P016").ToMediaSubtype();
+        public static readonly Guid v210 = new FourCC("v210").ToMediaSubtype();
+        public static readonly Guid v410 = new FourCC("v410").ToMediaSubtype();
+        public static readonly Guid MP43 = new FourCC("MP43").ToMediaSubtype();
+        public static readonly Guid MP4S = new FourCC("MP4S").ToMediaSubtype();
+        public static readonly Guid WMV1 = new FourCC("WMV1").ToMediaSubtype();
+        public static readonly Guid WMV2 = new FourCC("WMV2").ToMediaSubtype();
+        public static readonly Guid WMV3 = new FourCC("WMV3").ToMediaSubtype();
+        public static readonly Guid MSS1 = new FourCC("MSS1").ToMediaSubtype();
+        public static readonly Guid MSS2 = new FourCC("MSS2").ToMediaSubtype();
+        public static readonly Guid MPG1 = new FourCC("MPG1").ToMediaSubtype();
+        public static readonly Guid DVSL = new FourCC("dvsl").ToMediaSubtype();
+        public static readonly Guid DVSD = new FourCC("dvsd").ToMediaSubtype();
+        public static readonly Guid DV25 = new FourCC("dv25").ToMediaSubtype();
+        public static readonly Guid DV50 = new FourCC("dv50").ToMediaSubtype();
+        public static readonly Guid DVH1 = new FourCC("dvh1").ToMediaSubtype();
 
         public static readonly Guid MPEG2 = new Guid(0xe06d8026, 0xdb46, 0x11cf, 0xb4, 0xd1, 0x00, 0x80, 0x5f, 0x6c, 0xbb, 0xea);
     }
@@ -744,13 +748,6 @@ namespace MediaFoundation
         RequirePrompt = 0x00000001
     }
 
-    [Flags, UnmanagedName("MFTIMER_FLAGS")]
-    public enum MFTimeFlags
-    {
-        None = 0,
-        Relative = 0x00000001
-    }
-
     [UnmanagedName("MF_QUALITY_DROP_MODE")]
     public enum MFQualitydropMode
     {
@@ -798,20 +795,6 @@ namespace MediaFoundation
         Reserved3 = 7
     }
 
-    [UnmanagedName("MFRATE_DIRECTION")]
-    public enum MFRateDirection
-    {
-        Forward,
-        Reverse
-    }
-
-    [UnmanagedName("MFSHUTDOWN_STATUS")]
-    public enum MFShutdownStatus
-    {
-        Initiated,
-        Completed
-    }
-
     [StructLayout(LayoutKind.Sequential), UnmanagedName("MPEG2VIDEOINFO")]
     public struct Mpeg2VideoInfo
     {
@@ -821,7 +804,7 @@ namespace MediaFoundation
         int dwProfile;              // use enum MPEG2Profile
         int dwLevel;                // use enum MPEG2Level
         int dwFlags;                // use AMMPEG2_* defines.  Reject connection if undefined bits are not 0
-        int[] dwSequenceHeader;    // DWORD instead of Byte for alignment purposes
+        int[] dwSequenceHeader;     // DWORD instead of Byte for alignment purposes
         //   For MPEG-2, if a sequence_header is included, the sequence_extension
         //   should also be included
     }
@@ -907,6 +890,13 @@ namespace MediaFoundation
     }
 
 #endif
+
+    [UnmanagedName("MFRATE_DIRECTION")]
+    public enum MFRateDirection
+    {
+        Forward = 0,
+        Reverse
+    }
 
     [UnmanagedName("MFSTREAMSINK_MARKER_TYPE")]
     public enum MFStreamSinkMarkerType
@@ -1120,6 +1110,20 @@ namespace MediaFoundation
         JitterNeverAhead = 0x1
     }
 
+    [UnmanagedName("MFSHUTDOWN_STATUS")]
+    public enum MFShutdownStatus
+    {
+        Initiated,
+        Completed
+    }
+
+    [Flags, UnmanagedName("MFTIMER_FLAGS")]
+    public enum MFTimeFlags
+    {
+        None = 0,
+        Relative = 0x00000001
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1), UnmanagedName("MFAYUVSample")]
     public struct MFAYUVSample
     {
@@ -1309,56 +1313,6 @@ namespace MediaFoundation
     {
         void ForceEndOfPresentation(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("F88CFB8C-EF16-4991-B450-CB8C69E51704"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFMetadata
-    {
-        void SetLanguage(
-            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszRFC1766
-            );
-
-        void GetLanguage(
-            [MarshalAs(UnmanagedType.LPWStr)] out string ppwszRFC1766
-            );
-
-        void GetAllLanguages(
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvLanguages
-            );
-
-        void SetProperty(
-            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
-            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant ppvValue
-            );
-
-        void GetProperty(
-            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvValue
-            );
-
-        void DeleteProperty(
-            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName
-            );
-
-        void GetAllPropertyNames(
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvNames
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("56181D2D-E221-4ADB-B1C8-3CEE6A53F76F"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFMetadataProvider
-    {
-        void GetMFMetadata(
-            [In, MarshalAs(UnmanagedType.Interface)]
-            IMFPresentationDescriptor pPresentationDescriptor,
-            [In] int dwStreamIdentifier,
-            [In] int dwFlags, // must be zero
-            [MarshalAs(UnmanagedType.Interface)] out IMFMetadata ppMFMetadata
             );
     }
 
@@ -1981,46 +1935,6 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("88DDCD21-03C3-4275-91ED-55EE3929328F"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFRateControl
-    {
-        void SetRate(
-            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
-            [In] float flRate
-            );
-
-        void GetRate(
-            [In, Out, MarshalAs(UnmanagedType.Bool)] ref bool pfThin,
-            [In, Out] ref float pflRate
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("0A9CCDBC-D797-4563-9667-94EC5D79292D"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFRateSupport
-    {
-        void GetSlowestRate(
-            [In] MFRateDirection eDirection,
-            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
-            out float pflRate
-            );
-
-        void GetFastestRate(
-            [In] MFRateDirection eDirection,
-            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
-            out float pflRate
-            );
-
-        void IsRateSupported(
-            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
-            [In] float flRate,
-            [In, Out] MfFloat pflNearestSupportedRate
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("2347D60B-3FB5-480C-8803-8DF3ADCD3EF0")]
     public interface IMFRealTimeClient
@@ -2232,18 +2146,6 @@ namespace MediaFoundation
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("97EC2EA4-0E42-4937-97AC-9D6D328824E1"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFShutdown
-    {
-        void Shutdown();
-
-        void GetShutdownStatus(
-            out MFShutdownStatus pStatus
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("089EDF13-CF71-4338-8D13-9E569DBDC319"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFSimpleAudioVolume
@@ -2262,34 +2164,6 @@ namespace MediaFoundation
 
         void GetMute(
             [MarshalAs(UnmanagedType.Bool)] out bool pbMute
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("059054B3-027C-494C-A27D-9113291CF87F"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFSourceOpenMonitor
-    {
-        void OnSourceEvent(
-            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("E56E4CBD-8F70-49D8-A0F8-EDB3D6AB9BF2"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IMFTimer
-    {
-        void SetTimer(
-            [In] MFTimeFlags dwFlags,
-            [In] long llClockTime,
-            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
-            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState,
-            [MarshalAs(UnmanagedType.IUnknown)] out object ppunkKey
-            );
-
-        void CancelTimer(
-            [In, MarshalAs(UnmanagedType.IUnknown)] object punkKey
             );
     }
 
@@ -4057,6 +3931,136 @@ namespace MediaFoundation
 
         void EndFinalize(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pResult
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("0A9CCDBC-D797-4563-9667-94EC5D79292D"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFRateSupport
+    {
+        void GetSlowestRate(
+            [In] MFRateDirection eDirection,
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
+            out float pflRate
+            );
+
+        void GetFastestRate(
+            [In] MFRateDirection eDirection,
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
+            out float pflRate
+            );
+
+        void IsRateSupported(
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
+            [In] float flRate,
+            [In, Out] MfFloat pflNearestSupportedRate
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("059054B3-027C-494C-A27D-9113291CF87F"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFSourceOpenMonitor
+    {
+        void OnSourceEvent(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("97EC2EA4-0E42-4937-97AC-9D6D328824E1"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFShutdown
+    {
+        void Shutdown();
+
+        void GetShutdownStatus(
+            out MFShutdownStatus pStatus
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("F88CFB8C-EF16-4991-B450-CB8C69E51704"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFMetadata
+    {
+        void SetLanguage(
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszRFC1766
+            );
+
+        void GetLanguage(
+            [MarshalAs(UnmanagedType.LPWStr)] out string ppwszRFC1766
+            );
+
+        void GetAllLanguages(
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvLanguages
+            );
+
+        void SetProperty(
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
+            [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant ppvValue
+            );
+
+        void GetProperty(
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvValue
+            );
+
+        void DeleteProperty(
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszName
+            );
+
+        void GetAllPropertyNames(
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant ppvNames
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("88DDCD21-03C3-4275-91ED-55EE3929328F"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFRateControl
+    {
+        void SetRate(
+            [In, MarshalAs(UnmanagedType.Bool)] bool fThin,
+            [In] float flRate
+            );
+
+        void GetRate(
+            [In, Out, MarshalAs(UnmanagedType.Bool)] ref bool pfThin,
+            out float pflRate
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("E56E4CBD-8F70-49D8-A0F8-EDB3D6AB9BF2"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFTimer
+    {
+        void SetTimer(
+            [In] MFTimeFlags dwFlags,
+            [In] long llClockTime,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkState,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppunkKey
+            );
+
+        void CancelTimer(
+            [In, MarshalAs(UnmanagedType.IUnknown)] object punkKey
+            );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("56181D2D-E221-4ADB-B1C8-3CEE6A53F76F"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFMetadataProvider
+    {
+        void GetMFMetadata(
+            [In, MarshalAs(UnmanagedType.Interface)]
+            IMFPresentationDescriptor pPresentationDescriptor,
+            [In] int dwStreamIdentifier,
+            [In] int dwFlags, // must be zero
+            [MarshalAs(UnmanagedType.Interface)] out IMFMetadata ppMFMetadata
             );
     }
 

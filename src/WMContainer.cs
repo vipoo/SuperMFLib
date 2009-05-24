@@ -60,7 +60,7 @@ namespace MediaFoundation
 
     [Flags, UnmanagedName("ASF_STATUSFLAGS")]
     public enum ASFStatusFlags
-    {	
+    {
         None = 0,
         Incomplete = 0x1
     }
@@ -97,7 +97,7 @@ namespace MediaFoundation
         public short wStreamNumber;
     }
 
-    public sealed class MFASFSampleExtension
+    public static class MFASFSampleExtension
     {
         public static readonly Guid SampleDuration = new Guid(0xc6bd9450, 0x867f, 0x4907, 0x83, 0xa3, 0xc7, 0x79, 0x21, 0xb7, 0x33, 0xad);
         public static readonly Guid OutputCleanPoint = new Guid(0xf72a3c6f, 0x6eb4, 0x4ebc, 0xb1, 0x92, 0x9, 0xad, 0x97, 0x59, 0xe8, 0x28);

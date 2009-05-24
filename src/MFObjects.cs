@@ -362,14 +362,26 @@ namespace MediaFoundation
     {
         public int Numerator;
         public int Denominator;
+
+        public MFRatio(int n, int d)
+        {
+            Numerator = n;
+            Denominator = d;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoArea")]
-    public struct MFVideoArea
+    public class MFVideoArea
     {
         public MFOffset OffsetX;
         public MFOffset OffsetY;
         public SIZE Area;
+
+        public MFVideoArea()
+        {
+            OffsetX = new MFOffset();
+            OffsetY = new MFOffset();
+        }
 
         public MFVideoArea(float x, float y, int width, int height)
         {
@@ -388,10 +400,14 @@ namespace MediaFoundation
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2), UnmanagedName("MFOffset")]
-    public struct MFOffset
+    public class MFOffset
     {
         public short fract;
         public short Value;
+
+        public MFOffset()
+        {
+        }
 
         public MFOffset(float v)
         {
@@ -403,6 +419,11 @@ namespace MediaFoundation
         {
             Value = (short)v;
             fract = (short)(65536 * (v-Value));
+        }
+
+        public float GetOffset()
+        {
+            return ((float)Value) + (((float)fract) / 65536.0f);
         }
     }
 

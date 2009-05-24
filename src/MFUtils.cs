@@ -25,8 +25,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 using System;
 using System.Collections;
 using System.Text;
+using System.Drawing;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security;
 
 using MediaFoundation.Misc;
 using MediaFoundation.Transform;
@@ -40,19 +42,19 @@ namespace MediaFoundation.Misc
     {
         private float Value;
 
-        public MfFloat(float Value)
+        public MfFloat(float v)
         {
-            this.Value = Value;
+            Value = v;
         }
 
         public override string ToString()
         {
-            return this.Value.ToString();
+            return Value.ToString();
         }
 
         public override int GetHashCode()
         {
-            return this.Value.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public static implicit operator float(MfFloat l)
@@ -167,6 +169,11 @@ namespace MediaFoundation.Misc
         public ConstPropVariant()
         {
             type = VariantType.None;
+        }
+
+        protected ConstPropVariant(VariantType v)
+        {
+            type = v;
         }
 
         public static explicit operator string(ConstPropVariant f)
@@ -341,7 +348,7 @@ namespace MediaFoundation.Misc
         {
             if (type == VariantType.UInt32)
             {
-                return this.uintVal;
+                return uintVal;
             }
             throw new ArgumentException("PropVariant contents not an uint32");
         }
@@ -857,34 +864,30 @@ namespace MediaFoundation.Misc
     {
         #region Declarations
 
-        [DllImport("ole32.dll", PreserveSig = false)]
+        [DllImport("ole32.dll", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
         protected static extern void PropVariantCopy(
             [Out, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvarDest,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarSource
             );
 
-        [DllImport("ole32.dll", PreserveSig = false)]
+        [DllImport("ole32.dll", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
         protected static extern void PropVariantClear(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropVariant pvar
             );
 
         #endregion
 
-        public PropVariant()
+        public PropVariant() : base(VariantType.None)
         {
-            type = VariantType.None;
         }
 
-        public PropVariant(string value)
+        public PropVariant(string value) : base(VariantType.String)
         {
-            type = VariantType.String;
             ptr = Marshal.StringToCoTaskMemUni(value);
         }
 
-        public PropVariant(string[] value)
+        public PropVariant(string[] value) : base(VariantType.StringArray)
         {
-            type = VariantType.StringArray;
-
             calpwstrVal.cElems = value.Length;
             calpwstrVal.pElems = Marshal.AllocCoTaskMem(IntPtr.Size * value.Length);
 
@@ -894,82 +897,69 @@ namespace MediaFoundation.Misc
             }
         }
 
-        public PropVariant(byte value)
+        public PropVariant(byte value) : base(VariantType.UByte)
         {
-            type = VariantType.UByte;
             bVal = value;
         }
 
-        public PropVariant(short value)
+        public PropVariant(short value) : base(VariantType.Short)
         {
-            type = VariantType.Short;
             iVal = value;
         }
 
         [CLSCompliant(false)]
-        public PropVariant(ushort value)
+        public PropVariant(ushort value) : base(VariantType.UShort)
         {
-            type = VariantType.UShort;
             uiVal = value;
         }
 
-        public PropVariant(int value)
+        public PropVariant(int value) : base(VariantType.Int32)
         {
-            type = VariantType.Int32;
             intValue = value;
         }
 
         [CLSCompliant(false)]
-        public PropVariant(uint value)
+        public PropVariant(uint value) : base(VariantType.UInt32)
         {
-            type = VariantType.UInt32;
             uintVal = value;
         }
 
-        public PropVariant(float value)
+        public PropVariant(float value) : base(VariantType.Float)
         {
-            type = VariantType.Float;
             fltVal = value;
         }
 
-        public PropVariant(double value)
+        public PropVariant(double value) : base(VariantType.Double)
         {
-            type = VariantType.Double;
             doubleValue = value;
         }
 
-        public PropVariant(long value)
+        public PropVariant(long value) : base(VariantType.Int64)
         {
-            type = VariantType.Int64;
             longValue = value;
         }
 
         [CLSCompliant(false)]
-        public PropVariant(ulong value)
+        public PropVariant(ulong value) : base(VariantType.UInt64)
         {
-            type = VariantType.UInt64;
             ulongValue = value;
         }
 
-        public PropVariant(Guid value)
+        public PropVariant(Guid value) : base(VariantType.Guid)
         {
-            type = VariantType.Guid;
             ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(value));
             Marshal.StructureToPtr(value, ptr, false);
         }
 
-        public PropVariant(byte[] value)
+        public PropVariant(byte[] value) : base(VariantType.Blob)
         {
-            type = VariantType.Blob;
-
             blobValue.cbSize = value.Length;
             blobValue.pBlobData = Marshal.AllocCoTaskMem(value.Length);
             Marshal.Copy(value, 0, blobValue.pBlobData, value.Length);
         }
 
-        public PropVariant(object value)
+        public PropVariant(object value) : base(VariantType.IUnknown)
         {
-            type = VariantType.IUnknown;
             ptr = Marshal.GetIUnknownForObject(value);
         }
 
@@ -1026,7 +1016,6 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Sequential)]
     public class FourCC
     {
-        protected const string m_SubTypeExtension = "-0000-0010-8000-00aa00389b71";
         private int m_fourCC;
 
         public FourCC(string fcc)
@@ -1042,8 +1031,9 @@ namespace MediaFoundation.Misc
         }
 
         public FourCC(char a, char b, char c, char d)
-            : this(new string(new char[] { a, b, c, d }))
-        { }
+        {
+            LoadFromBytes((byte)a, (byte)b, (byte)c, (byte)d);
+        }
 
         public FourCC(int fcc)
         {
@@ -1070,10 +1060,7 @@ namespace MediaFoundation.Misc
 
         public void LoadFromBytes(byte a, byte b, byte c, byte d)
         {
-            m_fourCC = a;
-            m_fourCC |= b << 8;
-            m_fourCC |= c << 16;
-            m_fourCC |= d << 24;
+            m_fourCC = a | (b << 8) | (c << 16) | (d << 24);
         }
 
         public int ToInt32()
@@ -1086,9 +1073,14 @@ namespace MediaFoundation.Misc
             return f.ToInt32();
         }
 
+        public static explicit operator Guid(FourCC f)
+        {
+            return f.ToMediaSubtype();
+        }
+
         public Guid ToMediaSubtype()
         {
-            return new Guid(m_fourCC.ToString("X") + m_SubTypeExtension);
+            return new Guid(m_fourCC, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
         }
 
         public static bool operator ==(FourCC fcc1, FourCC fcc2)
@@ -1166,7 +1158,7 @@ namespace MediaFoundation.Misc
 
         public static bool IsA4ccSubtype(Guid g)
         {
-            return (g.ToString().Contains(m_SubTypeExtension));
+            return (g.ToString().EndsWith("-0000-0010-8000-00aa00389b71"));
         }
     }
 
@@ -1567,17 +1559,17 @@ namespace MediaFoundation.Misc
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("BITMAPINFOHEADER")]
     public class BitmapInfoHeader
     {
-        public int biSize;
-        public int biWidth;
-        public int biHeight;
-        public short biPlanes;
-        public short biBitCount;
-        public int biCompression;
-        public int biSizeImage;
-        public int biXPelsPerMeter;
-        public int biYPelsPerMeter;
-        public int biClrUsed;
-        public int biClrImportant;
+        public int Size;
+        public int Width;
+        public int Height;
+        public short Planes;
+        public short BitCount;
+        public int Compression;
+        public int ImageSize;
+        public int XPelsPerMeter;
+        public int YPelsPerMeter;
+        public int ClrUsed;
+        public int ClrImportant;
 
         public IntPtr GetPtr()
         {
@@ -1659,17 +1651,17 @@ namespace MediaFoundation.Misc
             {
                 BitmapInfoHeaderWithData ext = new BitmapInfoHeaderWithData();
 
-                ext.biSize = Marshal.ReadInt32(pNativeData, 0);
-                ext.biWidth = Marshal.ReadInt32(pNativeData, 4);
-                ext.biHeight = Marshal.ReadInt32(pNativeData, 8);
-                ext.biPlanes = Marshal.ReadInt16(pNativeData, 12);
-                ext.biBitCount = Marshal.ReadInt16(pNativeData, 14);
-                ext.biCompression = Marshal.ReadInt32(pNativeData, 16);
-                ext.biSizeImage = Marshal.ReadInt32(pNativeData, 20);
-                ext.biXPelsPerMeter = Marshal.ReadInt32(pNativeData, 24);
-                ext.biYPelsPerMeter = Marshal.ReadInt32(pNativeData, 28);
-                ext.biClrUsed = Marshal.ReadInt32(pNativeData, 32);
-                ext.biClrImportant = Marshal.ReadInt32(pNativeData, 36);
+                ext.Size = Marshal.ReadInt32(pNativeData, 0);
+                ext.Width = Marshal.ReadInt32(pNativeData, 4);
+                ext.Height = Marshal.ReadInt32(pNativeData, 8);
+                ext.Planes = Marshal.ReadInt16(pNativeData, 12);
+                ext.BitCount = Marshal.ReadInt16(pNativeData, 14);
+                ext.Compression = Marshal.ReadInt32(pNativeData, 16);
+                ext.ImageSize = Marshal.ReadInt32(pNativeData, 20);
+                ext.XPelsPerMeter = Marshal.ReadInt32(pNativeData, 24);
+                ext.YPelsPerMeter = Marshal.ReadInt32(pNativeData, 28);
+                ext.ClrUsed = Marshal.ReadInt32(pNativeData, 32);
+                ext.ClrImportant = Marshal.ReadInt32(pNativeData, 36);
 
                 bmi = ext as BitmapInfoHeader;
 
@@ -1683,17 +1675,16 @@ namespace MediaFoundation.Misc
 
         public void CopyFrom(BitmapInfoHeader bmi)
         {
-            biSize = bmi.biSize;
-            biWidth = bmi.biWidth;
-            biHeight = bmi.biHeight;
-            biPlanes = bmi.biPlanes;
-            biBitCount = bmi.biBitCount;
-            biCompression = bmi.biCompression;
-            biSizeImage = bmi.biSizeImage;
-            biSizeImage = bmi.biSizeImage;
-            biYPelsPerMeter = bmi.biYPelsPerMeter;
-            biClrUsed = bmi.biClrUsed;
-            biClrImportant = bmi.biClrImportant;
+            Size = bmi.Size;
+            Width = bmi.Width;
+            Height = bmi.Height;
+            Planes = bmi.Planes;
+            BitCount = bmi.BitCount;
+            Compression = bmi.Compression;
+            ImageSize = bmi.ImageSize;
+            YPelsPerMeter = bmi.YPelsPerMeter;
+            ClrUsed = bmi.ClrUsed;
+            ClrImportant = bmi.ClrImportant;
 
             if (bmi is BitmapInfoHeaderWithData)
             {
@@ -1774,11 +1765,174 @@ namespace MediaFoundation.Misc
         }
     }
 
+    /// <summary>
+    /// MFRect is a managed representation of the Win32 RECT structure.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public class MFRect
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+
+        /// <summary>
+        /// Empty contructor. Initialize all fields to 0
+        /// </summary>
+        public MFRect()
+        {
+        }
+
+        /// <summary>
+        /// A parametred constructor. Initialize fields with given values.
+        /// </summary>
+        /// <param name="left">the left value</param>
+        /// <param name="top">the top value</param>
+        /// <param name="right">the right value</param>
+        /// <param name="bottom">the bottom value</param>
+        public MFRect(int l, int t, int r, int b)
+        {
+            left = l;
+            top = t;
+            right = r;
+            bottom = b;
+        }
+
+        /// <summary>
+        /// A parametred constructor. Initialize fields with a given <see cref="System.Drawing.Rectangle"/>.
+        /// </summary>
+        /// <param name="rectangle">A <see cref="System.Drawing.Rectangle"/></param>
+        /// <remarks>
+        /// Warning, MFRect define a rectangle by defining two of his corners and <see cref="System.Drawing.Rectangle"/> define a rectangle with his upper/left corner, his width and his height.
+        /// </remarks>
+        public MFRect(Rectangle rectangle)
+        {
+            left = rectangle.Left;
+            top = rectangle.Top;
+            right = rectangle.Right;
+            bottom = rectangle.Bottom;
+        }
+
+        /// <summary>
+        /// Provide de string representation of this MFRect instance
+        /// </summary>
+        /// <returns>A string formated like this : [left, top - right, bottom]</returns>
+        public override string ToString()
+        {
+            return string.Format("[{0}, {1}] - [{2}, {3}]", left, top, right, bottom);
+        }
+
+        public override int GetHashCode()
+        {
+            return left.GetHashCode() |
+                top.GetHashCode() |
+                right.GetHashCode() |
+                bottom.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MFRect)
+            {
+                MFRect cmp = (MFRect)obj;
+
+                return right == cmp.right && bottom == cmp.bottom && left == cmp.left && top == cmp.top;
+            }
+
+            if (obj is Rectangle)
+            {
+                Rectangle cmp = (Rectangle)obj;
+
+                return right == cmp.Right && bottom == cmp.Bottom && left == cmp.Left && top == cmp.Top;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see if the rectangle is empty
+        /// </summary>
+        /// <returns>Returns true if the rectangle is empty</returns>
+        public bool IsEmpty()
+        {
+            return (right <= left || bottom <= top);
+        }
+
+        /// <summary>
+        /// Define implicit cast between MFRect and System.Drawing.Rectangle for languages supporting this feature.
+        /// VB.Net doesn't support implicit cast. <see cref="MFRect.ToRectangle"/> for similar functionality.
+        /// <code>
+        ///   // Define a new Rectangle instance
+        ///   Rectangle r = new Rectangle(0, 0, 100, 100);
+        ///   // Do implicit cast between Rectangle and MFRect
+        ///   MFRect mfR = r;
+        ///
+        ///   Console.WriteLine(mfR.ToString());
+        /// </code>
+        /// </summary>
+        /// <param name="r">a MFRect to be cast</param>
+        /// <returns>A casted System.Drawing.Rectangle</returns>
+        public static implicit operator Rectangle(MFRect r)
+        {
+            return r.ToRectangle();
+        }
+
+        /// <summary>
+        /// Define implicit cast between System.Drawing.Rectangle and MFRect for languages supporting this feature.
+        /// VB.Net doesn't support implicit cast. <see cref="MFRect.FromRectangle"/> for similar functionality.
+        /// <code>
+        ///   // Define a new MFRect instance
+        ///   MFRect mfR = new MFRect(0, 0, 100, 100);
+        ///   // Do implicit cast between MFRect and Rectangle
+        ///   Rectangle r = mfR;
+        ///
+        ///   Console.WriteLine(r.ToString());
+        /// </code>
+        /// </summary>
+        /// <param name="r">A System.Drawing.Rectangle to be cast</param>
+        /// <returns>A casted MFRect</returns>
+        public static implicit operator MFRect(Rectangle r)
+        {
+            return new MFRect(r);
+        }
+
+        /// <summary>
+        /// Get the System.Drawing.Rectangle equivalent to this MFRect instance.
+        /// </summary>
+        /// <returns>A System.Drawing.Rectangle</returns>
+        public Rectangle ToRectangle()
+        {
+            return new Rectangle(left, top, (right - left), (bottom - top));
+        }
+
+        /// <summary>
+        /// Get a new MFRect instance for a given <see cref="System.Drawing.Rectangle"/>
+        /// </summary>
+        /// <param name="r">The <see cref="System.Drawing.Rectangle"/> used to initialize this new MFGuid</param>
+        /// <returns>A new instance of MFGuid</returns>
+        public static MFRect FromRectangle(Rectangle r)
+        {
+            return new MFRect(r);
+        }
+
+        /// <summary>
+        /// Copy the members from an MFRect into this object
+        /// </summary>
+        /// <param name="from">The rectangle from which to copy the values.</param>
+        public void CopyFrom(MFRect from)
+        {
+            left = from.left;
+            top = from.top;
+            right = from.right;
+            bottom = from.bottom;
+        }
+    }
+
     #endregion
 
     #region Utility Classes
 
-    sealed public class MFError
+    public static class MFError
     {
         #region Errors
 
@@ -2057,18 +2211,18 @@ namespace MediaFoundation.Misc
 
         #region externs
 
-        [DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint="FormatMessageW", ExactSpelling=true), SuppressUnmanagedCodeSecurity]
         private static extern int FormatMessage(FormatMessageFlags dwFlags, IntPtr lpSource,
             int dwMessageId, int dwLanguageId, ref IntPtr lpBuffer, int nSize, IntPtr Arguments);
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryExW", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         private static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, LoadLibraryExFlags dwFlags);
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool FreeLibrary(IntPtr hFile);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         private static extern IntPtr LocalFree(IntPtr hMem);
 
         #endregion
@@ -2100,14 +2254,6 @@ namespace MediaFoundation.Misc
 
         private static IntPtr s_hModule = IntPtr.Zero;
         private const string MESSAGEFILE = "mferror.dll";
-
-        /// <summary>
-        /// Prevent people from trying to instantiate this class
-        /// </summary>
-        private MFError()
-        {
-            // Prevent people from trying to instantiate this class
-        }
 
         /// <summary>
         /// Returns a string describing a MF error.  Works for both error codes
@@ -2217,7 +2363,7 @@ namespace MediaFoundation.Misc
     abstract public class COMBase
     {
         public const int S_Ok = 0;
-        public const int S_False = 0;
+        public const int S_False = 1;
 
         public const int E_NotImplemented = unchecked((int)0x80004001);
         public const int E_NoInterface = unchecked((int)0x80004002);
@@ -2245,7 +2391,8 @@ namespace MediaFoundation.Misc
             {
                 if (Marshal.IsComObject(o))
                 {
-                    Marshal.ReleaseComObject(o);
+                    int i = Marshal.ReleaseComObject(o);
+                    Debug.Assert(i >= 0);
                 }
                 else
                 {
@@ -2253,6 +2400,10 @@ namespace MediaFoundation.Misc
                     if (iDis != null)
                     {
                         iDis.Dispose();
+                    }
+                    else
+                    {
+                        throw new Exception("What the heck was that?");
                     }
                 }
             }
@@ -2763,6 +2914,118 @@ namespace MediaFoundation.Misc
         public static ICustomMarshaler GetInstance(string cookie)
         {
             return new BMMarshaler();
+        }
+    }
+
+    // Class to handle Array of Guid
+    internal class GMarshaler : ICustomMarshaler
+    {
+        protected enum IsNative
+        {
+            None,
+            Native,
+            Managed
+        }
+
+        protected object[] m_Obj = new object[5];
+        protected IntPtr[] m_ip = new IntPtr[5];
+        protected IsNative[] m_bIsNative = new IsNative[5];
+
+        protected int m_iNest;
+
+        public IntPtr MarshalManagedToNative(object managedObj)
+        {
+            if (m_Obj[m_iNest] != managedObj)
+            {
+                m_iNest++;
+                m_bIsNative[m_iNest] = IsNative.Managed;
+                m_Obj[m_iNest] = managedObj;
+
+                IntPtr ip = Marshal.AllocCoTaskMem(IntPtr.Size);
+
+                return ip;
+            }
+            else
+            {
+                Guid[] o = managedObj as Guid[];
+                IntPtr ip = Marshal.AllocCoTaskMem(16 * o.Length);
+                Marshal.WriteIntPtr(m_ip[m_iNest], ip);
+
+                for (int x = 0; (o[x] != Guid.Empty) && (x < o.Length); x++)
+                {
+                    Marshal.StructureToPtr(o[x], ip, false);
+                    ip = new IntPtr(ip.ToInt64() + 16);
+                }
+                return m_ip[m_iNest];
+            }
+        }
+
+        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
+        // from MarshalManagedToNative.  The return value is unused.
+        public object MarshalNativeToManaged(IntPtr pNativeData)
+        {
+            if (m_bIsNative[m_iNest] != IsNative.None)
+            {
+                Guid[] g = m_Obj[m_iNest] as Guid[];
+                byte[] b = new byte[16];
+                IntPtr pBuff = Marshal.ReadIntPtr(pNativeData);
+                for (int x = 0; x < g.Length; x++)
+                {
+                    Marshal.Copy(pBuff, b, 0, 16);
+                    g[x] = new Guid(b);
+
+                    pBuff = new IntPtr(pBuff.ToInt64() + 16);
+                }
+
+                Marshal.FreeCoTaskMem(Marshal.ReadIntPtr(pNativeData));
+
+                return null;
+            }
+            else
+            {
+                m_iNest++;
+                m_ip[m_iNest] = pNativeData;
+                m_Obj[m_iNest] = new Guid[64];
+                m_bIsNative[m_iNest] = IsNative.Native;
+
+                return m_Obj[m_iNest];
+            }
+        }
+
+        // It appears this routine is never called
+        public void CleanUpManagedData(object ManagedObj)
+        {
+            m_ip[m_iNest] = IntPtr.Zero;
+            m_Obj[m_iNest] = null;
+            m_bIsNative[m_iNest] = IsNative.None;
+
+            m_iNest--;
+        }
+
+        public void CleanUpNativeData(IntPtr pNativeData)
+        {
+            m_ip[m_iNest] = IntPtr.Zero;
+            m_Obj[m_iNest] = null;
+            m_bIsNative[m_iNest] = IsNative.None;
+
+            m_iNest--;
+            if (pNativeData != IntPtr.Zero)
+            {
+                Marshal.FreeCoTaskMem(pNativeData);
+            }
+        }
+
+        // The number of bytes to marshal out - never called
+        public int GetNativeDataSize()
+        {
+            return -1;
+        }
+
+        // This method is called by interop to create the custom marshaler.  The (optional)
+        // cookie is the value specified in MarshalCookie="asdf", or "" is none is specified.
+        public static ICustomMarshaler GetInstance(string cookie)
+        {
+            return new GMarshaler();
         }
     }
 

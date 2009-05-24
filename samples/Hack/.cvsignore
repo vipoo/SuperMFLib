@@ -2,3 +2,4 @@ x64
 Hack_h.h
 Hack_i.c
 Hack_p.c
+dlldata.c

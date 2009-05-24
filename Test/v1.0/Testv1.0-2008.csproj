@@ -1,0 +1,130 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5BFA8D49-A0B3-4B76-88CD-F63D0EB94B23}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Testv10</RootNamespace>
+    <AssemblyName>Testv10</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ALLOW_UNTESTED_INTERFACES</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ALLOW_UNTESTED_INTERFACES</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ALLOW_UNTESTED_INTERFACES</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IEVRFilterConfigTest.cs" />
+    <Compile Include="IMFActivateTest.cs" />
+    <Compile Include="IMFASFIndexerTest.cs" />
+    <Compile Include="IMFASFMutualExclusionTest.cs" />
+    <Compile Include="IMFASFProfileTest.cs" />
+    <Compile Include="IMFASFSplitterTest.cs" />
+    <Compile Include="IMFASFStreamConfigTest.cs" />
+    <Compile Include="IMFASFStreamSelectorTest.cs" />
+    <Compile Include="IMFAttributesTest.cs" />
+    <Compile Include="IMFByteStreamHandlerTest.cs" />
+    <Compile Include="IMFByteStreamTest.cs" />
+    <Compile Include="IMFClockTest.cs" />
+    <Compile Include="IMFCollectionTest.cs" />
+    <Compile Include="IMFContentEnablerTest.cs" />
+    <Compile Include="IMFMediaBufferTest.cs" />
+    <Compile Include="IMFMediaEventGeneratorTest.cs" />
+    <Compile Include="IMFMediaEventQueueTest.cs" />
+    <Compile Include="IMFMediaEventTest.cs" />
+    <Compile Include="IMFMediaSessionTest.cs" />
+    <Compile Include="IMFMediaSourceTopologyProviderTest.cs" />
+    <Compile Include="IMFMediaStreamTest.cs" />
+    <Compile Include="IMFMediaTypeHandlerTest.cs" />
+    <Compile Include="IMFMediaTypeTest.cs" />
+    <Compile Include="IMFPresentationClockTest.cs" />
+    <Compile Include="IMFPresentationDescriptorTest.cs" />
+    <Compile Include="IMFPresentationTimeSourceTest.cs" />
+    <Compile Include="IMFSampleTest.cs" />
+    <Compile Include="IMFSourceResolverTest.cs" />
+    <Compile Include="IMFStreamDescriptorTest.cs" />
+    <Compile Include="IMFTopologyNodeTest.cs" />
+    <Compile Include="IMFTopologyTest.cs" />
+    <Compile Include="IMFVideoDisplayControlTest.cs" />
+    <Compile Include="INamedPropertyStoreTest.cs" />
+    <Compile Include="IPropertyStoreTest.cs" />
+    <Compile Include="TestExtern.cs" />
+    <Compile Include="MFTransformTest.cs" />
+    <Compile Include="RunTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestBMI.cs" />
+    <Compile Include="TestPropVariant.cs" />
+    <Compile Include="TestWave.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MediaFoundation.csproj">
+      <Project>{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}</Project>
+      <Name>MediaFoundation</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

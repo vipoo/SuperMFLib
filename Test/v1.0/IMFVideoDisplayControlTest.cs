@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using MediaFoundation;
 using MediaFoundation.Misc;
 using MediaFoundation.EVR;
+using System.Drawing;
 
 namespace Testv10
 {
@@ -41,9 +42,9 @@ namespace Testv10
 
         void TestGetNativeVideoSize()
         {
-            SIZE s1, s2;
-            s1 = new SIZE();
-            s2 = new SIZE();
+            Size s1, s2;
+            s1 = new Size();
+            s2 = new Size();
 
             // Note, this call doesn't seem to do anything, but it uses the
             // same defs as GetidealVideoSize, so I'm assuming it's just cuz
@@ -53,19 +54,19 @@ namespace Testv10
 
         void TestGetIdealVideoSize()
         {
-            SIZE s1, s2;
-            s1 = new SIZE();
-            s2 = new SIZE();
+            Size s1, s2;
+            s1 = new Size();
+            s2 = new Size();
 
             m_vdc.GetIdealVideoSize(s1, s2);
 
-            Debug.Assert(s1.cx > 0 && s1.cy > 0 && s1.cx > 0 && s2.cy > 0);
+            Debug.Assert(s1.Width > 0 && s1.Height > 0 && s1.Width > 0 && s2.Height > 0);
         }
 
         void TestSetVideoPosition()
         {
             MFVideoNormalizedRect r1 = new MFVideoNormalizedRect();
-            RECT r2 = new RECT();
+            MFRect r2 = new MFRect();
 
             r1.bottom = 1.0f;
             r1.right = 0.9f;
@@ -76,7 +77,7 @@ namespace Testv10
             m_vdc.SetVideoPosition(r1, r2);
 
             MFVideoNormalizedRect r3 = new MFVideoNormalizedRect();
-            RECT r4 = new RECT();
+            MFRect r4 = new MFRect();
 
             m_vdc.GetVideoPosition(r3, r4);
         }
@@ -114,7 +115,7 @@ namespace Testv10
             long l = 0;
             IntPtr ip = IntPtr.Zero;
 
-            bmh.biSize = Marshal.SizeOf(typeof(BitmapInfoHeader));
+            bmh.Size = Marshal.SizeOf(typeof(BitmapInfoHeader));
 
             try
             {

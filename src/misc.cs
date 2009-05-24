@@ -23,10 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endregion
 
 using System;
-using System.Diagnostics;
-using System.Text;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace MediaFoundation.Misc
 {
@@ -156,8 +153,8 @@ namespace MediaFoundation.Misc
     [UnmanagedName("VIDEOINFOHEADER"), StructLayout(LayoutKind.Sequential)]
     public class VideoInfoHeader
     {
-        public RECT SrcRect;
-        public RECT TargetRect;
+        public MFRect SrcRect;
+        public MFRect TargetRect;
         public int BitRate;
         public int BitErrorRate;
         public long AvgTimePerFrame;
@@ -167,8 +164,8 @@ namespace MediaFoundation.Misc
     [UnmanagedName("VIDEOINFOHEADER2"), StructLayout(LayoutKind.Sequential)]
     public class VideoInfoHeader2
     {
-        public RECT SrcRect;
-        public RECT TargetRect;
+        public MFRect SrcRect;
+        public MFRect TargetRect;
         public int BitRate;
         public int BitErrorRate;
         public long AvgTimePerFrame;
@@ -186,6 +183,16 @@ namespace MediaFoundation.Misc
     {
         public Guid fmtid;
         public int pID;
+
+        public PropertyKey()
+        {
+        }
+
+        public PropertyKey(Guid f, int p)
+        {
+            fmtid = f;
+            pID = p;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
@@ -202,35 +209,6 @@ namespace MediaFoundation.Misc
         {
             cx = width;
             cy = height;
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("RECT")]
-    public class RECT
-    {
-        public int left;
-        public int top;
-        public int right;
-        public int bottom;
-
-        public RECT()
-        {
-        }
-
-        public RECT(int l, int t, int r, int b)
-        {
-            left = l;
-            top = t;
-            right = r;
-            bottom = b;
-        }
-
-        public void Empty()
-        {
-            left = 0;
-            top = 0;
-            right = 0;
-            bottom = 0;
         }
     }
 

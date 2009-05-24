@@ -1,40 +1,83 @@
 /****************************************************************************
-While the underlying libraries are covered by LGPL, this sample is released 
-as public domain.  It is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE.  
+While the underlying libraries are covered by LGPL, this sample is released
+as public domain.  It is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.
 *****************************************************************************/
 
 using System;
-using System.Collections;
-using System.Text;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security;
 
 using MediaFoundation;
-using MediaFoundation.EVR;
 using MediaFoundation.Misc;
+using MediaFoundation.Utility;
+using D3D;
 
 namespace EVRPresenter
 {
     public class D3DPresentEngine : COMBase, IDisposable
     {
-        const int PRESENTER_BUFFER_COUNT = 3;
+        public const int PRESENTER_BUFFER_COUNT = 3;
 
-        int m_DeviceResetToken;     // Reset token for the D3D device manager.
+        public enum DeviceState
+        {
+            DeviceOK,
+            DeviceReset,    // The device was reset OR re-created.
+            DeviceRemoved  // The device was removed.
+        }
 
-        IntPtr m_hwnd;                 // Application-provided destination window.
-        RECT m_rcDestRect;           // Destination rectangle.
-        D3DDISPLAYMODE m_DisplayMode;          // Adapter's display mode.
+        #region Externs
+
+        protected enum MonitorFlags
+        {
+            DefaultToNull = 0x00000000,
+            DefaultToPrimary = 0x00000001,
+            DefaultToNearest = 0x00000002
+        }
+
+        [DllImport("user32.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        protected static extern IntPtr GetDesktopWindow();
+
+        [DllImport("user32.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        protected static extern IntPtr MonitorFromWindow(
+          IntPtr hwnd,       // handle to a window
+          MonitorFlags dwFlags    // determine return value
+            );
+
+        [DllImport("user32.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        protected static extern bool GetClientRect(
+          IntPtr hwnd,       // handle to a window
+          [Out] MFRect r    // determine return value
+            );
+
+        #endregion
+
+        #region Member variables
+
+        protected int m_DeviceResetToken;     // Reset token for the D3D device manager.
+
+        protected int m_iFrames;
+
+        protected IntPtr m_hwnd;                 // Application-provided destination window.
+        protected MFRect m_rcDestRect;           // Destination rectangle.
+        protected D3DDISPLAYMODE m_DisplayMode;          // Adapter's display mode.
 
         // COM interfaces
-        IDirect3D9Ex m_pD3D9;
-        IDirect3DDevice9Ex m_pDevice;
-        IDirect3DDeviceManager9 m_pDeviceManager;        // Direct3D device manager.
-        IDirect3DSurface9 m_pSurfaceRepaint;       // Surface for repaint requests.
+        protected IDirect3D9Ex m_pD3D9;
+        protected IDirect3DDevice9Ex m_pDevice;
+        protected IDirect3DDeviceManager9 m_pDeviceManager;        // Direct3D device manager.
+        protected IDirect3DSurface9 m_pSurfaceRepaint;       // Surface for repaint requests.
+
+        #endregion
 
         public D3DPresentEngine()
         {
+            m_iFrames = 0;
             m_hwnd = IntPtr.Zero;
             m_DeviceResetToken = 0;
             m_pD3D9 = null;
@@ -42,33 +85,28 @@ namespace EVRPresenter
             m_pDeviceManager = null;
             m_pSurfaceRepaint = null;
 
-            m_rcDestRect = new RECT();
-            //m_rcDestRect.Empty();
+            m_rcDestRect = new MFRect();
+            m_DisplayMode = new D3DDISPLAYMODE();
 
             InitializeD3D();
 
             CreateD3DDevice();
         }
 
-
-        //-----------------------------------------------------------------------------
-        // Destructor
-        //-----------------------------------------------------------------------------
-
         ~D3DPresentEngine()
         {
+            Dispose();
         }
-
 
         //-----------------------------------------------------------------------------
         // GetService
         //
         // Returns a service interface from the presenter engine.
-        // The presenter calls this method from inside it's implementation of 
+        // The presenter calls this method from inside it's implementation of
         // IMFGetService::GetService.
         //
-        // Classes that derive from D3DPresentEngine can override this method to return 
-        // other interfaces. If you override this method, call the base method from the 
+        // Classes that derive from D3DPresentEngine can override this method to return
+        // other interfaces. If you override this method, call the base method from the
         // derived class.
         //-----------------------------------------------------------------------------
 
@@ -78,7 +116,7 @@ namespace EVRPresenter
             {
                 if (m_pDeviceManager == null)
                 {
-                    throw new COMException("D3DPresentEngine::GetService", MFError.MF_E_UNSUPPORTED_SERVICE);
+                    throw new COMException("m_pDeviceManager not yet available", MFError.MF_E_UNSUPPORTED_SERVICE);
                 }
                 else
                 {
@@ -87,15 +125,12 @@ namespace EVRPresenter
             }
             else
             {
-                throw new COMException("D3DPresentEngine::GetService 2", MFError.MF_E_UNSUPPORTED_SERVICE);
+                throw new COMException("GetService requested unknown interface", MFError.MF_E_UNSUPPORTED_SERVICE);
             }
         }
-
-        public RECT GetDestinationRect() { return m_rcDestRect; }
+        public MFRect GetDestinationRect() { return m_rcDestRect; }
         public IntPtr GetVideoWindow() { return m_hwnd; }
         public int RefreshRate() { return m_DisplayMode.RefreshRate; }
-
-
 
         //-----------------------------------------------------------------------------
         // CheckFormat
@@ -103,13 +138,15 @@ namespace EVRPresenter
         // Queries whether the D3DPresentEngine can use a specified Direct3D format.
         //-----------------------------------------------------------------------------
 
-        public void CheckFormat(D3DFORMAT format)
+        public void CheckFormat(int iformat)
         {
             int uAdapter = 0;
-            D3DDEVTYPE type = D3DDEVTYPE.D3DDEVTYPE_HAL;
+            D3DDEVTYPE type = D3DDEVTYPE.HAL;
 
             D3DDISPLAYMODE mode;
             D3DDEVICE_CREATION_PARAMETERS dparams;
+
+            D3DFORMAT format = (D3DFORMAT)iformat;
 
             if (m_pDevice != null)
             {
@@ -117,7 +154,6 @@ namespace EVRPresenter
 
                 uAdapter = dparams.AdapterOrdinal;
                 type = dparams.DeviceType;
-
             }
 
             m_pD3D9.GetAdapterDisplayMode(uAdapter, out mode);
@@ -125,11 +161,9 @@ namespace EVRPresenter
             m_pD3D9.CheckDeviceType(uAdapter, type, mode.Format, format, true);
         }
 
-
-
         //-----------------------------------------------------------------------------
         // SetVideoWindow
-        // 
+        //
         // Sets the window where the video is drawn.
         //-----------------------------------------------------------------------------
 
@@ -152,30 +186,31 @@ namespace EVRPresenter
 
         //-----------------------------------------------------------------------------
         // SetDestinationRect
-        // 
+        //
         // Sets the region within the video window where the video is drawn.
         //-----------------------------------------------------------------------------
 
-        public void SetDestinationRect(RECT rcDest)
+        public void SetDestinationRect(MFRect rcDest)
         {
-            if (!Utils.EqualRect(rcDest, m_rcDestRect))
+            if (!m_rcDestRect.Equals(rcDest))
             {
                 lock (this)
                 {
-                    m_rcDestRect = rcDest;
+                    m_rcDestRect.left = rcDest.left;
+                    m_rcDestRect.right = rcDest.right;
+                    m_rcDestRect.top = rcDest.top;
+                    m_rcDestRect.bottom = rcDest.bottom;
 
                     UpdateDestRect();
                 }
             }
         }
 
-
-
         //-----------------------------------------------------------------------------
         // CreateVideoSamples
-        // 
+        //
         // Creates video samples based on a specified media type.
-        // 
+        //
         // pFormat: Media type that describes the video format.
         // videoSampleQueue: List that will contain the video samples.
         //
@@ -187,7 +222,7 @@ namespace EVRPresenter
 
         public void CreateVideoSamples(
             IMFMediaType pFormat,
-            Queue videoSampleQueue
+            Queue<IMFSample> videoSampleQueue
             )
         {
             if (m_hwnd == IntPtr.Zero)
@@ -233,12 +268,9 @@ namespace EVRPresenter
                         // for the duration of the sample's lifetime.
                         pVideoSample.SetUnknown(EVRCustomPresenter.MFSamplePresenter_SampleSwapChain, pSwapChain);
 
-                        SafeRelease(pVideoSample);
-                        SafeRelease(pSwapChain);
+                        //SafeRelease(pVideoSample);
+                        SafeRelease(pSwapChain); pSwapChain = null;
                     }
-
-                    // Let the derived class create any additional D3D resources that it needs.
-                    OnCreateVideoSamples(pp);
                 }
                 catch
                 {
@@ -246,32 +278,27 @@ namespace EVRPresenter
                 }
                 finally
                 {
-                    SafeRelease(pSwapChain);
-                    SafeRelease(pVideoSample);
+                    SafeRelease(pSwapChain); pSwapChain = null;
+                    //SafeRelease(pVideoSample);
                 }
             }
         }
 
-
-
         //-----------------------------------------------------------------------------
         // ReleaseResources
-        // 
-        // Released Direct3D resources used by this object. 
+        //
+        // Released Direct3D resources used by this object.
         //-----------------------------------------------------------------------------
 
         public void ReleaseResources()
         {
-            // Let the derived class release any resources it created.
-            OnReleaseResources();
-
-            SafeRelease(m_pSurfaceRepaint);
+            SafeRelease(m_pSurfaceRepaint); m_pSurfaceRepaint = null;
+            m_iFrames = 0;
         }
-
 
         //-----------------------------------------------------------------------------
         // CheckDeviceState
-        // 
+        //
         // Tests the Direct3D device state.
         //
         // pState: Receives the state of the device (OK, reset, removed)
@@ -289,26 +316,26 @@ namespace EVRPresenter
                 switch (hr)
                 {
                     case S_Ok:
-                    case (int)D3DError.S_PRESENT_OCCLUDED:
-                    case (int)D3DError.S_PRESENT_MODE_CHANGED:
+                    case (int)D3DError.S_PresentOccluded:
+                    case (int)D3DError.S_PresentModeChanged:
                         // state is DeviceOK
                         break;
 
-                    case (int)D3DError.D3DERR_DEVICELOST:
-                    case (int)D3DError.D3DERR_DEVICEHUNG:
+                    case (int)D3DError.DeviceLost:
+                    case (int)D3DError.DeviceHung:
                         // Lost/hung device. Destroy the device and create a new one.
                         CreateD3DDevice();
                         pState = DeviceState.DeviceReset;
                         break;
 
-                    case (int)D3DError.D3DERR_DEVICEREMOVED:
+                    case (int)D3DError.DeviceRemoved:
                         // This is a fatal error.
                         pState = DeviceState.DeviceRemoved;
                         break;
 
                     case E_InvalidArgument:
                         // CheckDeviceState can return E_INVALIDARG if the window is not valid
-                        // We'll assume that the window was destroyed; we'll recreate the device 
+                        // We'll assume that the window was destroyed; we'll recreate the device
                         // if the application sets a new window.
                         break;
 
@@ -324,14 +351,14 @@ namespace EVRPresenter
         //
         // Presents a video frame.
         //
-        // pSample:  Pointer to the sample that contains the surface to present. If 
-        //           this parameter is null, the method paints a black rectangle.
+        // pSample:  Pointer to the sample that contains the surface to present. If
+        //           this parameter is NULL, the method paints a black rectangle.
         // llTarget: Target presentation time.
         //
         // This method is called by the scheduler and/or the presenter.
         //-----------------------------------------------------------------------------
 
-        public void PresentSample(IMFSample pSample, Int64 llTarget)
+        public void PresentSample(IMFSample pSample, long llTarget)
         {
             IMFMediaBuffer pBuffer = null;
             IDirect3DSurface9 pSurface = null;
@@ -365,7 +392,11 @@ namespace EVRPresenter
                     PresentSwapChain(pSwapChain, pSurface);
 
                     // Store this pointer in case we need to repaint the surface.
-                    m_pSurfaceRepaint = pSurface;
+                    if (m_pSurfaceRepaint != pSurface)
+                    {
+                        SafeRelease(m_pSurfaceRepaint);
+                        m_pSurfaceRepaint = pSurface;
+                    }
                 }
                 else
                 {
@@ -376,7 +407,7 @@ namespace EVRPresenter
             catch (Exception e)
             {
                 int hr = Marshal.GetHRForException(e);
-                if (hr == (int)D3DError.D3DERR_DEVICELOST || hr == (int)D3DError.D3DERR_DEVICENOTRESET || hr == (int)D3DError.D3DERR_DEVICEHUNG)
+                if (hr == (int)D3DError.DeviceLost || hr == (int)D3DError.DeviceNotReset || hr == (int)D3DError.DeviceHung)
                 {
                     // We failed because the device was lost. Fill the destination rectangle.
                     PaintFrameWithGDI();
@@ -386,32 +417,36 @@ namespace EVRPresenter
                     // same thread that created the device. The Reset(Ex) method must be
                     // called from the thread that created the device.
 
-                    // The presenter will detect the state when it calls CheckDeviceState() 
+                    // The presenter will detect the state when it calls CheckDeviceState()
                     // on the next sample.
                 }
             }
             finally
             {
-                SafeRelease(pSwapChain);
-                SafeRelease(pSurface);
-                SafeRelease(pBuffer);
+                SafeRelease(pSwapChain); pSwapChain = null;
+                //SafeRelease(pSurface); pSurface = null;
+                SafeRelease(pBuffer); pBuffer = null;
             }
         }
 
+        public int GetFrames() { return m_iFrames; }
 
+        public void GetDeviceID(out Guid pDeviceID)
+        {
+            // This presenter is built on Direct3D9, so the device ID is
+            // IID_IDirect3DDevice9. (Same as the standard presenter.)
+            pDeviceID = typeof(IDirect3DDevice9).GUID; // IID_IDirect3DDevice9;
+        }
 
-        //-----------------------------------------------------------------------------
-        // private/protected methods
-        //-----------------------------------------------------------------------------
-
+        #region private/protected methods
 
         //-----------------------------------------------------------------------------
         // InitializeD3D
-        // 
+        //
         // Initializes Direct3D and the Direct3D device manager.
         //-----------------------------------------------------------------------------
 
-        public void InitializeD3D()
+        protected void InitializeD3D()
         {
             Debug.Assert(m_pD3D9 == null);
             Debug.Assert(m_pDeviceManager == null);
@@ -425,11 +460,11 @@ namespace EVRPresenter
 
         //-----------------------------------------------------------------------------
         // CreateD3DDevice
-        // 
+        //
         // Creates the Direct3D device.
         //-----------------------------------------------------------------------------
 
-        public void CreateD3DDevice()
+        protected void CreateD3DDevice()
         {
             IntPtr hwnd = IntPtr.Zero;
             IntPtr hMonitor = IntPtr.Zero;
@@ -437,7 +472,6 @@ namespace EVRPresenter
             D3DCREATE vp = 0;
 
             D3DCAPS9 ddCaps;
-            //ZeroMemory(ddCaps, sizeof(ddCaps));
 
             IDirect3DDevice9Ex pDevice = null;
 
@@ -449,52 +483,51 @@ namespace EVRPresenter
                     throw new COMException("D3DPresentEngine::CreateD3DDevice", MFError.MF_E_NOT_INITIALIZED);
                 }
 
-                hwnd = Extern.GetDesktopWindow();
+                hwnd = GetDesktopWindow();
 
                 // Note: The presenter creates additional swap chains to present the
-                // video frames. Therefore, it does not use the device's implicit 
+                // video frames. Therefore, it does not use the device's implicit
                 // swap chain, so the size of the back buffer here is 1 x 1.
 
                 D3DPRESENT_PARAMETERS pp = new D3DPRESENT_PARAMETERS();
-                //ZeroMemory(pp, sizeof(pp));
 
                 pp.BackBufferWidth = 1;
                 pp.BackBufferHeight = 1;
                 pp.Windowed = true;
-                pp.SwapEffect = D3DSWAPEFFECT.D3DSWAPEFFECT_COPY;
-                pp.BackBufferFormat = D3DFORMAT.D3DFMT_UNKNOWN;
+                pp.SwapEffect = D3DSWAPEFFECT.Copy;
+                pp.BackBufferFormat = D3DFORMAT.Unknown;
                 pp.hDeviceWindow = hwnd;
-                pp.Flags = D3DPRESENTFLAG.VIDEO;
-                pp.PresentationInterval = D3DPRESENT_INTERVAL.DEFAULT;
+                pp.Flags = D3DPRESENTFLAG.Video;
+                pp.PresentationInterval = D3DPRESENT_INTERVAL.Default;
 
                 // Find the monitor for this window.
                 if (m_hwnd != IntPtr.Zero)
                 {
-                    hMonitor = Extern.MonitorFromWindow(m_hwnd, MonitorFlags.DEFAULTTONEAREST);
+                    hMonitor = MonitorFromWindow(m_hwnd, MonitorFlags.DefaultToNearest);
 
                     // Find the corresponding adapter.
                     FindAdapter(m_pD3D9 as IDirect3D9, hMonitor, out uAdapterID);
                 }
 
                 // Get the device caps for this adapter.
-                m_pD3D9.GetDeviceCaps(uAdapterID, D3DDEVTYPE.D3DDEVTYPE_HAL, out ddCaps);
+                m_pD3D9.GetDeviceCaps(uAdapterID, D3DDEVTYPE.HAL, out ddCaps);
 
                 if ((ddCaps.DevCaps & D3DDEVCAPS.HWTRANSFORMANDLIGHT) > 0)
                 {
-                    vp = D3DCREATE.HARDWARE_VERTEXPROCESSING;
+                    vp = D3DCREATE.HardwareVertexProcessing;
                 }
                 else
                 {
-                    vp = D3DCREATE.SOFTWARE_VERTEXPROCESSING;
+                    vp = D3DCREATE.SoftwareVertexProcessing;
                 }
 
                 // Create the device.
                 m_pD3D9.CreateDeviceEx(
                     uAdapterID,
-                    D3DDEVTYPE.D3DDEVTYPE_HAL,
+                    D3DDEVTYPE.HAL,
                     pp.hDeviceWindow,
-                    vp | D3DCREATE.NOWINDOWCHANGES | D3DCREATE.MULTITHREADED | D3DCREATE.FPU_PRESERVE,
-                    ref pp,
+                    vp | D3DCREATE.NoWindowChanges | D3DCREATE.MultiThreaded | D3DCREATE.FPU_PRESERVE,
+                    pp,
                     null,
                     out pDevice
                     );
@@ -502,17 +535,19 @@ namespace EVRPresenter
                 // Get the adapter display mode.
                 m_pD3D9.GetAdapterDisplayMode(uAdapterID, out m_DisplayMode);
 
-                // Reset the D3DDeviceManager with the new device 
+                // Reset the D3DDeviceManager with the new device
                 m_pDeviceManager.ResetDevice(pDevice, m_DeviceResetToken);
 
-                SafeRelease(m_pDevice);
+                if (m_pDevice != pDevice)
+                {
+                    SafeRelease(m_pDevice);
 
-                m_pDevice = pDevice;
+                    m_pDevice = pDevice;
+                }
 
                 //SafeRelease(pDevice);
             }
         }
-
 
         //-----------------------------------------------------------------------------
         // CreateD3DSample
@@ -520,37 +555,24 @@ namespace EVRPresenter
         // Creates an sample object (IMFSample) to hold a Direct3D swap chain.
         //-----------------------------------------------------------------------------
 
-        public void CreateD3DSample(IDirect3DSwapChain9 pSwapChain, out IMFSample ppVideoSample)
+        protected void CreateD3DSample(IDirect3DSwapChain9 pSwapChain, out IMFSample ppVideoSample)
         {
             IDirect3DSurface9 pSurface = null;
-            IMFSample pSample = null;
 
             // Caller holds the object lock.
             try
             {
-                int clrBlack = Utils.D3DCOLOR_ARGB(0xFF, 0x00, 0x00, 0x00);
-
                 // Get the back buffer surface.
-                pSwapChain.GetBackBuffer(0, D3DBACKBUFFER_TYPE.D3DBACKBUFFER_TYPE_MONO, out pSurface);
-
-                // Fill it with black.
-                m_pDevice.ColorFill(pSurface, null, clrBlack);
+                pSwapChain.GetBackBuffer(0, D3DBACKBUFFER_TYPE.Mono, out pSurface);
 
                 // Create the sample.
-                MFExtern.MFCreateVideoSampleFromSurface(pSurface, out pSample);
-
-                // Return the pointer to the caller.
-                ppVideoSample = pSample;
-
+                MFExtern.MFCreateVideoSampleFromSurface(pSurface, out ppVideoSample);
             }
             finally
             {
-                SafeRelease(pSurface);
-                SafeRelease(pSample);
+                SafeRelease(pSurface); pSurface = null;
             }
         }
-
-
 
         //-----------------------------------------------------------------------------
         // PresentSwapChain
@@ -561,11 +583,11 @@ namespace EVRPresenter
         // pSurface: Pointer to the swap chain's back buffer surface.
 
         //
-        // Note: This method simply calls IDirect3DSwapChain9::Present, but a derived 
+        // Note: This method simply calls IDirect3DSwapChain9::Present, but a derived
         // class could do something fancier.
         //-----------------------------------------------------------------------------
 
-        public void PresentSwapChain(IDirect3DSwapChain9 pSwapChain, IDirect3DSurface9 pSurface)
+        protected void PresentSwapChain(IDirect3DSwapChain9 pSwapChain, IDirect3DSurface9 pSurface)
         {
             if (m_hwnd == IntPtr.Zero)
             {
@@ -573,32 +595,28 @@ namespace EVRPresenter
             }
 
             pSwapChain.Present(null, m_rcDestRect, m_hwnd, null, 0);
+            m_iFrames++;
         }
 
         //-----------------------------------------------------------------------------
         // PaintFrameWithGDI
-        // 
+        //
         // Fills the destination rectangle with black.
         //-----------------------------------------------------------------------------
 
-        public void PaintFrameWithGDI()
+        protected void PaintFrameWithGDI()
         {
-            IntPtr hdc = Extern.GetDC(m_hwnd);
+            Graphics g = Graphics.FromHwnd(m_hwnd);
 
-            if (hdc != IntPtr.Zero)
+            try
             {
-                IntPtr hBrush = Extern.CreateSolidBrush(Utils.RGB(0, 0, 0));
-
-                if (hBrush != IntPtr.Zero)
-                {
-                    Extern.FillRect(hdc, m_rcDestRect, hBrush);
-                    Extern.DeleteObject(hBrush);
-                }
-
-                Extern.ReleaseDC(m_hwnd, hdc);
+                g.FillRectangle(Brushes.Black, m_rcDestRect);
+            }
+            finally
+            {
+                g.Dispose();
             }
         }
-
 
         //-----------------------------------------------------------------------------
         // GetSwapChainPresentParameters
@@ -607,7 +625,7 @@ namespace EVRPresenter
         // D3DPRESENT_PARAMETERS for creating a swap chain.
         //-----------------------------------------------------------------------------
 
-        public void GetSwapChainPresentParameters(IMFMediaType pType, out D3DPRESENT_PARAMETERS pPP)
+        protected void GetSwapChainPresentParameters(IMFMediaType pType, out D3DPRESENT_PARAMETERS pPP)
         {
             pPP = new D3DPRESENT_PARAMETERS();
             // Caller holds the object lock.
@@ -624,38 +642,34 @@ namespace EVRPresenter
 
             try
             {
-                //ZeroMemory(pPP, Marshal.SizeOf(typeof(D3DPRESENT_PARAMETERS)));
-
                 // Create the helper object for reading the proposed type.
-                VideoTypeBuilder.Create(pType, out pTypeHelper);
+                pTypeHelper = new VideoTypeBuilder(pType);
 
                 // Get some information about the video format.
                 pTypeHelper.GetFrameDimensions(out width, out height);
                 pTypeHelper.GetFourCC(out d3dFormat);
 
-                pPP.Empty();
                 pPP.BackBufferWidth = width;
                 pPP.BackBufferHeight = height;
                 pPP.Windowed = true;
-                pPP.SwapEffect = D3DSWAPEFFECT.D3DSWAPEFFECT_COPY;
+                pPP.SwapEffect = D3DSWAPEFFECT.Copy;
                 pPP.BackBufferFormat = (D3DFORMAT)d3dFormat;
                 pPP.hDeviceWindow = m_hwnd;
-                pPP.Flags = D3DPRESENTFLAG.VIDEO;
-                pPP.PresentationInterval = D3DPRESENT_INTERVAL.DEFAULT;
+                pPP.Flags = D3DPRESENTFLAG.Video;
+                pPP.PresentationInterval = D3DPRESENT_INTERVAL.Default;
 
                 D3DDEVICE_CREATION_PARAMETERS dparams;
                 m_pDevice.GetCreationParameters(out dparams);
 
-                if (dparams.DeviceType != D3DDEVTYPE.D3DDEVTYPE_HAL)
+                if (dparams.DeviceType != D3DDEVTYPE.HAL)
                 {
-                    pPP.Flags |= D3DPRESENTFLAG.LOCKABLE_BACKBUFFER;
+                    pPP.Flags |= D3DPRESENTFLAG.LockableBackbuffer;
                 }
             }
             catch { }
 
             //SafeRelease(pTypeHelper);
         }
-
 
         //-----------------------------------------------------------------------------
         // UpdateDestRect
@@ -667,26 +681,23 @@ namespace EVRPresenter
         // rectangle.
         //-----------------------------------------------------------------------------
 
-        public void UpdateDestRect()
+        protected void UpdateDestRect()
         {
-            //if (m_hwnd == IntPtr.Zero)
-            //{
-            //    return S_False;
-            //}
-
-
-            RECT rcView;
-            Extern.GetClientRect(m_hwnd, out rcView);
-
-            // Clip the destination rectangle to the window's client area.
-            if (m_rcDestRect.right > rcView.right)
+            if (m_hwnd != IntPtr.Zero)
             {
-                m_rcDestRect.right = rcView.right;
-            }
+                MediaFoundation.Misc.MFRect rcView = new MFRect();
+                GetClientRect(m_hwnd, rcView);
 
-            if (m_rcDestRect.bottom > rcView.bottom)
-            {
-                m_rcDestRect.bottom = rcView.bottom;
+                // Clip the destination rectangle to the window's client area.
+                if (m_rcDestRect.right > rcView.right)
+                {
+                    m_rcDestRect.right = rcView.right;
+                }
+
+                if (m_rcDestRect.bottom > rcView.bottom)
+                {
+                    m_rcDestRect.bottom = rcView.bottom;
+                }
             }
         }
 
@@ -697,14 +708,14 @@ namespace EVRPresenter
         //-----------------------------------------------------------------------------
         // FindAdapter
         //
-        // Given a handle to a monitor, returns the ordinal number that D3D uses to 
+        // Given a handle to a monitor, returns the ordinal number that D3D uses to
         // identify the adapter.
         //-----------------------------------------------------------------------------
 
-        public void FindAdapter(IDirect3D9 pD3D9, IntPtr hMonitor, out int puAdapterID)
+        protected static void FindAdapter(IDirect3D9 pD3D9, IntPtr hMonitor, out int puAdapterID)
         {
             int cAdapters = 0;
-            int uAdapterID = -1;
+            puAdapterID = -1;
 
             cAdapters = pD3D9.GetAdapterCount();
             for (int i = 0; i < cAdapters; i++)
@@ -717,43 +728,29 @@ namespace EVRPresenter
                 }
                 if (hMonitorTmp == hMonitor)
                 {
-                    uAdapterID = i;
+                    puAdapterID = i;
                     break;
                 }
             }
 
-            if (uAdapterID != -1)
-            {
-                puAdapterID = uAdapterID;
-            }
-            else
+            if (puAdapterID == -1)
             {
                 throw new COMException("D3DPresentEngine::FindAdapter", E_Fail);
             }
         }
 
-        protected void OnCreateVideoSamples(D3DPRESENT_PARAMETERS pp)
-        {
-        }
-
-        protected void OnReleaseResources()
-        {
-        }
-
+        #endregion
 
         #region IDisposable Members
 
         public void Dispose()
         {
-            SafeRelease(m_pDevice);
-            SafeRelease(m_pSurfaceRepaint);
-            SafeRelease(m_pDeviceManager);
-            SafeRelease(m_pD3D9);
+            GC.SuppressFinalize(this);
 
-            m_pDevice = null;
-            m_pSurfaceRepaint = null;
-            m_pDeviceManager = null;
-            m_pD3D9 = null;
+            SafeRelease(m_pDevice); m_pDevice = null;
+            SafeRelease(m_pSurfaceRepaint); m_pSurfaceRepaint = null;
+            SafeRelease(m_pDeviceManager); m_pDeviceManager = null;
+            SafeRelease(m_pD3D9); m_pD3D9 = null;
         }
 
         #endregion

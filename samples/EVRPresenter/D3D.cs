@@ -1,70 +1,277 @@
 /****************************************************************************
-While the underlying libraries are covered by LGPL, this sample is released 
-as public domain.  It is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE.  
+While the underlying libraries are covered by LGPL, this sample is released
+as public domain.  It is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.
 *****************************************************************************/
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Security;
 
 using MediaFoundation.Misc;
 
-namespace EVRPresenter
+namespace D3D
 {
     #region Externs
 
-    public class D3DExtern
+    public static class D3DExtern
     {
         public const int D3D_SDK_VERSION = 32;
 
-        [DllImport("D3D9.DLL", PreserveSig = false)]
-        public extern static void Direct3DCreate9Ex(int SDKVersion, out IDirect3D9Ex a);
+        // Debug value (32 | 0x80000000)
+        //public const int D3D_SDK_VERSION = unchecked((int)0x80000020);
 
-        [DllImport("dxva2.DLL", PreserveSig = false)]
+        [DllImport("D3D9.DLL", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
+        public extern static void Direct3DCreate9Ex(
+            int SDKVersion,
+            out IDirect3D9Ex pD3D
+            );
+
+        [DllImport("dxva2.DLL", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
         public extern static void DXVA2CreateDirect3DDeviceManager9(
             out int pResetToken,
             out IDirect3DDeviceManager9 ppDXVAManager
-        );
+            );
     }
 
     #endregion
 
     #region Definitions
 
-    public enum D3DCREATE
+    [UnmanagedName("D3DBACKBUFFER_TYPE")]
+    public enum D3DBACKBUFFER_TYPE
     {
-        FPU_PRESERVE = 0x00000002,
-        MULTITHREADED = 0x00000004,
+        Mono = 0,
+        Left = 1,
+        Right = 2,
 
-        PUREDEVICE = 0x00000010,
-        SOFTWARE_VERTEXPROCESSING = 0x00000020,
-        HARDWARE_VERTEXPROCESSING = 0x00000040,
-        MIXED_VERTEXPROCESSING = 0x00000080,
-
-        DISABLE_DRIVER_MANAGEMENT = 0x00000100,
-        ADAPTERGROUP_DEVICE = 0x00000200,
-        DISABLE_DRIVER_MANAGEMENT_EX = 0x00000400,
-
-        // This flag causes the D3D runtime not to alter the focus 
-        // window in any way. Use with caution- the burden of supporting
-        // focus management events (alt-tab, etc.) falls on the 
-        // application, and appropriate responses (switching display
-        // mode, etc.) should be coded.
-        NOWINDOWCHANGES = 0x00000800,
-
-        // Disable multithreading for software vertex processing
-        DISABLE_PSGP_THREADING = 0x00002000,
-        // This flag enables present statistics on device.
-        ENABLE_PRESENTSTATS = 0x00004000,
-        // This flag disables printscreen support in the runtime for this device
-        DISABLE_PRINTSCREEN = 0x00008000,
-
-        SCREENSAVER = 0x10000000
+        ForceDWORD = 0x7fffffff
     }
 
+    [UnmanagedName("D3DERR_* defines")]
+    public enum D3DError
+    {
+        Ok = 0,
+
+        WrongTextureFormat = unchecked((int)0x88760818),
+        UnsupportedColorOperation,
+        UnsupportedColorArg,
+        UnsupportedAlphaOperation,
+        UnsupportedAlphaArg,
+        TooManyOperations,
+        ConflictingTextureFilter,
+        UnsupportedFactorValue,
+        junk1,
+        ConflictingRenderState,
+        UnsupportedTextureFilter,
+        junk2,
+        junk3,
+        junk4,
+        ConflictingTexturePalette,
+        DriverInternalError,
+
+        NotFound = unchecked((int)0x88760866),
+        MoreData,
+        DeviceLost,
+        DeviceNotReset,
+        NotAvailable,
+        InvalidDevice,
+        InvalidCall,
+        DriverInvalidCall,
+        junk5,
+        NoAutoGen,
+        DeviceRemoved,
+        junk6,
+        junk7,
+        junk8,
+        DeviceHung,
+        S_NotResident = 0x8760875,
+        S_ResidentInSharedMemory,
+        S_PresentModeChanged,
+        S_PresentOccluded
+    }
+
+    [UnmanagedName("D3DFORMAT")]
+    public enum D3DFORMAT
+    {
+        Unknown = 0,
+
+        R8G8B8 = 20,
+        A8R8G8B8 = 21,
+        X8R8G8B8 = 22,
+        R5G6B5 = 23,
+        X1R5G5B5 = 24,
+        A1R5G5B5 = 25,
+        A4R4G4B4 = 26,
+        R3G3B2 = 27,
+        A8 = 28,
+        A8R3G3B2 = 29,
+        X4R4G4B4 = 30,
+        A2B10G10R10 = 31,
+        A8B8G8R8 = 32,
+        X8B8G8R8 = 33,
+        G16R16 = 34,
+        A2R10G10B10 = 35,
+        A16B16G16R16 = 36,
+
+        A8P8 = 40,
+        P8 = 41,
+
+        L8 = 50,
+        A8L8 = 51,
+        A4L4 = 52,
+
+        V8U8 = 60,
+        L6V5U5 = 61,
+        X8L8V8U8 = 62,
+        Q8W8V8U8 = 63,
+        V16U16 = 64,
+        A2W10V10U10 = 67,
+
+        UYVY = 1498831189, // MAKEFOURCC('U', 'Y', 'V', 'Y'),
+        R8G8_B8G8 = 1195525970, // MAKEFOURCC('R', 'G', 'B', 'G'),
+        YUY2 = 844715353, // MAKEFOURCC('Y', 'U', 'Y', '2'),
+        G8R8_G8B8 = 1111970375, // MAKEFOURCC('G', 'R', 'G', 'B'),
+        DXT1 = 827611204, // MAKEFOURCC('D', 'X', 'T', '1'),
+        DXT2 = 844388420, // MAKEFOURCC('D', 'X', 'T', '2'),
+        DXT3 = 861165636, // MAKEFOURCC('D', 'X', 'T', '3'),
+        DXT4 = 877942852, // MAKEFOURCC('D', 'X', 'T', '4'),
+        DXT5 = 894720068, // MAKEFOURCC('D', 'X', 'T', '5'),
+
+        D16_LOCKABLE = 70,
+        D32 = 71,
+        D15S1 = 73,
+        D24S8 = 75,
+        D24X8 = 77,
+        D24X4S4 = 79,
+        D16 = 80,
+
+        D32F_LOCKABLE = 82,
+        D24FS8 = 83,
+
+        /* Z-Stencil formats valid for CPU access */
+        D32_LOCKABLE = 84,
+        S8_LOCKABLE = 85,
+
+        L16 = 81,
+
+        VERTEXDATA = 100,
+        INDEX16 = 101,
+        INDEX32 = 102,
+
+        Q16W16V16U16 = 110,
+
+        MULTI2_ARGB8 = 827606349, // MAKEFOURCC('M','E','T','1'),
+
+        // Floating point surface formats
+
+        // s10e5 formats (16-bits per channel)
+        R16F = 111,
+        G16R16F = 112,
+        A16B16G16R16F = 113,
+
+        // IEEE s23e8 formats (32-bits per channel)
+        R32F = 114,
+        G32R32F = 115,
+        A32B32G32R32F = 116,
+
+        CxV8U8 = 117,
+
+        // Monochrome 1 bit per pixel format
+        A1 = 118,
+
+        // Binary format indicating that the data has no inherent type
+        BINARYBUFFER = 199,
+
+        FORCE_DWORD = 0x7fffffff
+    }
+
+    [UnmanagedName("D3DMULTISAMPLE_TYPE")]
+    public enum D3DMULTISAMPLE_TYPE
+    {
+        None = 0,
+        NonMaskable = 1,
+        Samples2 = 2,
+        Samples3 = 3,
+        Samples4 = 4,
+        Samples5 = 5,
+        Samples6 = 6,
+        Samples7 = 7,
+        Samples8 = 8,
+        Samples9 = 9,
+        Samples10 = 10,
+        Samples11 = 11,
+        Samples12 = 12,
+        Samples13 = 13,
+        Samples14 = 14,
+        Samples15 = 15,
+        Samples16 = 16,
+
+        ForceDWORD = 0x7fffffff
+    }
+
+    [UnmanagedName("D3DSWAPEFFECT")]
+    public enum D3DSWAPEFFECT
+    {
+        None = 0,
+        Discard = 1,
+        Flip = 2,
+        Copy = 3,
+
+        ForceDWORD = 0x7fffffff
+    }
+
+    [UnmanagedName("D3DSCANLINEORDERING")]
+    public enum D3DSCANLINEORDERING
+    {
+        Unknown = 0,
+        Progressive = 1,
+        Interlaced = 2
+    }
+
+    [UnmanagedName("D3DDEVTYPE")]
+    public enum D3DDEVTYPE
+    {
+        HAL = 1,
+        REF = 2,
+        SW = 3,
+
+        NULLREF = 4,
+
+        FORCE_DWORD = 0x7fffffff
+    }
+
+    [Flags,
+    UnmanagedName("D3DPRESENTFLAG_* defines")]
+    public enum D3DPRESENTFLAG
+    {
+        None = 0,
+        LockableBackbuffer = 0x00000001,
+        DiscardDepthStencil = 0x00000002,
+        DeviceClip = 0x00000004,
+        Video = 0x00000010,
+        NoAutoRotate = 0x00000020,
+        UnPrunedMode = 0x00000040
+    }
+
+    [Flags,
+    UnmanagedName("D3DPRESENT_INTERVAL* defines")]
+    public enum D3DPRESENT_INTERVAL
+    {
+        Default = 0x00000000,
+        One = 0x00000001,
+        Two = 0x00000002,
+        Three = 0x00000004,
+        Four = 0x00000008,
+        Immediate = unchecked((int)0x80000000)
+    }
+
+    [Flags,
+    UnmanagedName("D3DDEVCAPS* defines")]
     public enum D3DDEVCAPS
     {
         EXECUTESYSTEMMEMORY = 0x00000010, /* Device can use execute buffers from system memory */
@@ -89,381 +296,42 @@ namespace EVRPresenter
         NPATCHES = 0x01000000 /* Device supports N-Patches */
     }
 
-    public enum D3DPRESENT_INTERVAL
+    [Flags,
+    UnmanagedName("D3DCREATE_* defines")]
+    public enum D3DCREATE
     {
-        DEFAULT = 0x00000000,
-        ONE = 0x00000001,
-        TWO = 0x00000002,
-        THREE = 0x00000004,
-        FOUR = 0x00000008,
-        IMMEDIATE = unchecked((int)0x80000000)
+        FPU_PRESERVE = 0x00000002,
+        MultiThreaded = 0x00000004,
+
+        PureDevice = 0x00000010,
+        SoftwareVertexProcessing = 0x00000020,
+        HardwareVertexProcessing = 0x00000040,
+        MixedVertexProcessing = 0x00000080,
+
+        DisableDriverManagement = 0x00000100,
+        AdapterGroupDevice = 0x00000200,
+        DisableDriverManagementEx = 0x00000400,
+
+        // This flag causes the D3D runtime not to alter the focus
+        // window in any way. Use with caution- the burden of supporting
+        // focus management events (alt-tab, etc.) falls on the
+        // application, and appropriate responses (switching display
+        // mode, etc.) should be coded.
+        NoWindowChanges = 0x00000800,
+
+        // Disable multithreading for software vertex processing
+        DisablePSGPThreading = 0x00002000,
+        // This flag enables present statistics on device.
+        EnablePresentStats = 0x00004000,
+        // This flag disables printscreen support in the runtime for this device
+        DisablePrintScreen = 0x00008000,
+
+        ScreenSaver = 0x10000000
     }
 
-    public enum MONITOR_DEFAULTTO
-    {
-        NULL = 0x00000000,
-        PRIMARY = 0x00000001,
-        NEAREST = 0x00000002
-    }
-
-    public enum D3DDISPLAYROTATION
-    {
-    }
-
-    public enum D3DCOMPOSERECTSOP
-    {
-    }
-
-    public enum D3DQUERYTYPE
-    {
-    }
-
-    public enum D3DSAMPLERSTATETYPE
-    {
-    }
-
-    public enum D3DTEXTURESTAGESTATETYPE
-    {
-    }
-
-    public enum D3DSTATEBLOCKTYPE
-    {
-    }
-
-    public enum D3DRENDERSTATETYPE
-    {
-    }
-
-    public enum D3DPRIMITIVETYPE
-    {
-    }
-
-    public enum D3DTRANSFORMSTATETYPE
-    {
-    }
-
-    public enum D3DTEXTUREFILTERTYPE
-    {
-    }
-
-    public enum D3DPOOL
-    {
-    }
-
-    public enum D3DBACKBUFFER_TYPE
-    {
-        D3DBACKBUFFER_TYPE_MONO = 0,
-        D3DBACKBUFFER_TYPE_LEFT = 1,
-        D3DBACKBUFFER_TYPE_RIGHT = 2,
-
-        D3DBACKBUFFER_TYPE_FORCE_DWORD = 0x7fffffff
-    }
-
-    [Flags]
-    public enum D3DPRESENTFLAG
-    {
-        None = 0,
-        LOCKABLE_BACKBUFFER = 0x00000001,
-        DISCARD_DEPTHSTENCIL = 0x00000002,
-        DEVICECLIP = 0x00000004,
-        VIDEO = 0x00000010,
-        NOAUTOROTATE = 0x00000020,
-        UNPRUNEDMODE = 0x00000040
-    }
-
-    public enum D3DRESOURCETYPE
-    {
-        D3DRTYPE_SURFACE = 1,
-        D3DRTYPE_VOLUME = 2,
-        D3DRTYPE_TEXTURE = 3,
-        D3DRTYPE_VOLUMETEXTURE = 4,
-        D3DRTYPE_CUBETEXTURE = 5,
-        D3DRTYPE_VERTEXBUFFER = 6,
-        D3DRTYPE_INDEXBUFFER = 7,           //if this changes, change _D3DDEVINFO_RESOURCEMANAGER definition
-
-
-        D3DRTYPE_FORCE_DWORD = 0x7fffffff
-    }
-
-    public enum D3DError
-    {
-        D3D_OK = 0,
-
-        D3DERR_WRONGTEXTUREFORMAT = unchecked((int)0x88760818),
-        D3DERR_UNSUPPORTEDCOLOROPERATION,
-        D3DERR_UNSUPPORTEDCOLORARG,
-        D3DERR_UNSUPPORTEDALPHAOPERATION,
-        D3DERR_UNSUPPORTEDALPHAARG,
-        D3DERR_TOOMANYOPERATIONS,
-        D3DERR_CONFLICTINGTEXTUREFILTER,
-        D3DERR_UNSUPPORTEDFACTORVALUE,
-        junk1,
-        D3DERR_CONFLICTINGRENDERSTATE,
-        D3DERR_UNSUPPORTEDTEXTUREFILTER,
-        junk2,
-        junk3,
-        junk4,
-        D3DERR_CONFLICTINGTEXTUREPALETTE,
-        D3DERR_DRIVERINTERNALERROR,
-
-        D3DERR_NOTFOUND = unchecked((int)0x88760866),
-        D3DERR_MOREDATA,
-        D3DERR_DEVICELOST,
-        D3DERR_DEVICENOTRESET,
-        D3DERR_NOTAVAILABLE,
-        D3DERR_INVALIDDEVICE,
-        D3DERR_INVALIDCALL,
-        D3DERR_DRIVERINVALIDCALL,
-        junk5,
-        D3DOK_NOAUTOGEN,
-        D3DERR_DEVICEREMOVED,
-        junk6,
-        junk7,
-        junk8,
-        D3DERR_DEVICEHUNG,
-        S_NOT_RESIDENT = 0x8760875,
-        S_RESIDENT_IN_SHARED_MEMORY,
-        S_PRESENT_MODE_CHANGED,
-        S_PRESENT_OCCLUDED,
-    }
-
-    public enum D3DDEVTYPE
-    {
-        D3DDEVTYPE_HAL = 1,
-        D3DDEVTYPE_REF = 2,
-        D3DDEVTYPE_SW = 3,
-
-        D3DDEVTYPE_NULLREF = 4,
-
-        D3DDEVTYPE_FORCE_DWORD = 0x7fffffff
-    }
-
-    public enum DeviceState
-    {
-        DeviceOK,
-        DeviceReset,    // The device was reset OR re-created.
-        DeviceRemoved,  // The device was removed.
-    }
-
-    public enum D3DMULTISAMPLE_TYPE
-    {
-        D3DMULTISAMPLE_NONE = 0,
-        D3DMULTISAMPLE_NONMASKABLE = 1,
-        D3DMULTISAMPLE_2_SAMPLES = 2,
-        D3DMULTISAMPLE_3_SAMPLES = 3,
-        D3DMULTISAMPLE_4_SAMPLES = 4,
-        D3DMULTISAMPLE_5_SAMPLES = 5,
-        D3DMULTISAMPLE_6_SAMPLES = 6,
-        D3DMULTISAMPLE_7_SAMPLES = 7,
-        D3DMULTISAMPLE_8_SAMPLES = 8,
-        D3DMULTISAMPLE_9_SAMPLES = 9,
-        D3DMULTISAMPLE_10_SAMPLES = 10,
-        D3DMULTISAMPLE_11_SAMPLES = 11,
-        D3DMULTISAMPLE_12_SAMPLES = 12,
-        D3DMULTISAMPLE_13_SAMPLES = 13,
-        D3DMULTISAMPLE_14_SAMPLES = 14,
-        D3DMULTISAMPLE_15_SAMPLES = 15,
-        D3DMULTISAMPLE_16_SAMPLES = 16,
-
-        D3DMULTISAMPLE_FORCE_DWORD = 0x7fffffff
-    }
-
-    public enum D3DSWAPEFFECT
-    {
-        D3DSWAPEFFECT_DISCARD = 1,
-        D3DSWAPEFFECT_FLIP = 2,
-        D3DSWAPEFFECT_COPY = 3,
-
-        D3DSWAPEFFECT_FORCE_DWORD = 0x7fffffff
-    }
-
-    public enum D3DFORMAT
-    {
-        D3DFMT_UNKNOWN = 0,
-
-        D3DFMT_R8G8B8 = 20,
-        D3DFMT_A8R8G8B8 = 21,
-        D3DFMT_X8R8G8B8 = 22,
-        D3DFMT_R5G6B5 = 23,
-        D3DFMT_X1R5G5B5 = 24,
-        D3DFMT_A1R5G5B5 = 25,
-        D3DFMT_A4R4G4B4 = 26,
-        D3DFMT_R3G3B2 = 27,
-        D3DFMT_A8 = 28,
-        D3DFMT_A8R3G3B2 = 29,
-        D3DFMT_X4R4G4B4 = 30,
-        D3DFMT_A2B10G10R10 = 31,
-        D3DFMT_A8B8G8R8 = 32,
-        D3DFMT_X8B8G8R8 = 33,
-        D3DFMT_G16R16 = 34,
-        D3DFMT_A2R10G10B10 = 35,
-        D3DFMT_A16B16G16R16 = 36,
-
-        D3DFMT_A8P8 = 40,
-        D3DFMT_P8 = 41,
-
-        D3DFMT_L8 = 50,
-        D3DFMT_A8L8 = 51,
-        D3DFMT_A4L4 = 52,
-
-        D3DFMT_V8U8 = 60,
-        D3DFMT_L6V5U5 = 61,
-        D3DFMT_X8L8V8U8 = 62,
-        D3DFMT_Q8W8V8U8 = 63,
-        D3DFMT_V16U16 = 64,
-        D3DFMT_A2W10V10U10 = 67,
-
-        D3DFMT_UYVY = 1498831189, //new FourCC('U', 'Y', 'V', 'Y').ToInt32(),
-        D3DFMT_R8G8_B8G8 = 1195525970, //MAKEFOURCC('R', 'G', 'B', 'G'),
-        D3DFMT_YUY2 = 844715353, //MAKEFOURCC('Y', 'U', 'Y', '2'),
-        D3DFMT_G8R8_G8B8 = 1111970375, //MAKEFOURCC('G', 'R', 'G', 'B'),
-        D3DFMT_DXT1 = 827611204, //MAKEFOURCC('D', 'X', 'T', '1'),
-        D3DFMT_DXT2 = 844388420, //MAKEFOURCC('D', 'X', 'T', '2'),
-        D3DFMT_DXT3 = 861165636, //MAKEFOURCC('D', 'X', 'T', '3'),
-        D3DFMT_DXT4 = 877942852, //MAKEFOURCC('D', 'X', 'T', '4'),
-        D3DFMT_DXT5 = 894720068, //MAKEFOURCC('D', 'X', 'T', '5'),
-
-        D3DFMT_D16_LOCKABLE = 70,
-        D3DFMT_D32 = 71,
-        D3DFMT_D15S1 = 73,
-        D3DFMT_D24S8 = 75,
-        D3DFMT_D24X8 = 77,
-        D3DFMT_D24X4S4 = 79,
-        D3DFMT_D16 = 80,
-
-        D3DFMT_D32F_LOCKABLE = 82,
-        D3DFMT_D24FS8 = 83,
-
-        /* Z-Stencil formats valid for CPU access */
-        D3DFMT_D32_LOCKABLE = 84,
-        D3DFMT_S8_LOCKABLE = 85,
-
-
-
-        D3DFMT_L16 = 81,
-
-        D3DFMT_VERTEXDATA = 100,
-        D3DFMT_INDEX16 = 101,
-        D3DFMT_INDEX32 = 102,
-
-        D3DFMT_Q16W16V16U16 = 110,
-
-        D3DFMT_MULTI2_ARGB8 = 827606349, //MAKEFOURCC('M','E','T','1'),
-
-        // Floating point surface formats
-
-        // s10e5 formats (16-bits per channel)
-        D3DFMT_R16F = 111,
-        D3DFMT_G16R16F = 112,
-        D3DFMT_A16B16G16R16F = 113,
-
-        // IEEE s23e8 formats (32-bits per channel)
-        D3DFMT_R32F = 114,
-        D3DFMT_G32R32F = 115,
-        D3DFMT_A32B32G32R32F = 116,
-
-        D3DFMT_CxV8U8 = 117,
-
-        // Monochrome 1 bit per pixel format
-        D3DFMT_A1 = 118,
-
-
-        // Binary format indicating that the data has no inherent type
-        D3DFMT_BINARYBUFFER = 199,
-
-
-        D3DFMT_FORCE_DWORD = 0x7fffffff
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DLOCKED_RECT
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DSURFACE_DESC
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DDISPLAYMODEFILTER
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct LUID
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DRECTPATCH_INFO
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DTRIPATCH_INFO
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DVERTEXELEMENT9
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct PALETTEENTRY
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DCLIPSTATUS9
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DLIGHT9
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DMATERIAL9
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DVIEWPORT9
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DMATRIX
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DRECT
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DGAMMARAMP
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct POINT
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DRASTER_STATUS
-    {
-        public bool InVBlank;
-        public int ScanLine;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DVSHADERCAPS2_0
+    [UnmanagedName("D3DVSHADERCAPS2_0"),
+    StructLayout(LayoutKind.Sequential)]
+    public class D3DVSHADERCAPS2_0
     {
         public int Caps;
         public int DynamicFlowControlDepth;
@@ -471,8 +339,9 @@ namespace EVRPresenter
         public int StaticFlowControlDepth;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DPSHADERCAPS2_0
+    [UnmanagedName("D3DPSHADERCAPS2_0"),
+    StructLayout(LayoutKind.Sequential)]
+    public class D3DPSHADERCAPS2_0
     {
         public int Caps;
         public int DynamicFlowControlDepth;
@@ -481,7 +350,28 @@ namespace EVRPresenter
         public int NumInstructionSlots;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [UnmanagedName("D3DDEVICE_CREATION_PARAMETERS"),
+    StructLayout(LayoutKind.Sequential)]
+    public struct D3DDEVICE_CREATION_PARAMETERS
+    {
+        public int AdapterOrdinal;
+        public D3DDEVTYPE DeviceType;
+        public IntPtr hFocusWindow;
+        public D3DCREATE BehaviorFlags;
+    }
+
+    [UnmanagedName("D3DDISPLAYMODE"),
+    StructLayout(LayoutKind.Sequential)]
+    public struct D3DDISPLAYMODE
+    {
+        public int Width;
+        public int Height;
+        public int RefreshRate;
+        public D3DFORMAT Format;
+    }
+
+    [UnmanagedName("D3DCAPS9"),
+    StructLayout(LayoutKind.Sequential)]
     public struct D3DCAPS9
     {
         /* Device Info */
@@ -577,17 +467,40 @@ namespace EVRPresenter
         public int MaxPixelShader30InstructionSlots;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DDEVICE_CREATION_PARAMETERS
+    [UnmanagedName("D3DDISPLAYMODEEX"),
+    StructLayout(LayoutKind.Sequential)]
+    public class D3DDISPLAYMODEEX
     {
-        public int AdapterOrdinal;
-        public D3DDEVTYPE DeviceType;
-        public IntPtr hFocusWindow;
-        public int BehaviorFlags;
+        int Size;
+        int Width;
+        int Height;
+        int RefreshRate;
+        D3DFORMAT Format;
+        D3DSCANLINEORDERING ScanLineOrdering;
     }
 
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("D3DPRESENT_PARAMETERS")]
-    public struct D3DPRESENT_PARAMETERS
+    [UnmanagedName("RGNDATAHEADER"),
+    StructLayout(LayoutKind.Sequential)]
+    public class RGNDATAHEADER
+    {
+        public int dwSize;
+        public int iType;
+        public int nCount;
+        public int nRgnSize;
+        public Rectangle rcBound;
+    }
+
+    [UnmanagedName("RGNDATA"),
+    StructLayout(LayoutKind.Sequential)]
+    public class RGNDATA
+    {
+        public RGNDATAHEADER rdh;
+        public Rectangle[] Buffer;
+    }
+
+    [UnmanagedName("D3DPRESENT_PARAMETERS"),
+    StructLayout(LayoutKind.Sequential)]
+    public class D3DPRESENT_PARAMETERS
     {
         public int BackBufferWidth;
         public int BackBufferHeight;
@@ -631,70 +544,31 @@ namespace EVRPresenter
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct D3DADAPTER_IDENTIFIER9
-    {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 512)]
-        public char Driver;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 512)]
-        public char Description;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public char DeviceName;         /* Device name for GDI (ex. \\.\DISPLAY1) */
-
-        public long DriverVersion;          /* Defined for 32 bit components */
-
-        public int VendorId;
-        public int DeviceId;
-        public int SubSysId;
-        public int Revision;
-
-        public Guid DeviceIdentifier;
-
-        public int WHQLLevel;
-
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct D3DDISPLAYMODE
-    {
-        public int Width;
-        public int Height;
-        public int RefreshRate;
-        public D3DFORMAT Format;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class D3DDISPLAYMODEEX
-    {
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class RGNDATA
-    {
-    }
-
     #endregion
 
     #region Interfaces
 
-    public interface IDirect3DQuery9
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("81BDCBCA-64D4-426d-AE8D-AD0147F4275C"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IDirect3D9
     {
-    }
-
-    public interface IDirect3DResource9
-    {
-    }
-
-    public interface IDirect3DPixelShader9
-    {
-    }
-
-    public interface IDirect3DVertexShader9
-    {
-    }
-
-    public interface IDirect3DVertexDeclaration9
-    {
+        void Junk01();
+        [PreserveSig]
+        int GetAdapterCount();
+        void Junk03();
+        void Junk04();
+        void Junk05();
+        void GetAdapterDisplayMode(int Adapter, out D3DDISPLAYMODE pMode);
+        void CheckDeviceType(int Adapter, D3DDEVTYPE DevType, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, [MarshalAs(UnmanagedType.Bool)] bool bWindowed);
+        void Junk08();
+        void Junk09();
+        void Junk10();
+        void Junk11();
+        void GetDeviceCaps(int Adapter, D3DDEVTYPE DeviceType, out D3DCAPS9 pCaps);
+        [PreserveSig]
+        IntPtr GetAdapterMonitor(int Adapter);
+        void Junk14();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -704,77 +578,37 @@ namespace EVRPresenter
     {
         #region IDirect3D9
 
-        new void RegisterSoftwareDevice(IntPtr pInitializeFunction);
+        new void Junk01();
+        [PreserveSig]
         new int GetAdapterCount();
-        new void GetAdapterIdentifier(int Adapter, int Flags, out D3DADAPTER_IDENTIFIER9 pIdentifier);
-        new int GetAdapterModeCount(int Adapter, D3DFORMAT Format);
-        new void EnumAdapterModes(int Adapter, D3DFORMAT Format, int Mode, out D3DDISPLAYMODE pMode);
+        new void Junk03();
+        new void Junk04();
+        new void Junk05();
         new void GetAdapterDisplayMode(int Adapter, out D3DDISPLAYMODE pMode);
         new void CheckDeviceType(int Adapter, D3DDEVTYPE DevType, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, [MarshalAs(UnmanagedType.Bool)] bool bWindowed);
-        new void CheckDeviceFormat(int Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, int Usage, D3DRESOURCETYPE RType, D3DFORMAT CheckFormat);
-        new void CheckDeviceMultiSampleType(int Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SurfaceFormat, [MarshalAs(UnmanagedType.Bool)] bool Windowed, D3DMULTISAMPLE_TYPE MultiSampleType, out int pQualityLevels);
-        new void CheckDepthStencilMatch(int Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, D3DFORMAT RenderTargetFormat, D3DFORMAT DepthStencilFormat);
-        new void CheckDeviceFormatConversion(int Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SourceFormat, D3DFORMAT TargetFormat);
+        new void Junk08();
+        new void Junk09();
+        new void Junk10();
+        new void Junk11();
         new void GetDeviceCaps(int Adapter, D3DDEVTYPE DeviceType, out D3DCAPS9 pCaps);
+        [PreserveSig]
         new IntPtr GetAdapterMonitor(int Adapter);
-        new void CreateDevice(int Adapter, D3DDEVTYPE DeviceType, IntPtr hFocusWindow, int BehaviorFlags, D3DPRESENT_PARAMETERS pPresentationParameters, out IDirect3DDevice9 ppReturnedDeviceInterface);
+        new void Junk14();
 
         #endregion
 
-        int GetAdapterModeCountEx(int Adapter, out D3DDISPLAYMODEFILTER pFilter);
-        void EnumAdapterModesEx(int Adapter, D3DDISPLAYMODEFILTER pFilter, int Mode, out D3DDISPLAYMODEEX pMode);
-        void GetAdapterDisplayModeEx(int Adapter, out D3DDISPLAYMODEEX pMode, out D3DDISPLAYROTATION pRotation);
-        void CreateDeviceEx(int Adapter, D3DDEVTYPE DeviceType, IntPtr hFocusWindow, D3DCREATE BehaviorFlags, ref D3DPRESENT_PARAMETERS pPresentationParameters, D3DDISPLAYMODEEX pFullscreenDisplayMode, out IDirect3DDevice9Ex ppReturnedDeviceInterface);
-        void GetAdapterLUID(int Adapter, LUID pLUID);
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("85C31227-3DE5-4f00-9B3A-F11AC38C18B5"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DTexture9
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("2518526C-E789-4111-A7B9-47EF328D13E6"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DVolumeTexture9
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("FFF32F81-D953-473a-9223-93D652ABA93F"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DCubeTexture9
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("B64BB1B5-FD70-4df6-BF91-19D0A12455E3"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DVertexBuffer9
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("7C9DD65E-D3F7-4529-ACEE-785830ACDE35"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DIndexBuffer9
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("580CA87E-1D3C-4d54-991D-B7D3E3C298CE"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DBaseTexture9
-    {
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("B07C4FE5-310D-4ba8-A23C-4F0F206F218B"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3DStateBlock9
-    {
+        void Junk1();
+        void Junk2();
+        void Junk3();
+        void CreateDeviceEx(
+            int Adapter,
+            D3DDEVTYPE DeviceType,
+            IntPtr hFocusWindow,
+            D3DCREATE BehaviorFlags,
+            [In, Out, MarshalAs(UnmanagedType.LPStruct)]D3DPRESENT_PARAMETERS pPresentationParameters,
+            D3DDISPLAYMODEEX pFullscreenDisplayMode,
+            out IDirect3DDevice9Ex ppReturnedDeviceInterface);
+        void Junk5();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -782,124 +616,122 @@ namespace EVRPresenter
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IDirect3DDevice9
     {
-        void TestCooperativeLevel();
-        int GetAvailableTextureMem();
-        void EvictManagedResources();
-        void GetDirect3D(out IDirect3D9 ppD3D9);
-        void GetDeviceCaps(out D3DCAPS9 pCaps);
-        void GetDisplayMode(int iSwapChain, out D3DDISPLAYMODE pMode);
+        void Junk001();
+        void Junk002();
+        void Junk003();
+        void Junk004();
+        void Junk005();
+        void Junk006();
         void GetCreationParameters(out D3DDEVICE_CREATION_PARAMETERS pParameters);
-        void SetCursorProperties(int XHotSpot, int YHotSpot, IDirect3DSurface9 pCursorBitmap);
-        void SetCursorPosition(int X, int Y, int Flags);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        bool ShowCursor([MarshalAs(UnmanagedType.Bool)] bool bShow);
-        void CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS pPresentationParameters, out IDirect3DSwapChain9 pSwapChain);
-        void GetSwapChain(int iSwapChain, out IDirect3DSwapChain9 pSwapChain);
-        int GetNumberOfSwapChains();
-        void Reset(D3DPRESENT_PARAMETERS pPresentationParameters);
-        void Present(RECT pSourceRect, RECT pDestRect, IntPtr hDestWindowOverride, RGNDATA pDirtyRegion);
-        void GetBackBuffer(int iSwapChain, int iBackBuffer, D3DBACKBUFFER_TYPE Type, out IDirect3DSurface9 ppBackBuffer);
-        void GetRasterStatus(int iSwapChain, out D3DRASTER_STATUS pRasterStatus);
-        void SetDialogBoxMode([MarshalAs(UnmanagedType.Bool)] bool bEnableDialogs);
-        void SetGammaRamp(int iSwapChain, int Flags, D3DGAMMARAMP pRamp);
-        void GetGammaRamp(int iSwapChain, out D3DGAMMARAMP pRamp);
-        void CreateTexture(int Width, int Height, int Levels, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DTexture9 ppTexture, out IntPtr pSharedHandle);
-        void CreateVolumeTexture(int Width, int Height, int Depth, int Levels, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DVolumeTexture9 ppVolumeTexture, out IntPtr pSharedHandle);
-        void CreateCubeTexture(int EdgeLength, int Levels, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DCubeTexture9 ppCubeTexture, out IntPtr pSharedHandle);
-        void CreateVertexBuffer(int Length, int Usage, int FVF, D3DPOOL Pool, out IDirect3DVertexBuffer9 ppVertexBuffer, out IntPtr pSharedHandle);
-        void CreateIndexBuffer(int Length, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DIndexBuffer9 ppIndexBuffer, out IntPtr pSharedHandle);
-        void CreateRenderTarget(int Width, int Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, int MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Lockable, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle);
-        void CreateDepthStencilSurface(int Width, int Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, int MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Discard, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle);
-        void UpdateSurface(IDirect3DSurface9 pSourceSurface, RECT pSourceRect, IDirect3DSurface9 pDestinationSurface, POINT pDestPoint);
-        void UpdateTexture(IDirect3DBaseTexture9 pSourceTexture, IDirect3DBaseTexture9 pDestinationTexture);
-        void GetRenderTargetData(IDirect3DSurface9 pRenderTarget, IDirect3DSurface9 pDestSurface);
-        void GetFrontBufferData(int iSwapChain, IDirect3DSurface9 pDestSurface);
-        void StretchRect(IDirect3DSurface9 pSourceSurface, RECT pSourceRect, IDirect3DSurface9 pDestSurface, RECT pDestRect, D3DTEXTUREFILTERTYPE Filter);
-        void ColorFill(IDirect3DSurface9 pSurface, RECT pRect, int color);
-        void CreateOffscreenPlainSurface(int Width, int Height, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle);
-        void SetRenderTarget(int RenderTargetIndex, IDirect3DSurface9 pRenderTarget);
-        void GetRenderTarget(int RenderTargetIndex, out IDirect3DSurface9 ppRenderTarget);
-        void SetDepthStencilSurface(IDirect3DSurface9 pNewZStencil);
-        void GetDepthStencilSurface(out IDirect3DSurface9 ppZStencilSurface);
-        void BeginScene();
-        void EndScene();
-        void Clear(int Count, D3DRECT pRects, int Flags, int Color, float Z, int Stencil);
-        void SetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX pMatrix);
-        void GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX pMatrix);
-        void MultiplyTransform(D3DTRANSFORMSTATETYPE a, D3DMATRIX b);
-        void SetViewport(D3DVIEWPORT9 pViewport);
-        void GetViewport(D3DVIEWPORT9 pViewport);
-        void SetMaterial(D3DMATERIAL9 pMaterial);
-        void GetMaterial(D3DMATERIAL9 pMaterial);
-        void SetLight(int Index, D3DLIGHT9 a);
-        void GetLight(int Index, D3DLIGHT9 a);
-        void LightEnable(int Index, [MarshalAs(UnmanagedType.Bool)] bool Enable);
-        void GetLightEnable(int Index, [MarshalAs(UnmanagedType.Bool)] out bool pEnable);
-        void SetClipPlane(int Index, float pPlane);
-        void GetClipPlane(int Index, out float pPlane);
-        void SetRenderState(D3DRENDERSTATETYPE State, int Value);
-        void GetRenderState(D3DRENDERSTATETYPE State, out int pValue);
-        void CreateStateBlock(D3DSTATEBLOCKTYPE Type, out IDirect3DStateBlock9 ppSB);
-        void BeginStateBlock();
-        void EndStateBlock(out IDirect3DStateBlock9 ppSB);
-        void SetClipStatus(D3DCLIPSTATUS9 pClipStatus);
-        void GetClipStatus(out D3DCLIPSTATUS9 pClipStatus);
-        void GetTexture(int Stage, out IDirect3DBaseTexture9 ppTexture);
-        void SetTexture(int Stage, IDirect3DBaseTexture9 pTexture);
-        void GetTextureStageState(int Stage, D3DTEXTURESTAGESTATETYPE Type, out int pValue);
-        void SetTextureStageState(int Stage, D3DTEXTURESTAGESTATETYPE Type, int Value);
-        void GetSamplerState(int Sampler, D3DSAMPLERSTATETYPE Type, out int pValue);
-        void SetSamplerState(int Sampler, D3DSAMPLERSTATETYPE Type, int Value);
-        void ValidateDevice(ref int pNumPasses);
-        void SetPaletteEntries(int PaletteNumber, PALETTEENTRY pEntries);
-        void GetPaletteEntries(int PaletteNumber, PALETTEENTRY pEntries);
-        void SetCurrentTexturePalette(int PaletteNumber);
-        void GetCurrentTexturePalette(out int PaletteNumber);
-        void SetScissorRect(RECT pRect);
-        void GetScissorRect(out RECT pRect);
-        void SetSoftwareVertexProcessing([MarshalAs(UnmanagedType.Bool)] bool bSoftware);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        bool GetSoftwareVertexProcessing();
-        void SetNPatchMode(float nSegments);
-        float GetNPatchMode();
-        void DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, int StartVertex, int PrimitiveCount);
-        void DrawIndexedPrimitive(D3DPRIMITIVETYPE a, int BaseVertexIndex, int MinVertexIndex, int NumVertices, int startIndex, int primCount);
-        void DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, int PrimitiveCount, IntPtr pVertexStreamZeroData, int VertexStreamZeroStride);
-        void DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, int MinVertexIndex, int NumVertices, int PrimitiveCount, IntPtr pIndexData, D3DFORMAT IndexDataFormat, IntPtr pVertexStreamZeroData, int VertexStreamZeroStride);
-        void ProcessVertices(int SrcStartIndex, int DestIndex, int VertexCount, IDirect3DVertexBuffer9 pDestBuffer, IDirect3DVertexDeclaration9 pVertexDecl, int Flags);
-        void CreateVertexDeclaration(D3DVERTEXELEMENT9 pVertexElements, out IDirect3DVertexDeclaration9 ppDecl);
-        void SetVertexDeclaration(IDirect3DVertexDeclaration9 pDecl);
-        void GetVertexDeclaration(out IDirect3DVertexDeclaration9 ppDecl);
-        void SetFVF(int FVF);
-        void GetFVF(int pFVF);
-        void CreateVertexShader(int pFunction, out IDirect3DVertexShader9 ppShader);
-        void SetVertexShader(IDirect3DVertexShader9 pShader);
-        void GetVertexShader(out IDirect3DVertexShader9 ppShader);
-        void SetVertexShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        void GetVertexShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        void SetVertexShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        void GetVertexShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        void SetVertexShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        void GetVertexShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        void SetStreamSource(int StreamNumber, IDirect3DVertexBuffer9 pStreamData, int OffsetInBytes, int Stride);
-        void GetStreamSource(int StreamNumber, out IDirect3DVertexBuffer9 ppStreamData, int pOffsetInBytes, int pStride);
-        void SetStreamSourceFreq(int StreamNumber, int Setting);
-        void GetStreamSourceFreq(int StreamNumber, int pSetting);
-        void SetIndices(IDirect3DIndexBuffer9 pIndexData);
-        void GetIndices(out IDirect3DIndexBuffer9 ppIndexData);
-        void CreatePixelShader(int pFunction, out IDirect3DPixelShader9 ppShader);
-        void SetPixelShader(IDirect3DPixelShader9 pShader);
-        void GetPixelShader(out IDirect3DPixelShader9 ppShader);
-        void SetPixelShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        void GetPixelShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        void SetPixelShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        void GetPixelShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        void SetPixelShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        void GetPixelShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        void DrawRectPatch(int Handle, float pNumSegs, D3DRECTPATCH_INFO pRectPatchInfo);
-        void DrawTriPatch(int Handle, float pNumSegs, D3DTRIPATCH_INFO pTriPatchInfo);
-        void DeletePatch(int Handle);
-        void CreateQuery(D3DQUERYTYPE Type, out IDirect3DQuery9 ppQuery);
+        void Junk008();
+        void Junk009();
+        void Junk010();
+        void CreateAdditionalSwapChain([In, MarshalAs(UnmanagedType.LPStruct)]D3DPRESENT_PARAMETERS pPresentationParameters, out IDirect3DSwapChain9 pSwapChain);
+        void Junk012();
+        void Junk013();
+        void Junk014();
+        void Junk015();
+        void Junk016();
+        void Junk017();
+        void Junk018();
+        void Junk019();
+        void Junk020();
+        void Junk021();
+        void Junk022();
+        void Junk023();
+        void Junk024();
+        void Junk025();
+        void Junk026();
+        void Junk027();
+        void Junk028();
+        void Junk029();
+        void Junk030();
+        void Junk031();
+        void Junk032();
+        void Junk033();
+        void Junk034();
+        void Junk035();
+        void Junk036();
+        void Junk037();
+        void Junk038();
+        void Junk039();
+        void Junk040();
+        void Junk041();
+        void Junk042();
+        void Junk043();
+        void Junk044();
+        void Junk045();
+        void Junk046();
+        void Junk047();
+        void Junk048();
+        void Junk049();
+        void Junk050();
+        void Junk051();
+        void Junk052();
+        void Junk053();
+        void Junk054();
+        void Junk055();
+        void Junk056();
+        void Junk057();
+        void Junk058();
+        void Junk059();
+        void Junk060();
+        void Junk061();
+        void Junk062();
+        void Junk063();
+        void Junk064();
+        void Junk065();
+        void Junk066();
+        void Junk067();
+        void Junk068();
+        void Junk069();
+        void Junk070();
+        void Junk071();
+        void Junk072();
+        void Junk073();
+        void Junk074();
+        void Junk075();
+        void Junk076();
+        void Junk077();
+        void Junk078();
+        void Junk079();
+        void Junk080();
+        void Junk081();
+        void Junk082();
+        void Junk083();
+        void Junk084();
+        void Junk085();
+        void Junk086();
+        void Junk087();
+        void Junk088();
+        void Junk089();
+        void Junk090();
+        void Junk091();
+        void Junk092();
+        void Junk093();
+        void Junk094();
+        void Junk095();
+        void Junk096();
+        void Junk097();
+        void Junk098();
+        void Junk099();
+        void Junk100();
+        void Junk101();
+        void Junk102();
+        void Junk103();
+        void Junk104();
+        void Junk105();
+        void Junk106();
+        void Junk107();
+        void Junk108();
+        void Junk109();
+        void Junk110();
+        void Junk111();
+        void Junk112();
+        void Junk113();
+        void Junk114();
+        void Junk115();
+        void Junk116();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -909,143 +741,141 @@ namespace EVRPresenter
     {
         #region IDirect3DDevice9
 
-        new void TestCooperativeLevel();
-        new int GetAvailableTextureMem();
-        new void EvictManagedResources();
-        new void GetDirect3D(out IDirect3D9 ppD3D9);
-        new void GetDeviceCaps(out D3DCAPS9 pCaps);
-        new void GetDisplayMode(int iSwapChain, out D3DDISPLAYMODE pMode);
+        new void Junk001();
+        new void Junk002();
+        new void Junk003();
+        new void Junk004();
+        new void Junk005();
+        new void Junk006();
         new void GetCreationParameters(out D3DDEVICE_CREATION_PARAMETERS pParameters);
-        new void SetCursorProperties(int XHotSpot, int YHotSpot, IDirect3DSurface9 pCursorBitmap);
-        new void SetCursorPosition(int X, int Y, int Flags);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        new bool ShowCursor([MarshalAs(UnmanagedType.Bool)] bool bShow);
-        new void CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS pPresentationParameters, out IDirect3DSwapChain9 pSwapChain);
-        new void GetSwapChain(int iSwapChain, out IDirect3DSwapChain9 pSwapChain);
-        new int GetNumberOfSwapChains();
-        new void Reset(D3DPRESENT_PARAMETERS pPresentationParameters);
-        new void Present(RECT pSourceRect, RECT pDestRect, IntPtr hDestWindowOverride, RGNDATA pDirtyRegion);
-        new void GetBackBuffer(int iSwapChain, int iBackBuffer, D3DBACKBUFFER_TYPE Type, out IDirect3DSurface9 ppBackBuffer);
-        new void GetRasterStatus(int iSwapChain, out D3DRASTER_STATUS pRasterStatus);
-        new void SetDialogBoxMode([MarshalAs(UnmanagedType.Bool)] bool bEnableDialogs);
-        new void SetGammaRamp(int iSwapChain, int Flags, D3DGAMMARAMP pRamp);
-        new void GetGammaRamp(int iSwapChain, out D3DGAMMARAMP pRamp);
-        new void CreateTexture(int Width, int Height, int Levels, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DTexture9 ppTexture, out IntPtr pSharedHandle);
-        new void CreateVolumeTexture(int Width, int Height, int Depth, int Levels, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DVolumeTexture9 ppVolumeTexture, out IntPtr pSharedHandle);
-        new void CreateCubeTexture(int EdgeLength, int Levels, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DCubeTexture9 ppCubeTexture, out IntPtr pSharedHandle);
-        new void CreateVertexBuffer(int Length, int Usage, int FVF, D3DPOOL Pool, out IDirect3DVertexBuffer9 ppVertexBuffer, out IntPtr pSharedHandle);
-        new void CreateIndexBuffer(int Length, int Usage, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DIndexBuffer9 ppIndexBuffer, out IntPtr pSharedHandle);
-        new void CreateRenderTarget(int Width, int Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, int MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Lockable, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle);
-        new void CreateDepthStencilSurface(int Width, int Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, int MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Discard, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle);
-        new void UpdateSurface(IDirect3DSurface9 pSourceSurface, RECT pSourceRect, IDirect3DSurface9 pDestinationSurface, POINT pDestPoint);
-        new void UpdateTexture(IDirect3DBaseTexture9 pSourceTexture, IDirect3DBaseTexture9 pDestinationTexture);
-        new void GetRenderTargetData(IDirect3DSurface9 pRenderTarget, IDirect3DSurface9 pDestSurface);
-        new void GetFrontBufferData(int iSwapChain, IDirect3DSurface9 pDestSurface);
-        new void StretchRect(IDirect3DSurface9 pSourceSurface, RECT pSourceRect, IDirect3DSurface9 pDestSurface, RECT pDestRect, D3DTEXTUREFILTERTYPE Filter);
-        new void ColorFill(IDirect3DSurface9 pSurface, RECT pRect, int color);
-        new void CreateOffscreenPlainSurface(int Width, int Height, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle);
-        new void SetRenderTarget(int RenderTargetIndex, IDirect3DSurface9 pRenderTarget);
-        new void GetRenderTarget(int RenderTargetIndex, out IDirect3DSurface9 ppRenderTarget);
-        new void SetDepthStencilSurface(IDirect3DSurface9 pNewZStencil);
-        new void GetDepthStencilSurface(out IDirect3DSurface9 ppZStencilSurface);
-        new void BeginScene();
-        new void EndScene();
-        new void Clear(int Count, D3DRECT pRects, int Flags, int Color, float Z, int Stencil);
-        new void SetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX pMatrix);
-        new void GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX pMatrix);
-        new void MultiplyTransform(D3DTRANSFORMSTATETYPE a, D3DMATRIX b);
-        new void SetViewport(D3DVIEWPORT9 pViewport);
-        new void GetViewport(D3DVIEWPORT9 pViewport);
-        new void SetMaterial(D3DMATERIAL9 pMaterial);
-        new void GetMaterial(D3DMATERIAL9 pMaterial);
-        new void SetLight(int Index, D3DLIGHT9 a);
-        new void GetLight(int Index, D3DLIGHT9 a);
-        new void LightEnable(int Index, [MarshalAs(UnmanagedType.Bool)] bool Enable);
-        new void GetLightEnable(int Index, [MarshalAs(UnmanagedType.Bool)] out bool pEnable);
-        new void SetClipPlane(int Index, float pPlane);
-        new void GetClipPlane(int Index, out float pPlane);
-        new void SetRenderState(D3DRENDERSTATETYPE State, int Value);
-        new void GetRenderState(D3DRENDERSTATETYPE State, out int pValue);
-        new void CreateStateBlock(D3DSTATEBLOCKTYPE Type, out IDirect3DStateBlock9 ppSB);
-        new void BeginStateBlock();
-        new void EndStateBlock(out IDirect3DStateBlock9 ppSB);
-        new void SetClipStatus(D3DCLIPSTATUS9 pClipStatus);
-        new void GetClipStatus(out D3DCLIPSTATUS9 pClipStatus);
-        new void GetTexture(int Stage, out IDirect3DBaseTexture9 ppTexture);
-        new void SetTexture(int Stage, IDirect3DBaseTexture9 pTexture);
-        new void GetTextureStageState(int Stage, D3DTEXTURESTAGESTATETYPE Type, out int pValue);
-        new void SetTextureStageState(int Stage, D3DTEXTURESTAGESTATETYPE Type, int Value);
-        new void GetSamplerState(int Sampler, D3DSAMPLERSTATETYPE Type, out int pValue);
-        new void SetSamplerState(int Sampler, D3DSAMPLERSTATETYPE Type, int Value);
-        new void ValidateDevice(ref int pNumPasses);
-        new void SetPaletteEntries(int PaletteNumber, PALETTEENTRY pEntries);
-        new void GetPaletteEntries(int PaletteNumber, PALETTEENTRY pEntries);
-        new void SetCurrentTexturePalette(int PaletteNumber);
-        new void GetCurrentTexturePalette(out int PaletteNumber);
-        new void SetScissorRect(RECT pRect);
-        new void GetScissorRect(out RECT pRect);
-        new void SetSoftwareVertexProcessing([MarshalAs(UnmanagedType.Bool)] bool bSoftware);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        new bool GetSoftwareVertexProcessing();
-        new void SetNPatchMode(float nSegments);
-        new float GetNPatchMode();
-        new void DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, int StartVertex, int PrimitiveCount);
-        new void DrawIndexedPrimitive(D3DPRIMITIVETYPE a, int BaseVertexIndex, int MinVertexIndex, int NumVertices, int startIndex, int primCount);
-        new void DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, int PrimitiveCount, IntPtr pVertexStreamZeroData, int VertexStreamZeroStride);
-        new void DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, int MinVertexIndex, int NumVertices, int PrimitiveCount, IntPtr pIndexData, D3DFORMAT IndexDataFormat, IntPtr pVertexStreamZeroData, int VertexStreamZeroStride);
-        new void ProcessVertices(int SrcStartIndex, int DestIndex, int VertexCount, IDirect3DVertexBuffer9 pDestBuffer, IDirect3DVertexDeclaration9 pVertexDecl, int Flags);
-        new void CreateVertexDeclaration(D3DVERTEXELEMENT9 pVertexElements, out IDirect3DVertexDeclaration9 ppDecl);
-        new void SetVertexDeclaration(IDirect3DVertexDeclaration9 pDecl);
-        new void GetVertexDeclaration(out IDirect3DVertexDeclaration9 ppDecl);
-        new void SetFVF(int FVF);
-        new void GetFVF(int pFVF);
-        new void CreateVertexShader(int pFunction, out IDirect3DVertexShader9 ppShader);
-        new void SetVertexShader(IDirect3DVertexShader9 pShader);
-        new void GetVertexShader(out IDirect3DVertexShader9 ppShader);
-        new void SetVertexShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        new void GetVertexShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        new void SetVertexShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        new void GetVertexShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        new void SetVertexShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        new void GetVertexShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        new void SetStreamSource(int StreamNumber, IDirect3DVertexBuffer9 pStreamData, int OffsetInBytes, int Stride);
-        new void GetStreamSource(int StreamNumber, out IDirect3DVertexBuffer9 ppStreamData, int pOffsetInBytes, int pStride);
-        new void SetStreamSourceFreq(int StreamNumber, int Setting);
-        new void GetStreamSourceFreq(int StreamNumber, int pSetting);
-        new void SetIndices(IDirect3DIndexBuffer9 pIndexData);
-        new void GetIndices(out IDirect3DIndexBuffer9 ppIndexData);
-        new void CreatePixelShader(int pFunction, out IDirect3DPixelShader9 ppShader);
-        new void SetPixelShader(IDirect3DPixelShader9 pShader);
-        new void GetPixelShader(out IDirect3DPixelShader9 ppShader);
-        new void SetPixelShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        new void GetPixelShaderConstantF(int StartRegister, float pConstantData, int Vector4fCount);
-        new void SetPixelShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        new void GetPixelShaderConstantI(int StartRegister, int pConstantData, int Vector4iCount);
-        new void SetPixelShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        new void GetPixelShaderConstantB(int StartRegister, [MarshalAs(UnmanagedType.Bool)] bool pConstantData, int BoolCount);
-        new void DrawRectPatch(int Handle, float pNumSegs, D3DRECTPATCH_INFO pRectPatchInfo);
-        new void DrawTriPatch(int Handle, float pNumSegs, D3DTRIPATCH_INFO pTriPatchInfo);
-        new void DeletePatch(int Handle);
-        new void CreateQuery(D3DQUERYTYPE Type, out IDirect3DQuery9 ppQuery);
+        new void Junk008();
+        new void Junk009();
+        new void Junk010();
+        new void CreateAdditionalSwapChain([In, MarshalAs(UnmanagedType.LPStruct)]D3DPRESENT_PARAMETERS pPresentationParameters, out IDirect3DSwapChain9 pSwapChain);
+        new void Junk012();
+        new void Junk013();
+        new void Junk014();
+        new void Junk015();
+        new void Junk016();
+        new void Junk017();
+        new void Junk018();
+        new void Junk019();
+        new void Junk020();
+        new void Junk021();
+        new void Junk022();
+        new void Junk023();
+        new void Junk024();
+        new void Junk025();
+        new void Junk026();
+        new void Junk027();
+        new void Junk028();
+        new void Junk029();
+        new void Junk030();
+        new void Junk031();
+        new void Junk032();
+        new void Junk033();
+        new void Junk034();
+        new void Junk035();
+        new void Junk036();
+        new void Junk037();
+        new void Junk038();
+        new void Junk039();
+        new void Junk040();
+        new void Junk041();
+        new void Junk042();
+        new void Junk043();
+        new void Junk044();
+        new void Junk045();
+        new void Junk046();
+        new void Junk047();
+        new void Junk048();
+        new void Junk049();
+        new void Junk050();
+        new void Junk051();
+        new void Junk052();
+        new void Junk053();
+        new void Junk054();
+        new void Junk055();
+        new void Junk056();
+        new void Junk057();
+        new void Junk058();
+        new void Junk059();
+        new void Junk060();
+        new void Junk061();
+        new void Junk062();
+        new void Junk063();
+        new void Junk064();
+        new void Junk065();
+        new void Junk066();
+        new void Junk067();
+        new void Junk068();
+        new void Junk069();
+        new void Junk070();
+        new void Junk071();
+        new void Junk072();
+        new void Junk073();
+        new void Junk074();
+        new void Junk075();
+        new void Junk076();
+        new void Junk077();
+        new void Junk078();
+        new void Junk079();
+        new void Junk080();
+        new void Junk081();
+        new void Junk082();
+        new void Junk083();
+        new void Junk084();
+        new void Junk085();
+        new void Junk086();
+        new void Junk087();
+        new void Junk088();
+        new void Junk089();
+        new void Junk090();
+        new void Junk091();
+        new void Junk092();
+        new void Junk093();
+        new void Junk094();
+        new void Junk095();
+        new void Junk096();
+        new void Junk097();
+        new void Junk098();
+        new void Junk099();
+        new void Junk100();
+        new void Junk101();
+        new void Junk102();
+        new void Junk103();
+        new void Junk104();
+        new void Junk105();
+        new void Junk106();
+        new void Junk107();
+        new void Junk108();
+        new void Junk109();
+        new void Junk110();
+        new void Junk111();
+        new void Junk112();
+        new void Junk113();
+        new void Junk114();
+        new void Junk115();
+        new void Junk116();
 
         #endregion
 
-        void SetConvolutionMonoKernel(int width, int height, float rows, float columns);
-        void ComposeRects(IDirect3DSurface9 pSrc, IDirect3DSurface9 pDst, IDirect3DVertexBuffer9 pSrcRectDescs, int NumRects, IDirect3DVertexBuffer9 pDstRectDescs, D3DCOMPOSERECTSOP Operation, int Xoffset, int Yoffset);
-        void PresentEx(RECT pSourceRect, RECT pDestRect, IntPtr hDestWindowOverride, RGNDATA pDirtyRegion, int dwFlags);
-        void GetGPUThreadPriority(int pPriority);
-        void SetGPUThreadPriority(int Priority);
-        void WaitForVBlank(int iSwapChain);
-        void CheckResourceResidency(out IDirect3DResource9 pResourceArray, int NumResources);
-        void SetMaximumFrameLatency(int MaxLatency);
-        void GetMaximumFrameLatency(int pMaxLatency);
+        void Junk1();
+        void Junk2();
+        void Junk3();
+        void Junk4();
+        void Junk5();
+        void Junk6();
+        void Junk7();
+        void Junk8();
+        void Junk9();
         [PreserveSig]
         int CheckDeviceState(IntPtr hDestinationWindow);
-        void CreateRenderTargetEx(int Width, int Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, int MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Lockable, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle, int Usage);
-        void CreateOffscreenPlainSurfaceEx(int Width, int Height, D3DFORMAT Format, D3DPOOL Pool, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle, int Usage);
-        void CreateDepthStencilSurfaceEx(int Width, int Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, int MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Discard, out IDirect3DSurface9 ppSurface, out IntPtr pSharedHandle, int Usage);
-        void ResetEx(D3DPRESENT_PARAMETERS pPresentationParameters, D3DDISPLAYMODEEX pFullscreenDisplayMode);
-        void GetDisplayModeEx(int iSwapChain, D3DDISPLAYMODEEX pMode, D3DDISPLAYROTATION pRotation);
+        void Junk11();
+        void Junk12();
+        void Junk13();
+        void Junk14();
+        void Junk15();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -1057,28 +887,11 @@ namespace EVRPresenter
             [In]  IDirect3DDevice9 pDevice,
             [In]  int resetToken);
 
-        void OpenDeviceHandle(
-            out IntPtr phDevice);
-
-        void CloseDeviceHandle(
-            [In]  IntPtr hDevice);
-
-        void TestDevice(
-            [In]  IntPtr hDevice);
-
-        void LockDevice(
-            [In]  IntPtr hDevice,
-            out IDirect3DDevice9 ppDevice,
-            [In, MarshalAs(UnmanagedType.Bool)]  bool fBlock);
-
-        void UnlockDevice(
-            [In]  IntPtr hDevice,
-            [In, MarshalAs(UnmanagedType.Bool)]  bool fSaveState);
-
-        void GetVideoService(
-            [In]  IntPtr hDevice,
-            [In]  Guid riid,
-            out object ppService);
+        void Junk2();
+        void Junk3();
+        void Junk4();
+        void Junk5();
+        void Junk6();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -1086,120 +899,22 @@ namespace EVRPresenter
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IDirect3DSurface9
     {
-        void GetDevice(out IDirect3DDevice9 ppDevice);
-        void SetPrivateData(Guid refguid, IntPtr pData, int SizeOfData, int Flags);
-        void GetPrivateData(Guid refguid, IntPtr pData, out int pSizeOfData);
-        void FreePrivateData(Guid refguid);
-        [PreserveSig]
-        int SetPriority(int PriorityNew);
-        [PreserveSig]
-        int GetPriority();
-        void PreLoad();
-        [PreserveSig]
-        D3DRESOURCETYPE GetType();
-        void GetContainer(Guid riid, out object ppContainer);
-        void GetDesc(out D3DSURFACE_DESC pDesc);
-        void LockRect(D3DLOCKED_RECT pLockedRect, RECT pRect, int Flags);
-        void UnlockRect();
-        void GetDC(out IntPtr phdc);
-        void ReleaseDC(IntPtr hdc);
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    Guid("81BDCBCA-64D4-426d-AE8D-AD0147F4275C"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDirect3D9
-    {
-        void RegisterSoftwareDevice(
-            IntPtr pInitializeFunction
-            );
-
-        [PreserveSig]
-        int GetAdapterCount();
-
-        void GetAdapterIdentifier(
-            int Adapter,
-            int Flags,
-            out D3DADAPTER_IDENTIFIER9 pIdentifier
-            );
-
-        [PreserveSig]
-        int GetAdapterModeCount(
-            int Adapter,
-            D3DFORMAT Format
-            );
-
-        void EnumAdapterModes(
-            int Adapter,
-            D3DFORMAT Format,
-            int Mode,
-            out D3DDISPLAYMODE pMode
-            );
-
-        void GetAdapterDisplayMode(
-            int Adapter,
-            out D3DDISPLAYMODE pMode
-            );
-
-        void CheckDeviceType(
-            int Adapter,
-            D3DDEVTYPE DevType,
-            D3DFORMAT AdapterFormat,
-            D3DFORMAT BackBufferFormat,
-            [MarshalAs(UnmanagedType.Bool)] bool bWindowed
-            );
-
-        void CheckDeviceFormat(
-            int Adapter,
-            D3DDEVTYPE DeviceType,
-            D3DFORMAT AdapterFormat,
-            int Usage,
-            D3DRESOURCETYPE RType,
-            D3DFORMAT CheckFormat
-            );
-
-        void CheckDeviceMultiSampleType(
-            int Adapter,
-            D3DDEVTYPE DeviceType,
-            D3DFORMAT SurfaceFormat,
-            [MarshalAs(UnmanagedType.Bool)] bool bWindowed,
-            D3DMULTISAMPLE_TYPE MultiSampleType,
-            out int pQualityLevels
-            );
-
-        void CheckDepthStencilMatch(
-            int Adapter,
-            D3DDEVTYPE DeviceType,
-            D3DFORMAT AdapterFormat,
-            D3DFORMAT RenderTargetFormat,
-            D3DFORMAT DepthStencilFormat
-            );
-
-        void CheckDeviceFormatConversion(
-            int Adapter,
-            D3DDEVTYPE DeviceType,
-            D3DFORMAT SourceFormat,
-            D3DFORMAT TargetFormat
-            );
-
-        void GetDeviceCaps(
-            int Adapter,
-            D3DDEVTYPE DeviceType,
-            out D3DCAPS9 pCaps
-            );
-
-        [PreserveSig]
-        IntPtr GetAdapterMonitor(
-            int Adapter
-            );
-
-        void CreateDevice(
-            int Adapter,
-            D3DDEVTYPE DeviceType, IntPtr hFocusWindow,
-            int BehaviorFlags,
-            D3DPRESENT_PARAMETERS pPresentationParameters,
-            out IDirect3DDevice9 ppReturnedDeviceInterface
-            );
+        void Junk1();
+        void Junk2();
+        void Junk3();
+        void Junk4();
+        void Junk5();
+        void Junk6();
+        void Junk7();
+        void Junk8();
+        void GetContainer(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppContainer);
+        void Junk10();
+        void Junk11();
+        void Junk12();
+        void Junk13();
+        void Junk14();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -1207,13 +922,26 @@ namespace EVRPresenter
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IDirect3DSwapChain9
     {
-        void Present(RECT pSourceRect, RECT pDestRect, IntPtr hDestWindowOverride, RGNDATA pDirtyRegion, int dwFlags);
-        void GetFrontBufferData(IDirect3DSurface9 pDestSurface);
-        void GetBackBuffer(int iBackBuffer, D3DBACKBUFFER_TYPE Type, out IDirect3DSurface9 ppBackBuffer);
-        void GetRasterStatus(out D3DRASTER_STATUS pRasterStatus);
-        void GetDisplayMode(out D3DDISPLAYMODE pMode);
-        void GetDevice(out IDirect3DDevice9 ppDevice);
-        void GetPresentParameters(out D3DPRESENT_PARAMETERS pPresentationParameters);
+        void Present(
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFRect pSourceRect,
+            [In, MarshalAs(UnmanagedType.LPStruct)] MFRect pDestRect,
+            IntPtr hDestWindowOverride,
+            [In, MarshalAs(UnmanagedType.LPStruct)] RGNDATA pDirtyRegion,
+            int dwFlags
+            );
+
+        void Junk2();
+
+        void GetBackBuffer(
+            int iBackBuffer,
+            D3DBACKBUFFER_TYPE Type,
+            out IDirect3DSurface9 ppBackBuffer
+            );
+
+        void Junk4();
+        void Junk5();
+        void Junk6();
+        void Junk7();
     }
 
     #endregion

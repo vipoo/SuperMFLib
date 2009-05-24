@@ -1,8 +1,8 @@
 /****************************************************************************
-While the underlying libraries are covered by LGPL, this sample is released 
-as public domain.  It is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE.  
+While the underlying libraries are covered by LGPL, this sample is released
+as public domain.  It is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.
 *****************************************************************************/
 
 using System;
@@ -14,196 +14,72 @@ using System.Runtime.InteropServices;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
-using System.Windows.Forms;
 
-namespace EVRPresenter
+namespace MediaFoundation.Utility
 {
-    public enum PeekFlags
-    {
-        NOREMOVE = 0x0000,
-        REMOVE = 0x0001,
-        NOYIELD = 0x0002
-    }
-
-    public enum WakeMask
-    {
-        KEY = 0x0001,
-        MOUSEMOVE = 0x0002,
-        MOUSEBUTTON = 0x0004,
-        POSTMESSAGE = 0x0008,
-        TIMER = 0x0010,
-        PAINT = 0x0020,
-        SENDMESSAGE = 0x0040,
-        HOTKEY = 0x0080,
-        ALLPOSTMESSAGE = 0x0100
-    }
-
-    public enum MonitorFlags
-    {
-        DEFAULTTONULL = 0x00000000,
-        DEFAULTTOPRIMARY = 0x00000001,
-        DEFAULTTONEAREST = 0x00000002
-    }
-
-    class Extern
-    {
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetDesktopWindow();
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DeleteObject(IntPtr a);
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetDC(IntPtr a);
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        public static extern IntPtr MonitorFromWindow(
-          IntPtr hwnd,       // handle to a window 
-          MonitorFlags dwFlags    // determine return value 
-        );
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetClientRect(
-          IntPtr hwnd,       // handle to a window 
-          out RECT r    // determine return value 
-        );
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        public static extern int ReleaseDC(
-          IntPtr hwnd,       // handle to a window 
-          IntPtr hdc    // determine return value 
-        );
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("coredll.dll")]
-        public static extern IntPtr CreateSolidBrush(
-          int c
-        );
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        public static extern int FillRect(
-            IntPtr hDC,           // handle to DC
-            RECT lprc,  // rectangle
-            IntPtr hbr         // handle to brush
-        );
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("user32.dll")]
-        public static extern int MsgWaitForMultipleObjects(uint nCount, IntPtr[] pHandles,
-           bool bWaitAll, int dwMilliseconds, WakeMask dwWakeMask);
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool PeekMessage(out Message message, IntPtr handle, uint filterMin, uint filterMax, PeekFlags flags);
-
-
-        [DllImport("user32.dll")]
-        public extern static int PostThreadMessage(
-            int handle,
-            int msg,
-            IntPtr wParam,
-            IntPtr lParam
-         );
-
-        [DllImport("user32.dll")]
-        public extern static bool IsWindow(IntPtr x);
-
-    }
-
     class Utils
     {
         public static void MFSetBlob(IMFAttributes p, Guid g, object o)
         {
             int iSize = Marshal.SizeOf(o);
-            IntPtr ip = Marshal.AllocCoTaskMem(iSize);
-            byte[] b;
+            byte[] b = new byte[iSize];
+
+            GCHandle h = GCHandle.Alloc(b, GCHandleType.Pinned);
             try
             {
-                Marshal.PtrToStructure(ip, o);
-                b = new byte[iSize];
-                Marshal.Copy(ip, b, 0, iSize);
+                IntPtr ip = h.AddrOfPinnedObject();
+
+                Marshal.StructureToPtr(o, ip, false);
             }
             finally
             {
-                Marshal.FreeCoTaskMem(ip);
+                h.Free();
             }
-            p.SetBlob(MFAttributesClsid.MF_MT_CUSTOM_VIDEO_PRIMARIES, b, iSize);
+            p.SetBlob(g, b, iSize);
         }
 
-        public static IntPtr MFGetBlob(IMFAttributes p, Guid g)
+        public static void MFGetBlob(IMFAttributes p, Guid g, object obj)
         {
             int iSize;
             int i;
 
+            // Get the blob into a byte array
             p.GetBlobSize(g, out iSize);
             byte[] b = new byte[iSize];
-            p.GetBlob(MFAttributesClsid.MF_MT_CUSTOM_VIDEO_PRIMARIES, b, iSize, out i);
+            p.GetBlob(g, b, iSize, out i);
 
-            IntPtr ip = Marshal.AllocCoTaskMem(iSize);
-            Marshal.Copy(b, 0, ip, iSize);
+            GCHandle h = GCHandle.Alloc(b, GCHandleType.Pinned);
 
-            return ip;
+            try
+            {
+                IntPtr ip = h.AddrOfPinnedObject();
+
+                // Convert the byte array to an IntPtr
+                Marshal.PtrToStructure(ip, obj);
+            }
+            finally
+            {
+                h.Free();
+            }
         }
 
-        public static void MFSetAttributeRatio(IMFAttributes pAttributes, Guid g, int nNumerator, int nDenominator)
+        public static void MFSetAttribute2UINT32asUINT64(IMFAttributes pAttributes, Guid g, int nNumerator, int nDenominator)
         {
-            pAttributes.SetUINT64(g, (nNumerator << 32) | nDenominator);
+            long ul = nNumerator;
+
+            ul <<= 32;
+            ul |= (UInt32)nDenominator;
+
+            pAttributes.SetUINT64(g, ul);
         }
 
-        public static void MFGetAttributeRatio(IMFAttributes pAttributes, Guid g, out int nNumerator, out int nDenominator)
+        public static void MFGetAttribute2UINT32asUINT64(IMFAttributes pAttributes, Guid g, out int nNumerator, out int nDenominator)
         {
-            long l;
-            pAttributes.GetUINT64(g, out l);
-            nDenominator = (int)l;
-            nNumerator = (int)(l >> 32);
-        }
+            long ul;
 
-        public static void MFGetAttributeSize(IMFAttributes pAttributes, Guid g, out int width, out int height)
-        {
-            long l;
-            pAttributes.GetUINT64(g, out l);
-            height = (int)l;
-            width = (int)(l >> 32);
-        }
-
-        public static void MFSetAttributeSize(IMFAttributes pAttributes, Guid g, int width, int height)
-        {
-            pAttributes.SetUINT64(g, (width << 32) | width);
-        }
-
-        public static MFOffset MakeOffset(float v)
-        {
-            MFOffset offset;
-            offset.Value = (short)v;
-            offset.fract = (short)(65536 * (v - offset.Value));
-            return offset;
-        }
-
-        public static MFVideoArea MakeArea(float x, float y, int width, int height)
-        {
-            MFVideoArea area = new MFVideoArea();
-
-            area.OffsetX = Utils.MakeOffset(x);
-            area.OffsetY = Utils.MakeOffset(y);
-            area.Area.cx = width;
-            area.Area.cy = height;
-
-            return area;
-        }
-
-        public static int GetOffset(MFOffset offset)
-        {
-            return (int)((float)offset.Value + offset.fract / 65536.0f);
+            pAttributes.GetUINT64(g, out ul);
+            nDenominator = (int)ul;
+            nNumerator = (int)(ul >> 32);
         }
 
         public static bool AreMediaTypesEqual(IMFMediaType pType1, IMFMediaType pType2)
@@ -217,10 +93,38 @@ namespace EVRPresenter
                 return false; // One is NULL.
             }
 
-            MFMediaEqual dwFlags = MFMediaEqual.None;
+            MFMediaEqual dwFlags;
             int hr = pType1.IsEqual(pType2, out dwFlags);
 
             return (hr == 0);
+        }
+
+        public static int MulDiv(long a, long b, long c)
+        {
+            // Max Rate = Refresh Rate / Frame Rate
+            long l = a * b;
+
+            return (int)(l / c);
+        }
+
+        public static int MFTimeToMsec(long time)
+        {
+            const long ONE_SECOND = 10000000; // One second in hns
+            const int ONE_MSEC = 1000;       // One msec in hns
+
+            return (int)(time / (ONE_SECOND / ONE_MSEC));
+        }
+
+        public static MFRatio GetFrameRate(IMFMediaType pMediaType)
+        {
+            long i64;
+            MFRatio fps;
+
+            pMediaType.GetUINT64(MFAttributesClsid.MF_MT_FRAME_RATE, out i64);
+            fps.Numerator = (int)(i64 >> 32);
+            fps.Denominator = (int)i64;
+
+            return fps;
         }
 
         public static int
@@ -240,196 +144,38 @@ namespace EVRPresenter
             {
                 unRet = unDefault;
             }
+
             return unRet;
         }
-
-        public static int MulDiv(int a, int b, int c)
-        {
-            // Max Rate = Refresh Rate / Frame Rate
-            long l = a * b;
-            return (int)(l / c);
-        }
-
-        public static int RGB(int r, int g, int b)
-        {
-            return r | (g << 8) | (b << 16);
-        }
-
-        public static int D3DCOLOR_ARGB(int a, int r, int g, int b)
-        {
-            return ((((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff));
-        }
-        const Int64 ONE_SECOND = 10000000; // One second in hns
-        const int ONE_MSEC = 1000;       // One msec in hns 
-
-        public static int MFTimeToMsec(Int64 time)
-        {
-            return (int)(time / (ONE_SECOND / ONE_MSEC));
-        }
-
-        public static bool EqualRect(
-            RECT lprc1,
-            RECT lprc2
-        )
-        {
-            return (
-                lprc1.bottom == lprc2.bottom &&
-                lprc1.left == lprc2.left &&
-                lprc1.right == lprc2.right &&
-                lprc1.top == lprc2.top);
-        }
-
-        public static bool IsRectEmpty(
-            RECT lprc)
-        {
-            return (lprc.right <= lprc.left || lprc.bottom <= lprc.top);
-        }
-
-        public static MFRatio GetFrameRate(IMFMediaType pMediaType)
-        {
-            Int64 i64;
-            MFRatio fps;
-
-            pMediaType.GetUINT64(MFAttributesClsid.MF_MT_FRAME_RATE, out i64);
-            fps.Numerator = (int)(i64 >> 32);
-            fps.Denominator = (int)i64;
-
-            return fps;
-        }
-        public static float MFOffsetToFloat(MFOffset offset)
-        {
-            return (float)offset.Value + (float)offset.Value / 65536.0f;
-        }
-
     }
 
-    public class AsyncCallback : COMBase, IMFAsyncCallback
+    class MediaTypeBuilder : IDisposable
     {
-        private EVRCustomPresenter m_pParent;
+        #region Member variables
 
-        public AsyncCallback(EVRCustomPresenter pParent)
-        {
-            m_pParent = pParent;
-        }
-
-        #region IMFAsyncCallback Members
-
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Invoke(IMFAsyncResult pAsyncResult)
-        {
-            m_pParent.OnSampleFree(pAsyncResult);
-        }
-
-        #endregion
-    }
-
-    class MediaTypeBuilder
-    {
         protected IMFMediaType m_pType;
 
-        protected bool IsValid()
-        {
-            return m_pType != null;
-        }
-
-        protected IMFMediaType GetMediaType()
-        {
-            Debug.Assert(IsValid());
-            return m_pType;
-        }
+        #endregion
 
         // Construct from an existing media type.
-        protected MediaTypeBuilder(IMFMediaType pType)
+        public MediaTypeBuilder(IMFMediaType pType)
         {
             Debug.Assert(pType != null);
 
-            if (pType == null)
+            if (pType != null)
             {
-                throw new Exception("E_POINTER");
+                m_pType = pType;
             }
             else
             {
-                m_pType = pType;
+                throw new Exception("E_POINTER");
             }
         }
 
         // Create a new media type.
-        protected MediaTypeBuilder()
+        public MediaTypeBuilder()
         {
             MFExtern.MFCreateMediaType(out m_pType);
-        }
-
-#if false
-        //~MediaTypeBuilder()
-        //{
-            //Marshal.ReleaseComObject(m_pType);
-        //}
-
-        // Static creation functions. 
-
-        // Use this version to create a new media type.
-        template <class T>
-        public static HRESULT Create(T** ppTypeBuilder)
-        {
-            if (ppTypeBuilder == NULL)
-            {
-                return E_POINTER;
-            }
-
-            HRESULT hr = S_OK;
-
-            T *pTypeBuilder = new T(hr);
-            if (pTypeBuilder == NULL)
-            {
-                return E_OUTOFMEMORY;
-            }
-
-            if (SUCCEEDED(hr))
-            {
-                *ppTypeBuilder = pTypeBuilder;
-                (*ppTypeBuilder).AddRef();
-            }
-            SAFE_RELEASE(pTypeBuilder);
-            return hr;
-        }
-
-        // Use this version to initialize from an existing media type.
-        template <class T>
-        public static HRESULT Create(IMFMediaType *pType, T** ppTypeBuilder)
-        {
-            if (ppTypeBuilder == NULL)
-            {
-                return E_POINTER;
-            }
-
-            HRESULT hr = S_OK;
-
-            T *pTypeBuilder = new T(pType, hr);
-            if (pTypeBuilder == NULL)
-            {
-                return E_OUTOFMEMORY;
-            }
-
-            if (SUCCEEDED(hr))
-            {
-                *ppTypeBuilder = pTypeBuilder;
-            }
-            SAFE_RELEASE(pTypeBuilder);
-            return hr;
-        }
-#endif
-        public static void Create(out MediaTypeBuilder ppTypeBuilder)
-        {
-            ppTypeBuilder = new MediaTypeBuilder();
-        }
-
-        public static void Create(IMFMediaType pType, out MediaTypeBuilder ppTypeBuilder)
-        {
-            ppTypeBuilder = new MediaTypeBuilder(pType);
         }
 
         // Direct wrappers of IMFMediaType methods.
@@ -465,7 +211,6 @@ namespace EVRPresenter
             GetMediaType().FreeRepresentation(guidRepresentation, pvRepresentation);
         }
 
-
         // Helper methods
 
         // CopyFrom: Copy all of the attributes from another media type into this type.
@@ -491,7 +236,7 @@ namespace EVRPresenter
             pType.CopyAllItems(m_pType);
         }
 
-        // Returns the underlying IMFMediaType pointer. 
+        // Returns the underlying IMFMediaType pointer.
         public void GetMediaType(out IMFMediaType ppType)
         {
             Debug.Assert(IsValid());
@@ -566,13 +311,13 @@ namespace EVRPresenter
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_FIXED_SIZE_SAMPLES, i);
         }
 
-        // Retrieves the size of each sample, in bytes. 
+        // Retrieves the size of each sample, in bytes.
         public void GetSampleSize(out int pnSize)
         {
             GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, out pnSize);
         }
 
-        // Sets the size of each sample, in bytes. 
+        // Sets the size of each sample, in bytes.
         public void SetSampleSize(int nSize)
         {
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, nSize);
@@ -585,7 +330,7 @@ namespace EVRPresenter
         }
 
         // The following versions return reasonable defaults if the relevant attribute is not present (zero/FALSE).
-        // This is useful for making quick comparisons betweeen media types. 
+        // This is useful for making quick comparisons betweeen media types.
 
         public bool AllSamplesIndependent()
         {
@@ -601,20 +346,30 @@ namespace EVRPresenter
         {
             return Utils.MFGetAttributeUINT32(GetMediaType(), MFAttributesClsid.MF_MT_SAMPLE_SIZE, 0);
         }
+
+        protected bool IsValid()
+        {
+            return m_pType != null;
+        }
+
+        protected IMFMediaType GetMediaType()
+        {
+            Debug.Assert(IsValid());
+            return m_pType;
+        }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            m_pType = null;
+        }
+
+        #endregion
     }
 
     class VideoTypeBuilder : MediaTypeBuilder
     {
-
-        public static void Create(out VideoTypeBuilder ppTypeBuilder)
-        {
-            ppTypeBuilder = new VideoTypeBuilder();
-        }
-
-        public static void Create(IMFMediaType pType, out VideoTypeBuilder ppTypeBuilder)
-        {
-            ppTypeBuilder = new VideoTypeBuilder(pType);
-        }
 
         public VideoTypeBuilder(IMFMediaType pType)
             : base(pType)
@@ -690,23 +445,22 @@ namespace EVRPresenter
             pnStride = nStride;
         }
 
-
         // Sets the default stride. Only appropriate for uncompressed data formats.
         public void SetDefaultStride(int nStride)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, (int)nStride);
+            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, nStride);
         }
 
         // Retrieves the width and height of the video frame.
         public void GetFrameDimensions(out int pdwWidthInPixels, out int pdwHeightInPixels)
         {
-            Utils.MFGetAttributeSize(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_SIZE, out pdwWidthInPixels, out pdwHeightInPixels);
+            Utils.MFGetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_SIZE, out pdwWidthInPixels, out pdwHeightInPixels);
         }
 
         // Sets the width and height of the video frame.
         public void SetFrameDimensions(int dwWidthInPixels, int dwHeightInPixels)
         {
-            Utils.MFSetAttributeSize(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_SIZE, dwWidthInPixels, dwHeightInPixels);
+            Utils.MFSetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_SIZE, dwWidthInPixels, dwHeightInPixels);
         }
 
         // Retrieves the data error rate in bit errors per second
@@ -737,15 +491,7 @@ namespace EVRPresenter
         public void GetCustomVideoPrimaries(out MT_CustomVideoPrimaries pPrimaries)
         {
             pPrimaries = new MT_CustomVideoPrimaries();
-            IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_CUSTOM_VIDEO_PRIMARIES);
-            try
-            {
-                Marshal.PtrToStructure(ip, pPrimaries);
-            }
-            finally
-            {
-                Marshal.FreeCoTaskMem(ip);
-            }
+            Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_CUSTOM_VIDEO_PRIMARIES, pPrimaries);
         }
 
         // Sets custom color primaries.
@@ -757,7 +503,7 @@ namespace EVRPresenter
         // Gets the number of frames per second.
         public void GetFrameRate(out int pnNumerator, out int pnDenominator)
         {
-            Utils.MFGetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_RATE, out pnNumerator, out pnDenominator);
+            Utils.MFGetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_RATE, out pnNumerator, out pnDenominator);
         }
 
         // Gets the frames per second as a ratio.
@@ -769,28 +515,20 @@ namespace EVRPresenter
         // Sets the number of frames per second.
         public void SetFrameRate(int nNumerator, int nDenominator)
         {
-            Utils.MFSetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_RATE, nNumerator, nDenominator);
+            Utils.MFSetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_RATE, nNumerator, nDenominator);
         }
 
         // Sets the number of frames per second, as a ratio.
         public void SetFrameRate(MFRatio ratio)
         {
-            Utils.MFSetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_RATE, ratio.Numerator, ratio.Denominator);
+            Utils.MFSetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_RATE, ratio.Numerator, ratio.Denominator);
         }
 
         // Queries the geometric aperture.
         public void GetGeometricAperture(out MFVideoArea pArea)
         {
             pArea = new MFVideoArea();
-            IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_GEOMETRIC_APERTURE);
-            try
-            {
-                Marshal.PtrToStructure(ip, pArea);
-            }
-            finally
-            {
-                Marshal.FreeCoTaskMem(ip);
-            }
+            Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_GEOMETRIC_APERTURE, pArea);
         }
 
         // Sets the geometric aperture.
@@ -815,15 +553,7 @@ namespace EVRPresenter
         public void GetMinDisplayAperture(out MFVideoArea pArea)
         {
             pArea = new MFVideoArea();
-            IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_MINIMUM_DISPLAY_APERTURE);
-            try
-            {
-                Marshal.PtrToStructure(ip, pArea);
-            }
-            finally
-            {
-                Marshal.FreeCoTaskMem(ip);
-            }
+            Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_MINIMUM_DISPLAY_APERTURE, pArea);
         }
 
         // Sets the the region that contains the valid portion of the signal.
@@ -832,7 +562,7 @@ namespace EVRPresenter
             Utils.MFSetBlob(GetMediaType(), MFAttributesClsid.MF_MT_MINIMUM_DISPLAY_APERTURE, area);
         }
 
-        // Retrieves the aspect ratio of the output rectangle for a video media type. 
+        // Retrieves the aspect ratio of the output rectangle for a video media type.
         public void GetPadControlFlags(out MFVideoPadFlags pFlags)
         {
             int i;
@@ -840,29 +570,21 @@ namespace EVRPresenter
             pFlags = (MFVideoPadFlags)i;
         }
 
-        // Sets the aspect ratio of the output rectangle for a video media type. 
+        // Sets the aspect ratio of the output rectangle for a video media type.
         public void SetPadControlFlags(MFVideoPadFlags flags)
         {
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_PAD_CONTROL_FLAGS, (int)flags);
         }
 
-        // Retrieves an array of palette entries for a video media type. 
+        // Retrieves an array of palette entries for a video media type.
         public void GetPaletteEntries(out MFPaletteEntry[] paEntries, int nEntries)
         {
             paEntries = new MFPaletteEntry[nEntries];
-            IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PALETTE);
-            try
-            {
-                Marshal.PtrToStructure(ip, paEntries);
-            }
-            finally
-            {
-                Marshal.FreeCoTaskMem(ip);
-            }
+            Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PALETTE, paEntries);
         }
 
-        // Sets an array of palette entries for a video media type. 
-        public void SetPaletteEntries(MFPaletteEntry paEntries, int nEntries)
+        // Sets an array of palette entries for a video media type.
+        public void SetPaletteEntries(MFPaletteEntry[] paEntries, int nEntries)
         {
             Utils.MFSetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PALETTE, paEntries);
         }
@@ -870,28 +592,21 @@ namespace EVRPresenter
         // Retrieves the number of palette entries.
         public void GetNumPaletteEntries(out int pnEntries)
         {
+            int iSize = Marshal.SizeOf(typeof(MFPaletteEntry));
             int nBytes = 0;
             GetMediaType().GetBlobSize(MFAttributesClsid.MF_MT_PALETTE, out nBytes);
-            if (nBytes % Marshal.SizeOf(typeof(MFPaletteEntry)) != 0)
+            if (nBytes % iSize != 0)
             {
                 throw new Exception("E_UNEXPECTED");
             }
-            pnEntries = nBytes / Marshal.SizeOf(typeof(MFPaletteEntry));
+            pnEntries = nBytes / iSize;
         }
 
         // Queries the 4×3 region of video that should be displayed in pan/scan mode.
         public void GetPanScanAperture(out MFVideoArea pArea)
         {
             pArea = new MFVideoArea();
-            IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_APERTURE);
-            try
-            {
-                Marshal.PtrToStructure(ip, pArea);
-            }
-            finally
-            {
-                Marshal.FreeCoTaskMem(ip);
-            }
+            Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_APERTURE, pArea);
         }
 
         // Sets the 4×3 region of video that should be displayed in pan/scan mode.
@@ -914,25 +629,27 @@ namespace EVRPresenter
         {
             int i = 0;
             if (bEnabled)
+            {
                 i = 1;
+            }
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, i);
         }
 
         // Queries the pixel aspect ratio
         public void GetPixelAspectRatio(out int pnNumerator, out int pnDenominator)
         {
-            Utils.MFGetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, out pnNumerator, out pnDenominator);
+            Utils.MFGetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, out pnNumerator, out pnDenominator);
         }
 
         // Sets the pixel aspect ratio
         public void SetPixelAspectRatio(int nNumerator, int nDenominator)
         {
-            Utils.MFSetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, nNumerator, nDenominator);
+            Utils.MFSetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, nNumerator, nDenominator);
         }
 
         public void SetPixelAspectRatio(MFRatio ratio)
         {
-            Utils.MFSetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, ratio.Numerator, ratio.Denominator);
+            Utils.MFSetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, ratio.Numerator, ratio.Denominator);
         }
 
         // Queries the intended aspect ratio.
@@ -991,7 +708,7 @@ namespace EVRPresenter
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_LIGHTING, (int)nLighting);
         }
 
-        // Queries the nominal range of the color information in a video media type. 
+        // Queries the nominal range of the color information in a video media type.
         public void GetVideoNominalRange(out MFNominalRange pRange)
         {
             int i;
@@ -999,7 +716,7 @@ namespace EVRPresenter
             pRange = (MFNominalRange)i;
         }
 
-        // Sets the nominal range of the color information in a video media type. 
+        // Sets the nominal range of the color information in a video media type.
         public void SetVideoNominalRange(MFNominalRange nRange)
         {
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_NOMINAL_RANGE, (int)nRange);
@@ -1019,7 +736,7 @@ namespace EVRPresenter
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_PRIMARIES, (int)nPrimaries);
         }
 
-        // Gets a enumeration representing the conversion matrix from the 
+        // Gets a enumeration representing the conversion matrix from the
         // Y'Cb'Cr' color space to the R'G'B' color space.
         public void GetYUVMatrix(out MFVideoTransferMatrix pMatrix)
         {
@@ -1028,16 +745,16 @@ namespace EVRPresenter
             pMatrix = (MFVideoTransferMatrix)i;
         }
 
-        // Sets an enumeration representing the conversion matrix from the 
+        // Sets an enumeration representing the conversion matrix from the
         // Y'Cb'Cr' color space to the R'G'B' color space.
         public void SetYUVMatrix(MFVideoTransferMatrix nMatrix)
         {
             GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_YUV_MATRIX, (int)nMatrix);
         }
 
-        // 
+        //
         // The following versions return reasonable defaults if the relevant attribute is not present (zero/FALSE).
-        // This is useful for making quick comparisons betweeen media types. 
+        // This is useful for making quick comparisons betweeen media types.
         //
 
         public MFRatio GetPixelAspectRatio() // Defaults to 1:1 (square pixels)
@@ -1046,7 +763,7 @@ namespace EVRPresenter
 
             try
             {
-                Utils.MFGetAttributeRatio(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, out PAR.Numerator, out PAR.Denominator);
+                Utils.MFGetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, out PAR.Numerator, out PAR.Denominator);
             }
             catch
             {
@@ -1061,7 +778,7 @@ namespace EVRPresenter
             return Utils.MFGetAttributeUINT32(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, 0) != 0;
         }
 
-        // Returns (in this order) 
+        // Returns (in this order)
         // 1. The pan/scan region, only if pan/scan mode is enabled.
         // 2. The geometric aperture.
         // 3. The entire video area.
@@ -1072,26 +789,14 @@ namespace EVRPresenter
             int width = 0, height = 0;
             pArea = new MFVideoArea();
 
-            try
-            {
-                bPanScan = Utils.MFGetAttributeUINT32(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, 0) != 0;
-            }
-            catch { }
+            bPanScan = Utils.MFGetAttributeUINT32(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, 0) != 0;
 
             // In pan/scan mode, try to get the pan/scan region.
             if (bPanScan)
             {
                 try
                 {
-                    IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_APERTURE);
-                    try
-                    {
-                        Marshal.PtrToStructure(ip, pArea);
-                    }
-                    finally
-                    {
-                        Marshal.FreeCoTaskMem(ip);
-                    }
+                    Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_PAN_SCAN_APERTURE, pArea);
                 }
                 catch (Exception e)
                 {
@@ -1102,22 +807,22 @@ namespace EVRPresenter
             // If not in pan/scan mode, or there is not pan/scan region, get the geometric aperture.
             if (!bPanScan || hr == MFError.MF_E_ATTRIBUTENOTFOUND)
             {
-                IntPtr ip = Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_GEOMETRIC_APERTURE);
                 try
                 {
-                    Marshal.PtrToStructure(ip, pArea);
+                    Utils.MFGetBlob(GetMediaType(), MFAttributesClsid.MF_MT_GEOMETRIC_APERTURE, pArea);
+                    hr = 0;
                 }
-                finally
+                catch (Exception e)
                 {
-                    Marshal.FreeCoTaskMem(ip);
+                    hr = Marshal.GetHRForException(e);
                 }
-            }
 
-            // Default: Use the entire video area.
-            if (!bPanScan || hr == MFError.MF_E_ATTRIBUTENOTFOUND)
-            {
-                Utils.MFGetAttributeSize(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_SIZE, out width, out height);
-                pArea.MakeArea(0, 0, width, height);
+                // Default: Use the entire video area.
+                if (hr == MFError.MF_E_ATTRIBUTENOTFOUND)
+                {
+                    Utils.MFGetAttribute2UINT32asUINT64(GetMediaType(), MFAttributesClsid.MF_MT_FRAME_SIZE, out width, out height);
+                    pArea.MakeArea(0, 0, width, height);
+                }
             }
 
         }

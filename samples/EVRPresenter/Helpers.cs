@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 While the underlying libraries are covered by LGPL, this sample is released 
 as public domain.  It is distributed in the hope that it will be useful, but 
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
@@ -6,7 +6,8 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 *****************************************************************************/
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Runtime.InteropServices;
 
@@ -15,16 +16,16 @@ using MediaFoundation.Misc;
 
 namespace EVRPresenter
 {
-    public class SamplePool
+    public class SamplePool : COMBase
     {
-        Queue m_VideoSampleQueue;			// Available queue
+        protected Queue<IMFSample> m_VideoSampleQueue;          // Available queue
 
-        bool m_bInitialized;
-        int m_cPending;
+        protected bool m_bInitialized;
+        protected int m_cPending;
 
-        public SamplePool()
+        public SamplePool(int iSize)
         {
-            m_VideoSampleQueue = new Queue();
+            m_VideoSampleQueue = new Queue<IMFSample>(iSize);
             m_bInitialized = false;
             m_cPending = 0;
         }
@@ -33,7 +34,7 @@ namespace EVRPresenter
         // GetSample
         //
         // Gets a sample from the pool. If no samples are available, the method
-        // returns MF_E_SAMPLEALLOCATOR_EMPTY.
+        // returns ppSample = null
         //-----------------------------------------------------------------------------
 
         public void GetSample(out IMFSample ppSample)
@@ -42,23 +43,19 @@ namespace EVRPresenter
             {
                 if (!m_bInitialized)
                 {
-                    throw new COMException("SamplePool::GetSample", MFError.MF_E_NOT_INITIALIZED);
+                    throw new COMException("SamplePool::GetSample1", MFError.MF_E_NOT_INITIALIZED);
                 }
 
                 if (m_VideoSampleQueue.Count == 0)
                 {
-                    throw new COMException("SamplePool::GetSample", MFError.MF_E_SAMPLEALLOCATOR_EMPTY);
+                    ppSample = null;
+                    return;
                 }
 
                 // Get a sample from the allocated queue.
-
-                // It doesn't matter if we pull them from the head or tail of the list,
-                // but when we get it back, we want to re-insert it onto the opposite end.
-                // (see ReturnSample)
-
                 ppSample = (IMFSample)m_VideoSampleQueue.Dequeue();
 
-                m_cPending++;
+                m_cPending++;  // Since we're locked, we don't need InterlockedIncrement
             }
         }
 
@@ -79,7 +76,7 @@ namespace EVRPresenter
 
                 m_VideoSampleQueue.Enqueue(pSample);
 
-                m_cPending--;
+                m_cPending--;  // Since we're locked, we don't need InterlockedDecrement
             }
         }
 
@@ -112,7 +109,7 @@ namespace EVRPresenter
         // Initializes the pool with a list of samples.
         //-----------------------------------------------------------------------------
 
-        public void Initialize(Queue samples)
+        public void Initialize(Queue<IMFSample> samples)
         {
             lock (this)
             {
@@ -121,11 +118,9 @@ namespace EVRPresenter
                     throw new COMException("SamplePool::Initialize", MFError.MF_E_INVALIDREQUEST);
                 }
 
-                // Move these samples into our allocated queue.
-                while (samples.Count > 0)
-                {
-                    m_VideoSampleQueue.Enqueue(samples.Dequeue());
-                }
+                Debug.Assert(m_VideoSampleQueue.Count == 0);
+
+                m_VideoSampleQueue = samples;
 
                 m_bInitialized = true;
             }
@@ -142,11 +137,13 @@ namespace EVRPresenter
         {
             lock (this)
             {
-                m_VideoSampleQueue.Clear();
+                while (m_VideoSampleQueue.Count > 0)
+                {
+                    SafeRelease(m_VideoSampleQueue.Dequeue());
+                }
                 m_bInitialized = false;
                 m_cPending = 0;
             }
         }
-
     }
 }

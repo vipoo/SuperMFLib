@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
 using MediaFoundation;
 using MediaFoundation.Misc;
 using MediaFoundation.Transform;
+using System.Drawing;
 
 namespace MediaFoundation.EVR
 {
@@ -270,13 +271,13 @@ namespace MediaFoundation.EVR
     public interface IMFVideoDisplayControl
     {
         void GetNativeVideoSize(
-            [Out] SIZE pszVideo,
-            [Out] SIZE pszARVideo
+            [Out] Size pszVideo,
+            [Out] Size pszARVideo
             );
 
         void GetIdealVideoSize(
-            [Out] SIZE pszMin,
-            [Out] SIZE pszMax
+            [Out] Size pszMin,
+            [Out] Size pszMax
             );
 
         void SetVideoPosition(

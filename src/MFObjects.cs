@@ -27,6 +27,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 using MediaFoundation.Misc;
+using System.Drawing;
 
 namespace MediaFoundation
 {
@@ -375,7 +376,7 @@ namespace MediaFoundation
     {
         public MFOffset OffsetX;
         public MFOffset OffsetY;
-        public SIZE Area;
+        public Size Area;
 
         public MFVideoArea()
         {
@@ -387,15 +388,15 @@ namespace MediaFoundation
         {
             OffsetX = new MFOffset(x);
             OffsetY = new MFOffset(y);
-            Area = new SIZE(width, height);
+            Area = new Size(width, height);
         }
 
         public void MakeArea(float x, float y, int width, int height)
         {
             OffsetX.MakeOffset(x);
             OffsetY.MakeOffset(y);
-            Area.cx = width;
-            Area.cy = height;
+            Area.Width = width;
+            Area.Height = height;
         }
     }
 

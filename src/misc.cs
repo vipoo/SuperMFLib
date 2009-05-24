@@ -195,23 +195,6 @@ namespace MediaFoundation.Misc
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
-    public class SIZE
-    {
-        public int cx;
-        public int cy;
-
-        public SIZE()
-        {
-        }
-
-        public SIZE(int width, int height)
-        {
-            cx = width;
-            cy = height;
-        }
-    }
-
     #endregion
 
     #region Generic Interfaces

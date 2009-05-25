@@ -32,11 +32,30 @@ using System.Drawing;
 
 namespace MediaFoundation.EVR
 {
+    #region COM Class Objects
+
     [UnmanagedName("CLSID_EnhancedVideoRenderer"), 
-    ComImport, Guid("FA10746C-9B63-4b6c-BC49-FC300EA5F256")]
+    ComImport, 
+    Guid("FA10746C-9B63-4b6c-BC49-FC300EA5F256")]
     public class EnhancedVideoRenderer
     {
     }
+
+    [UnmanagedName("CLSID_MFVideoMixer9"),
+    ComImport,
+    Guid("E474E05A-AB65-4f6a-827C-218B1BAAF31F")]
+    public class MFVideoMixer9
+    {
+    }
+
+    [UnmanagedName("CLSID_MFVideoPresenter9"),
+    ComImport,
+    Guid("98455561-5136-4d28-AB08-4CEE40EA2781")]
+    public class MFVideoPresenter9
+    {
+    }
+
+    #endregion
 
     #region Declarations
 

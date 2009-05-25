@@ -14,6 +14,7 @@ using System.Collections;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
+using MediaFoundation.Alt;
 
 namespace WavSinkNS
 {
@@ -941,26 +942,29 @@ namespace WavSinkNS
             WaveFormatEx pWav;
             int cbSize;
 
-            CheckShutdown();
-
-            pMediaType.GetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, out majorType);
-
-            // First make sure it's audio. 
-            if (majorType != MFMediaType.Audio)
+            lock (this)
             {
-                throw new COMException("type not audio", MFError.MF_E_INVALIDTYPE);
-            }
+                CheckShutdown();
 
-            // Get a WAVEFORMATEX structure to validate against.
-            MFExtern.MFCreateWaveFormatExFromMFMediaType(pMediaType, out pWav, out cbSize, MFWaveFormatExConvertFlags.Normal);
+                pMediaType.GetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, out majorType);
 
-            // Validate the WAVEFORMATEX structure.
-            ValidateWaveFormat(pWav, cbSize);
+                // First make sure it's audio. 
+                if (majorType != MFMediaType.Audio)
+                {
+                    throw new COMException("type not audio", MFError.MF_E_INVALIDTYPE);
+                }
 
-            // We don't return any "close match" types.
-            if (ppMediaType != IntPtr.Zero)
-            {
-                Marshal.WriteIntPtr(ppMediaType, IntPtr.Zero);
+                // Get a WAVEFORMATEX structure to validate against.
+                MFExtern.MFCreateWaveFormatExFromMFMediaType(pMediaType, out pWav, out cbSize, MFWaveFormatExConvertFlags.Normal);
+
+                // Validate the WAVEFORMATEX structure.
+                ValidateWaveFormat(pWav, cbSize);
+
+                // We don't return any "close match" types.
+                if (ppMediaType != IntPtr.Zero)
+                {
+                    Marshal.WriteIntPtr(ppMediaType, IntPtr.Zero);
+                }
             }
 
             //CoTaskMemFree(pWav);
@@ -975,8 +979,11 @@ namespace WavSinkNS
         {
             TRACE("CWavStream::GetMediaTypeCount");
 
-            CheckShutdown();
-            pdwTypeCount = CWavSink.g_AudioFormats.Length;
+            lock (this)
+            {
+                CheckShutdown();
+                pdwTypeCount = CWavSink.g_AudioFormats.Length;
+            }
         }
 
         //-------------------------------------------------------------------
@@ -990,18 +997,21 @@ namespace WavSinkNS
         {
             TRACE("CWavStream::GetMediaTypeByIndex");
 
-            CheckShutdown();
-
-            if (dwIndex >= CWavSink.g_AudioFormats.Length)
+            lock (this)
             {
-                throw new COMException("No more types", MFError.MF_E_NO_MORE_TYPES);
+                CheckShutdown();
+
+                if (dwIndex >= CWavSink.g_AudioFormats.Length)
+                {
+                    throw new COMException("No more types", MFError.MF_E_NO_MORE_TYPES);
+                }
+
+                WaveFormatEx wav;
+                InitializePCMWaveFormat(out wav, CWavSink.g_AudioFormats[dwIndex]);
+
+                MFExtern.MFCreateMediaType(out ppType);
+                MFExtern.MFInitMediaTypeFromWaveFormatEx(ppType, wav, Marshal.SizeOf(typeof(WaveFormatEx)));
             }
-
-            WaveFormatEx wav;
-            InitializePCMWaveFormat(out wav, CWavSink.g_AudioFormats[dwIndex]);
-
-            MFExtern.MFCreateMediaType(out ppType);
-            MFExtern.MFInitMediaTypeFromWaveFormatEx(ppType, wav, Marshal.SizeOf(typeof(WaveFormatEx)));
         }
 
         //-------------------------------------------------------------------

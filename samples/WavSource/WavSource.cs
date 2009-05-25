@@ -12,6 +12,8 @@ using System.Threading;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
+using MediaFoundation.Alt;
+
 using Utils;
 
 namespace WavSourceFilter

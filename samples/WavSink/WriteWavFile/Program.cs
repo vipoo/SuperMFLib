@@ -13,6 +13,7 @@ using System.Diagnostics;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
+using MediaFoundation.Alt;
 
 namespace WriteWavFile
 {

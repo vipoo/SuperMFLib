@@ -207,7 +207,7 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
         {
             if (meType == MediaEventType.MEEnablerProgress)
             {
-                if (varEventData.GetAttributeType() == PropVariant.VariantType.String)
+                if (varEventData.GetVariantType() == PropVariant.VariantType.String)
                 {
                     Debug.WriteLine(string.Format("Progress: {0}", varEventData.GetString()));
                 }

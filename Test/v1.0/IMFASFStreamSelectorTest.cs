@@ -15,7 +15,6 @@ namespace Testv10
     {
         IMFASFStreamSelector m_ss;
 
-#if ALLOW_UNTESTED_INTERFACES
         public void DoTests()
         {
             Alt();
@@ -142,6 +141,5 @@ namespace Testv10
             MFExtern.MFCreateASFStreamSelector(prof, out m_ss);
 
         }
-#endif
     }
 }

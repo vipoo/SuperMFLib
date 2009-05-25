@@ -4,15 +4,18 @@ http://msdn2.microsoft.com/en-us/library/ms696268.aspx and
 
 This doc describes the status of each of these.
 
-======================== Interfaces ====================================
+===================================== Interfaces =====================================
 
-These 46 interfaces have been tested (7 of these are duplicates to deal with MF bug)
+These 69 interfaces have been tested (10 of these are duplicates to deal with MF bugs)
 
 IEVRFilterConfig
+IEVRTrustedVideoPlugin
+IEVRVideoStreamControl
 IMF2DBuffer
 IMFActivate
 IMFASFContentInfo
 IMFASFIndexer
+IMFASFMultiplexer
 IMFASFMutualExclusion
 IMFASFProfile
 IMFASFSplitter
@@ -28,8 +31,10 @@ IMFClockStateSink
 IMFCollection
 IMFContentEnabler
 IMFContentProtectionManager
+IMFDesiredSample
 IMFFinalizableMediaSink
 IMFGetService
+IMFGetServiceAlt
 IMFMediaBuffer
 IMFMediaEvent
 IMFMediaEventGenerator
@@ -41,19 +46,38 @@ IMFMediaSourceTopologyProvider
 IMFMediaStream
 IMFMediaType
 IMFMediaTypeHandler
+IMFMetadata
+IMFMetadataProvider
 IMFPresentationClock
 IMFPresentationDescriptor
 IMFPresentationTimeSource
+IMFRateControl
+IMFRateSupport
 IMFSample
 IMFSequencerSource
+IMFShutdown
+IMFSourceOpenMonitor
 IMFSourceResolver
 IMFStreamDescriptor
 IMFStreamSink
+IMFTimer
 IMFTopology
 IMFTopologyNode
+IMFTopologyServiceLookup
+IMFTopologyServiceLookupAlt
+IMFTopologyServiceLookupClient
+IMFTopologyServiceLookupClientAlt
+IMFTrackedSample
 IMFTransform
+IMFVideoDeviceID
 IMFVideoDisplayControl
 IMFVideoMediaType
+IMFVideoMixerBitmap
+IMFVideoMixerControl
+IMFVideoPositionMapper
+IMFVideoPresenter
+IMFVideoProcessor
+IMFVideoRenderer
 
 ------------------------------------------------------------------------------
 
@@ -64,19 +88,15 @@ IPropertyStore
 INamedPropertyStore
 
 ------------------------------------------------------------------------------
-These 57 interfaces are defined in the library, but have not yet been tested.
+These 38 interfaces are defined in the library, but have not yet been tested.
 
-IEVRTrustedVideoPlugin
 IMFASFMultiplexer
 IMFAudioPolicy
 IMFAudioStreamVolume
 IMFByteStreamBuffering
-IMFDesiredSample
 IMFInputTrustAuthority
 IMFMediaSinkPreroll
 IMFMediaSourcePresentationProvider
-IMFMetadata
-IMFMetadataProvider
 IMFNetCredential
 IMFNetCredentialCache
 IMFNetCredentialManager
@@ -92,8 +112,6 @@ IMFPMPHost
 IMFPMPServer
 IMFQualityAdvise
 IMFQualityManager
-IMFRateControl
-IMFRateSupport
 IMFRealTimeClient
 IMFRemoteDesktopPlugin
 IMFRemoteProxy
@@ -103,24 +121,11 @@ IMFSampleProtection
 IMFSaveJob
 IMFSchemeHandler
 IMFSecureChannel
-IMFShutdown
 IMFSimpleAudioVolume
-IMFSourceOpenMonitor
-IMFTimer
 IMFTopoLoader
 IMFTopologyNodeAttributeEditor
-IMFTopologyServiceLookup
-IMFTopologyServiceLookupClient
-IMFTrackedSample
 IMFTrustedInput
 IMFTrustedOutput
-IMFVideoDeviceID
-IMFVideoMixerBitmap
-IMFVideoMixerControl
-IMFVideoPositionMapper
-IMFVideoPresenter
-IMFVideoProcessor
-IMFVideoRenderer
 IMFVideoSampleAllocator
 IMFWorkQueueServices
 
@@ -135,10 +140,9 @@ IMFRemoteAsyncCallback
 
 ------------------------------------------------------------------------------
 
-These 8 interfaces require work that is beyond the scope of this library and
+These 7 interfaces require work that is beyond the scope of this library and
 are not defined in the library:
 
-IEVRVideoStreamControl
 IDirect3DDeviceManager9
 IDirectXVideoAccelerationService
 IDirectXVideoDecoder

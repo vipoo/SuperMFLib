@@ -249,7 +249,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         {
             try
             {
-                RECT rcDest = new RECT();
+                MFRect rcDest = new MFRect();
                 MFVideoNormalizedRect nRect = new MFVideoNormalizedRect();
 
                 nRect.left = 0;

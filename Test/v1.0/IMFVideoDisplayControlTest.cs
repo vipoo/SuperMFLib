@@ -16,11 +16,6 @@ namespace Testv10
 {
     class IMFVideoDisplayControlTest
     {
-        [ComImport, Guid("98455561-5136-4d28-AB08-4CEE40EA2781")]
-        protected class myEVR
-        {
-        }
-
         IMFVideoDisplayControl m_vdc;
 
         public void DoTests()
@@ -161,7 +156,7 @@ namespace Testv10
         {
             object o;
 
-            IMFGetService gs = new myEVR() as IMFGetService;
+            IMFGetService gs = new MFVideoPresenter9() as IMFGetService;
             gs.GetService(MFServices.MR_VIDEO_RENDER_SERVICE, typeof(IMFVideoDisplayControl).GUID, out o);
             m_vdc = o as IMFVideoDisplayControl;
         }

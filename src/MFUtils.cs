@@ -2213,7 +2213,7 @@ namespace MediaFoundation.Misc
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint="FormatMessageW", ExactSpelling=true), SuppressUnmanagedCodeSecurity]
         private static extern int FormatMessage(FormatMessageFlags dwFlags, IntPtr lpSource,
-            int dwMessageId, int dwLanguageId, ref IntPtr lpBuffer, int nSize, IntPtr Arguments);
+            int dwMessageId, int dwLanguageId, out IntPtr lpBuffer, int nSize, IntPtr [] Arguments);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryExW", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         private static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, LoadLibraryExFlags dwFlags);

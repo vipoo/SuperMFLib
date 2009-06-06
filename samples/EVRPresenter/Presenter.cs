@@ -1719,7 +1719,8 @@ namespace EVRPresenter
 
                         try
                         {
-                            NotifyEvent(EventCode.ProcessingLatency, gh.AddrOfPinnedObject(), IntPtr.Zero);
+                            // This event (EventCode.ProcessingLatency) isn't defined until DirectShowNet v2.1
+                            NotifyEvent((EventCode)0x21, gh.AddrOfPinnedObject(), IntPtr.Zero);
                         }
                         finally
                         {
@@ -1953,7 +1954,8 @@ namespace EVRPresenter
                     }
                 }
 
-                NotifyEvent(EventCode.ScrubTime, new IntPtr((int)hnsSampleTime), new IntPtr(hnsSampleTime >> 32));
+                // This event (EventCode.ScrubTime) isn't defined until DirectShowNet v2.1
+                NotifyEvent((EventCode)0x23, new IntPtr((int)hnsSampleTime), new IntPtr(hnsSampleTime >> 32));
             }
         }
 

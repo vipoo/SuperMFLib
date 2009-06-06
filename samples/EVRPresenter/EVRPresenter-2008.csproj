@@ -89,9 +89,9 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DirectShowLib-2008, Version=2.0.0.24190, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
+    <Reference Include="DirectShowLib-2005, Version=2.0.0.0, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\directshowlib\lib\DirectShowLib-2008.dll</HintPath>
+      <HintPath>..\..\..\directshowlib\lib\DirectShowLib-2005.dll</HintPath>
     </Reference>
     <Reference Include="MediaFoundation, Version=1.0.0.24132, Culture=neutral, PublicKeyToken=36fa660e1d6ebf8d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

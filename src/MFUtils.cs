@@ -1598,7 +1598,7 @@ namespace MediaFoundation.Misc
             {
                 int iBitmapInfoHeaderSize = Marshal.SizeOf(typeof(BitmapInfoHeader));
 
-                // WaveFormatEx - just do a copy
+                // BitmapInfoHeader - just do a copy
                 ip = Marshal.AllocCoTaskMem(iBitmapInfoHeaderSize);
                 Marshal.StructureToPtr(this as BitmapInfoHeader, ip, false);
             }
@@ -2279,9 +2279,9 @@ namespace MediaFoundation.Misc
                 s_hModule, // module to get message from (NULL == system)
                 hr, // error number to get message for
                 0, // default language
-                ref ip,
+                out ip,
                 0,
-                IntPtr.Zero
+                null
                 );
 
             // Not a system message.  In theory, you should be able to get both with one call.  In practice (at
@@ -2305,9 +2305,9 @@ namespace MediaFoundation.Misc
                         s_hModule, // module to get message from (NULL == system)
                         hr, // error number to get message for
                         0, // default language
-                        ref ip,
+                        out ip,
                         0,
-                        IntPtr.Zero
+                        null
                         );
                 }
             }
@@ -2477,7 +2477,6 @@ namespace MediaFoundation.Misc
             return m_prop;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
             m_prop = null;
@@ -2601,7 +2600,6 @@ namespace MediaFoundation.Misc
             return null;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
         }
@@ -2670,7 +2668,6 @@ namespace MediaFoundation.Misc
             return null;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
         }
@@ -2792,7 +2789,6 @@ namespace MediaFoundation.Misc
             return null;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
         }
@@ -2837,7 +2833,6 @@ namespace MediaFoundation.Misc
             return wfe;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
         }
@@ -2892,7 +2887,6 @@ namespace MediaFoundation.Misc
             return bmi;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
             m_bmi = null;
@@ -2920,99 +2914,71 @@ namespace MediaFoundation.Misc
     // Class to handle Array of Guid
     internal class GMarshaler : ICustomMarshaler
     {
-        protected enum IsNative
-        {
-            None,
-            Native,
-            Managed
-        }
-
-        protected object[] m_Obj = new object[5];
-        protected IntPtr[] m_ip = new IntPtr[5];
-        protected IsNative[] m_bIsNative = new IsNative[5];
-
-        protected int m_iNest;
+        protected Guid[] m_Obj;
+        protected IntPtr m_ip;
 
         public IntPtr MarshalManagedToNative(object managedObj)
         {
-            if (m_Obj[m_iNest] != managedObj)
+            if (m_ip == IntPtr.Zero)
             {
-                m_iNest++;
-                m_bIsNative[m_iNest] = IsNative.Managed;
-                m_Obj[m_iNest] = managedObj;
+                // If we are being called first from managed
 
-                IntPtr ip = Marshal.AllocCoTaskMem(IntPtr.Size);
-
-                return ip;
+                m_Obj = (Guid[])managedObj;
+                // Freed in CleanUpManagedData
+                m_ip = Marshal.AllocCoTaskMem(IntPtr.Size);
             }
             else
             {
-                Guid[] o = managedObj as Guid[];
-                IntPtr ip = Marshal.AllocCoTaskMem(16 * o.Length);
-                Marshal.WriteIntPtr(m_ip[m_iNest], ip);
+                // Return the value to native
+                Guid [] mo = (Guid [])managedObj;
 
-                for (int x = 0; (o[x] != Guid.Empty) && (x < o.Length); x++)
+                IntPtr ip = Marshal.AllocCoTaskMem(16 * mo.Length);
+                Marshal.WriteIntPtr(m_ip, ip);
+
+                for (int x = 0; (mo[x] != Guid.Empty) && (x < mo.Length); x++)
                 {
-                    Marshal.StructureToPtr(o[x], ip, false);
+                    Marshal.StructureToPtr(mo[x], ip, false);
                     ip = new IntPtr(ip.ToInt64() + 16);
                 }
-                return m_ip[m_iNest];
             }
+            return m_ip;
         }
 
-        // Called just after invoking the COM method.  The IntPtr is the same one that just got returned
-        // from MarshalManagedToNative.  The return value is unused.
         public object MarshalNativeToManaged(IntPtr pNativeData)
         {
-            if (m_bIsNative[m_iNest] != IsNative.None)
+            if (m_Obj != null)
             {
-                Guid[] g = m_Obj[m_iNest] as Guid[];
+                // Return the value to managed
                 byte[] b = new byte[16];
                 IntPtr pBuff = Marshal.ReadIntPtr(pNativeData);
-                for (int x = 0; x < g.Length; x++)
+                for (int x = 0; x < m_Obj.Length; x++)
                 {
                     Marshal.Copy(pBuff, b, 0, 16);
-                    g[x] = new Guid(b);
+                    m_Obj[x] = new Guid(b);
 
                     pBuff = new IntPtr(pBuff.ToInt64() + 16);
                 }
 
                 Marshal.FreeCoTaskMem(Marshal.ReadIntPtr(pNativeData));
-
-                return null;
             }
             else
             {
-                m_iNest++;
-                m_ip[m_iNest] = pNativeData;
-                m_Obj[m_iNest] = new Guid[64];
-                m_bIsNative[m_iNest] = IsNative.Native;
-
-                return m_Obj[m_iNest];
+                // If we are being called first from native
+                m_ip = pNativeData;
+                return new Guid[30];
             }
+
+            return null;
         }
 
-        // It appears this routine is never called
         public void CleanUpManagedData(object ManagedObj)
         {
-            m_ip[m_iNest] = IntPtr.Zero;
-            m_Obj[m_iNest] = null;
-            m_bIsNative[m_iNest] = IsNative.None;
-
-            m_iNest--;
+            m_Obj = null;
         }
 
         public void CleanUpNativeData(IntPtr pNativeData)
         {
-            m_ip[m_iNest] = IntPtr.Zero;
-            m_Obj[m_iNest] = null;
-            m_bIsNative[m_iNest] = IsNative.None;
-
-            m_iNest--;
-            if (pNativeData != IntPtr.Zero)
-            {
-                Marshal.FreeCoTaskMem(pNativeData);
-            }
+            Marshal.FreeCoTaskMem(pNativeData);
         }
 
         // The number of bytes to marshal out - never called

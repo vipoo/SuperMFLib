@@ -43,16 +43,16 @@ namespace Testv11
         {
             int i;
             Guid g1;
-            Guid[] g = null;
+            Guid[] g3;
 
             //((IMediaControl)m_pGraph).Run();
 
             m_vp.GetVideoProcessorMode(out g1);
-            m_vp.GetAvailableVideoProcessorModes(out i, g);
-            g = new Guid[i];
-            m_vp.GetAvailableVideoProcessorModes(out i, g);
+            m_vp.GetAvailableVideoProcessorModes(out i, null);
+            g3 = new Guid[i];
+            m_vp.GetAvailableVideoProcessorModes(out i, g3);
 
-            m_vp.SetVideoProcessorMode(g[0]);
+            //m_vp.SetVideoProcessorMode(g[0]);
         }
 
         private void TestBackClr()

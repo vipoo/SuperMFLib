@@ -37,8 +37,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // MF's objects are c# programmers.  And, not surprisingly, sometimes the first time code is 
 // run, it doesn't work correctly.
 
-// The only way you can work around it is to change the definition of the method to from 
-// the IMFMediaSink (or whatever interface MF is trying to pass you) to IntPtr.  Of course, 
+// The only way you can work around it is to change the definition of the method from 
+// IMFMediaSink (or whatever interface MF is trying to pass you) to IntPtr.  Of course, 
 // that limits what you can do with it.  You can't call methods on an IntPtr.
 
 // Something to keep in mind is that while the work-around involves changing the interface,
@@ -50,10 +50,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // In W7, MS has fixed a few of these issues that were reported in Vista.  The problem 
 // is that even if they are fixed in W7, if your program also needs to run on Vista, you 
 // still have to use the work-arounds.
-
-// I haven't started trying to use the new W7 intefaces, so I don't know what new problems
-// may have been introduced.
-
 
 using System;
 using System.Collections.Generic;

@@ -14,9 +14,16 @@ Externs
 
 See interfaces.txt for details.
 
-Since the last release, I have gotten the EVRPresenter to work.  This
-was a HUGE and finicky project.  It required adding support for a
-number of MF interfaces.
+There were a few minor perf changes.  I also changed the def for BitmapInfoHeader
+to be consistent with DirectShow.  Yes, it will cause problems for (a few) MFLib
+users.  However, it makes life less confusing when you use both libraries.
+
+Also, I added 2 new interfaces to the alt.cs file.  Check out the comments at
+the top of the file for details.
+
+Since the last release, I have gotten the EVRPresenter sample to work.  This
+was a HUGE and finicky project.  It required adding support for a number of 
+MF interfaces.
 
 So, in order to have a release of MFNet that would work with this new 
 sample, I decided it was time to do a v1.1.  Since I was doing another 

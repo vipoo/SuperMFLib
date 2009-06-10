@@ -14,11 +14,14 @@ Externs
 
 See interfaces.txt for details.
 
+The new lib is compiled with VS 2008 (framework v3.5).  However, this should still
+work properly with apps from VS2005.
+
 There were a few minor perf changes.  I also changed the def for BitmapInfoHeader
 to be consistent with DirectShow.  Yes, it will cause problems for (a few) MFLib
 users.  However, it makes life less confusing when you use both libraries.
 
-Also, I added 2 new interfaces to the alt.cs file.  Check out the comments at
+Also, I added new interfaces to the alt.cs file.  Check out the comments at
 the top of the file for details.
 
 Since the last release, I have gotten the EVRPresenter sample to work.  This

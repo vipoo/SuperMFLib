@@ -1,4 +1,4 @@
-Media Foundation Lib Samples 2007-07-15
+Media Foundation Lib Samples 2009-06-10
 
 http://mflib.SourceForge.net
 

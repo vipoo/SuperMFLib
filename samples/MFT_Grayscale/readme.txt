@@ -16,10 +16,9 @@ The most significant difference between this code and the original c++ has to do
 with how error handling is performed.  See "Error handling" in docs\ReadMe.rtf 
 for details.
 
-After you build this sample, you will need to register it with both COM and MF.  
-In theory, you can do this by clicking the "Register as COM" box in Visual Studio.  
-In practice, I find that this doesn't work on Vista due to the way they have
-mucked with security.  Instead, I use this command line from a cmd window opened 
-with "Run as administrator":
+After you build this sample, you will need to use this line (or one like it) to 
+register the MFT:
 
-c:\Windows\Microsoft.NET\Framework\v2.0.50727\regasm /tlb /codebase MFT_Grayscale.dll
+	%windir%\Microsoft.NET\Framework\v2.0.50727\regasm /tlb /codebase MFT_Grayscale.dll
+
+To invoke this MFT, use the PlaybackFx sample.

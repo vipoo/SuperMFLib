@@ -67,9 +67,9 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MediaFoundation-2008, Version=1.0.0.33165, Culture=neutral, PublicKeyToken=36fa660e1d6ebf8d, processorArchitecture=MSIL">
+    <Reference Include="MediaFoundation, Version=1.1.0.0, Culture=neutral, PublicKeyToken=36fa660e1d6ebf8d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\lib\MediaFoundation-2008.dll</HintPath>
+      <HintPath>..\..\..\lib\MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

@@ -35,7 +35,7 @@ public class WebHelper
     private byte[] m_byteArray;
     private IntPtr m_hwnd;
 
-    public void OpenURLWithData(string wszURL, IntPtr pbPostData, int cbData, IntPtr hwnd) // todo: static?
+    public void OpenURLWithData(string wszURL, IntPtr pbPostData, int cbData, IntPtr hwnd)
     {
         Thread InvokeThread;
 

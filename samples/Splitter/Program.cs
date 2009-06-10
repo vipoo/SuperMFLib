@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 using MediaFoundation;
 using MediaFoundation.Misc;
 
-// Test with c:\Program Files\Microsoft SDKs\Windows\v6.0\Samples\Multimedia\WMP_11\media\smooth.wmv
+// Test with c:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\Multimedia\WMP_11\media\smooth.wmv
 
 namespace Splitter
 {

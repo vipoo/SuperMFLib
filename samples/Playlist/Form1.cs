@@ -390,7 +390,7 @@ namespace Playlist
 
                 tbDuration.Text = FormatTimeString(hnsSegmentDuration);
 
-                if (lbPlaylist.Items.Count == 1) // todo - this can't be right
+                if (lbPlaylist.Items.Count == 1)
                 {
                     bnPlay.Enabled = true;
                     removeFromPlaylistToolStripMenuItem.Enabled = true;

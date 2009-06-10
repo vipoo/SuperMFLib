@@ -74,3 +74,17 @@ WavSink
 A c# implementation of the WavSink sample that ships with the Vista PSDK.  Is the opposite
 of the WavSource sample: It writes audio output to a .wav file.
 
+
+EVRPresenter
+--------------------
+A c# implementation of the EVRPresenter sample that ships with the Vista PSDK.  This code replaces
+the default renderer of the Enhanced Video Renderer (EVR).  To have any hope of understanding what
+this code does and how it works, read the readmes included with the project.
+
+
+Hack
+--------------------
+This c++ project allows c# code to work around flaws in c++ COM objects that don't correctly implement 
+the IUnknown interface.  It is used by the EVRPresenter project, but is a general-purpose COM object
+that can be used to work around similar problems in other COM objects.
+

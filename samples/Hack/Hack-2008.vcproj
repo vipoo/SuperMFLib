@@ -25,6 +25,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.pch;*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -65,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				RegisterOutput="true"
-				OutputFile="$(OutDir)/Hack.dll"
+				OutputFile="$(OutDir)/Hack-32.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="Hack.def"
 				GenerateDebugInformation="true"
@@ -100,6 +101,7 @@
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.pch;*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -176,6 +178,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.pch;*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;$(TargetPath)"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -216,7 +219,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				RegisterOutput="true"
-				OutputFile="$(OutDir)/Hack.dll"
+				OutputFile="$(OutDir)/Hack-32.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="Hack.def"
 				GenerateDebugInformation="true"
@@ -253,6 +256,7 @@
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.pch;*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;$(TargetPath)"
 			WholeProgramOptimization="1"
 			>
 			<Tool

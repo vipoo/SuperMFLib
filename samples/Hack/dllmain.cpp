@@ -15,7 +15,7 @@ volatile LONG m_serverLocks = 0;
 // Friendly name for COM registration.
 WCHAR* g_sFriendlyName =  L"Hack";
 
-__declspec( dllexport ) BOOL APIENTRY DllMain( HANDLE hModule,
+BOOL APIENTRY DllMain( HANDLE hModule,
                                               DWORD  ul_reason_for_call,
                                               LPVOID lpReserved
                                               )

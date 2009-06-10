@@ -7,7 +7,12 @@ review the code yourself, and test it for your specific purposes.
 This project is a c++ COM object.  It is intended to allow c# to use c++ objects that
 have broken implementations of QueryInterface.
 
-To use this COM object, create an instance of it:
+******************************************************************************
+* NOTE: You do not have to build this project in order to use it.  Pre-built *
+*       versions of the x86 and x64 DLLs are included                        *
+******************************************************************************
+
+To use this COM object, add HackClasses.cs to your project.  Then create an instance of it:
 
    IHack ih = new Hack() as IHack;
    
@@ -29,7 +34,7 @@ object introduces.
 As with all COM objects, this object must be registered with COM before it will work.  If you
 build the project with Visual Studio, it will register it for you.  Otherwise, you can run
 
-    regsvr32 Hack.dll
+    regsvr32 Hack-32.dll
     
 or
 

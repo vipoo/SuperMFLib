@@ -1865,10 +1865,10 @@ namespace MediaFoundation
 
         #endregion
 
-        [PreserveSig]
+        [PreserveSig, Obsolete("This method is deprecated by MS")]
         MFVideoFormat GetVideoFormat();
 
-        [Obsolete("This method is deprecated")]
+        [Obsolete("This method is deprecated by MS")]
         void GetVideoRepresentation(
             [In, MarshalAs(UnmanagedType.Struct)] Guid guidRepresentation,
             out IntPtr ppvRepresentation,

@@ -28,13 +28,14 @@ Before you start:
 You need to build and register the Hack project.  This allows the EVRPresenter to 
 work around problems in Vista and W7.  See the readme in that project.
 
-Second, you will need the v2.1 DirectShowNet library (or later) from 
+Second, you will need the v2.0 DirectShowNet library (or later) from 
 http://DirectShowNet.SourceForge.Net
 
 Finally, as with any code that is labeled "sample," you should be clear about what level of 
 quality you are expecting.  While there are no bugs or gotchas in this code TO MY 
 KNOWLEDGE, that doesn't mean there aren't any.  You should review the code yourself, 
 and test it for your specific purposes.
+
 
 Understanding how it works:
 ---------------------------

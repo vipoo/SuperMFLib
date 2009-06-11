@@ -15,11 +15,15 @@ reading .wav files.
 The most significant difference has to do with how error handling is performed.
 See "Error handling" in docs\ReadMe.rtf for details.
 
-After you build this sample, you will need to register it with both COM and MF.  
-In theory, you can do this by clicking the "Register as COM" box in Visual Studio.  
-In practice, I find that this doesn't work on Vista due to the way they have
-mucked with security.  Instead, I use this command line from a cmd window opened 
-with "Run as administrator":
+After you build this sample, you will need to use this line (or one like it) to 
+register the handler:
 
-c:\Windows\Microsoft.NET\Framework\v2.0.50727\regasm /tlb /codebase WavSource.dll
+	%windir%\Microsoft.NET\Framework\v2.0.50727\regasm /tlb /codebase WavSource.dll
 
+To invoke this handler, use the BasicPlayback sample to play a .wav file.
+
+Update!
+
+MS has added a WavByteStreamHandler for wav files.  Attempting to register this provider will
+*APPEAR* to work, but will actually fail.  To actually see this code run, change sWavFileExtension 
+in WavByteStreamHandler.cs to some other extension (.xyz).  Then rename a .wav file to .xyz.

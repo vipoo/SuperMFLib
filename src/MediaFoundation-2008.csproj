@@ -86,12 +86,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Alt.cs" />
+    <Compile Include="mfmp2dlna.cs" />
+    <Compile Include="dxvahd.cs" />
     <Compile Include="EVR.cs" />
     <Compile Include="Externs.cs" />
     <Compile Include="MFObjects.cs" />
+    <Compile Include="MFPlayer.cs" />
+    <Compile Include="MFReadWrite.cs" />
     <Compile Include="MFTransform.cs" />
     <Compile Include="MFUtils.cs" />
     <Compile Include="misc.cs" />
+    <Compile Include="OpmApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MFIdl.cs" />
     <Compile Include="WMContainer.cs" />

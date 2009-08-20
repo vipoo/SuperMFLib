@@ -62,7 +62,8 @@ namespace MediaFoundation
     public enum ASFStatusFlags
     {
         None = 0,
-        Incomplete = 0x1
+        Incomplete = 0x1,
+        NonfatalError = 0x2
     }
 
     [Flags, UnmanagedName("MFASF_STREAMSELECTORFLAGS")]
@@ -173,6 +174,25 @@ namespace MediaFoundation
 
         void SetSyncTolerance(
             [In] int msSyncTolerance);
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("3D1FF0EA-679A-4190-8D46-7FA69E8C7E15")]
+    public interface IMFDRMNetHelper
+    {
+        void ProcessLicenseRequest(
+            [In] IntPtr pLicenseRequest,
+            [In] int cbLicenseRequest,
+            [Out] IntPtr ppLicenseResponse,
+            out int pcbLicenseResponse,
+            [MarshalAs(UnmanagedType.BStr)] out string pbstrKID
+        );
+
+        void GetChainedLicenseResponse(
+            [Out] IntPtr ppLicenseResponse,
+            out int pcbLicenseResponse
+        );
     }
 
 #endif

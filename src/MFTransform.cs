@@ -31,6 +31,31 @@ namespace MediaFoundation.Transform
 {
     #region Declarations
 
+#if ALLOW_UNTESTED_INTERFACES
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("STREAM_MEDIUM")]
+    public struct STREAM_MEDIUM
+    {
+        Guid gidMedium;
+        int unMediumInstance;
+    }
+
+    [Flags, UnmanagedName("MFT_ENUM_FLAG")]
+    public enum MFT_EnumFlag
+    {
+        None = 0x00000000,
+        SyncMFT = 0x00000001,   // Enumerates V1 MFTs. This is default.
+        AsyncMFT = 0x00000002,   // Enumerates only software async MFTs also known as V2 MFTs
+        Hardware = 0x00000004,   // Enumerates V2 hardware async MFTs
+        FieldOfUse = 0x00000008,   // Enumerates MFTs that require unlocking
+        LocalMFT = 0x00000010,   // Enumerates Locally (in-process) registered MFTs
+        TranscodeOnly = 0x00000020,   // Enumerates decoder MFTs used by transcode only    
+        SortAndFilter = 0x00000040,   // Apply system local, do not use and preferred sorting and filtering
+        All = 0x0000003F    // Enumerates all MFTs including SW and HW MFTs and applies filtering
+    }
+
+#endif
+
     [UnmanagedName("_MFT_DRAIN_TYPE")]
     public enum MFTDrainType
     {
@@ -103,7 +128,9 @@ namespace MediaFoundation.Transform
         NotifyEndOfStream = 0x10000002,
         NotifyEndStreaming = 0x10000001,
         NotifyStartOfStream = 0x10000003,
-        SetD3DManager = 2
+        SetD3DManager = 2,
+        DropSamples = 0x00000003,
+        CommandMarker = 0x20000000
     }
 
     [Flags, UnmanagedName("_MFT_OUTPUT_DATA_BUFFER_FLAGS")]
@@ -161,6 +188,34 @@ namespace MediaFoundation.Transform
     #endregion
 
     #region Interfaces
+
+#if ALLOW_UNTESTED_INTERFACES
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("149c4d73-b4be-4f8d-8b87-079e926b6add")]
+    interface IMFLocalMFTRegistration
+    {
+        void RegisterMFTs(
+            [In] MFT_REGISTRATION_INFO[] pMFTs,
+            int cMFTs);
+    }
+
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MFT_REGISTRATION_INFO")]
+    public struct MFT_REGISTRATION_INFO
+    {
+        Guid clsid;
+        Guid guidCategory;
+        int uiFlags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        string pszName;
+        int cInTypes;
+        MFTRegisterTypeInfo[] pInTypes;
+        int cOutTypes;
+        MFTRegisterTypeInfo[] pOutTypes;
+    }
+
+#endif
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),

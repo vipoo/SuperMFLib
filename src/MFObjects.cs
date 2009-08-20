@@ -91,6 +91,7 @@ namespace MediaFoundation
     [UnmanagedName("MFVideoTransferFunction")]
     public enum MFVideoTransferFunction
     {
+        Unknown = 0,
         Func10 = 1,
         Func18 = 2,
         Func20 = 3,
@@ -101,7 +102,9 @@ namespace MediaFoundation
         ForceDWORD = 0x7fffffff,
         Last = 9,
         sRGB = 7,
-        Unknown = 0
+        Log_100 = 9,
+        Log_316 = 10,
+        x709_sym = 11 // symmetric 709
     }
 
     [UnmanagedName("MFVideoPrimaries")]
@@ -146,14 +149,17 @@ namespace MediaFoundation
     [UnmanagedName("MFNominalRange")]
     public enum MFNominalRange
     {
+        MFNominalRange_Unknown = 0,
+        MFNominalRange_Normal = 1,
+        MFNominalRange_Wide = 2,
+
         MFNominalRange_0_255 = 1,
         MFNominalRange_16_235 = 2,
         MFNominalRange_48_208 = 3,
+        MFNominalRange_64_127 = 4,
+
+        MFNominalRange_Last,
         MFNominalRange_ForceDWORD = 0x7fffffff,
-        MFNominalRange_Last = 4,
-        MFNominalRange_Normal = 1,
-        MFNominalRange_Unknown = 0,
-        MFNominalRange_Wide = 2
     }
 
     [Flags, UnmanagedName("MFBYTESTREAM_SEEK_FLAG_ defines")]
@@ -180,7 +186,8 @@ namespace MediaFoundation
         IsRemote = 0x00000008,
         IsDirectory = 0x00000080,
         HasSlowSeek = 0x00000100,
-        IsPartiallyDownloaded = 0x00000200
+        IsPartiallyDownloaded = 0x00000200,
+        ShareWrite = 0x00000400
     }
 
     [Flags, UnmanagedName("MF_MEDIATYPE_EQUAL_* defines")]
@@ -248,8 +255,10 @@ namespace MediaFoundation
     public enum MediaEventType
     {
         MEUnknown = 0,
-        MEError = (MEUnknown + 1),
-        MEExtendedType = (MEError + 1),
+        MEError = 1,
+        MEExtendedType = 2,
+        MENonFatalError = 3,
+        MEGenericV1Anchor = MENonFatalError,
         MESessionUnknown = 100,
         MESessionTopologySet = (MESessionUnknown + 1),
         MESessionTopologiesCleared = (MESessionTopologySet + 1),
@@ -280,6 +289,7 @@ namespace MediaFoundation
         MEReconnectEnd = (MEReconnectStart + 1),
         MERendererEvent = (MEReconnectEnd + 1),
         MESessionStreamSinkFormatChanged = (MERendererEvent + 1),
+        MESessionV1Anchor = MESessionStreamSinkFormatChanged,
         MESourceUnknown = 200,
         MESourceStarted = (MESourceUnknown + 1),
         MEStreamStarted = (MESourceStarted + 1),
@@ -303,6 +313,7 @@ namespace MediaFoundation
         MESourceRateChangeRequested = (MESourceCharacteristicsChanged + 1),
         MESourceMetadataChanged = (MESourceRateChangeRequested + 1),
         MESequencerSourceTopologyUpdated = (MESourceMetadataChanged + 1),
+        MESourceV1Anchor = MESequencerSourceTopologyUpdated,
         MESinkUnknown = 300,
         MEStreamSinkStarted = (MESinkUnknown + 1),
         MEStreamSinkStopped = (MEStreamSinkStarted + 1),
@@ -325,10 +336,12 @@ namespace MediaFoundation
         MEAudioSessionFormatChanged = (MEAudioSessionIconChanged + 1),
         MEAudioSessionDisconnected = (MEAudioSessionFormatChanged + 1),
         MEAudioSessionExclusiveModeOverride = (MEAudioSessionDisconnected + 1),
+        MESinkV1Anchor = MEAudioSessionExclusiveModeOverride,
         METrustUnknown = 400,
         MEPolicyChanged = (METrustUnknown + 1),
         MEContentProtectionMessage = (MEPolicyChanged + 1),
         MEPolicySet = (MEContentProtectionMessage + 1),
+        METrustV1Anchor = MEPolicySet,
         MEWMDRMLicenseBackupCompleted = 500,
         MEWMDRMLicenseBackupProgress = 501,
         MEWMDRMLicenseRestoreCompleted = 502,
@@ -339,7 +352,20 @@ namespace MediaFoundation
         MEWMDRMProximityCompleted = 514,
         MEWMDRMLicenseStoreCleaned = 515,
         MEWMDRMRevocationDownloadCompleted = 516,
+        MEWMDRMV1Anchor = MEWMDRMRevocationDownloadCompleted,
+        METransformUnknown = 600,
+        METransformNeedInput,
+        METransformHaveOutput,
+        METransformDrainComplete,
+        METransformMarker,
         MEReservedMax = 10000
+    }
+
+    [UnmanagedName("MF_Plugin_Type")]
+    public enum MFPluginType
+    {
+        MFT = 0,
+        MediaSource = 1
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8), UnmanagedName("MFVideoCompressedInfo")]
@@ -664,6 +690,48 @@ namespace MediaFoundation
 
         [PreserveSig, Obsolete("To get the properties of the audio format, applications should use the media type attributes. If you need to convert the media type into a WAVEFORMATEX structure, call MFCreateWaveFormatExFromMFMediaType")]
         IntPtr GetAudioFormat();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("5C6C44BF-1DB6-435B-9249-E8CD10FDEC96")]
+    public interface IMFPluginControl
+    {
+        void GetPreferredClsid(
+            MFPluginType pluginType,
+            [MarshalAs(UnmanagedType.LPWStr)] string selector,
+            out Guid clsid
+        );
+
+        void GetPreferredClsidByIndex(
+            MFPluginType pluginType,
+            int index,
+            [MarshalAs(UnmanagedType.LPWStr)] out string selector,
+            out Guid clsid
+        );
+
+        void SetPreferredClsid(
+            MFPluginType pluginType,
+            [MarshalAs(UnmanagedType.LPWStr)] string selector,
+            [MarshalAs(UnmanagedType.LPStruct)] Guid clsid
+        );
+
+        void IsDisabled(
+            MFPluginType pluginType,
+            [MarshalAs(UnmanagedType.LPStruct)] Guid clsid
+        );
+
+        void GetDisabledByIndex(
+            MFPluginType pluginType,
+            int index,
+            out Guid clsid
+        );
+
+        void SetDisabled(
+            MFPluginType pluginType,
+            [MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
+            [MarshalAs(UnmanagedType.Bool)] bool disabled
+        );
     }
 
 #endif

@@ -55,6 +55,13 @@ namespace MediaFoundation.EVR
     {
     }
 
+    [UnmanagedName("CLSID_EVRTearlessWindowPresenter9"),
+    ComImport,
+    Guid("a0a7a57b-59b2-4919-a694-add0a526c373")]
+    public class EVRTearlessWindowPresenter9
+    {
+    }
+
     #endregion
 
     #region Declarations
@@ -89,7 +96,14 @@ namespace MediaFoundation.EVR
         None = 0,
         DoNotRenderBorder = 0x00000001,
         DoNotClipToDevice = 0x00000002,
-        Mask = 0x00000003
+        AllowOutputThrottling = 0x00000004,
+        ForceOutputThrottling = 0x00000008,
+        ForceBatching = 0x00000010,
+        AllowBatching = 0x00000020,
+        ForceScaling = 0x00000040,
+        AllowScaling = 0x00000080,
+        DoNotRepaintOnStop = 0x00000100,
+        Mask = 0x000001ff,
     }
 
     [Flags, UnmanagedName("MFVideoAspectRatioMode")]
@@ -141,6 +155,25 @@ namespace MediaFoundation.EVR
         FilterMode = 0x00000010,
         Alpha = 0x00000020,
         BitMask = 0x0000003f
+    }
+
+    [Flags, UnmanagedName("MFVideoMixPrefs")]
+    public enum MFVideoMixPrefs
+    {
+        None = 0,
+        ForceHalfInterlace = 0x00000001,
+        AllowDropToHalfInterlace = 0x00000002,
+        AllowDropToBob = 0x00000004,
+        ForceBob = 0x00000008,
+        Mask = 0x0000000f
+    }
+
+    [UnmanagedName("EVRFilterConfigPrefs")]
+    public enum EVRFilterConfigPrefs
+    {
+        None = 0,
+        EnableQoS = 0x1,
+        Mask = 0x1
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("MFVideoNormalizedRect")]
@@ -280,6 +313,70 @@ namespace MediaFoundation.EVR
         void DisableImageExport(
             [MarshalAs(UnmanagedType.Bool)] bool bDisable
             );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("AEA36028-796D-454F-BEEE-B48071E24304")]
+    public interface IEVRFilterConfigEx : IEVRFilterConfig
+    {
+        #region IEVRFilterConfig methods
+
+        new void SetNumberOfStreams(
+            [In] int dwMaxStreams
+        );
+
+        new void GetNumberOfStreams(
+            out int pdwMaxStreams
+        );
+
+        #endregion
+
+        void SetConfigPrefs(
+            [In] EVRFilterConfigPrefs dwConfigFlags
+        );
+
+        void GetConfigPrefs(
+            out EVRFilterConfigPrefs pdwConfigFlags
+        );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("8459616D-966E-4930-B658-54FA7E5A16D3")]
+    public interface IMFVideoMixerControl2 : IMFVideoMixerControl
+    {
+        #region IMFVideoMixerControl methods
+
+        new void SetStreamZOrder(
+            [In] int dwStreamID,
+            [In] int dwZ
+            );
+
+        new void GetStreamZOrder(
+            [In] int dwStreamID,
+            out int pdwZ
+            );
+
+        new void SetStreamOutputRect(
+            [In] int dwStreamID,
+            [In] MFVideoNormalizedRect pnrcOutput
+            );
+
+        new void GetStreamOutputRect(
+            [In] int dwStreamID,
+            [Out, MarshalAs(UnmanagedType.LPStruct)] MFVideoNormalizedRect pnrcOutput
+            );
+
+        #endregion
+
+        void SetMixingPrefs(
+            [In] MFVideoMixPrefs dwMixFlags
+        );
+
+        void GetMixingPrefs(
+            out MFVideoMixPrefs pdwMixFlags
+        );
     }
 
 #endif

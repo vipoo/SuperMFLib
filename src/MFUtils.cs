@@ -2005,6 +2005,12 @@ namespace MediaFoundation.Misc
         public const int MF_E_SESSION_PAUSEWHILESTOPPED = unchecked((int)0xC00D36FC);
         public const int MF_S_ACTIVATE_REPLACED = unchecked((int)0x000D36FD);
         public const int MF_E_FORMAT_CHANGE_NOT_SUPPORTED = unchecked((int)0xC00D36FE);
+        public const int MF_E_INVALID_WORKQUEUE = unchecked((int)0xC00D36FF);
+        public const int MF_E_DRM_UNSUPPORTED = unchecked((int)0xC00D3700);
+        public const int MF_E_UNAUTHORIZED = unchecked((int)0xC00D3701);
+        public const int MF_E_OUT_OF_RANGE = unchecked((int)0xC00D3702);
+        public const int MF_E_INVALID_CODEC_MERIT = unchecked((int)0xC00D3703);
+        public const int MF_E_HW_MFT_FAILED_START_STREAMING = unchecked((int)0xC00D3704);
         public const int MF_S_ASF_PARSEINPROGRESS = unchecked((int)0x400D3A98);
         public const int MF_E_ASF_PARSINGINCOMPLETE = unchecked((int)0xC00D3A98);
         public const int MF_E_ASF_MISSINGDATA = unchecked((int)0xC00D3A99);
@@ -2015,6 +2021,7 @@ namespace MediaFoundation.Misc
         public const int MF_E_ASF_INDEXNOTLOADED = unchecked((int)0xC00D3A9E);
         public const int MF_E_ASF_TOO_MANY_PAYLOADS = unchecked((int)0xC00D3A9F);
         public const int MF_E_ASF_UNSUPPORTED_STREAM_TYPE = unchecked((int)0xC00D3AA0);
+        public const int MF_E_ASF_DROPPED_PACKET = unchecked((int)0xC00D3AA1);
         public const int MF_E_NO_EVENTS_AVAILABLE = unchecked((int)0xC00D3E80);
         public const int MF_E_INVALID_STATE_TRANSITION = unchecked((int)0xC00D3E82);
         public const int MF_E_END_OF_STREAM = unchecked((int)0xC00D3E84);
@@ -2033,6 +2040,8 @@ namespace MediaFoundation.Misc
         public const int MF_E_MP3_BAD_CRC = unchecked((int)0xC00D3E99);
         public const int MF_E_NOT_PROTECTED = unchecked((int)0xC00D3E9A);
         public const int MF_E_MEDIA_SOURCE_WRONGSTATE = unchecked((int)0xC00D3E9B);
+        public const int MF_E_MEDIA_SOURCE_NO_STREAMS_SELECTED = unchecked((int)0xC00D3E9C);
+        public const int MF_E_CANNOT_FIND_KEYFRAME_SAMPLE = unchecked((int)0xC00D3E9D);
         public const int MF_E_NETWORK_RESOURCE_FAILURE = unchecked((int)0xC00D4268);
         public const int MF_E_NET_WRITE = unchecked((int)0xC00D4269);
         public const int MF_E_NET_READ = unchecked((int)0xC00D426A);
@@ -2097,6 +2106,8 @@ namespace MediaFoundation.Misc
         public const int MF_E_ASF_FILESINK_BITRATE_UNKNOWN = unchecked((int)0xC00D4A40);
         public const int MF_E_SINK_NO_STREAMS = unchecked((int)0xC00D4A41);
         public const int MF_S_SINK_NOT_FINALIZED = unchecked((int)0x000D4A42);
+        public const int MF_E_METADATA_TOO_LONG = unchecked((int)0xC00D4A43);
+        public const int MF_E_SINK_NO_SAMPLES_PROCESSED = unchecked((int)0xC00D4A44);
         public const int MF_E_VIDEO_REN_NO_PROCAMP_HW = unchecked((int)0xC00D4E20);
         public const int MF_E_VIDEO_REN_NO_DEINTERLACE_HW = unchecked((int)0xC00D4E21);
         public const int MF_E_VIDEO_REN_COPYPROT_FAILED = unchecked((int)0xC00D4E22);
@@ -2114,6 +2125,12 @@ namespace MediaFoundation.Misc
         public const int MF_E_TOPO_CANNOT_CONNECT = unchecked((int)0xC00D5213);
         public const int MF_E_TOPO_UNSUPPORTED = unchecked((int)0xC00D5214);
         public const int MF_E_TOPO_INVALID_TIME_ATTRIBUTES = unchecked((int)0xC00D5215);
+        public const int MF_E_TOPO_LOOPS_IN_TOPOLOGY = unchecked((int)0xC00D5216);
+        public const int MF_E_TOPO_MISSING_PRESENTATION_DESCRIPTOR = unchecked((int)0xC00D5217);
+        public const int MF_E_TOPO_MISSING_STREAM_DESCRIPTOR = unchecked((int)0xC00D5218);
+        public const int MF_E_TOPO_STREAM_DESCRIPTOR_NOT_SELECTED = unchecked((int)0xC00D5219);
+        public const int MF_E_TOPO_MISSING_SOURCE = unchecked((int)0xC00D521A);
+        public const int MF_E_TOPO_SINK_ACTIVATES_UNSUPPORTED = unchecked((int)0xC00D521B);
         public const int MF_E_SEQUENCER_UNKNOWN_SEGMENT_ID = unchecked((int)0xC00D61AC);
         public const int MF_S_SEQUENCER_CONTEXT_CANCELED = unchecked((int)0x000D61AD);
         public const int MF_E_NO_SOURCE_IN_CACHE = unchecked((int)0xC00D61AE);
@@ -2140,6 +2157,8 @@ namespace MediaFoundation.Misc
         public const int MF_E_TRANSFORM_CANNOT_CHANGE_MEDIATYPE_WHILE_PROCESSING = unchecked((int)0xC00D6D74);
         public const int MF_S_TRANSFORM_DO_NOT_PROPAGATE_EVENT = unchecked((int)0x000D6D75);
         public const int MF_E_UNSUPPORTED_D3D_TYPE = unchecked((int)0xC00D6D76);
+        public const int MF_E_TRANSFORM_ASYNC_LOCKED = unchecked((int)0xC00D6D77);
+        public const int MF_E_TRANSFORM_CANNOT_INITIALIZE_ACM_DRIVER = unchecked((int)0xC00D6D78L);
         public const int MF_E_LICENSE_INCORRECT_RIGHTS = unchecked((int)0xC00D7148);
         public const int MF_E_LICENSE_OUTOFDATE = unchecked((int)0xC00D7149);
         public const int MF_E_LICENSE_REQUIRED = unchecked((int)0xC00D714A);
@@ -2206,14 +2225,23 @@ namespace MediaFoundation.Misc
         public const int MF_E_DROPTIME_NOT_SUPPORTED = unchecked((int)0xC00DA02A);
         public const int MF_E_QUALITYKNOB_WAIT_LONGER = unchecked((int)0xC00DA02B);
         public const int MF_E_QM_INVALIDSTATE = unchecked((int)0xC00DA02C);
+        public const int MF_E_TRANSCODE_NO_CONTAINERTYPE = unchecked((int)0xC00DA410);
+        public const int MF_E_TRANSCODE_PROFILE_NO_MATCHING_STREAMS = unchecked((int)0xC00DA411);
+        public const int MF_E_TRANSCODE_NO_MATCHING_ENCODER = unchecked((int)0xC00DA412);
+        public const int MF_E_ALLOCATOR_NOT_INITIALIZED = unchecked((int)0xC00DA7F8);
+        public const int MF_E_ALLOCATOR_NOT_COMMITED = unchecked((int)0xC00DA7F9);
+        public const int MF_E_ALLOCATOR_ALREADY_COMMITED = unchecked((int)0xC00DA7FA);
+        public const int MF_E_STREAM_ERROR = unchecked((int)0xC00DA7FB);
+        public const int MF_E_INVALID_STREAM_STATE = unchecked((int)0xC00DA7FC);
+        public const int MF_E_HW_STREAM_NOT_CONNECTED = unchecked((int)0xC00DA7FD);
 
         #endregion
 
         #region externs
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint="FormatMessageW", ExactSpelling=true), SuppressUnmanagedCodeSecurity]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "FormatMessageW", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         private static extern int FormatMessage(FormatMessageFlags dwFlags, IntPtr lpSource,
-            int dwMessageId, int dwLanguageId, out IntPtr lpBuffer, int nSize, IntPtr [] Arguments);
+            int dwMessageId, int dwLanguageId, out IntPtr lpBuffer, int nSize, IntPtr[] Arguments);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryExW", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         private static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, LoadLibraryExFlags dwFlags);

@@ -422,7 +422,8 @@ namespace MediaFoundation.dxvahd
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IDXVAHD_Device
     {
-        void CreateVideoSurface(
+        [PreserveSig]
+        int CreateVideoSurface(
             int Width,
             int Height,
             int Format, // D3DFORMAT 
@@ -433,31 +434,38 @@ namespace MediaFoundation.dxvahd
             out IDirect3DSurface9[] ppSurfaces,
             ref  IntPtr pSharedHandle);
 
-        void GetVideoProcessorDeviceCaps(
+        [PreserveSig]
+        int GetVideoProcessorDeviceCaps(
             out DXVAHD_VPDEVCAPS pCaps);
 
-        void GetVideoProcessorOutputFormats(
+        [PreserveSig]
+        int GetVideoProcessorOutputFormats(
             int Count,
             out int[] pFormats); // D3DFORMAT 
 
-        void GetVideoProcessorInputFormats(
+        [PreserveSig]
+        int GetVideoProcessorInputFormats(
             int Count,
             out int[] pFormats); // D3DFORMAT 
 
-        void GetVideoProcessorCaps(
+        [PreserveSig]
+        int GetVideoProcessorCaps(
             int Count,
             out DXVAHD_VPCAPS[] pCaps);
 
-        void GetVideoProcessorCustomRates(
+        [PreserveSig]
+        int GetVideoProcessorCustomRates(
             Guid pVPGuid,
             int Count,
             out DXVAHD_CUSTOM_RATE_DATA[] pRates);
 
-        void GetVideoProcessorFilterRange(
+        [PreserveSig]
+        int GetVideoProcessorFilterRange(
             DXVAHD_FILTER Filter,
             out DXVAHD_FILTER_RANGE_DATA pRange);
 
-        void CreateVideoProcessor(
+        [PreserveSig]
+        int CreateVideoProcessor(
             Guid pVPGuid,
             out IDXVAHD_VideoProcessor ppVideoProcessor);
     }
@@ -468,29 +476,34 @@ namespace MediaFoundation.dxvahd
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IDXVAHD_VideoProcessor
     {
-        void SetVideoProcessBltState(
+        [PreserveSig]
+        int SetVideoProcessBltState(
             DXVAHD_BLT_STATE State,
             int DataSize,
             IntPtr pData);
 
-        void GetVideoProcessBltState(
+        [PreserveSig]
+        int GetVideoProcessBltState(
             DXVAHD_BLT_STATE State,
             int DataSize,
             IntPtr pData);
 
-        void SetVideoProcessStreamState(
+        [PreserveSig]
+        int SetVideoProcessStreamState(
             int StreamNumber,
             DXVAHD_STREAM_STATE State,
             int DataSize,
             IntPtr pData);
 
-        void GetVideoProcessStreamState(
+        [PreserveSig]
+        int GetVideoProcessStreamState(
             int StreamNumber,
             DXVAHD_STREAM_STATE State,
             int DataSize,
             IntPtr pData);
 
-        void VideoProcessBltHD(
+        [PreserveSig]
+        int VideoProcessBltHD(
             IDirect3DSurface9 pOutputSurface,
             int OutputFrame,
             int StreamCount,
@@ -698,8 +711,8 @@ namespace MediaFoundation.dxvahd
 
     public class OPMExtern
     {
-        [DllImport("Dxva2.dll", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
-        public static extern void DXVAHD_CreateDevice(
+        [DllImport("Dxva2.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        public static extern int DXVAHD_CreateDevice(
             IDirect3DDevice9Ex pD3DDevice,
             DXVAHD_CONTENT_DESC pContentDesc,
             DXVAHD_DEVICE_USAGE Usage,

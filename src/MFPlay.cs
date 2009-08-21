@@ -282,147 +282,183 @@ namespace MediaFoundation.MFPlayer
     Guid("A714590A-58AF-430a-85BF-44F5EC838D85")]
     public interface IMFPMediaPlayer
     {
-        void Play();
+        [PreserveSig]
+        int Play();
 
-        void Pause();
+        [PreserveSig]
+        int Pause();
 
-        void Stop();
+        [PreserveSig]
+        int Stop();
 
-        void FrameStep();
+        [PreserveSig]
+        int FrameStep();
 
-        void SetPosition(
+        [PreserveSig]
+        int SetPosition(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidPositionType,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvPositionValue
         );
 
-        void GetPosition(
+        [PreserveSig]
+        int GetPosition(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidPositionType,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvPositionValue
         );
 
-        void GetDuration(
+        [PreserveSig]
+        int GetDuration(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidPositionType,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvPositionValue
         );
 
-        void SetRate(
+        [PreserveSig]
+        int SetRate(
             float flRate
         );
 
-        void GetRate(
+        [PreserveSig]
+        int GetRate(
             out float pflRate
         );
 
-        void GetSupportedRates(
+        [PreserveSig]
+        int GetSupportedRates(
             [MarshalAs(UnmanagedType.Bool)] bool fForwardDirection,
             out float pflSlowestRate,
             out float pflFastestRate
         );
 
-        void GetState(
+        [PreserveSig]
+        int GetState(
             out MFP_MEDIAPLAYER_STATE peState
         );
 
-        void CreateMediaItemFromURL(
+        [PreserveSig]
+        int CreateMediaItemFromURL(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszURL,
             [MarshalAs(UnmanagedType.Bool)] bool fSync,
             IntPtr dwUserData,
             out IMFPMediaItem ppMediaItem
         );
 
-        void CreateMediaItemFromObject(
+        [PreserveSig]
+        int CreateMediaItemFromObject(
             [MarshalAs(UnmanagedType.IUnknown)] object pIUnknownObj,
             [MarshalAs(UnmanagedType.Bool)] bool fSync,
             IntPtr dwUserData,
             out IMFPMediaItem ppMediaItem
         );
 
-        void SetMediaItem(
+        [PreserveSig]
+        int SetMediaItem(
             IMFPMediaItem pIMFPMediaItem
         );
 
-        void ClearMediaItem();
+        [PreserveSig]
+        int ClearMediaItem();
 
-        void GetMediaItem(
+        [PreserveSig]
+        int GetMediaItem(
             out IMFPMediaItem ppIMFPMediaItem
         );
 
-        void GetVolume(
+        [PreserveSig]
+        int GetVolume(
             out float pflVolume
         );
 
-        void SetVolume(
+        [PreserveSig]
+        int SetVolume(
             float flVolume
         );
 
-        void GetBalance(
+        [PreserveSig]
+        int GetBalance(
             out float pflBalance
         );
 
-        void SetBalance(
+        [PreserveSig]
+        int SetBalance(
             float flBalance
         );
 
-        void GetMute(
+        [PreserveSig]
+        int GetMute(
             [MarshalAs(UnmanagedType.Bool)] out bool pfMute
         );
 
-        void SetMute(
+        [PreserveSig]
+        int SetMute(
             [MarshalAs(UnmanagedType.Bool)] bool fMute
         );
 
-        void GetNativeVideoSize(
+        [PreserveSig]
+        int GetNativeVideoSize(
             out Size pszVideo,
             out Size pszARVideo
         );
 
-        void GetIdealVideoSize(
+        [PreserveSig]
+        int GetIdealVideoSize(
             out Size pszMin,
             out Size pszMax
         );
 
-        void SetVideoSourceRect(
+        [PreserveSig]
+        int SetVideoSourceRect(
             [In] MFVideoNormalizedRect pnrcSource
         );
 
-        void GetVideoSourceRect(
+        [PreserveSig]
+        int GetVideoSourceRect(
             out MFVideoNormalizedRect pnrcSource
         );
 
-        void SetAspectRatioMode(
+        [PreserveSig]
+        int SetAspectRatioMode(
             MFVideoAspectRatioMode dwAspectRatioMode
         );
 
-        void GetAspectRatioMode(
+        [PreserveSig]
+        int GetAspectRatioMode(
             out MFVideoAspectRatioMode pdwAspectRatioMode
         );
 
-        void GetVideoWindow(
+        [PreserveSig]
+        int GetVideoWindow(
             out IntPtr phwndVideo
         );
 
-        void UpdateVideo();
+        [PreserveSig]
+        int UpdateVideo();
 
-        void SetBorderColor(
+        [PreserveSig]
+        int SetBorderColor(
             Color Clr
         );
 
-        void GetBorderColor(
+        [PreserveSig]
+        int GetBorderColor(
             out Color pClr
         );
 
-        void InsertEffect(
+        [PreserveSig]
+        int InsertEffect(
             [MarshalAs(UnmanagedType.IUnknown)] object pEffect,
             [MarshalAs(UnmanagedType.Bool)] bool fOptional
         );
 
-        void RemoveEffect(
+        [PreserveSig]
+        int RemoveEffect(
             [MarshalAs(UnmanagedType.IUnknown)] object pEffect
         );
 
-        void RemoveAllEffects();
+        [PreserveSig]
+        int RemoveAllEffects();
 
-        void Shutdown();
+        [PreserveSig]
+        int Shutdown();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -430,94 +466,113 @@ namespace MediaFoundation.MFPlayer
     Guid("90EB3E6B-ECBF-45cc-B1DA-C6FE3EA70D57")]
     public interface IMFPMediaItem
     {
-        void GetMediaPlayer(
+        [PreserveSig]
+        int GetMediaPlayer(
             out IMFPMediaPlayer ppMediaPlayer
         );
 
-        void GetURL(
+        [PreserveSig]
+        int GetURL(
             [MarshalAs(UnmanagedType.LPWStr)] out string ppwszURL
         );
 
-        void GetObject(
+        [PreserveSig]
+        int GetObject(
             [MarshalAs(UnmanagedType.IUnknown)] out object ppIUnknown
         );
 
-        void GetUserData(
+        [PreserveSig]
+        int GetUserData(
             out IntPtr pdwUserData
         );
 
-        void SetUserData(
+        [PreserveSig]
+        int SetUserData(
             IntPtr dwUserData
         );
 
-        void GetStartStopPosition(
+        [PreserveSig]
+        int GetStartStopPosition(
             out Guid pguidStartPositionType,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvStartValue,
             out Guid pguidStopPositionType,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvStopValue
         );
 
-        void SetStartStopPosition(
+        [PreserveSig]
+        int SetStartStopPosition(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidStartPositionType,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvStartValue,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidStopPositionType,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvStopValue
         );
 
-        void HasVideo(
+        [PreserveSig]
+        int HasVideo(
             [MarshalAs(UnmanagedType.Bool)] out bool pfHasVideo,
             [MarshalAs(UnmanagedType.Bool)] out bool pfSelected
         );
 
-        void HasAudio(
+        [PreserveSig]
+        int HasAudio(
             [MarshalAs(UnmanagedType.Bool)] out bool pfHasAudio,
             [MarshalAs(UnmanagedType.Bool)] out bool pfSelected
         );
 
-        void IsProtected(
+        [PreserveSig]
+        int IsProtected(
             [MarshalAs(UnmanagedType.Bool)] out bool pfProtected
         );
 
-        void GetDuration(
+        [PreserveSig]
+        int GetDuration(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidPositionType,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvDurationValue
         );
 
-        void GetNumberOfStreams(
+        [PreserveSig]
+        int GetNumberOfStreams(
             out int pdwStreamCount
         );
 
-        void GetStreamSelection(
+        [PreserveSig]
+        int GetStreamSelection(
             int dwStreamIndex,
             [MarshalAs(UnmanagedType.Bool)] out bool pfEnabled
         );
 
-        void SetStreamSelection(
+        [PreserveSig]
+        int SetStreamSelection(
             int dwStreamIndex,
             [MarshalAs(UnmanagedType.Bool)] bool fEnabled
         );
 
-        void GetStreamAttribute(
+        [PreserveSig]
+        int GetStreamAttribute(
             int dwStreamIndex,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidMFAttribute,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvValue
         );
 
-        void GetPresentationAttribute(
+        [PreserveSig]
+        int GetPresentationAttribute(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidMFAttribute,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvValue
         );
 
-        void GetCharacteristics(
+        [PreserveSig]
+        int GetCharacteristics(
             out MFP_MEDIAITEM_CHARACTERISTICS pCharacteristics
         );
 
-        void SetStreamSink(
+        [PreserveSig]
+        int SetStreamSink(
             int dwStreamIndex,
             [MarshalAs(UnmanagedType.IUnknown)] object pMediaSink
         );
 
-        void GetMetadata(
+        [PreserveSig]
+        int GetMetadata(
             out IPropertyStore ppMetadataStore
         );
     }
@@ -527,7 +582,8 @@ namespace MediaFoundation.MFPlayer
     Guid("766C8FFB-5FDB-4fea-A28D-B912996F51BD")]
     public interface IMFPMediaPlayerCallback
     {
-        void OnMediaPlayerEvent(
+        [PreserveSig]
+        int OnMediaPlayerEvent(
             [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(EHMarshaler))] MFP_EVENT_HEADER pEventHeader
             );
     }

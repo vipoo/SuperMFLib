@@ -204,19 +204,23 @@ namespace MediaFoundation.Misc
     Guid("71604b0f-97b0-4764-8577-2f13e98a1422")]
     public interface INamedPropertyStore
     {
-        void GetNamedValue(
+        [PreserveSig]
+        int GetNamedValue(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pValue
         );
 
-        void SetNamedValue(
+        [PreserveSig]
+        int SetNamedValue(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant propvar);
 
-        void GetNameCount(
+        [PreserveSig]
+        int GetNameCount(
             out int pdwCount);
 
-        void GetNameAt(
+        [PreserveSig]
+        int GetNameAt(
             int iProp,
             [MarshalAs(UnmanagedType.BStr)] out string pbstrName);
     }
@@ -226,26 +230,31 @@ namespace MediaFoundation.Misc
     Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99")]
     public interface IPropertyStore
     {
-        void GetCount(
+        [PreserveSig]
+        int GetCount(
             out int cProps
             );
 
-        void GetAt(
+        [PreserveSig]
+        int GetAt(
             [In] int iProp,
             [Out] PropertyKey pkey
             );
 
-        void GetValue(
+        [PreserveSig]
+        int GetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pv
             );
 
-        void SetValue(
+        [PreserveSig]
+        int SetValue(
             [In, MarshalAs(UnmanagedType.LPStruct)] PropertyKey key,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant propvar
             );
 
-        void Commit();
+        [PreserveSig]
+        int Commit();
     }
 
     #endregion

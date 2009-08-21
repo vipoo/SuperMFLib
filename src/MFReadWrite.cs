@@ -126,7 +126,8 @@ namespace MediaFoundation.ReadWrite
     Guid("E7FE2E12-661C-40DA-92F9-4F002AB67627")]
     public interface IMFReadWriteClassFactory
     {
-        void CreateInstanceFromURL(
+        [PreserveSig]
+        int CreateInstanceFromURL(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszURL,
             IMFAttributes pAttributes,
@@ -134,7 +135,8 @@ namespace MediaFoundation.ReadWrite
             [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
         );
 
-        void CreateInstanceFromObject(
+        [PreserveSig]
+        int CreateInstanceFromObject(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
             [MarshalAs(UnmanagedType.IUnknown)] object punkObject,
             IMFAttributes pAttributes,
@@ -148,39 +150,46 @@ namespace MediaFoundation.ReadWrite
     Guid("70ae66f2-c809-4e4f-8915-bdcb406b7993")]
     public interface IMFSourceReader
     {
-        void GetStreamSelection(
+        [PreserveSig]
+        int GetStreamSelection(
             int dwStreamIndex,
             [MarshalAs(UnmanagedType.Bool)] out bool pfSelected
         );
 
-        void SetStreamSelection(
+        [PreserveSig]
+        int SetStreamSelection(
             int dwStreamIndex,
             bool fSelected
         );
 
-        void GetNativeMediaType(
+        [PreserveSig]
+        int GetNativeMediaType(
             int dwStreamIndex,
             int dwMediaTypeIndex,
             out IMFMediaType ppMediaType
         );
 
-        void GetCurrentMediaType(
+        [PreserveSig]
+        int GetCurrentMediaType(
             int dwStreamIndex,
             out IMFMediaType ppMediaType
         );
 
-        void SetCurrentMediaType(
+        [PreserveSig]
+        int SetCurrentMediaType(
             int dwStreamIndex,
             ref int pdwReserved,
             IMFMediaType pMediaType
         );
 
-        void SetCurrentPosition(
+        [PreserveSig]
+        int SetCurrentPosition(
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidTimeFormat,
             [In] PropVariant varPosition
         );
 
-        void ReadSample(
+        [PreserveSig]
+        int ReadSample(
             int dwStreamIndex,
             int dwControlFlags,
             out int pdwActualStreamIndex,
@@ -189,18 +198,21 @@ namespace MediaFoundation.ReadWrite
             out IMFSample ppSample
         );
 
-        void Flush(
+        [PreserveSig]
+        int Flush(
             int dwStreamIndex
         );
 
-        void GetServiceForStream(
+        [PreserveSig]
+        int GetServiceForStream(
             int dwStreamIndex,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
             [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
         );
 
-        void GetPresentationAttribute(
+        [PreserveSig]
+        int GetPresentationAttribute(
             int dwStreamIndex,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidAttribute,
             [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvarAttribute
@@ -212,7 +224,8 @@ namespace MediaFoundation.ReadWrite
     Guid("deec8d99-fa1d-4d82-84c2-2c8969944867")]
     public interface IMFSourceReaderCallback
     {
-        void OnReadSample(
+        [PreserveSig]
+        int OnReadSample(
             int hrStatus,
             int dwStreamIndex,
             MF_SOURCE_READER_FLAG dwStreamFlags,
@@ -220,11 +233,13 @@ namespace MediaFoundation.ReadWrite
             IMFSample pSample
         );
 
-        void OnFlush(
+        [PreserveSig]
+        int OnFlush(
             int dwStreamIndex
         );
 
-        void OnEvent(
+        [PreserveSig]
+        int OnEvent(
             int dwStreamIndex,
             IMFMediaEvent pEvent
         );
@@ -235,52 +250,63 @@ namespace MediaFoundation.ReadWrite
     Guid("3137f1cd-fe5e-4805-a5d8-fb477448cb3d")]
     public interface IMFSinkWriter
     {
-        void AddStream(
+        [PreserveSig]
+        int AddStream(
             IMFMediaType pTargetMediaType,
             out int pdwStreamIndex
         );
 
-        void SetInputMediaType(
+        [PreserveSig]
+        int SetInputMediaType(
             int dwStreamIndex,
             IMFMediaType pInputMediaType,
             IMFAttributes pEncodingParameters
         );
 
-        void BeginWriting();
+        [PreserveSig]
+        int BeginWriting();
 
-        void WriteSample(
+        [PreserveSig]
+        int WriteSample(
             int dwStreamIndex,
             IMFSample pSample
         );
 
-        void SendStreamTick(
+        [PreserveSig]
+        int SendStreamTick(
             int dwStreamIndex,
             long llTimestamp
         );
 
-        void PlaceMarker(
+        [PreserveSig]
+        int PlaceMarker(
             int dwStreamIndex,
             IntPtr pvContext
         );
 
-        void NotifyEndOfSegment(
+        [PreserveSig]
+        int NotifyEndOfSegment(
             int dwStreamIndex
         );
 
-        void Flush(
+        [PreserveSig]
+        int Flush(
             int dwStreamIndex
         );
 
-        void Finalize_();
+        [PreserveSig]
+        int Finalize_();
 
-        void GetServiceForStream(
+        [PreserveSig]
+        int GetServiceForStream(
             int dwStreamIndex,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
             [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
         );
 
-        void GetStatistics(
+        [PreserveSig]
+        int GetStatistics(
             int dwStreamIndex,
             out MF_SINK_WRITER_STATISTICS pStats
         );
@@ -291,11 +317,13 @@ namespace MediaFoundation.ReadWrite
     Guid("666f76de-33d2-41b9-a458-29ed0a972c58")]
     public interface IMFSinkWriterCallback
     {
-        void OnFinalize(
+        [PreserveSig]
+        int OnFinalize(
             int hrStatus
         );
 
-        void OnMarker(
+        [PreserveSig]
+        int OnMarker(
             int dwStreamIndex,
             IntPtr pvContext
         );

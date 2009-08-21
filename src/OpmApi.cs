@@ -35,16 +35,16 @@ namespace MediaFoundation.OPM
 
     public class OPMExtern
     {
-        [DllImport("Dxva2.dll", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
-        public static extern void OPMGetVideoOutputsFromHMONITOR(
+        [DllImport("Dxva2.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        public static extern int OPMGetVideoOutputsFromHMONITOR(
             IntPtr hMonitor,
             OPM_VIDEO_OUTPUT_SEMANTICS vos,
             out int pulNumVideoOutputs,
             IntPtr pppOPMVideoOutputArray       // ISYN: IOPMVideoOutput***
             );
 
-        [DllImport("Dxva2.dll", ExactSpelling = true, PreserveSig = false), SuppressUnmanagedCodeSecurity]
-        public static extern void OPMGetVideoOutputsFromIDirect3DDevice9Object(
+        [DllImport("Dxva2.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        public static extern int OPMGetVideoOutputsFromIDirect3DDevice9Object(
             [MarshalAs(UnmanagedType.IUnknown)] object pDirect3DDevice9, // IDirect3DDevice9
             OPM_VIDEO_OUTPUT_SEMANTICS vos,
             out int pulNumVideoOutputs,
@@ -395,23 +395,28 @@ namespace MediaFoundation.OPM
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IOPMVideoOutput
     {
-        void StartInitialization(
+        [PreserveSig]
+        int StartInitialization(
             out OPM_RANDOM_NUMBER prnRandomNumber,
             out IntPtr ppbCertificate,
             out  int pulCertificateLength);
 
-        void FinishInitialization(
+        [PreserveSig]
+        int FinishInitialization(
             OPM_ENCRYPTED_INITIALIZATION_PARAMETERS pParameters);
 
-        void GetInformation(
+        [PreserveSig]
+        int GetInformation(
             OPM_GET_INFO_PARAMETERS pParameters,
             out OPM_REQUESTED_INFORMATION pRequestedInformation);
 
-        void COPPCompatibleGetInformation(
+        [PreserveSig]
+        int COPPCompatibleGetInformation(
             OPM_COPP_COMPATIBLE_GET_INFO_PARAMETERS pParameters,
             out OPM_REQUESTED_INFORMATION pRequestedInformation);
 
-        void Configure(
+        [PreserveSig]
+        int Configure(
             OPM_CONFIGURE_PARAMETERS pParameters,
             int ulAdditionalParametersSize,
             IntPtr pbAdditionalParameters);

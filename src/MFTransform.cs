@@ -196,7 +196,8 @@ namespace MediaFoundation.Transform
     Guid("149c4d73-b4be-4f8d-8b87-079e926b6add")]
     interface IMFLocalMFTRegistration
     {
-        void RegisterMFTs(
+        [PreserveSig]
+        int RegisterMFTs(
             [In] MFT_REGISTRATION_INFO[] pMFTs,
             int cMFTs);
     }
@@ -222,123 +223,146 @@ namespace MediaFoundation.Transform
     Guid("BF94C121-5B05-4E6F-8000-BA598961414D")]
     public interface IMFTransform
     {
-        void GetStreamLimits(
+        [PreserveSig]
+        int GetStreamLimits(
             [Out] MFInt pdwInputMinimum,
             [Out] MFInt pdwInputMaximum,
             [Out] MFInt pdwOutputMinimum,
             [Out] MFInt pdwOutputMaximum
             );
 
-        void GetStreamCount(
+        [PreserveSig]
+        int GetStreamCount(
             [Out] MFInt pcInputStreams,
             [Out] MFInt pcOutputStreams
             );
 
-        void GetStreamIDs(
+        [PreserveSig]
+        int GetStreamIDs(
             int dwInputIDArraySize,
             [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int [] pdwInputIDs,
             int dwOutputIDArraySize,
             [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] int[] pdwOutputIDs
             );
 
-        void GetInputStreamInfo(
+        [PreserveSig]
+        int GetInputStreamInfo(
             int dwInputStreamID,
             out MFTInputStreamInfo pStreamInfo
             );
 
-        void GetOutputStreamInfo(
+        [PreserveSig]
+        int GetOutputStreamInfo(
             int dwOutputStreamID,
             out MFTOutputStreamInfo pStreamInfo
             );
 
-        void GetAttributes(
+        [PreserveSig]
+        int GetAttributes(
             [MarshalAs(UnmanagedType.Interface)] out IMFAttributes pAttributes
             );
 
-        void GetInputStreamAttributes(
+        [PreserveSig]
+        int GetInputStreamAttributes(
             int dwInputStreamID,
             [MarshalAs(UnmanagedType.Interface)] out IMFAttributes pAttributes
             );
 
-        void GetOutputStreamAttributes(
+        [PreserveSig]
+        int GetOutputStreamAttributes(
             int dwOutputStreamID,
             [MarshalAs(UnmanagedType.Interface)] out IMFAttributes pAttributes
             );
 
-        void DeleteInputStream(
+        [PreserveSig]
+        int DeleteInputStream(
             int dwStreamID
             );
 
-        void AddInputStreams(
+        [PreserveSig]
+        int AddInputStreams(
             int cStreams,
             [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] adwStreamIDs
             );
 
-        void GetInputAvailableType(
+        [PreserveSig]
+        int GetInputAvailableType(
             int dwInputStreamID,
             int dwTypeIndex,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaType ppType
             );
 
-        void GetOutputAvailableType(
+        [PreserveSig]
+        int GetOutputAvailableType(
             int dwOutputStreamID,
             int dwTypeIndex,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaType ppType
             );
 
-        void SetInputType(
+        [PreserveSig]
+        int SetInputType(
             int dwInputStreamID,
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pType,
             MFTSetTypeFlags dwFlags
             );
 
-        void SetOutputType(
+        [PreserveSig]
+        int SetOutputType(
             int dwOutputStreamID,
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pType,
             MFTSetTypeFlags dwFlags
             );
 
-        void GetInputCurrentType(
+        [PreserveSig]
+        int GetInputCurrentType(
             int dwInputStreamID,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaType ppType
             );
 
-        void GetOutputCurrentType(
+        [PreserveSig]
+        int GetOutputCurrentType(
             int dwOutputStreamID,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaType ppType
             );
 
-        void GetInputStatus(
+        [PreserveSig]
+        int GetInputStatus(
             int dwInputStreamID,
             out MFTInputStatusFlags pdwFlags
             );
 
-        void GetOutputStatus(
+        [PreserveSig]
+        int GetOutputStatus(
             out MFTOutputStatusFlags pdwFlags
             );
 
-        void SetOutputBounds(
+        [PreserveSig]
+        int SetOutputBounds(
             long hnsLowerBound,
             long hnsUpperBound
             );
 
-        void ProcessEvent(
+        [PreserveSig]
+        int ProcessEvent(
             int dwInputStreamID,
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaEvent pEvent
             );
 
-        void ProcessMessage(
+        [PreserveSig]
+        int ProcessMessage(
             MFTMessageType eMessage,
             IntPtr ulParam
             );
 
-        void ProcessInput(
+        [PreserveSig]
+        int ProcessInput(
             int dwInputStreamID,
             [MarshalAs(UnmanagedType.Interface)] IMFSample pSample,
             int dwFlags // Must be zero
             );
 
-        void ProcessOutput(
+        [PreserveSig]
+        int ProcessOutput(
             MFTProcessOutputFlags dwFlags,
             int cOutputBufferCount,
             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=1)] MFTOutputDataBuffer [] pOutputSamples,

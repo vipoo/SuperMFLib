@@ -235,6 +235,7 @@ namespace EVRPresenter
                 throw new COMException("D3DPresentEngine::CreateVideoSamples", MFError.MF_E_UNEXPECTED);
             }
 
+            int hr;
             D3DPRESENT_PARAMETERS pp;
 
             IDirect3DSwapChain9 pSwapChain = null;    // Swap chain
@@ -266,7 +267,8 @@ namespace EVRPresenter
                         // Set the swap chain pointer as a custom attribute on the sample. This keeps
                         // a reference count on the swap chain, so that the swap chain is kept alive
                         // for the duration of the sample's lifetime.
-                        pVideoSample.SetUnknown(EVRCustomPresenter.MFSamplePresenter_SampleSwapChain, pSwapChain);
+                        hr = pVideoSample.SetUnknown(EVRCustomPresenter.MFSamplePresenter_SampleSwapChain, pSwapChain);
+                        MFError.ThrowExceptionForHR(hr);
 
                         //SafeRelease(pVideoSample);
                         SafeRelease(pSwapChain); pSwapChain = null;
@@ -360,6 +362,7 @@ namespace EVRPresenter
 
         public void PresentSample(IMFSample pSample, long llTarget)
         {
+            int hr;
             IMFMediaBuffer pBuffer = null;
             IDirect3DSurface9 pSurface = null;
             IDirect3DSwapChain9 pSwapChain = null;
@@ -370,10 +373,12 @@ namespace EVRPresenter
                 if (pSample != null)
                 {
                     // Get the buffer from the sample.
-                    pSample.GetBufferByIndex(0, out pBuffer);
+                    hr = pSample.GetBufferByIndex(0, out pBuffer);
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Get the surface from the buffer.
-                    MFExtern.MFGetService(pBuffer, MFServices.MR_BUFFER_SERVICE, typeof(IDirect3DSurface9).GUID, out o);
+                    hr = MFExtern.MFGetService(pBuffer, MFServices.MR_BUFFER_SERVICE, typeof(IDirect3DSurface9).GUID, out o);
+                    MFError.ThrowExceptionForHR(hr);
                     pSurface = o as IDirect3DSurface9;
                 }
                 else if (m_pSurfaceRepaint != null)
@@ -406,7 +411,7 @@ namespace EVRPresenter
             }
             catch (Exception e)
             {
-                int hr = Marshal.GetHRForException(e);
+                hr = Marshal.GetHRForException(e);
                 if (hr == (int)D3DError.DeviceLost || hr == (int)D3DError.DeviceNotReset || hr == (int)D3DError.DeviceHung)
                 {
                     // We failed because the device was lost. Fill the destination rectangle.
@@ -557,6 +562,7 @@ namespace EVRPresenter
 
         protected void CreateD3DSample(IDirect3DSwapChain9 pSwapChain, out IMFSample ppVideoSample)
         {
+            int hr;
             IDirect3DSurface9 pSurface = null;
 
             // Caller holds the object lock.
@@ -566,7 +572,8 @@ namespace EVRPresenter
                 pSwapChain.GetBackBuffer(0, D3DBACKBUFFER_TYPE.Mono, out pSurface);
 
                 // Create the sample.
-                MFExtern.MFCreateVideoSampleFromSurface(pSurface, out ppVideoSample);
+                hr = MFExtern.MFCreateVideoSampleFromSurface(pSurface, out ppVideoSample);
+                MFError.ThrowExceptionForHR(hr);
             }
             finally
             {

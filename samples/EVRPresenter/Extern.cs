@@ -21,6 +21,7 @@ namespace MediaFoundation.Utility
     {
         public static void MFSetBlob(IMFAttributes p, Guid g, object o)
         {
+            int hr;
             int iSize = Marshal.SizeOf(o);
             byte[] b = new byte[iSize];
 
@@ -35,18 +36,23 @@ namespace MediaFoundation.Utility
             {
                 h.Free();
             }
-            p.SetBlob(g, b, iSize);
+            hr = p.SetBlob(g, b, iSize);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         public static void MFGetBlob(IMFAttributes p, Guid g, object obj)
         {
+            int hr;
             int iSize;
             int i;
 
             // Get the blob into a byte array
-            p.GetBlobSize(g, out iSize);
+            hr = p.GetBlobSize(g, out iSize);
+            MFError.ThrowExceptionForHR(hr);
+
             byte[] b = new byte[iSize];
-            p.GetBlob(g, b, iSize, out i);
+            hr = p.GetBlob(g, b, iSize, out i);
+            MFError.ThrowExceptionForHR(hr);
 
             GCHandle h = GCHandle.Alloc(b, GCHandleType.Pinned);
 
@@ -65,19 +71,24 @@ namespace MediaFoundation.Utility
 
         public static void MFSetAttribute2UINT32asUINT64(IMFAttributes pAttributes, Guid g, int nNumerator, int nDenominator)
         {
+            int hr;
             long ul = nNumerator;
 
             ul <<= 32;
             ul |= (UInt32)nDenominator;
 
-            pAttributes.SetUINT64(g, ul);
+            hr = pAttributes.SetUINT64(g, ul);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         public static void MFGetAttribute2UINT32asUINT64(IMFAttributes pAttributes, Guid g, out int nNumerator, out int nDenominator)
         {
             long ul;
+            int hr;
 
-            pAttributes.GetUINT64(g, out ul);
+            hr = pAttributes.GetUINT64(g, out ul);
+            MFError.ThrowExceptionForHR(hr);
+
             nDenominator = (int)ul;
             nNumerator = (int)(ul >> 32);
         }
@@ -117,10 +128,12 @@ namespace MediaFoundation.Utility
 
         public static MFRatio GetFrameRate(IMFMediaType pMediaType)
         {
+            int hr;
             long i64;
             MFRatio fps;
 
-            pMediaType.GetUINT64(MFAttributesClsid.MF_MT_FRAME_RATE, out i64);
+            hr = pMediaType.GetUINT64(MFAttributesClsid.MF_MT_FRAME_RATE, out i64);
+            MFError.ThrowExceptionForHR(hr);
             fps.Numerator = (int)(i64 >> 32);
             fps.Denominator = (int)i64;
 
@@ -134,11 +147,13 @@ namespace MediaFoundation.Utility
             int unDefault
             )
         {
+            int hr;
             int unRet;
 
             try
             {
-                pAttributes.GetUINT32(guidKey, out unRet);
+                hr = pAttributes.GetUINT32(guidKey, out unRet);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch
             {
@@ -175,7 +190,8 @@ namespace MediaFoundation.Utility
         // Create a new media type.
         public MediaTypeBuilder()
         {
-            MFExtern.MFCreateMediaType(out m_pType);
+            int hr = MFExtern.MFCreateMediaType(out m_pType);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Direct wrappers of IMFMediaType methods.
@@ -184,13 +200,15 @@ namespace MediaFoundation.Utility
         // Retrieves the major type GUID.
         public void GetMajorType(out Guid pGuid)
         {
-            GetMediaType().GetMajorType(out pGuid);
+            int hr = GetMediaType().GetMajorType(out pGuid);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Specifies whether the media data is compressed
         public void IsCompressedFormat(out bool pbCompressed)
         {
-            GetMediaType().IsCompressedFormat(out pbCompressed);
+            int hr = GetMediaType().IsCompressedFormat(out pbCompressed);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Compares two media types and determines whether they are identical.
@@ -202,13 +220,15 @@ namespace MediaFoundation.Utility
         // Retrieves an alternative representation of the media type.
         public void GetRepresentation(Guid guidRepresentation, out IntPtr ppvRepresentation)
         {
-            GetMediaType().GetRepresentation(guidRepresentation, out ppvRepresentation);
+            int hr = GetMediaType().GetRepresentation(guidRepresentation, out ppvRepresentation);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Frees memory that was allocated by the GetRepresentation method.
         public void FreeRepresentation(Guid guidRepresentation, IntPtr pvRepresentation)
         {
-            GetMediaType().FreeRepresentation(guidRepresentation, pvRepresentation);
+            int hr = GetMediaType().FreeRepresentation(guidRepresentation, pvRepresentation);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Helper methods
@@ -233,7 +253,8 @@ namespace MediaFoundation.Utility
             {
                 throw new Exception("E_POINTER");
             }
-            pType.CopyAllItems(m_pType);
+            int hr = pType.CopyAllItems(m_pType);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Returns the underlying IMFMediaType pointer.
@@ -246,19 +267,22 @@ namespace MediaFoundation.Utility
         // Sets the major type GUID.
         public void SetMajorType(Guid guid)
         {
-            GetMediaType().SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, guid);
+            int hr = GetMediaType().SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, guid);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves the subtype GUID.
         public void GetSubType(out Guid pGuid)
         {
-            GetMediaType().GetGUID(MFAttributesClsid.MF_MT_SUBTYPE, out pGuid);
+            int hr = GetMediaType().GetGUID(MFAttributesClsid.MF_MT_SUBTYPE, out pGuid);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Sets the subtype GUID.
         public void SetSubType(Guid guid)
         {
-            GetMediaType().SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, guid);
+            int hr = GetMediaType().SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, guid);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Extracts the FOURCC code from the subtype.
@@ -279,7 +303,9 @@ namespace MediaFoundation.Utility
         public void GetAllSamplesIndependent(out bool pbIndependent)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_ALL_SAMPLES_INDEPENDENT, out i);
+
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_ALL_SAMPLES_INDEPENDENT, out i);
+            MFError.ThrowExceptionForHR(hr);
 
             pbIndependent = i != 0;
         }
@@ -290,14 +316,16 @@ namespace MediaFoundation.Utility
             int i = 0;
             if (bIndependent)
                 i = 1;
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_ALL_SAMPLES_INDEPENDENT, i);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_ALL_SAMPLES_INDEPENDENT, i);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries whether the samples have a fixed size.
         public void GetFixedSizeSamples(out bool pbFixed)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_FIXED_SIZE_SAMPLES, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_FIXED_SIZE_SAMPLES, out i);
+            MFError.ThrowExceptionForHR(hr);
 
             pbFixed = i != 0;
         }
@@ -314,19 +342,22 @@ namespace MediaFoundation.Utility
         // Retrieves the size of each sample, in bytes.
         public void GetSampleSize(out int pnSize)
         {
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, out pnSize);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, out pnSize);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Sets the size of each sample, in bytes.
         public void SetSampleSize(int nSize)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, nSize);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, nSize);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves a media type that was wrapped by the MFWrapMediaType function.
         public void Unwrap(out IMFMediaType ppOriginal)
         {
-            MFExtern.MFUnwrapMediaType(GetMediaType(), out ppOriginal);
+            int hr = MFExtern.MFUnwrapMediaType(GetMediaType(), out ppOriginal);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // The following versions return reasonable defaults if the relevant attribute is not present (zero/FALSE).
@@ -394,7 +425,8 @@ namespace MediaFoundation.Utility
         public void GetInterlaceMode(out MFVideoInterlaceMode pmode)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, out i);
+            MFError.ThrowExceptionForHR(hr);
 
             pmode = (MFVideoInterlaceMode)i;
         }
@@ -402,7 +434,8 @@ namespace MediaFoundation.Utility
         // Sets a description of how the frames are interlaced.
         public void SetInterlaceMode(MFVideoInterlaceMode mode)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, (int)mode);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, (int)mode);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // This returns the default or attempts to compute it, in its absence.
@@ -414,7 +447,8 @@ namespace MediaFoundation.Utility
             // First try to get it from the attribute.
             try
             {
-                GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, out nStride);
+                int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, out nStride);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch
             {
@@ -436,7 +470,8 @@ namespace MediaFoundation.Utility
 
                 // Now compute the stride for a particular bitmap type
                 FourCC f = new FourCC(subtype);
-                MFExtern.MFGetStrideForBitmapInfoHeader(f.ToInt32(), width, out nStride);
+                int hr = MFExtern.MFGetStrideForBitmapInfoHeader(f.ToInt32(), width, out nStride);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Set the attribute for later reference.
                 SetDefaultStride(nStride);
@@ -448,7 +483,8 @@ namespace MediaFoundation.Utility
         // Sets the default stride. Only appropriate for uncompressed data formats.
         public void SetDefaultStride(int nStride)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, nStride);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, nStride);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves the width and height of the video frame.
@@ -466,25 +502,29 @@ namespace MediaFoundation.Utility
         // Retrieves the data error rate in bit errors per second
         public void GetDataBitErrorRate(out int pRate)
         {
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_AVG_BIT_ERROR_RATE, out pRate);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_AVG_BIT_ERROR_RATE, out pRate);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Sets the data error rate in bit errors per second
         public void SetDataBitErrorRate(int rate)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_AVG_BIT_ERROR_RATE, rate);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_AVG_BIT_ERROR_RATE, rate);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves the approximate data rate of the video stream.
         public void GetAverageBitRate(out int pRate)
         {
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_AVG_BITRATE, out pRate);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_AVG_BITRATE, out pRate);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Sets the approximate data rate of the video stream.
         public void SetAvgerageBitRate(int rate)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_AVG_BITRATE, rate);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_AVG_BITRATE, rate);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves custom color primaries.
@@ -540,13 +580,15 @@ namespace MediaFoundation.Utility
         // Retrieves the maximum number of frames from one key frame to the next.
         public void GetMaxKeyframeSpacing(out int pnSpacing)
         {
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_MAX_KEYFRAME_SPACING, out pnSpacing);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_MAX_KEYFRAME_SPACING, out pnSpacing);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Sets the maximum number of frames from one key frame to the next.
         public void SetMaxKeyframeSpacing(int nSpacing)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_MAX_KEYFRAME_SPACING, nSpacing);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_MAX_KEYFRAME_SPACING, nSpacing);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves the region that contains the valid portion of the signal.
@@ -566,14 +608,16 @@ namespace MediaFoundation.Utility
         public void GetPadControlFlags(out MFVideoPadFlags pFlags)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_PAD_CONTROL_FLAGS, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_PAD_CONTROL_FLAGS, out i);
+            MFError.ThrowExceptionForHR(hr);
             pFlags = (MFVideoPadFlags)i;
         }
 
         // Sets the aspect ratio of the output rectangle for a video media type.
         public void SetPadControlFlags(MFVideoPadFlags flags)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_PAD_CONTROL_FLAGS, (int)flags);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_PAD_CONTROL_FLAGS, (int)flags);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Retrieves an array of palette entries for a video media type.
@@ -619,7 +663,8 @@ namespace MediaFoundation.Utility
         public void IsPanScanEnabled(out bool pBool)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, out i);
+            MFError.ThrowExceptionForHR(hr);
 
             pBool = i != 0;
         }
@@ -632,7 +677,8 @@ namespace MediaFoundation.Utility
             {
                 i = 1;
             }
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, i);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_PAN_SCAN_ENABLED, i);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries the pixel aspect ratio
@@ -656,84 +702,96 @@ namespace MediaFoundation.Utility
         public void GetSourceContentHint(out MFVideoSrcContentHintFlags pFlags)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_SOURCE_CONTENT_HINT, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_SOURCE_CONTENT_HINT, out i);
+            MFError.ThrowExceptionForHR(hr);
             pFlags = (MFVideoSrcContentHintFlags)i;
         }
 
         // Sets the intended aspect ratio.
         public void SetSourceContentHint(MFVideoSrcContentHintFlags nFlags)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_SOURCE_CONTENT_HINT, (int)nFlags);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_SOURCE_CONTENT_HINT, (int)nFlags);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries an enumeration which represents the conversion function from RGB to R'G'B'.
         public void GetTransferFunction(out MFVideoTransferFunction pnFxn)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_TRANSFER_FUNCTION, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_TRANSFER_FUNCTION, out i);
+            MFError.ThrowExceptionForHR(hr);
             pnFxn = (MFVideoTransferFunction)i;
         }
 
         // Set an enumeration which represents the conversion function from RGB to R'G'B'.
         public void SetTransferFunction(MFVideoTransferFunction nFxn)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_TRANSFER_FUNCTION, (int)nFxn);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_TRANSFER_FUNCTION, (int)nFxn);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries how chroma was sampled for a Y'Cb'Cr' video media type.
         public void GetChromaSiting(out MFVideoChromaSubsampling pSampling)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_CHROMA_SITING, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_CHROMA_SITING, out i);
+            MFError.ThrowExceptionForHR(hr);
             pSampling = (MFVideoChromaSubsampling)i;
         }
 
         // Sets how chroma was sampled for a Y'Cb'Cr' video media type.
         public void SetChromaSiting(MFVideoChromaSubsampling nSampling)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_CHROMA_SITING, (int)nSampling);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_CHROMA_SITING, (int)nSampling);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries the optimal lighting conditions for viewing.
         public void GetVideoLighting(out MFVideoLighting pLighting)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_LIGHTING, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_LIGHTING, out i);
+            MFError.ThrowExceptionForHR(hr);
             pLighting = (MFVideoLighting)i;
         }
 
         // Sets the optimal lighting conditions for viewing.
         public void SetVideoLighting(MFVideoLighting nLighting)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_LIGHTING, (int)nLighting);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_LIGHTING, (int)nLighting);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries the nominal range of the color information in a video media type.
         public void GetVideoNominalRange(out MFNominalRange pRange)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_NOMINAL_RANGE, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_NOMINAL_RANGE, out i);
+            MFError.ThrowExceptionForHR(hr);
             pRange = (MFNominalRange)i;
         }
 
         // Sets the nominal range of the color information in a video media type.
         public void SetVideoNominalRange(MFNominalRange nRange)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_NOMINAL_RANGE, (int)nRange);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_NOMINAL_RANGE, (int)nRange);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Queries the color primaries for a video media type.
         public void GetVideoPrimaries(out MFVideoPrimaries pPrimaries)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_PRIMARIES, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_VIDEO_PRIMARIES, out i);
+            MFError.ThrowExceptionForHR(hr);
             pPrimaries = (MFVideoPrimaries)i;
         }
 
         // Sets the color primaries for a video media type.
         public void SetVideoPrimaries(MFVideoPrimaries nPrimaries)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_PRIMARIES, (int)nPrimaries);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_VIDEO_PRIMARIES, (int)nPrimaries);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         // Gets a enumeration representing the conversion matrix from the
@@ -741,7 +799,8 @@ namespace MediaFoundation.Utility
         public void GetYUVMatrix(out MFVideoTransferMatrix pMatrix)
         {
             int i;
-            GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_YUV_MATRIX, out i);
+            int hr = GetMediaType().GetUINT32(MFAttributesClsid.MF_MT_YUV_MATRIX, out i);
+            MFError.ThrowExceptionForHR(hr);
             pMatrix = (MFVideoTransferMatrix)i;
         }
 
@@ -749,7 +808,8 @@ namespace MediaFoundation.Utility
         // Y'Cb'Cr' color space to the R'G'B' color space.
         public void SetYUVMatrix(MFVideoTransferMatrix nMatrix)
         {
-            GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_YUV_MATRIX, (int)nMatrix);
+            int hr = GetMediaType().SetUINT32(MFAttributesClsid.MF_MT_YUV_MATRIX, (int)nMatrix);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         //

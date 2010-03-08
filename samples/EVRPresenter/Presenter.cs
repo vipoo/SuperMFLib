@@ -225,16 +225,18 @@ namespace EVRPresenter
 
         #region IMFVideoDeviceID Members
 
-        public void GetDeviceID(out Guid pDeviceID)
+        public int GetDeviceID(out Guid pDeviceID)
         {
             m_pD3DPresentEngine.GetDeviceID(out pDeviceID);
+
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFVideoPresenter Members
 
-        void IMFVideoPresenter.GetCurrentMediaType(out IMFVideoMediaType ppMediaType)
+        public int GetCurrentMediaType(out IMFVideoMediaType ppMediaType)
         {
             lock (this)
             {
@@ -250,34 +252,36 @@ namespace EVRPresenter
 
                 ppMediaType = (IMFVideoMediaType)m_pMediaType;
             }
+
+            return S_Ok;
         }
 
-        void IMFVideoPresenter.OnClockPause(long hnsSystemTime)
+        int IMFVideoPresenter.OnClockPause(long hnsSystemTime)
         {
-            ((IMFClockStateSink)this).OnClockPause(hnsSystemTime);
+            return ((IMFClockStateSink)this).OnClockPause(hnsSystemTime);
         }
 
-        void IMFVideoPresenter.OnClockRestart(long hnsSystemTime)
+        int IMFVideoPresenter.OnClockRestart(long hnsSystemTime)
         {
-            ((IMFClockStateSink)this).OnClockRestart(hnsSystemTime);
+            return ((IMFClockStateSink)this).OnClockRestart(hnsSystemTime);
         }
 
-        void IMFVideoPresenter.OnClockSetRate(long hnsSystemTime, float flRate)
+        int IMFVideoPresenter.OnClockSetRate(long hnsSystemTime, float flRate)
         {
-            ((IMFClockStateSink)this).OnClockSetRate(hnsSystemTime, flRate);
+            return ((IMFClockStateSink)this).OnClockSetRate(hnsSystemTime, flRate);
         }
 
-        void IMFVideoPresenter.OnClockStart(long hnsSystemTime, long llClockStartOffset)
+        int IMFVideoPresenter.OnClockStart(long hnsSystemTime, long llClockStartOffset)
         {
-            ((IMFClockStateSink)this).OnClockStart(hnsSystemTime, llClockStartOffset);
+            return ((IMFClockStateSink)this).OnClockStart(hnsSystemTime, llClockStartOffset);
         }
 
-        void IMFVideoPresenter.OnClockStop(long hnsSystemTime)
+        int IMFVideoPresenter.OnClockStop(long hnsSystemTime)
         {
-            ((IMFClockStateSink)this).OnClockStop(hnsSystemTime);
+            return ((IMFClockStateSink)this).OnClockStop(hnsSystemTime);
         }
 
-        void IMFVideoPresenter.ProcessMessage(MFVPMessageType eMessage, IntPtr ulParam)
+        int IMFVideoPresenter.ProcessMessage(MFVPMessageType eMessage, IntPtr ulParam)
         {
             lock (this)
             {
@@ -334,13 +338,15 @@ namespace EVRPresenter
                         throw new COMException("ProcessMessage", E_InvalidArgument); // Unknown message. (This case should never occur.)
                 }
             }
+
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFClockStateSink Members
 
-        void IMFClockStateSink.OnClockPause(long hnsSystemTime)
+        public int OnClockPause(long hnsSystemTime)
         {
             TRACE(("OnClockPause"));
 
@@ -352,9 +358,11 @@ namespace EVRPresenter
                 // Set the state. (No other actions are necessary.)
                 m_RenderState = RenderState.Paused;
             }
+
+            return S_Ok;
         }
 
-        void IMFClockStateSink.OnClockRestart(long hnsSystemTime)
+        public int OnClockRestart(long hnsSystemTime)
         {
             TRACE(("OnClockRestart"));
 
@@ -374,9 +382,11 @@ namespace EVRPresenter
                 // Now resume the presentation loop.
                 ProcessOutputLoop();
             }
+
+            return S_Ok;
         }
 
-        void IMFClockStateSink.OnClockSetRate(long hnsSystemTime, float flRate)
+        public int OnClockSetRate(long hnsSystemTime, float flRate)
         {
             TRACE(string.Format("OnClockSetRate (rate={0})", flRate));
 
@@ -401,9 +411,11 @@ namespace EVRPresenter
                 // Tell the scheduler about the new rate.
                 m_scheduler.SetClockRate(flRate);
             }
+
+            return S_Ok;
         }
 
-        void IMFClockStateSink.OnClockStart(long hnsSystemTime, long llClockStartOffset)
+        public int OnClockStart(long hnsSystemTime, long llClockStartOffset)
         {
             TRACE(String.Format("OnClockStart (offset = {0})", llClockStartOffset));
 
@@ -438,9 +450,11 @@ namespace EVRPresenter
                 // Now try to get new output samples from the mixer.
                 ProcessOutputLoop();
             }
+
+            return S_Ok;
         }
 
-        void IMFClockStateSink.OnClockStop(long hnsSystemTime)
+        public int OnClockStop(long hnsSystemTime)
         {
             TRACE(("OnClockStop"));
 
@@ -460,13 +474,15 @@ namespace EVRPresenter
                     }
                 }
             }
+
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFRateSupport Members
 
-        public void GetFastestRate(MFRateDirection eDirection, bool fThin, out float pflRate)
+        public int GetFastestRate(MFRateDirection eDirection, bool fThin, out float pflRate)
         {
             lock (this)
             {
@@ -485,9 +501,11 @@ namespace EVRPresenter
 
                 pflRate = fMaxRate;
             }
+
+            return S_Ok;
         }
 
-        public void GetSlowestRate(MFRateDirection eDirection, bool fThin, out float pflRate)
+        public int GetSlowestRate(MFRateDirection eDirection, bool fThin, out float pflRate)
         {
             lock (this)
             {
@@ -496,9 +514,11 @@ namespace EVRPresenter
                 // There is no minimum playback rate, so the minimum is zero.
                 pflRate = 0;
             }
+
+            return S_Ok;
         }
 
-        public void IsRateSupported(bool fThin, float flRate, MfFloat pflNearestSupportedRate)
+        public int IsRateSupported(bool fThin, float flRate, MfFloat pflNearestSupportedRate)
         {
             lock (this)
             {
@@ -531,13 +551,15 @@ namespace EVRPresenter
                     pflNearestSupportedRate = fNearestRate;
                 }
             }
+
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFGetServiceAlt Members
 
-        public void GetService(Guid guidService, Guid riid, out IntPtr ppvObject)
+        public int GetService(Guid guidService, Guid riid, out IntPtr ppvObject)
         {
             ppvObject = IntPtr.Zero;
             int hr = 0;
@@ -586,6 +608,7 @@ namespace EVRPresenter
                 }
 
             }
+            return S_Ok;
         }
 
         #endregion
@@ -593,10 +616,11 @@ namespace EVRPresenter
         #region IMFTopologyServiceLookupClient Members
 
         //public void InitServicePointers(IMFTopologyServiceLookup pLookup)
-        public void InitServicePointers(IntPtr p1Lookup)
+        public int InitServicePointers(IntPtr p1Lookup)
         {
             TRACE(("InitServicePointers"));
 
+            int hr;
             int dwObjectCount = 0;
             IMFTopologyServiceLookup pLookup = null;
             IHack h1 = (IHack)new Hack();
@@ -626,7 +650,7 @@ namespace EVRPresenter
                     try
                     {
                         // Ask for the clock. Optional, because the EVR might not have a clock.
-                        pLookup.LookupService(
+                        hr = pLookup.LookupService(
                             MFServiceLookupType.Global,   // Not used.
                             0,                          // Reserved.
                             MFServices.MR_VIDEO_RENDER_SERVICE,    // Service to look up.
@@ -634,6 +658,7 @@ namespace EVRPresenter
                             o,
                             ref dwObjectCount              // Number of elements in the previous parameter.
                             );
+                        MFError.ThrowExceptionForHR(hr);
                         m_pClock = (IMFClock)o[0];
                     }
                     catch { }
@@ -641,7 +666,7 @@ namespace EVRPresenter
                     // Ask for the mixer. (Required.)
                     dwObjectCount = 1;
 
-                    pLookup.LookupService(
+                    hr = pLookup.LookupService(
                         MFServiceLookupType.Global,
                         0,
                         MFServices.MR_VIDEO_MIXER_SERVICE,
@@ -649,6 +674,7 @@ namespace EVRPresenter
                         o,
                         ref dwObjectCount
                         );
+                    MFError.ThrowExceptionForHR(hr);
                     m_pMixer = (IMFTransform)o[0];
 
                     // Make sure that we can work with this mixer.
@@ -660,7 +686,7 @@ namespace EVRPresenter
                     IMFTopologyServiceLookupAlt pLookup2 = (IMFTopologyServiceLookupAlt)pLookup;
                     IntPtr[] p2 = new IntPtr[1];
 
-                    pLookup2.LookupService(
+                    hr = pLookup2.LookupService(
                         MFServiceLookupType.Global,
                         0,
                         MFServices.MR_VIDEO_RENDER_SERVICE,
@@ -668,6 +694,7 @@ namespace EVRPresenter
                         p2,
                         ref dwObjectCount
                         );
+                    MFError.ThrowExceptionForHR(hr);
 
                     m_h2 = (IHack)new Hack();
 
@@ -683,9 +710,10 @@ namespace EVRPresenter
             {
                 SafeRelease(h1);
             }
+            return S_Ok;
         }
 
-        public void ReleaseServicePointers()
+        public int ReleaseServicePointers()
         {
             TRACE(("ReleaseServicePointers"));
 
@@ -708,68 +736,70 @@ namespace EVRPresenter
             SafeRelease(m_pMixer); m_pMixer = null;
             SafeRelease(m_h2); m_h2 = null;
             m_pMediaEventSink = null; // SafeRelease(m_pMediaEventSink);
+
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFVideoDisplayControl Members
 
-        public void GetAspectRatioMode(out MFVideoAspectRatioMode pdwAspectRatioMode)
+        public int GetAspectRatioMode(out MFVideoAspectRatioMode pdwAspectRatioMode)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void GetBorderColor(out int pClr)
+        public int GetBorderColor(out int pClr)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void GetCurrentImage(MediaFoundation.Misc.BitmapInfoHeader pBih, out IntPtr pDib, out int pcbDib, out long pTimeStamp)
+        public int GetCurrentImage(MediaFoundation.Misc.BitmapInfoHeader pBih, out IntPtr pDib, out int pcbDib, out long pTimeStamp)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void GetFullscreen(out bool pfFullscreen)
+        public int GetFullscreen(out bool pfFullscreen)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void GetIdealVideoSize(Size pszMin, Size pszMax)
+        public int GetIdealVideoSize(Size pszMin, Size pszMax)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void GetNativeVideoSize(Size pszVideo, Size pszARVideo)
+        public int GetNativeVideoSize(Size pszVideo, Size pszARVideo)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void GetRenderingPrefs(out MFVideoRenderPrefs pdwRenderFlags)
+        public int GetRenderingPrefs(out MFVideoRenderPrefs pdwRenderFlags)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void SetAspectRatioMode(MFVideoAspectRatioMode dwAspectRatioMode)
+        public int SetAspectRatioMode(MFVideoAspectRatioMode dwAspectRatioMode)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void SetBorderColor(int Clr)
+        public int SetBorderColor(int Clr)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void SetFullscreen(bool fFullscreen)
+        public int SetFullscreen(bool fFullscreen)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void SetRenderingPrefs(MFVideoRenderPrefs dwRenderFlags)
+        public int SetRenderingPrefs(MFVideoRenderPrefs dwRenderFlags)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
         }
 
-        public void SetVideoPosition(MFVideoNormalizedRect pnrcSource, MFRect prcDest)
+        public int SetVideoPosition(MFVideoNormalizedRect pnrcSource, MFRect prcDest)
         {
             lock (this)
             {
@@ -857,11 +887,12 @@ namespace EVRPresenter
                         }
                     }
                 }
-
             }
+
+            return S_Ok;
         }
 
-        public void SetVideoWindow(IntPtr hwndVideo)
+        public int SetVideoWindow(IntPtr hwndVideo)
         {
             lock (this)
             {
@@ -882,9 +913,11 @@ namespace EVRPresenter
                     NotifyEvent(EventCode.DisplayChanged, IntPtr.Zero, IntPtr.Zero);
                 }
             }
+
+            return S_Ok;
         }
 
-        public void GetVideoPosition(MFVideoNormalizedRect pnrcSource, MFRect prcDest)
+        public int GetVideoPosition(MFVideoNormalizedRect pnrcSource, MFRect prcDest)
         {
             lock (this)
             {
@@ -894,21 +927,24 @@ namespace EVRPresenter
                 }
 
                 pnrcSource.CopyFrom(m_nrcSource);
-
                 prcDest.CopyFrom(m_pD3DPresentEngine.GetDestinationRect());
             }
+
+            return S_Ok;
         }
 
-        public void GetVideoWindow(out IntPtr phwndVideo)
+        public int GetVideoWindow(out IntPtr phwndVideo)
         {
             lock (this)
             {
                 // The D3DPresentEngine object stores the handle.
                 phwndVideo = m_pD3DPresentEngine.GetVideoWindow();
             }
+
+            return S_Ok;
         }
 
-        public void RepaintVideo()
+        public int RepaintVideo()
         {
             lock (this)
             {
@@ -921,18 +957,20 @@ namespace EVRPresenter
                     ProcessOutput();
                 }
             }
+
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFAsyncCallback Members
 
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
             throw new NotImplementedException();
         }
 
-        public void Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
             try
             {
@@ -942,6 +980,8 @@ namespace EVRPresenter
             {
                 SafeRelease(pAsyncResult);
             }
+
+            return S_Ok;
         }
 
         #endregion
@@ -1009,7 +1049,8 @@ namespace EVRPresenter
 
                 try
                 {
-                    a.GetUINT32(guidKey, out unRet);
+                    int hr = a.GetUINT32(guidKey, out unRet);
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 catch
                 {
@@ -1083,6 +1124,7 @@ namespace EVRPresenter
         // Mixer operations
         protected void ConfigureMixer(IMFTransform pMixer)
         {
+            int hr;
             Guid deviceID = Guid.Empty;
             Guid myDeviceId;
 
@@ -1093,7 +1135,8 @@ namespace EVRPresenter
             {
                 // Make sure that the mixer has the same device ID as ourselves.
                 pDeviceID = (IMFVideoDeviceID)pMixer;
-                pDeviceID.GetDeviceID(out deviceID);
+                hr = pDeviceID.GetDeviceID(out deviceID);
+                MFError.ThrowExceptionForHR(hr);
 
                 if (deviceID != myDeviceId)
                 {
@@ -1240,6 +1283,7 @@ namespace EVRPresenter
         protected void SetMediaType(IMFMediaType pMediaType)
         {
             // Note: pMediaType can be NULL (to clear the type)
+            int hr;
 
             // Clearing the media type is allowed in any state (including shutdown).
             if (pMediaType == null)
@@ -1280,7 +1324,8 @@ namespace EVRPresenter
 
                 foreach (IMFSample pSample1 in sampleQueue)
                 {
-                    pSample1.SetUINT32(MFSamplePresenter_SampleCounter, m_TokenCounter);
+                    hr = pSample1.SetUINT32(MFSamplePresenter_SampleCounter, m_TokenCounter);
+                    MFError.ThrowExceptionForHR(hr);
                 }
 
                 // Add the samples to the sample pool.
@@ -1416,6 +1461,7 @@ namespace EVRPresenter
         {
             TRACE(("RenegotiateMediaType"));
 
+            int hr;
             bool bFoundMediaType = false;
 
             IMFMediaType pMixerType = null;
@@ -1437,7 +1483,8 @@ namespace EVRPresenter
                     SafeRelease(pOptimalType); pOptimalType = null;
 
                     // Step 1. Get the next media type supported by mixer.
-                    m_pMixer.GetOutputAvailableType(0, iTypeIndex++, out pMixerType);
+                    hr = m_pMixer.GetOutputAvailableType(0, iTypeIndex++, out pMixerType);
+                    MFError.ThrowExceptionForHR(hr);
 
                     // From now on, if anything in this loop fails, try the next type,
                     // until we succeed or the mixer runs out of types.
@@ -1454,7 +1501,8 @@ namespace EVRPresenter
                         CreateOptimalVideoType(pMixerType, out pOptimalType);
 
                         // Step 4. Check if the mixer will accept this media type.
-                        m_pMixer.SetOutputType(0, pOptimalType, MFTSetTypeFlags.TestOnly);
+                        hr = m_pMixer.SetOutputType(0, pOptimalType, MFTSetTypeFlags.TestOnly);
+                        MFError.ThrowExceptionForHR(hr);
 
                         // Step 5. Try to set the media type on ourselves.
                         SetMediaType(pOptimalType);
@@ -1462,7 +1510,8 @@ namespace EVRPresenter
                         // Step 6. Set output media type on mixer.
                         try
                         {
-                            m_pMixer.SetOutputType(0, pOptimalType, 0);
+                            hr = m_pMixer.SetOutputType(0, pOptimalType, 0);
+                            MFError.ThrowExceptionForHR(hr);
                             bFoundMediaType = true;
 
                             // Don't free this one.  We're using it.
@@ -1611,7 +1660,8 @@ namespace EVRPresenter
             if (!m_bRepaint)
             {
                 MFTOutputStatusFlags osf;
-                m_pMixer.GetOutputStatus(out osf);
+                hr = m_pMixer.GetOutputStatus(out osf);
+                MFError.ThrowExceptionForHR(hr);
 
                 if ((osf & MFTOutputStatusFlags.SampleReady) == 0)
                 {
@@ -1648,7 +1698,8 @@ namespace EVRPresenter
                     if (m_pClock != null)
                     {
                         // Latency: Record the starting time for the ProcessOutput operation.
-                        m_pClock.GetCorrelatedTime(0, out mixerStartTime, out systemTime);
+                        hr = m_pClock.GetCorrelatedTime(0, out mixerStartTime, out systemTime);
+                        MFError.ThrowExceptionForHR(hr);
                     }
                 }
 
@@ -1660,7 +1711,8 @@ namespace EVRPresenter
 
                 try
                 {
-                    m_pMixer.ProcessOutput(0, 1, dataBuffer, out dwStatus);
+                    hr = m_pMixer.ProcessOutput(0, 1, dataBuffer, out dwStatus);
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Release any events that were returned from the ProcessOutput method.
                     // (We don't expect any events from the mixer, but this is a good practice.)
@@ -1712,7 +1764,8 @@ namespace EVRPresenter
                         // Latency: Record the ending time for the ProcessOutput operation,
                         // and notify the EVR of the latency.
 
-                        m_pClock.GetCorrelatedTime(0, out mixerEndTime, out systemTime);
+                        hr = m_pClock.GetCorrelatedTime(0, out mixerEndTime, out systemTime);
+                        MFError.ThrowExceptionForHR(hr);
                         long latencyTime = mixerEndTime - mixerStartTime;
 
                         GCHandle gh = GCHandle.Alloc(latencyTime, GCHandleType.Pinned);
@@ -1793,7 +1846,8 @@ namespace EVRPresenter
             IMFTrackedSample pTracked = null;
 
             pTracked = (IMFTrackedSample)pSample;
-            pTracked.SetAllocator(this, null);
+            int hr = pTracked.SetAllocator(this, null);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         protected void ReleaseResources()
@@ -1926,6 +1980,7 @@ namespace EVRPresenter
 
         protected void CompleteFrameStep(IMFSample pSample)
         {
+            int hr;
             long hnsSampleTime = 0;
             long hnsSystemTime = 0;
 
@@ -1943,14 +1998,16 @@ namespace EVRPresenter
 
                 try
                 {
-                    pSample.GetSampleTime(out hnsSampleTime);
+                    hr = pSample.GetSampleTime(out hnsSampleTime);
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 catch
                 {
                     // No time stamp. Use the current presentation time.
                     if (m_pClock != null)
                     {
-                        m_pClock.GetCorrelatedTime(0, out hnsSampleTime, out hnsSystemTime);
+                        hr = m_pClock.GetCorrelatedTime(0, out hnsSampleTime, out hnsSystemTime);
+                        MFError.ThrowExceptionForHR(hr);
                     }
                 }
 
@@ -1990,7 +2047,8 @@ namespace EVRPresenter
                 int hr = pResult.GetStatus();
                 MFError.ThrowExceptionForHR(hr);
 
-                pResult.GetObject(out pObject);
+                hr = pResult.GetObject(out pObject);
+                MFError.ThrowExceptionForHR(hr);
                 pSample = (IMFSample)pObject;
 
                 // If this sample was submitted for a frame-step, then the frame step is complete.
@@ -2044,9 +2102,11 @@ namespace EVRPresenter
                 throw new COMException("SetMixerSourceRect", E_Pointer);
             }
 
+            int hr;
             IMFAttributes pAttributes = null;
 
-            pMixer.GetAttributes(out pAttributes);
+            hr = pMixer.GetAttributes(out pAttributes);
+            MFError.ThrowExceptionForHR(hr);
 
             Utils.MFSetBlob(pAttributes, MFAttributesClsid.VIDEO_ZOOM_RECT, nrcSource);
 
@@ -2099,25 +2159,32 @@ namespace EVRPresenter
             // attributes from the sample.
 
             int counter;
-            pSample.GetUINT32(MFSamplePresenter_SampleCounter, out counter);
+            int hr;
+
+            hr = pSample.GetUINT32(MFSamplePresenter_SampleCounter, out counter);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
                 Guid IID_IUnknown = new Guid("00000000-0000-0000-C000-000000000046");
-                pSample.GetUnknown(MFSamplePresenter_SampleSwapChain, IID_IUnknown, out pUnkSwapChain);
+                hr = pSample.GetUnknown(MFSamplePresenter_SampleSwapChain, IID_IUnknown, out pUnkSwapChain);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch { }
 
 
             pDesired = (IMFDesiredSample)pSample;
 
-            pDesired.Clear();
+            hr = pDesired.Clear();
+            MFError.ThrowExceptionForHR(hr);
 
-            pSample.SetUINT32(MFSamplePresenter_SampleCounter, counter);
+            hr = pSample.SetUINT32(MFSamplePresenter_SampleCounter, counter);
+            MFError.ThrowExceptionForHR(hr);
 
             if (pUnkSwapChain != null)
             {
-                pSample.SetUnknown(MFSamplePresenter_SampleSwapChain, pUnkSwapChain);
+                hr = pSample.SetUnknown(MFSamplePresenter_SampleSwapChain, pUnkSwapChain);
+                MFError.ThrowExceptionForHR(hr);
             }
 
             SafeRelease(pUnkSwapChain);
@@ -2134,6 +2201,7 @@ namespace EVRPresenter
                 throw new COMException("IsSampleTimePassed", E_Pointer);
             }
 
+            int hr;
             bool bRet = false;
             long hnsTimeNow = 0;
             long hnsSystemTime = 0;
@@ -2145,9 +2213,12 @@ namespace EVRPresenter
 
             try
             {
-                pClock.GetCorrelatedTime(0, out hnsTimeNow, out hnsSystemTime);
-                pSample.GetSampleTime(out hnsSampleStart);
-                pSample.GetSampleDuration(out hnsSampleDuration);
+                hr = pClock.GetCorrelatedTime(0, out hnsTimeNow, out hnsSystemTime);
+                MFError.ThrowExceptionForHR(hr);
+                hr = pSample.GetSampleTime(out hnsSampleStart);
+                MFError.ThrowExceptionForHR(hr);
+                hr = pSample.GetSampleDuration(out hnsSampleDuration);
+                MFError.ThrowExceptionForHR(hr);
 
                 if (hnsSampleStart + hnsSampleDuration < hnsTimeNow)
                 {

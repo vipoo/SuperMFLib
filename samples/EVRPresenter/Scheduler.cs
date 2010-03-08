@@ -115,7 +115,8 @@ namespace EVRPresenter
         public void SetFrameRate(MFRatio fps)
         {
             // Convert to a duration.
-            MFExtern.MFFrameRateToAverageTimePerFrame(fps.Numerator, fps.Denominator, out m_PerFrameInterval);
+            int hr = MFExtern.MFFrameRateToAverageTimePerFrame(fps.Numerator, fps.Denominator, out m_PerFrameInterval);
+            MFError.ThrowExceptionForHR(hr);
 
             // Calculate 1/4th of this value, because we use it frequently.
             m_PerFrame_1_4th = m_PerFrameInterval / 4;
@@ -269,6 +270,7 @@ namespace EVRPresenter
 
         public bool ProcessSample(IMFSample pSample, out int plNextSleep)
         {
+            int hr;
             long hnsPresentationTime = 0;
             long hnsTimeNow = 0;
             long hnsSystemTime = 0;
@@ -283,11 +285,13 @@ namespace EVRPresenter
 
                 try
                 {
-                    pSample.GetSampleTime(out hnsPresentationTime);
+                    hr = pSample.GetSampleTime(out hnsPresentationTime);
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Get the clock time. (But if the sample does not have a time stamp,
                     // we don't need the clock time.)
-                    m_pClock.GetCorrelatedTime(0, out hnsTimeNow, out hnsSystemTime);
+                    hr = m_pClock.GetCorrelatedTime(0, out hnsTimeNow, out hnsSystemTime);
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 catch { }
 

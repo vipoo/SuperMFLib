@@ -82,7 +82,7 @@ namespace MFT_Grayscale
         [ComRegisterFunctionAttribute]
         static public void DllRegisterServer(Type t)
         {
-            MFExtern.MFTRegister(
+            int hr = MFExtern.MFTRegister(
                 typeof(Grayscale).GUID,         // CLSID
                 MFTransformCategory.MFT_CATEGORY_VIDEO_EFFECT,  // Category
                 "Grayscale Video Effect .NET",  // Friendly name
@@ -93,13 +93,15 @@ namespace MFT_Grayscale
                 null,
                 null
                 );
+            MFError.ThrowExceptionForHR(hr);
 
         }
 
         [ComUnregisterFunctionAttribute]
         static public void DllUnregisterServer(Type t)
         {
-            MFExtern.MFTUnregister(typeof(Grayscale).GUID);
+            int hr = MFExtern.MFTUnregister(typeof(Grayscale).GUID);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         #endregion
@@ -124,7 +126,7 @@ namespace MFT_Grayscale
 
         #region IMFTransform methods
 
-        public void GetStreamLimits(
+        public int GetStreamLimits(
             MFInt pdwInputMinimum,
             MFInt pdwInputMaximum,
             MFInt pdwOutputMinimum,
@@ -150,9 +152,11 @@ namespace MFT_Grayscale
             {
                 pdwOutputMaximum.Assign(1);
             }
+
+            return S_Ok;
         }
 
-        public void GetStreamCount(
+        public int GetStreamCount(
             MFInt pcInputStreams,
             MFInt pcOutputStreams
         )
@@ -169,9 +173,10 @@ namespace MFT_Grayscale
             {
                 pcOutputStreams.Assign(1);
             }
+            return S_Ok;
         }
 
-        public void GetStreamIDs(
+        public int GetStreamIDs(
             int dwInputIDArraySize,
             int[] pdwInputIDs,
             int dwOutputIDArraySize,
@@ -188,9 +193,10 @@ namespace MFT_Grayscale
 
             pdwInputIDs[0] = 0;
             pdwOutputIDs[0] = 0;
+            return S_Ok;
         }
 
-        public void GetInputStreamInfo(
+        public int GetInputStreamInfo(
             int dwInputStreamID,
             out MFTInputStreamInfo pStreamInfo
         )
@@ -209,9 +215,10 @@ namespace MFT_Grayscale
                 pStreamInfo.cbMaxLookahead = 0;
                 pStreamInfo.cbAlignment = 0;
             }
+            return S_Ok;
         }
 
-        public void GetOutputStreamInfo(
+        public int GetOutputStreamInfo(
             int dwOutputStreamID,
             out MFTOutputStreamInfo pStreamInfo
         )
@@ -233,16 +240,17 @@ namespace MFT_Grayscale
                 pStreamInfo.cbSize = m_cbImageSize;
                 pStreamInfo.cbAlignment = 0;
             }
+            return S_Ok;
         }
 
-        public void GetAttributes(out IMFAttributes pAttributes)
+        public int GetAttributes(out IMFAttributes pAttributes)
         {
             TRACE("GetAttributes");
 
             throw new COMException("No attributes supported", E_NotImplemented);
         }
 
-        public void GetInputStreamAttributes(
+        public int GetInputStreamAttributes(
             int dwInputStreamID,
             out IMFAttributes ppAttributes
         )
@@ -252,7 +260,7 @@ namespace MFT_Grayscale
             throw new COMException("No input attributes supported", E_NotImplemented);
         }
 
-        public void GetOutputStreamAttributes(
+        public int GetOutputStreamAttributes(
             int dwOutputStreamID,
             out IMFAttributes ppAttributes
         )
@@ -262,14 +270,14 @@ namespace MFT_Grayscale
             throw new COMException("No output attributes supported", E_NotImplemented);
         }
 
-        public void DeleteInputStream(int dwStreamID)
+        public int DeleteInputStream(int dwStreamID)
         {
             TRACE("DeleteInputStream");
 
             throw new COMException("Removing streams not supported", E_NotImplemented);
         }
 
-        public void AddInputStreams(
+        public int AddInputStreams(
             int cStreams,
             int[] adwStreamIDs
         )
@@ -279,7 +287,7 @@ namespace MFT_Grayscale
             throw new COMException("Adding streams not supported", E_NotImplemented);
         }
 
-        public void GetInputAvailableType(
+        public int GetInputAvailableType(
             int dwInputStreamID,
             int dwTypeIndex, // 0-based
             out IMFMediaType ppType
@@ -301,9 +309,10 @@ namespace MFT_Grayscale
                     OnGetPartialType(dwTypeIndex, out ppType);
                 }
             }
+            return S_Ok;
         }
 
-        public void GetOutputAvailableType(
+        public int GetOutputAvailableType(
             int dwOutputStreamID,
             int dwTypeIndex, // 0-based
             out IMFMediaType ppType
@@ -324,9 +333,10 @@ namespace MFT_Grayscale
                     OnGetPartialType(dwTypeIndex, out ppType);
                 }
             }
+            return S_Ok;
         }
 
-        public void SetInputType(
+        public int SetInputType(
             int dwInputStreamID,
             IMFMediaType pType,
             MFTSetTypeFlags dwFlags
@@ -357,9 +367,10 @@ namespace MFT_Grayscale
                     OnSetInputType(pType);
                 }
             }
+            return S_Ok;
         }
 
-        public void SetOutputType(
+        public int SetOutputType(
             int dwOutputStreamID,
             IMFMediaType pType,
             MFTSetTypeFlags dwFlags
@@ -389,9 +400,10 @@ namespace MFT_Grayscale
                     OnSetOutputType(pType);
                 }
             }
+            return S_Ok;
         }
 
-        public void GetInputCurrentType(
+        public int GetInputCurrentType(
             int dwInputStreamID,
             out IMFMediaType ppType
         )
@@ -409,9 +421,10 @@ namespace MFT_Grayscale
 
                 ppType = m_pInputType;
             }
+            return S_Ok;
         }
 
-        public void GetOutputCurrentType(
+        public int GetOutputCurrentType(
             int dwOutputStreamID,
             out IMFMediaType ppType
         )
@@ -429,9 +442,10 @@ namespace MFT_Grayscale
 
                 ppType = m_pOutputType;
             }
+            return S_Ok;
         }
 
-        public void GetInputStatus(
+        public int GetInputStatus(
             int dwInputStreamID,
             out MFTInputStatusFlags pdwFlags
         )
@@ -453,9 +467,10 @@ namespace MFT_Grayscale
                     pdwFlags = MFTInputStatusFlags.None;
                 }
             }
+            return S_Ok;
         }
 
-        public void GetOutputStatus(
+        public int GetOutputStatus(
             out MFTOutputStatusFlags pdwFlags)
         {
             TRACE("GetOutputStatus");
@@ -473,9 +488,10 @@ namespace MFT_Grayscale
                     pdwFlags = MFTOutputStatusFlags.None;
                 }
             }
+            return S_Ok;
         }
 
-        public void SetOutputBounds(
+        public int SetOutputBounds(
             long hnsLowerBound,
             long hnsUpperBound
         )
@@ -485,7 +501,7 @@ namespace MFT_Grayscale
             throw new COMException("Output bounds not supported", E_NotImplemented);
         }
 
-        public void ProcessEvent(
+        public int ProcessEvent(
             int dwInputStreamID,
             IMFMediaEvent pEvent
         )
@@ -495,7 +511,7 @@ namespace MFT_Grayscale
             throw new COMException("Events not support", E_NotImplemented);
         }
 
-        public void ProcessMessage(
+        public int ProcessMessage(
             MFTMessageType eMessage,
             IntPtr ulParam
         )
@@ -539,9 +555,10 @@ namespace MFT_Grayscale
                         break;
                 }
             }
+            return S_Ok;
         }
 
-        public void ProcessInput(
+        public int ProcessInput(
             int dwInputStreamID,
             IMFSample pSample,
             int dwFlags
@@ -576,9 +593,10 @@ namespace MFT_Grayscale
                 // Cache the sample. We do the actual work in ProcessOutput.
                 m_pSample = pSample;
             }
+            return S_Ok;
         }
 
-        public void ProcessOutput(
+        public int ProcessOutput(
             MFTProcessOutputFlags dwFlags,
             int cOutputBufferCount,
             MFTOutputDataBuffer [] pOutputSamples, // one per stream
@@ -586,6 +604,8 @@ namespace MFT_Grayscale
         )
         {
             TRACE("ProcessOutput");
+
+            int hr;
 
             lock (this)
             {
@@ -632,11 +652,13 @@ namespace MFT_Grayscale
                 try
                 {
                     // Get the input buffer.
-                    m_pSample.GetBufferByIndex(0, out pInput);
+                    hr = m_pSample.GetBufferByIndex(0, out pInput);
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Get the output buffer.
                     mypSample = Marshal.GetUniqueObjectForIUnknown(pOutputSamples[0].pSample) as IMFSample;
-                    mypSample.GetBufferByIndex(0, out pOutput);
+                    hr = mypSample.GetBufferByIndex(0, out pOutput);
+                    MFError.ThrowExceptionForHR(hr);
 
                     OnProcessOutput(pInput, pOutput);
 
@@ -651,8 +673,11 @@ namespace MFT_Grayscale
                     {
                         long hnsDuration;
 
-                        m_pSample.GetSampleDuration(out hnsDuration);
-                        mypSample.SetSampleDuration(hnsDuration);
+                        hr = m_pSample.GetSampleDuration(out hnsDuration);
+                        MFError.ThrowExceptionForHR(hr);
+
+                        hr = mypSample.SetSampleDuration(hnsDuration);
+                        MFError.ThrowExceptionForHR(hr);
                     }
                     catch { }
 
@@ -660,8 +685,11 @@ namespace MFT_Grayscale
                     {
                         long hnsTime;
 
-                        m_pSample.GetSampleTime(out hnsTime);
-                        mypSample.SetSampleTime(hnsTime);
+                        hr = m_pSample.GetSampleTime(out hnsTime);
+                        MFError.ThrowExceptionForHR(hr);
+
+                        hr = mypSample.SetSampleTime(hnsTime);
+                        MFError.ThrowExceptionForHR(hr);
                     }
                     catch { }
 
@@ -677,6 +705,7 @@ namespace MFT_Grayscale
                 }
 
             }
+            return S_Ok;
         }
 
         #endregion
@@ -698,10 +727,14 @@ namespace MFT_Grayscale
                 throw new COMException("Index out of range", MFError.MF_E_NO_MORE_TYPES);
             }
 
-            MFExtern.MFCreateMediaType(out ppmt);
+            int hr = MFExtern.MFCreateMediaType(out ppmt);
+            MFError.ThrowExceptionForHR(hr);
 
-            ppmt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
-            ppmt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, g_MediaSubtypes[dwTypeIndex]);
+            hr = ppmt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = ppmt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, g_MediaSubtypes[dwTypeIndex]);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         //-------------------------------------------------------------------
@@ -772,7 +805,8 @@ namespace MFT_Grayscale
             int interlace;
 
             // Major type must be video.
-            pmt.GetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, out major_type);
+            int hr = pmt.GetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, out major_type);
+            MFError.ThrowExceptionForHR(hr);
 
             if (major_type != MFMediaType.Video)
             {
@@ -781,7 +815,8 @@ namespace MFT_Grayscale
 
             // Subtype must be one of the subtypes in our global list.
             // Get the subtype GUID.
-            pmt.GetGUID(MFAttributesClsid.MF_MT_SUBTYPE, out subtype);
+            hr = pmt.GetGUID(MFAttributesClsid.MF_MT_SUBTYPE, out subtype);
+            MFError.ThrowExceptionForHR(hr);
 
             TraceSubtype(subtype);
 
@@ -802,7 +837,9 @@ namespace MFT_Grayscale
             }
 
             // Video must be progressive frames.
-            pmt.GetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, out interlace);
+            hr = pmt.GetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, out interlace);
+            MFError.ThrowExceptionForHR(hr);
+
             if ((MFVideoInterlaceMode)interlace != MFVideoInterlaceMode.Progressive)
             {
                 throw new COMException("Video not progressive", MFError.MF_E_INVALIDTYPE);
@@ -857,6 +894,7 @@ namespace MFT_Grayscale
 
         private void OnProcessOutput(IMFMediaBuffer pIn, IMFMediaBuffer pOut)
         {
+            int hr;
             int cb;
 
             IntPtr pDest;			// Destination buffer.
@@ -874,20 +912,23 @@ namespace MFT_Grayscale
             // Stride if the buffer does not support IMF2DBuffer
             int lStrideIfContiguous;
 
-            m_pInputType.GetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, out lStrideIfContiguous);
+            hr = m_pInputType.GetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, out lStrideIfContiguous);
+            MFError.ThrowExceptionForHR(hr);
 
             // Lock the output buffer. Use IMF2DBuffer if available.
             pOut2D = pOut as IMF2DBuffer;
             if (pOut2D != null)
             {
                 TRACE("output buffer: 2D");
-                pOut2D.Lock2D(out pDest, out lDestStride);
+                hr = pOut2D.Lock2D(out pDest, out lDestStride);
+                MFError.ThrowExceptionForHR(hr);
             }
             else
             {
                 int ml;
                 TRACE("output buffer: Lock");
-                pOut.Lock(out pDest, out ml, out cb);
+                hr = pOut.Lock(out pDest, out ml, out cb);
+                MFError.ThrowExceptionForHR(hr);
                 lDestStride = lStrideIfContiguous;
             }
             bLockedOutputBuffer = true;
@@ -897,13 +938,15 @@ namespace MFT_Grayscale
             if (pIn2D != null)
             {
                 TRACE("input buffer: 2D");
-                pIn2D.Lock2D(out pSrc, out lSrcStride);
+                hr = pIn2D.Lock2D(out pSrc, out lSrcStride);
+                MFError.ThrowExceptionForHR(hr);
             }
             else
             {
                 int ml;
                 TRACE("Input buffer: lock");
-                pIn.Lock(out pSrc, out ml, out cb);
+                hr = pIn.Lock(out pSrc, out ml, out cb);
+                MFError.ThrowExceptionForHR(hr);
                 lSrcStride = lStrideIfContiguous;
             }
             bLockedInputBuffer = true;
@@ -925,11 +968,13 @@ namespace MFT_Grayscale
                 TRACE("Output buffer: unlock");
                 if (pOut2D != null)
                 {
-                    pOut2D.Unlock2D();
+                    hr = pOut2D.Unlock2D();
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 else
                 {
-                    pOut.Unlock();
+                    hr = pOut.Unlock();
+                    MFError.ThrowExceptionForHR(hr);
                 }
             }
 
@@ -938,16 +983,19 @@ namespace MFT_Grayscale
                 TRACE("Input buffer: unlock");
                 if (pIn2D != null)
                 {
-                    pIn2D.Unlock2D();
+                    hr = pIn2D.Unlock2D();
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 else
                 {
-                    pIn.Unlock();
+                    hr = pIn.Unlock();
+                    MFError.ThrowExceptionForHR(hr);
                 }
             }
 
             // Set the data size on the output buffer.
-            pOut.SetCurrentLength(m_cbImageSize);
+            hr = pOut.SetCurrentLength(m_cbImageSize);
+            MFError.ThrowExceptionForHR(hr);
 
             //SafeRelease(pOut2D);   // This gets released when pOut does
             //SafeRelease(pIn2D);   // This gets released when pIn does
@@ -973,6 +1021,7 @@ namespace MFT_Grayscale
 
         private void UpdateFormatInfo()
         {
+            int hr;
             Guid subtype;
 
             m_imageWidthInPixels = 0;
@@ -984,7 +1033,8 @@ namespace MFT_Grayscale
 
             if (m_pInputType != null)
             {
-                m_pInputType.GetGUID(MFAttributesClsid.MF_MT_SUBTYPE, out subtype);
+                hr = m_pInputType.GetGUID(MFAttributesClsid.MF_MT_SUBTYPE, out subtype);
+                MFError.ThrowExceptionForHR(hr);
 
                 TraceSubtype(subtype);
                 m_videoFOURCC = new FourCC(subtype);
@@ -1007,7 +1057,8 @@ namespace MFT_Grayscale
                 }
 
                 long lPacked;
-                m_pInputType.GetUINT64(MFAttributesClsid.MF_MT_FRAME_SIZE, out lPacked);
+                hr = m_pInputType.GetUINT64(MFAttributesClsid.MF_MT_FRAME_SIZE, out lPacked);
+                MFError.ThrowExceptionForHR(hr);
 
                 m_imageHeightInPixels = (int)(lPacked & int.MaxValue);
                 m_imageWidthInPixels = (int)(lPacked >> 32);

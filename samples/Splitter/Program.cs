@@ -41,6 +41,7 @@ namespace Splitter
 
         public void DoSplit()
         {
+            int hr;
             bool bHasVideo = false;
 
             IMFByteStream pStream = null;
@@ -52,7 +53,8 @@ namespace Splitter
             try
             {
                 // Start the Media Foundation platform.
-                MFExtern.MFStartup(0x10070, MFStartup.Full);
+                hr = MFExtern.MFStartup(0x10070, MFStartup.Full);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Open the file.
                 OpenFile(m_sFileName, out pStream);
@@ -78,7 +80,7 @@ namespace Splitter
             }
             catch (Exception e)
             {
-                int hr = Marshal.GetHRForException(e);
+                hr = Marshal.GetHRForException(e);
                 string s = MFError.GetErrorText(hr);
 
                 if (s == null)
@@ -101,13 +103,15 @@ namespace Splitter
             }
 
             // Shut down the Media Foundation platform.
-            MFExtern.MFShutdown();
+            hr = MFExtern.MFShutdown();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void OpenFile(string sFileName, out IMFByteStream ppStream)
         {
             // Open a byte stream for the file.
-            MFExtern.MFCreateFile(MFFileAccessMode.Read, MFFileOpenMode.FailIfNotExist, MFFileFlags.None, sFileName, out ppStream);
+            int hr = MFExtern.MFCreateFile(MFFileAccessMode.Read, MFFileOpenMode.FailIfNotExist, MFFileFlags.None, sFileName, out ppStream);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         /////////////////////////////////////////////////////////////////////
@@ -127,29 +131,35 @@ namespace Splitter
             out IMFMediaBuffer ppBuffer   // Receives a pointer to the buffer.
             )
         {
+            int hr;
             IntPtr pData;
             int cbRead;   // Actual amount of data read
             int iMax, iCur;
 
             // Create the media buffer. This function allocates the memory.
-            MFExtern.MFCreateMemoryBuffer(cbToRead, out ppBuffer);
+            hr = MFExtern.MFCreateMemoryBuffer(cbToRead, out ppBuffer);
+            MFError.ThrowExceptionForHR(hr);
 
             // Access the buffer.
-            ppBuffer.Lock(out pData, out iMax, out iCur);
+            hr = ppBuffer.Lock(out pData, out iMax, out iCur);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
                 // Read the data from the byte stream.
-                pStream.Read(pData, cbToRead, out cbRead);
+                hr = pStream.Read(pData, cbToRead, out cbRead);
+                MFError.ThrowExceptionForHR(hr);
             }
             finally
             {
-                ppBuffer.Unlock();
+                hr = ppBuffer.Unlock();
+                MFError.ThrowExceptionForHR(hr);
                 pData = IntPtr.Zero;
             }
 
             // Update the size of the valid data.
-            ppBuffer.SetCurrentLength(cbRead);
+            hr = ppBuffer.SetCurrentLength(cbRead);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         /////////////////////////////////////////////////////////////////////
@@ -170,6 +180,7 @@ namespace Splitter
             out IMFASFContentInfo ppContentInfo
             )
         {
+            int hr;
             long cbHeader = 0;
 
             const int MIN_ASF_HEADER_SIZE = 30;
@@ -177,17 +188,20 @@ namespace Splitter
             IMFMediaBuffer pBuffer;
 
             // Create the ASF content information object.
-            MFExtern.MFCreateASFContentInfo(out ppContentInfo);
+            hr = MFExtern.MFCreateASFContentInfo(out ppContentInfo);
+            MFError.ThrowExceptionForHR(hr);
 
             // Read the first 30 bytes to find the total header size.
             ReadDataIntoBuffer(pStream, MIN_ASF_HEADER_SIZE, out pBuffer);
 
             try
             {
-                ppContentInfo.GetHeaderSize(pBuffer, out cbHeader);
+                hr = ppContentInfo.GetHeaderSize(pBuffer, out cbHeader);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Pass the first 30 bytes to the content information object.
-                ppContentInfo.ParseHeader(pBuffer, 0);
+                hr = ppContentInfo.ParseHeader(pBuffer, 0);
+                MFError.ThrowExceptionForHR(hr);
             }
             finally
             {
@@ -197,7 +211,8 @@ namespace Splitter
             // Read the rest of the header and finish parsing the header.
             ReadDataIntoBuffer(pStream, (int)(cbHeader - MIN_ASF_HEADER_SIZE), out pBuffer);
 
-            ppContentInfo.ParseHeader(pBuffer, MIN_ASF_HEADER_SIZE);
+            hr = ppContentInfo.ParseHeader(pBuffer, MIN_ASF_HEADER_SIZE);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         /////////////////////////////////////////////////////////////////////
@@ -213,11 +228,16 @@ namespace Splitter
         void CreateASFSplitter(IMFASFContentInfo pContentInfo, out IMFASFSplitter ppSplitter)
         {
             MFASFSplitterFlags f;
+            int hr;
 
-            MFExtern.MFCreateASFSplitter(out ppSplitter);
-            ppSplitter.Initialize(pContentInfo);
+            hr = MFExtern.MFCreateASFSplitter(out ppSplitter);
+            MFError.ThrowExceptionForHR(hr);
 
-            ppSplitter.GetFlags(out f);
+            hr = ppSplitter.Initialize(pContentInfo);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = ppSplitter.GetFlags(out f);
+            MFError.ThrowExceptionForHR(hr);
             Console.WriteLine(string.Format("Splitter flags: {0}", f));
         }
 
@@ -244,26 +264,31 @@ namespace Splitter
             short[] wStreamIDs = new short[1];
             Guid streamType;
             bool bFoundVideo = false;
+            int hr;
 
             IMFASFProfile pProfile;
             IMFASFStreamConfig pStream;
 
             // Get the ASF profile from the content information object.
-            pContentInfo.GetProfile(out pProfile);
+            hr = pContentInfo.GetProfile(out pProfile);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
                 // Loop through all of the streams in the profile.
-                pProfile.GetStreamCount(out cStreams);
+                hr = pProfile.GetStreamCount(out cStreams);
+                MFError.ThrowExceptionForHR(hr);
 
                 for (int i = 0; i < cStreams; i++)
                 {
                     // Get the stream type and stream identifier.
-                    pProfile.GetStream(i, out wStreamID, out pStream);
+                    hr = pProfile.GetStream(i, out wStreamID, out pStream);
+                    MFError.ThrowExceptionForHR(hr);
 
                     try
                     {
-                        pStream.GetStreamType(out streamType);
+                        hr = pStream.GetStreamType(out streamType);
+                        MFError.ThrowExceptionForHR(hr);
 
                         if (streamType == MFMediaType.Video)
                         {
@@ -287,7 +312,8 @@ namespace Splitter
             {
                 // SelectStreams takes an array of stream identifiers.
                 wStreamIDs[0] = wStreamID;
-                pSplitter.SelectStreams(wStreamIDs, 1);
+                hr = pSplitter.SelectStreams(wStreamIDs, 1);
+                MFError.ThrowExceptionForHR(hr);
             }
 
             pbHasVideo = bFoundVideo;
@@ -319,6 +345,7 @@ namespace Splitter
             int cBuffers;           // Buffer count
             int cbTotalLength;      // Buffer length
             long hnsTime;            // Time stamp
+            int hr;
 
             IMFMediaBuffer pBuffer;
             IMFSample pSample;
@@ -330,7 +357,8 @@ namespace Splitter
 
                 try
                 {
-                    pBuffer.GetCurrentLength(out cbData);
+                    hr = pBuffer.GetCurrentLength(out cbData);
+                    MFError.ThrowExceptionForHR(hr);
 
                     if (cbData == 0)
                     {
@@ -338,12 +366,14 @@ namespace Splitter
                     }
 
                     // Send the data to the ASF splitter.
-                    pSplitter.ParseData(pBuffer, 0, 0);
+                    hr = pSplitter.ParseData(pBuffer, 0, 0);
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Pull samples from the splitter.
                     do
                     {
-                        pSplitter.GetNextSample(out dwStatus, out wStreamID, out pSample);
+                        hr = pSplitter.GetNextSample(out dwStatus, out wStreamID, out pSample);
+                        MFError.ThrowExceptionForHR(hr);
 
                         if (pSample == null)
                         {
@@ -358,7 +388,8 @@ namespace Splitter
                             try
                             {
                                 int i;
-                                pSample.GetUINT32(MFAttributesClsid.MFSampleExtension_CleanPoint, out i);
+                                hr = pSample.GetUINT32(MFAttributesClsid.MFSampleExtension_CleanPoint, out i);
+                                MFError.ThrowExceptionForHR(hr);
                                 bIsKeyFrame = i != 0;
                             }
                             catch
@@ -369,13 +400,17 @@ namespace Splitter
                             if (bIsKeyFrame)
                             {
                                 // Print various information about the key frame.
-                                pSample.GetBufferCount(out cBuffers);
-                                pSample.GetTotalLength(out cbTotalLength);
+                                hr = pSample.GetBufferCount(out cBuffers);
+                                MFError.ThrowExceptionForHR(hr);
+
+                                hr = pSample.GetTotalLength(out cbTotalLength);
+                                MFError.ThrowExceptionForHR(hr);
 
                                 Console.WriteLine(string.Format("Buffer count: {0}", cBuffers));
                                 Console.WriteLine(string.Format("Length: {0} bytes", cbTotalLength));
 
-                                pSample.GetSampleTime(out hnsTime);
+                                hr = pSample.GetSampleTime(out hnsTime);
+                                MFError.ThrowExceptionForHR(hr);
 
                                 // Convert the time stamp to seconds.
                                 double sec = (double)(hnsTime / 10000) / 1000;

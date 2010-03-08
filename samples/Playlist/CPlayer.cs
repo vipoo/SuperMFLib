@@ -150,24 +150,30 @@ namespace Playlist
                 IMFClock pClock;
 
                 // Initialize Media Foundation.
-                MFExtern.MFStartup(0x10070, MFStartup.Full);
+                hr = MFExtern.MFStartup(0x10070, MFStartup.Full);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Create the media session.
-                MFExtern.MFCreateMediaSession(null, out m_pMediaSession);
+                hr = MFExtern.MFCreateMediaSession(null, out m_pMediaSession);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Start the event queue.
-                m_pMediaSession.BeginGetEvent(this, null);
+                hr = m_pMediaSession.BeginGetEvent(this, null);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Create a sequencer Source.
-                MFExtern.MFCreateSequencerSource(null, out m_pSequencerSource);
+                hr = MFExtern.MFCreateSequencerSource(null, out m_pSequencerSource);
+                MFError.ThrowExceptionForHR(hr);
 
                 //setup clock
-                m_pMediaSession.GetClock(out pClock);
+                hr = m_pMediaSession.GetClock(out pClock);
+                MFError.ThrowExceptionForHR(hr);
 
                 m_pPresentationClock = (IMFPresentationClock)pClock;
 
                 // Create an IMFActivate object for the audio renderer.
-                MFExtern.MFCreateAudioRendererActivate(out m_pAudioRendererActivate);
+                hr = MFExtern.MFCreateAudioRendererActivate(out m_pAudioRendererActivate);
+                MFError.ThrowExceptionForHR(hr);
 
                 //Set the player state to Initialized
                 m_State = PlayerState.Initialized;
@@ -221,21 +227,24 @@ namespace Playlist
                     m_Segments.GetLastSegmentId(out SegmentId);
 
                     //reset the last topology in the sequencer
-                    m_pSequencerSource.UpdateTopologyFlags(SegmentId, 0);
+                    hr = m_pSequencerSource.UpdateTopologyFlags(SegmentId, 0);
+                    MFError.ThrowExceptionForHR(hr);
                 }
 
                 //Create media source and topology, and add it to the sequencer
                 AddSegment(sURL, out SegmentId);
 
                 //Set the last topology
-                m_pSequencerSource.UpdateTopologyFlags(SegmentId, MFSequencerTopologyFlags.Last);
+                hr = m_pSequencerSource.UpdateTopologyFlags(SegmentId, MFSequencerTopologyFlags.Last);
+                MFError.ThrowExceptionForHR(hr);
 
                 //If this is the first segment in the sequencer, queue it on the session
                 if (m_Segments.GetCount() == 1)
                 {
                     pMediaSource = (IMFMediaSource)m_pSequencerSource;
 
-                    pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+                    hr = pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+                    MFError.ThrowExceptionForHR(hr);
 
                     try
                     {
@@ -281,7 +290,9 @@ namespace Playlist
 
                 int SegId = 0;
 
-                m_pSequencerSource.DeleteTopology(SegmentID);
+                hr = m_pSequencerSource.DeleteTopology(SegmentID);
+                MFError.ThrowExceptionForHR(hr);
+
                 m_Segments.GetLastSegmentId(out SegId);
 
                 //Delete the segment entry from the list.
@@ -297,7 +308,8 @@ namespace Playlist
                         m_Segments.GetLastSegmentId(out SegId);
 
                         //set this topology as the last in the sequencer
-                        m_pSequencerSource.UpdateTopologyFlags(SegId, MFSequencerTopologyFlags.Last);
+                        hr = m_pSequencerSource.UpdateTopologyFlags(SegId, MFSequencerTopologyFlags.Last);
+                        MFError.ThrowExceptionForHR(hr);
                     }
                     catch { }
                 }
@@ -329,7 +341,8 @@ namespace Playlist
                 // Create the starting position parameter
                 PropVariant var = new PropVariant();
 
-                m_pMediaSession.Start(Guid.Empty, var);
+                hr = m_pMediaSession.Start(Guid.Empty, var);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch (Exception e)
             {
@@ -354,7 +367,8 @@ namespace Playlist
             try
             {
                 // pause the media session.
-                m_pMediaSession.Pause();
+                hr = m_pMediaSession.Pause();
+                MFError.ThrowExceptionForHR(hr);
             }
             catch (Exception e)
             {
@@ -383,7 +397,8 @@ namespace Playlist
 
             try
             {
-                m_pMediaSession.Stop();
+                hr = m_pMediaSession.Stop();
+                MFError.ThrowExceptionForHR(hr);
             }
             catch (Exception e)
             {
@@ -411,11 +426,14 @@ namespace Playlist
 
             try
             {
-                m_pMediaSession.Stop();
+                hr = m_pMediaSession.Stop();
+                MFError.ThrowExceptionForHR(hr);
 
-                MFExtern.MFCreateSequencerSegmentOffset(SegmentID, 0, var);
+                hr = MFExtern.MFCreateSequencerSegmentOffset(SegmentID, 0, var);
+                MFError.ThrowExceptionForHR(hr);
 
-                m_pMediaSession.Start(CLSID.MF_TIME_FORMAT_SEGMENT_OFFSET, var);
+                hr = m_pMediaSession.Start(CLSID.MF_TIME_FORMAT_SEGMENT_OFFSET, var);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch (Exception e)
             {
@@ -443,7 +461,8 @@ namespace Playlist
 
             try
             {
-                m_pPresentationClock.GetTime(out phnsCurrentTime);
+                hr = m_pPresentationClock.GetTime(out phnsCurrentTime);
+                MFError.ThrowExceptionForHR(hr);
 
                 if (m_phnsTimePairStart != null)
                 {
@@ -520,12 +539,14 @@ namespace Playlist
                 //Call shutdown on the sequencer source
                 pMediaSource = (IMFMediaSource)m_pSequencerSource;
 
-                pMediaSource.Shutdown();
+                hr = pMediaSource.Shutdown();
+                MFError.ThrowExceptionForHR(hr);
 
                 //Close media session
                 if (m_pMediaSession != null)
                 {
-                    m_pMediaSession.Close();
+                    hr = m_pMediaSession.Close();
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Wait for the close operation to complete
                     bool res = m_hCloseEvent.WaitOne(5000, false);
@@ -539,10 +560,12 @@ namespace Playlist
                 }
 
                 //Shutdown media session
-                m_pMediaSession.Shutdown();
+                hr = m_pMediaSession.Shutdown();
+                MFError.ThrowExceptionForHR(hr);
 
                 // Shut down Media Foundation.
-                MFExtern.MFShutdown();
+                hr = MFExtern.MFShutdown();
+                MFError.ThrowExceptionForHR(hr);
             }
             catch (Exception e)
             {
@@ -559,10 +582,12 @@ namespace Playlist
 
         #region IMFAsyncCallback methods
 
-        void IMFAsyncCallback.GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        int IMFAsyncCallback.GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
             pdwFlags = MFASync.None;
             pdwQueue = 0;
+
+            return S_Ok;
         }
 
         //////////////////////////////////////////////////////////////////////////
@@ -575,12 +600,13 @@ namespace Playlist
         //
         /////////////////////////////////////////////////////////////////////////
 
-        void IMFAsyncCallback.Invoke(IMFAsyncResult pAsyncResult)
+        int IMFAsyncCallback.Invoke(IMFAsyncResult pAsyncResult)
         {
             MediaEventType eventType = MediaEventType.MEUnknown;
             IMFMediaEvent pEvent;
             PropVariant eventData = null;
             Exception excpt = null;
+            int hr;
 
             try
             {
@@ -588,17 +614,21 @@ namespace Playlist
                 eventData = new PropVariant();                  // Event data
 
                 // Get the event from the event queue.
-                m_pMediaSession.EndGetEvent(pAsyncResult, out pEvent);
+                hr = m_pMediaSession.EndGetEvent(pAsyncResult, out pEvent);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Get the event type.
-                pEvent.GetType(out eventType);
+                hr = pEvent.GetType(out eventType);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Get the event data
-                pEvent.GetValue(eventData);
+                hr = pEvent.GetValue(eventData);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Get the event status. If the operation that triggered the event
                 // did not succeed, the status is a failure code.
-                pEvent.GetStatus(out eventStatus);
+                hr = pEvent.GetStatus(out eventStatus);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Switch on the event type. Update the internal state of the CPlayer
                 // as needed.
@@ -640,7 +670,8 @@ namespace Playlist
 
                             int value = 0;
 
-                            pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out value);
+                            hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out value);
+                            MFError.ThrowExceptionForHR(hr);
                             int SegmentID = 0;
                             long ID;
 
@@ -651,7 +682,8 @@ namespace Playlist
 
                             try
                             {
-                                pTopology.GetTopologyID(out ID);
+                                hr = pTopology.GetTopologyID(out ID);
+                                MFError.ThrowExceptionForHR(hr);
                                 m_Segments.GetSegmentIDByTopoID(ID, out SegmentID);
 
                                 topostat.iTopologyStatusType = (MFTopoStatus)value;
@@ -712,7 +744,8 @@ namespace Playlist
 
                             try
                             {
-                                pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_SOURCE_TOPOLOGY_CANCELED, out value);
+                                hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_SOURCE_TOPOLOGY_CANCELED, out value);
+                                MFError.ThrowExceptionForHR(hr);
                             }
                             catch { }
 
@@ -729,7 +762,8 @@ namespace Playlist
 
                             try
                             {
-                                pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_SOURCE_TOPOLOGY_CANCELED, out value);
+                                hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_SOURCE_TOPOLOGY_CANCELED, out value);
+                                MFError.ThrowExceptionForHR(hr);
                             }
                             catch { }
 
@@ -775,13 +809,16 @@ namespace Playlist
             // Request another event.
             if (eventType != MediaEventType.MESessionClosed)
             {
-                m_pMediaSession.BeginGetEvent(this, null);
+                hr = m_pMediaSession.BeginGetEvent(this, null);
+                MFError.ThrowExceptionForHR(hr);
             }
 
             if (excpt != null)
             {
                 throw excpt;
             }
+
+            return S_Ok;
         }
 
         #endregion
@@ -800,7 +837,8 @@ namespace Playlist
 
             try
             {
-                m_pPresentationClock.GetTime(out phnsPresentationTime);
+                hr = m_pPresentationClock.GetTime(out phnsPresentationTime);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch (Exception e)
             {
@@ -844,6 +882,7 @@ namespace Playlist
                 throw new COMException("null pointer", E_Pointer);
             }
 
+            int hr;
             IMFStreamDescriptor pStreamDescriptor;
             IMFTopologyNode pSourceNode;
             IMFTopologyNode pOutputNode;
@@ -851,7 +890,8 @@ namespace Playlist
             bool fSelected = false;
 
             // Get the stream descriptor for the only stream index =0.
-            pPresentationDescriptor.GetStreamDescriptorByIndex(0, out fSelected, out pStreamDescriptor);
+            hr = pPresentationDescriptor.GetStreamDescriptorByIndex(0, out fSelected, out pStreamDescriptor);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
@@ -862,17 +902,20 @@ namespace Playlist
 
                     try
                     {
-                        pTopology.AddNode(pSourceNode);
+                        hr = pTopology.AddNode(pSourceNode);
+                        MFError.ThrowExceptionForHR(hr);
 
                         // Create the output node for the renderer and add it to the topology.
                         CreateOutputNode(pStreamDescriptor, out pOutputNode);
 
                         try
                         {
-                            pTopology.AddNode(pOutputNode);
+                            hr = pTopology.AddNode(pOutputNode);
+                            MFError.ThrowExceptionForHR(hr);
 
                             // Connect the source node to the output node.
-                            pSourceNode.ConnectOutput(0, pOutputNode, 0);
+                            hr = pSourceNode.ConnectOutput(0, pOutputNode, 0);
+                            MFError.ThrowExceptionForHR(hr);
                         }
                         finally
                         {
@@ -914,17 +957,22 @@ namespace Playlist
                 throw new COMException("null pointer", E_Pointer);
             }
 
+            int hr;
             // Create the source-stream node.
-            MFExtern.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out ppSourceNode);
+            hr = MFExtern.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out ppSourceNode);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set attribute: Pointer to the media source. Necessary.
-            ppSourceNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, pMediaSource);
+            hr = ppSourceNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, pMediaSource);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set attribute: Pointer to the presentation descriptor. Necessary.
-            ppSourceNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_PRESENTATION_DESCRIPTOR, pPresentationDescriptor);
+            hr = ppSourceNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_PRESENTATION_DESCRIPTOR, pPresentationDescriptor);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set attribute: Pointer to the stream descriptor. Necessary.
-            ppSourceNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_STREAM_DESCRIPTOR, pStreamDescriptor);
+            hr = ppSourceNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_STREAM_DESCRIPTOR, pStreamDescriptor);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////
@@ -951,10 +999,12 @@ namespace Playlist
             Guid guidMajorType = Guid.Empty;
 
             // Create a downstream node.
-            MFExtern.MFCreateTopologyNode(MFTopologyType.OutputNode, out ppOutputNode);
+            int hr = MFExtern.MFCreateTopologyNode(MFTopologyType.OutputNode, out ppOutputNode);
+            MFError.ThrowExceptionForHR(hr);
 
             // Get the media type handler for the stream.
-            pStreamDescriptor.GetMediaTypeHandler(out pHandler);
+            hr = pStreamDescriptor.GetMediaTypeHandler(out pHandler);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
@@ -964,7 +1014,8 @@ namespace Playlist
                 // Set the IActivate object on the output node.
                 if (MFMediaType.Audio == guidMajorType)
                 {
-                    ppOutputNode.SetObject(m_pAudioRendererActivate);
+                    hr = ppOutputNode.SetObject(m_pAudioRendererActivate);
+                    MFError.ThrowExceptionForHR(hr);
                     Debug.WriteLine(("Audio stream"));
                 }
                 //Only audio is implemented, if guidMajorType is any other type, return E_NOTIMPL
@@ -1009,13 +1060,15 @@ namespace Playlist
                 m_phnsTimePairEnd.pNextTimePair = null;
             }
 
-            pEvent.GetUINT64(
+            int hr = pEvent.GetUINT64(
                         MFAttributesClsid.MF_EVENT_START_PRESENTATION_TIME,
                         out m_phnsTimePairEnd.hnsStartPresentationTime);
+            MFError.ThrowExceptionForHR(hr);
 
-            pEvent.GetUINT64(
+            hr = pEvent.GetUINT64(
                         MFAttributesClsid.MF_EVENT_PRESENTATION_TIME_OFFSET,
                         out m_phnsTimePairEnd.hnsPresentationTimeOffset);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////
@@ -1038,23 +1091,26 @@ namespace Playlist
                 throw new COMException("null pointer", E_Pointer);
             }
 
+            int hr;
             IMFSourceResolver pSourceResolver;
             object pSourceUnk;
 
-            MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            hr = MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
                 // Use the source resolver to create the media source.
                 MFObjectType ObjectType = MFObjectType.Invalid;
 
-                pSourceResolver.CreateObjectFromURL(
+                hr = pSourceResolver.CreateObjectFromURL(
                         sURL,                       // URL of the source.
                         MFResolution.MediaSource,  // Create a source object.
                         null,                       // Optional property store.
                         out ObjectType,                // Receives the created object type.
                         out pSourceUnk                 // Receives a pointer to the media source.
                     );
+                MFError.ThrowExceptionForHR(hr);
 
                 // Get the IMFMediaSource interface from the media source.
                 ppMediaSource = (IMFMediaSource)pSourceUnk;
@@ -1091,7 +1147,8 @@ namespace Playlist
             IMFPresentationDescriptor pPresentationDescriptor;
 
             //Create Presentation Descriptor for the media source
-            pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+            int hr = pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
@@ -1129,18 +1186,23 @@ namespace Playlist
 
             long hnsSegmentDuration = 0;
             long TopologyID = 0;
+            int hr;
 
             IMFPresentationDescriptor pPresentationDescriptor;
 
-            m_pSequencerSource.AppendTopology(pTopology, 0, out pSegmentId);
+            hr = m_pSequencerSource.AppendTopology(pTopology, 0, out pSegmentId);
+            MFError.ThrowExceptionForHR(hr);
 
-            pTopology.GetTopologyID(out TopologyID);
+            hr = pTopology.GetTopologyID(out TopologyID);
+            MFError.ThrowExceptionForHR(hr);
 
             //create a presentation descriptor
-            pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+            hr = pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+            MFError.ThrowExceptionForHR(hr);
 
             //get the segment duration
-            pPresentationDescriptor.GetUINT64(MFAttributesClsid.MF_PD_DURATION, out hnsSegmentDuration);
+            hr = pPresentationDescriptor.GetUINT64(MFAttributesClsid.MF_PD_DURATION, out hnsSegmentDuration);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(hnsSegmentDuration > 0);
 
@@ -1166,16 +1228,18 @@ namespace Playlist
                              IMFPresentationDescriptor pPresentationDescriptor,
                              out int pSegmentId)
         {
+            int hr;
             IMFMediaSourceTopologyProvider pMediaSourceTopologyProvider;
             IMFTopology pTopology;
 
             int SegId = 0;
 
             // Get the Segment ID.
-            m_pSequencerSource.GetPresentationContext(
+            hr = m_pSequencerSource.GetPresentationContext(
                 pPresentationDescriptor, 
                 out SegId,
                 out pTopology);
+            MFError.ThrowExceptionForHR(hr);
 
             SafeRelease(pTopology);
 
@@ -1184,14 +1248,16 @@ namespace Playlist
             //Get the topology for the presentation descriptor
             pMediaSourceTopologyProvider = (IMFMediaSourceTopologyProvider)m_pSequencerSource;
 
-            pMediaSourceTopologyProvider.GetMediaSourceTopology(
+            hr = pMediaSourceTopologyProvider.GetMediaSourceTopology(
                                 pPresentationDescriptor,
                                 out pTopology);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
                 //Set the topology on the media session
-                m_pMediaSession.SetTopology(MFSessionSetTopologyFlags.None, pTopology);
+                hr = m_pMediaSession.SetTopology(MFSessionSetTopologyFlags.None, pTopology);
+                MFError.ThrowExceptionForHR(hr);
 
                 pSegmentId = SegId;
             }
@@ -1228,7 +1294,8 @@ namespace Playlist
 
             try
             {
-                MFExtern.MFCreateTopology(out pTopology);
+                int hr = MFExtern.MFCreateTopology(out pTopology);
+                MFError.ThrowExceptionForHR(hr);
                 try
                 {
                     CreateTopology(pMediaSource, pTopology);

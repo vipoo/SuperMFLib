@@ -36,7 +36,7 @@ namespace WavSourceFilter
 
         #region IMFByteStreamHandler methods
 
-        public void BeginCreateObject(
+        public int BeginCreateObject(
             IMFByteStream pByteStream,
             string pwszURL,
             MFResolution dwFlags,
@@ -46,6 +46,7 @@ namespace WavSourceFilter
             object punkState                  // Can be NULL
         )
         {
+            int hr;
             m_Log.WriteLine("BeginCreateObject");
 
             ppIUnknownCancelCookie = null; // We don't return a cancellation cookie.
@@ -61,22 +62,27 @@ namespace WavSourceFilter
 
             pSource.Open(pByteStream);
 
-            MFExtern.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
+            hr = MFExtern.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFInvokeCallback(pResult);
+            hr = MFExtern.MFInvokeCallback(pResult);
+            MFError.ThrowExceptionForHR(hr);
 
             if (pResult != null)
             {
                 Marshal.ReleaseComObject(pResult);
             }
+            return S_Ok;
         }
 
-        public void EndCreateObject(
+        public int EndCreateObject(
             IMFAsyncResult pResult,
             out MFObjectType pObjectType,
             out object ppObject
         )
         {
+            int hr;
+
             pObjectType = MFObjectType.Invalid;
             ppObject = null;
 
@@ -87,7 +93,8 @@ namespace WavSourceFilter
                 throw new COMException("invalid IMFAsyncResult", E_InvalidArgument);
             }
 
-            pResult.GetObject(out ppObject);
+            hr = pResult.GetObject(out ppObject);
+            MFError.ThrowExceptionForHR(hr);
 
             // Minimal sanity check - is it really a media source?
             IMFMediaSource pSource = (IMFMediaSource)ppObject;
@@ -96,21 +103,23 @@ namespace WavSourceFilter
 
             // unneeded SAFE_RELEASE(pSource);
             // unneeded SAFE_RELEASE(ppObject);
+            return S_Ok;
         }
 
-        public void CancelObjectCreation(object pIUnknownCancelCookie)
+        public int CancelObjectCreation(object pIUnknownCancelCookie)
         {
             m_Log.WriteLine("CancelObjectCreation");
 
             throw new COMException("Not implemented", E_NotImplemented);
         }
 
-        public void GetMaxNumberOfBytesRequiredForResolution(out long pqwBytes)
+        public int GetMaxNumberOfBytesRequiredForResolution(out long pqwBytes)
         {
             m_Log.WriteLine("GetMaxNumberOfBytesRequiredForResolution");
 
             // In a canonical PCM .wav file, the start of the 'data' chunk is at byte offset 44.
             pqwBytes = 44;
+            return S_Ok;
         }
 
         #endregion

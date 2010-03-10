@@ -91,6 +91,7 @@ namespace WavSourceFilter
 
         public WavStream(WavSource pSource, CWavRiffParser pRiff, IMFStreamDescriptor pSD)
         {
+            int hr;
             m_pEventQueue = null;
             m_Log = new xLog("WavStream");
 #if false
@@ -108,7 +109,8 @@ namespace WavSourceFilter
             m_Riff = pRiff;
 
             // Create the media event queue.
-            MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
+            hr = MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
+            MFError.ThrowExceptionForHR(hr);
         }
 
 #if DEBUG
@@ -122,39 +124,47 @@ namespace WavSourceFilter
 
         #region IMFMediaEventGenerator methods
 
-        public void BeginGetEvent(
+        public int BeginGetEvent(
             //IMFAsyncCallback pCallback,
             IntPtr pCallback,
             object punkState
             )
         {
+            int hr;
             m_Log.WriteLine("-BeginGetEvent");
 
             lock (this)
             {
                 CheckShutdown();
-                m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                MFError.ThrowExceptionForHR(hr);
             }
+
+            return S_Ok;
         }
 
-        public void EndGetEvent(
+        public int EndGetEvent(
             //IMFAsyncResult pResult, 
             IntPtr pResult,
             out IMFMediaEvent ppEvent
             )
         {
+            int hr;
             m_Log.WriteLine("-EndGetEvent");
             ppEvent = null;
 
             lock (this)
             {
                 CheckShutdown();
-                m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
-        public void GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
+        public int GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
         {
+            int hr;
             m_Log.WriteLine("-GetEvent");
             ppEvent = null;
 
@@ -166,28 +176,33 @@ namespace WavSourceFilter
                 pQueue = (IMFMediaEventQueue)m_pEventQueue;
             }
 
-            pQueue.GetEvent(dwFlags, out ppEvent);
+            hr = pQueue.GetEvent(dwFlags, out ppEvent);
+            MFError.ThrowExceptionForHR(hr);
 
             //not needed SAFE_RELEASE(pQueue);
+            return S_Ok;
         }
 
-        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
+        public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
+            int hr;
             m_Log.WriteLine("-QueueEvent");
 
             lock (this)
             {
                 CheckShutdown();
 
-                m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
         #endregion
 
         #region IMFMediaStream methods.
 
-        public void GetMediaSource(out IMFMediaSource ppMediaSource)
+        public int GetMediaSource(out IMFMediaSource ppMediaSource)
         {
             m_Log.WriteLine("-GetMediaSource");
             ppMediaSource = null;
@@ -202,9 +217,10 @@ namespace WavSourceFilter
                 CheckShutdown();
                 ppMediaSource = (IMFMediaSource)m_pSource;
             }
+            return S_Ok;
         }
 
-        public void GetStreamDescriptor(out IMFStreamDescriptor ppStreamDescriptor)
+        public int GetStreamDescriptor(out IMFStreamDescriptor ppStreamDescriptor)
         {
             m_Log.WriteLine("-GetStreamDescriptor");
             ppStreamDescriptor = null;
@@ -219,10 +235,12 @@ namespace WavSourceFilter
                 CheckShutdown();
                 ppStreamDescriptor = m_pStreamDescriptor;
             }
+            return S_Ok;
         }
 
-        public void RequestSample(object pToken)
+        public int RequestSample(object pToken)
         {
+            int hr;
             m_Log.WriteLine("-RequestSample");
 
             if (m_pSource == null)
@@ -265,7 +283,8 @@ namespace WavSourceFilter
                 if (pToken != null)
                 {
                     object o = pToken;
-                    pSample.SetUnknown(MFAttributesClsid.MFSampleExtension_Token, o);
+                    hr = pSample.SetUnknown(MFAttributesClsid.MFSampleExtension_Token, o);
+                    MFError.ThrowExceptionForHR(hr);
                 }
 
                 // Send the MEMediaSample event with the new sample.
@@ -289,6 +308,7 @@ namespace WavSourceFilter
             {
                 m_pSource.QueueEvent(MediaEventType.MEEndOfPresentation, Guid.Empty, S_Ok, null);
             }
+            return S_Ok;
         }
 
         #endregion
@@ -334,6 +354,7 @@ namespace WavSourceFilter
 
         internal void Shutdown()
         {
+            int hr;
             m_Log.WriteLine("Shutdown");
 
             lock (this)
@@ -341,7 +362,8 @@ namespace WavSourceFilter
                 // Shut down the event queue.
                 if (m_pEventQueue != null)
                 {
-                    m_pEventQueue.Shutdown();
+                    hr = m_pEventQueue.Shutdown();
+                    MFError.ThrowExceptionForHR(hr);
                 }
 
                 // Release objects
@@ -386,6 +408,7 @@ namespace WavSourceFilter
 
         private void CreateAudioSample(out IMFSample ppSample)
         {
+            int hr;
             m_Log.WriteLine("CreateAudioSample");
             ppSample = null;
 
@@ -403,12 +426,14 @@ namespace WavSourceFilter
             cbBuffer = Math.Min(cbBuffer, m_Riff.BytesRemainingInChunk());
 
             // Create the buffer.
-            MFExtern.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
+            hr = MFExtern.MFCreateMemoryBuffer(cbBuffer, out pBuffer);
+            MFError.ThrowExceptionForHR(hr);
 
             int a, b;
 
             // Get a pointer to the buffer memory.
-            pBuffer.Lock(out pData, out a, out b);
+            hr = pBuffer.Lock(out pData, out a, out b);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
@@ -418,27 +443,34 @@ namespace WavSourceFilter
             finally
             {
                 // Unlock the buffer.
-                pBuffer.Unlock();
+                hr = pBuffer.Unlock();
+                MFError.ThrowExceptionForHR(hr);
             }
 
             // Set the size of the valid data in the buffer.
-            pBuffer.SetCurrentLength(cbBuffer);
+            hr = pBuffer.SetCurrentLength(cbBuffer);
+            MFError.ThrowExceptionForHR(hr);
 
             // Create a new sample and add the buffer to it.
-            MFExtern.MFCreateSample(out pSample);
+            hr = MFExtern.MFCreateSample(out pSample);
+            MFError.ThrowExceptionForHR(hr);
 
-            pSample.AddBuffer(pBuffer);
+            hr = pSample.AddBuffer(pBuffer);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the time stamps, duration, and sample flags.
-            pSample.SetSampleTime(m_rtCurrentPosition);
+            hr = pSample.SetSampleTime(m_rtCurrentPosition);
+            MFError.ThrowExceptionForHR(hr);
 
             duration = Utils.AudioDurationFromBufferSize(m_Riff.Format(), cbBuffer);
-            pSample.SetSampleDuration(duration);
+            hr = pSample.SetSampleDuration(duration);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the discontinuity flag.
             if (m_discontinuity)
             {
-                pSample.SetUINT32(MFAttributesClsid.MFSampleExtension_Discontinuity, 1);
+                hr = pSample.SetUINT32(MFAttributesClsid.MFSampleExtension_Discontinuity, 1);
+                MFError.ThrowExceptionForHR(hr);
             }
 
             // Update our current position.
@@ -526,11 +558,13 @@ namespace WavSourceFilter
 
         public WavSource()
         {
+            int hr;
             m_Log = new xLog("WavSource");
             m_state = State.Stopped;
 
             // Create the media event queue.
-            MFExtern.MFCreateEventQueue(out m_pEventQueue);
+            hr = MFExtern.MFCreateEventQueue(out m_pEventQueue);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         ~WavSource()
@@ -545,35 +579,41 @@ namespace WavSourceFilter
         // 1. Check for shutdown status.
         // 2. Call the event generator helper object.
 
-        public void BeginGetEvent(IMFAsyncCallback pCallback, object punkState)
+        public int BeginGetEvent(IMFAsyncCallback pCallback, object punkState)
         {
+            int hr;
             m_Log.WriteLine("-BeginGetEvent");
 
             lock (this)
             {
                 CheckShutdown();
-                m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
-        public void EndGetEvent(IMFAsyncResult pResult, out IMFMediaEvent ppEvent)
+        public int EndGetEvent(IMFAsyncResult pResult, out IMFMediaEvent ppEvent)
         {
+            int hr;
             m_Log.WriteLine("-EndGetEvent");
             ppEvent = null;
 
             lock (this)
             {
                 CheckShutdown();
-                m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
             }
+            return S_Ok;
         }
 
-        public void GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
+        public int GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
         {
             // NOTE: GetEvent can block indefinitely, so we don't hold the
             //       WavSource lock. This requires some juggling with the
             //       event queue pointer.
 
+            int hr;
             m_Log.WriteLine("-GetEvent");
             ppEvent = null;
 
@@ -586,20 +626,25 @@ namespace WavSourceFilter
                 pQueue = m_pEventQueue;
             }
 
-            pQueue.GetEvent(dwFlags, out ppEvent);
+            hr = pQueue.GetEvent(dwFlags, out ppEvent);
+            MFError.ThrowExceptionForHR(hr);
 
             // not needed SAFE_RELEASE(pQueue);
+            return S_Ok;
         }
 
-        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
+        public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
+            int hr;
             m_Log.WriteLine("-QueueEvent");
 
             lock (this)
             {
                 CheckShutdown();
-                m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
         #endregion
@@ -611,8 +656,9 @@ namespace WavSourceFilter
         // Description: Returns a copy of the default presentation descriptor.
         //-------------------------------------------------------------------
 
-        public void CreatePresentationDescriptor(out IMFPresentationDescriptor ppPresentationDescriptor)
+        public int CreatePresentationDescriptor(out IMFPresentationDescriptor ppPresentationDescriptor)
         {
+            int hr;
             m_Log.WriteLine("-CreatePresentationDescriptor");
             ppPresentationDescriptor = null;
 
@@ -625,8 +671,10 @@ namespace WavSourceFilter
                 }
 
                 // Clone our default presentation descriptor.
-                m_pPresentationDescriptor.Clone(out ppPresentationDescriptor);
+                hr = m_pPresentationDescriptor.Clone(out ppPresentationDescriptor);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -634,7 +682,7 @@ namespace WavSourceFilter
         // Description: Returns flags the describe the source.
         //-------------------------------------------------------------------
 
-        public void GetCharacteristics(out MFMediaSourceCharacteristics pdwCharacteristics)
+        public int GetCharacteristics(out MFMediaSourceCharacteristics pdwCharacteristics)
         {
             m_Log.WriteLine("-GetCharacteristics");
             pdwCharacteristics = MFMediaSourceCharacteristics.None;
@@ -644,6 +692,7 @@ namespace WavSourceFilter
                 CheckShutdown();
                 pdwCharacteristics = MFMediaSourceCharacteristics.CanPause | MFMediaSourceCharacteristics.CanSeek;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -651,12 +700,13 @@ namespace WavSourceFilter
         // Description: Switches to running state.
         //-------------------------------------------------------------------
 
-        public void Start(
+        public int Start(
            IMFPresentationDescriptor pPresentationDescriptor,
            Guid pguidTimeFormat,
            ConstPropVariant pvarStartPosition
            )
         {
+            int hr;
             m_Log.WriteLine("-Start");
 
             lock (this)
@@ -745,22 +795,25 @@ namespace WavSourceFilter
                     IMFMediaEvent pEvent = null;
 
                     // Create the event.
-                    MFExtern.MFCreateMediaEvent(
+                    hr = MFExtern.MFCreateMediaEvent(
                         MediaEventType.MESourceStarted,
                         Guid.Empty,
                         S_Ok,
                         var,
                         out pEvent
                         );
+                    MFError.ThrowExceptionForHR(hr);
 
                     // For restarts, set the actual start time as an attribute.
                     if (bIsRestartFromCurrentPosition)
                     {
-                        pEvent.SetUINT64(MFAttributesClsid.MF_EVENT_SOURCE_ACTUAL_START, llStartOffset);
+                        hr = pEvent.SetUINT64(MFAttributesClsid.MF_EVENT_SOURCE_ACTUAL_START, llStartOffset);
+                        MFError.ThrowExceptionForHR(hr);
                     }
 
                     // Now  queue the event.
-                    m_pEventQueue.QueueEvent(pEvent);
+                    hr = m_pEventQueue.QueueEvent(pEvent);
+                    MFError.ThrowExceptionForHR(hr);
 
                     //SAFE_RELEASE(pEvent);
                 }
@@ -790,6 +843,7 @@ namespace WavSourceFilter
 
                 var.Clear();
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -797,7 +851,7 @@ namespace WavSourceFilter
         // Description: Switches to paused state.
         //-------------------------------------------------------------------
 
-        public void Pause()
+        public int Pause()
         {
             m_Log.WriteLine("-Pause");
 
@@ -824,6 +878,7 @@ namespace WavSourceFilter
             }
 
             // Nothing else for us to do.
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -831,7 +886,7 @@ namespace WavSourceFilter
         // Description: Switches to stopped state.
         //-------------------------------------------------------------------
 
-        public void Stop()
+        public int Stop()
         {
             m_Log.WriteLine("-Stop");
 
@@ -850,6 +905,7 @@ namespace WavSourceFilter
                 // Update our state.
                 m_state = State.Stopped;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -861,8 +917,9 @@ namespace WavSourceFilter
         // method releases the pointer to the stream.
         //-------------------------------------------------------------------
 
-        public void Shutdown()
+        public int Shutdown()
         {
+            int hr;
             m_Log.WriteLine("-Shutdown");
 
             lock (this)
@@ -880,7 +937,8 @@ namespace WavSourceFilter
                 {
                     try
                     {
-                        m_pEventQueue.Shutdown();
+                        hr = m_pEventQueue.Shutdown();
+                        MFError.ThrowExceptionForHR(hr);
                     }
                     catch { }
                 }
@@ -891,6 +949,7 @@ namespace WavSourceFilter
                 // Set our shutdown flag.
                 m_IsShutdown = true;
             }
+            return S_Ok;
         }
 
         #endregion
@@ -993,6 +1052,7 @@ namespace WavSourceFilter
 
         private void CreatePresentationDescriptor()
         {
+            int hr;
             m_Log.WriteLine("CreatePresentationDescriptor");
 
             IMFMediaType pMediaType = null;
@@ -1002,42 +1062,51 @@ namespace WavSourceFilter
             Debug.Assert(WaveFormat() != null);
 
             // Create an empty media type.
-            MFExtern.MFCreateMediaType(out pMediaType);
+            hr = MFExtern.MFCreateMediaType(out pMediaType);
+            MFError.ThrowExceptionForHR(hr);
 
             // Initialize the media type from the WAVEFORMATEX structure.
-            MFExtern.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
+            hr = MFExtern.MFInitMediaTypeFromWaveFormatEx(pMediaType, WaveFormat(), WaveFormatSize());
+            MFError.ThrowExceptionForHR(hr);
 
             IMFMediaType[] mt = new IMFMediaType[1];
             mt[0] = pMediaType;
 
             // Create the stream descriptor.
-            MFExtern.MFCreateStreamDescriptor(
+            hr = MFExtern.MFCreateStreamDescriptor(
                 0,          // stream identifier
                 mt.Length,          // Number of media types.
                 mt, // Array of media types
                 out pStreamDescriptor
                 );
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the default media type on the media type handler.
-            pStreamDescriptor.GetMediaTypeHandler(out pHandler);
-            pHandler.SetCurrentMediaType(pMediaType);
+            hr = pStreamDescriptor.GetMediaTypeHandler(out pHandler);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = pHandler.SetCurrentMediaType(pMediaType);
+            MFError.ThrowExceptionForHR(hr);
 
             IMFStreamDescriptor[] ms = new IMFStreamDescriptor[1];
             ms[0] = pStreamDescriptor;
 
             // Create the presentation descriptor.
-            MFExtern.MFCreatePresentationDescriptor(
+            hr = MFExtern.MFCreatePresentationDescriptor(
                 ms.Length,      // Number of stream descriptors
                 ms, // Array of stream descriptors
                 out m_pPresentationDescriptor
                 );
+            MFError.ThrowExceptionForHR(hr);
 
             // Select the first stream
-            m_pPresentationDescriptor.SelectStream(0);
+            hr = m_pPresentationDescriptor.SelectStream(0);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the file duration as an attribute on the presentation descriptor.
             long duration = m_pRiff.FileDuration();
-            m_pPresentationDescriptor.SetUINT64(MFAttributesClsid.MF_PD_DURATION, (long)duration);
+            hr = m_pPresentationDescriptor.SetUINT64(MFAttributesClsid.MF_PD_DURATION, (long)duration);
+            MFError.ThrowExceptionForHR(hr);
 
             //SAFE_RELEASE(pMediaType);
             //SAFE_RELEASE(pStreamDescriptor);
@@ -1062,6 +1131,7 @@ namespace WavSourceFilter
 
         private void ValidatePresentationDescriptor(IMFPresentationDescriptor pPD)
         {
+            int hr;
             m_Log.WriteLine("ValidatePresentationDescriptor");
 
             Debug.Assert(pPD != null);
@@ -1075,7 +1145,8 @@ namespace WavSourceFilter
             bool fSelected = false;
 
             // Make sure there is only one stream.
-            pPD.GetStreamDescriptorCount(out cStreamDescriptors);
+            hr = pPD.GetStreamDescriptorCount(out cStreamDescriptors);
+            MFError.ThrowExceptionForHR(hr);
 
             if (cStreamDescriptors != 1)
             {
@@ -1083,7 +1154,8 @@ namespace WavSourceFilter
             }
 
             // Get the stream descriptor.
-            pPD.GetStreamDescriptorByIndex(0, out fSelected, out pStreamDescriptor);
+            hr = pPD.GetStreamDescriptorByIndex(0, out fSelected, out pStreamDescriptor);
+            MFError.ThrowExceptionForHR(hr);
 
             // Make sure it's selected. (This media source has only one stream, so it
             // is not useful to deselect the only stream.)
@@ -1093,9 +1165,11 @@ namespace WavSourceFilter
             }
 
             // Get the media type handler, so that we can get the media type.
-            pStreamDescriptor.GetMediaTypeHandler(out pHandler);
+            hr = pStreamDescriptor.GetMediaTypeHandler(out pHandler);
+            MFError.ThrowExceptionForHR(hr);
 
-            pHandler.GetCurrentMediaType(out pMediaType);
+            hr = pHandler.GetCurrentMediaType(out pMediaType);
+            MFError.ThrowExceptionForHR(hr);
 
             int iSize;
 
@@ -1104,11 +1178,12 @@ namespace WavSourceFilter
             //pFormat = new WaveFormatEx();
             //Marshal.PtrToStructure(ip, pFormat);
 
-            MFExtern.MFCreateWaveFormatExFromMFMediaType(
+            hr = MFExtern.MFCreateWaveFormatExFromMFMediaType(
                 pMediaType,
                 out pFormat,
                 out iSize,
                 MFWaveFormatExConvertFlags.Normal);
+            MFError.ThrowExceptionForHR(hr);
 
             if ((pFormat == null) || (this.WaveFormat() == null))
             {
@@ -1139,6 +1214,7 @@ namespace WavSourceFilter
 
         private void QueueNewStreamEvent(IMFPresentationDescriptor pPD)
         {
+            int hr;
             Debug.Assert(pPD != null);
 
             m_Log.WriteLine("QueueNewStreamEvent");
@@ -1146,7 +1222,8 @@ namespace WavSourceFilter
             IMFStreamDescriptor pSD = null;
 
             bool fSelected = false;
-            pPD.GetStreamDescriptorByIndex(0, out fSelected, out pSD);
+            hr = pPD.GetStreamDescriptorByIndex(0, out fSelected, out pSD);
+            MFError.ThrowExceptionForHR(hr);
 
             // The stream must be selected, because we don't allow the app
             // to de-select the stream. See ValidatePresentationDescriptor.

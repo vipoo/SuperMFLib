@@ -153,7 +153,7 @@ namespace WavSinkNS
         // Note: This sink has a fixed number of streams and is rateless.
         //-------------------------------------------------------------------
 
-        public void GetCharacteristics(out MFMediaSinkCharacteristics pdwCharacteristics)
+        public int GetCharacteristics(out MFMediaSinkCharacteristics pdwCharacteristics)
         {
             TRACE("CWavSink::GetCharacteristics");
             lock (this)
@@ -162,6 +162,7 @@ namespace WavSinkNS
 
                 pdwCharacteristics = MFMediaSinkCharacteristics.FixedStreams | MFMediaSinkCharacteristics.Rateless;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -172,7 +173,7 @@ namespace WavSinkNS
         //       always returns MF_E_STREAMSINKS_FIXED.
         //-------------------------------------------------------------------
 
-        public void AddStreamSink(
+        public int AddStreamSink(
             int dwStreamSinkIdentifier,
             IMFMediaType pMediaType,
             out IMFStreamSinkAlt ppStreamSink)
@@ -189,7 +190,7 @@ namespace WavSinkNS
         //       always returns MF_E_STREAMSINKS_FIXED.
         //-------------------------------------------------------------------
 
-        public void RemoveStreamSink(int dwStreamSinkIdentifier)
+        public int RemoveStreamSink(int dwStreamSinkIdentifier)
         {
             TRACE("CWavSink::RemoveStreamSink");
             throw new COMException("Fixed streams", MFError.MF_E_STREAMSINKS_FIXED);
@@ -200,7 +201,7 @@ namespace WavSinkNS
         // Description: Returns the number of streams. 
         //-------------------------------------------------------------------
 
-        public void GetStreamSinkCount(out int pcStreamSinkCount)
+        public int GetStreamSinkCount(out int pcStreamSinkCount)
         {
             TRACE("CWavSink::GetStreamSinkCount");
             lock (this)
@@ -209,6 +210,7 @@ namespace WavSinkNS
 
                 pcStreamSinkCount = 1;  // Fixed number of streams.
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -216,7 +218,7 @@ namespace WavSinkNS
         // Description: Retrieves a stream by index. 
         //-------------------------------------------------------------------
 
-        public void GetStreamSinkByIndex(
+        public int GetStreamSinkByIndex(
             int dwIndex,
             out IMFStreamSinkAlt ppStreamSink)
         {
@@ -233,6 +235,7 @@ namespace WavSinkNS
 
                 ppStreamSink = m_pStream;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -240,7 +243,7 @@ namespace WavSinkNS
         // Description: Retrieves a stream by ID. 
         //-------------------------------------------------------------------
 
-        public void GetStreamSinkById(
+        public int GetStreamSinkById(
             int dwStreamSinkIdentifier,
             out IMFStreamSinkAlt ppStreamSink)
         {
@@ -257,6 +260,7 @@ namespace WavSinkNS
 
                 ppStreamSink = m_pStream;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -266,8 +270,9 @@ namespace WavSinkNS
         // pPresentationClock: Pointer to the clock. Can be null.
         //-------------------------------------------------------------------
 
-        public void SetPresentationClock(IMFPresentationClock pPresentationClock)
+        public int SetPresentationClock(IMFPresentationClock pPresentationClock)
         {
+            int hr;
             TRACE("CWavSink::SetPresentationClock");
             lock (this)
             {
@@ -280,13 +285,15 @@ namespace WavSinkNS
                 {
                     if (m_pClock != null)
                     {
-                        m_pClock.RemoveClockStateSink(this);
+                        hr = m_pClock.RemoveClockStateSink(this);
+                        MFError.ThrowExceptionForHR(hr);
                     }
 
                     // Register ourselves to get state notifications from the new clock.
                     if (pPresentationClock != null)
                     {
-                        pPresentationClock.AddClockStateSink(this);
+                        hr = pPresentationClock.AddClockStateSink(this);
+                        MFError.ThrowExceptionForHR(hr);
                     }
 
                     // Release the pointer to the old clock.
@@ -296,6 +303,7 @@ namespace WavSinkNS
                     m_pClock = pPresentationClock;
                 }
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -303,7 +311,7 @@ namespace WavSinkNS
         // Description: Returns a pointer to the presentation clock. 
         //-------------------------------------------------------------------
 
-        public void GetPresentationClock(out IMFPresentationClock ppPresentationClock)
+        public int GetPresentationClock(out IMFPresentationClock ppPresentationClock)
         {
             TRACE("CWavSink::GetPresentationClock");
             lock (this)
@@ -320,6 +328,7 @@ namespace WavSinkNS
                     ppPresentationClock = m_pClock;
                 }
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -327,7 +336,7 @@ namespace WavSinkNS
         // Description: Releases resources held by the media sink. 
         //-------------------------------------------------------------------
 
-        public void Shutdown()
+        public int Shutdown()
         {
             TRACE("CWavSink::Shutdown");
             GC.SuppressFinalize(this);
@@ -354,6 +363,7 @@ namespace WavSinkNS
                     }
                 }
             }
+            return S_Ok;
         }
 
         #endregion
@@ -367,7 +377,7 @@ namespace WavSinkNS
         // Note: We use the Finalize operation to write the RIFF headers.
         //-------------------------------------------------------------------
 
-        public void BeginFinalize(
+        public int BeginFinalize(
             IMFAsyncCallback pCallback,
             object punkState)
         {
@@ -380,6 +390,7 @@ namespace WavSinkNS
                 // Tell the stream to finalize.
                 m_pStream.Finalize(pCallback, punkState);
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -387,7 +398,7 @@ namespace WavSinkNS
         // Description: Completes the asynchronous finalize operation.
         //-------------------------------------------------------------------
 
-        public void EndFinalize(IMFAsyncResult pResult)
+        public int EndFinalize(IMFAsyncResult pResult)
         {
             TRACE("CWavSink::EndFinalize");
 
@@ -397,6 +408,7 @@ namespace WavSinkNS
             {
                 throw new COMException("Failed status code in EndFinalize", hr);
             }
+            return S_Ok;
         }
 
         #endregion
@@ -416,7 +428,7 @@ namespace WavSinkNS
         //       input samples have an earlier time stamp, we discard them.
         //-------------------------------------------------------------------
 
-        public void OnClockStart(
+        public int OnClockStart(
             /* [in] */ long hnsSystemTime,
             /* [in] */ long llClockStartOffset)
         {
@@ -427,6 +439,7 @@ namespace WavSinkNS
 
                 m_pStream.Start(llClockStartOffset);
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -436,7 +449,7 @@ namespace WavSinkNS
         // Note: After this method is called, we stop accepting new data.
         //-------------------------------------------------------------------
 
-        public void OnClockStop(
+        public int OnClockStop(
             /* [in] */ long hnsSystemTime)
         {
             TRACE("CWavSink::OnClockStop");
@@ -446,6 +459,7 @@ namespace WavSinkNS
 
                 m_pStream.Stop();
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -456,7 +470,7 @@ namespace WavSinkNS
         //       running (started) state. We still accept data and archive it.
         //-------------------------------------------------------------------
 
-        public void OnClockPause(
+        public int OnClockPause(
             /* [in] */ long hnsSystemTime)
         {
             TRACE("CWavSink::OnClockPause");
@@ -466,6 +480,7 @@ namespace WavSinkNS
 
                 m_pStream.Pause();
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -473,7 +488,7 @@ namespace WavSinkNS
         // Description: Called when the presentation clock restarts.
         //-------------------------------------------------------------------
 
-        public void OnClockRestart(
+        public int OnClockRestart(
             /* [in] */ long hnsSystemTime)
         {
             TRACE("CWavSink::OnClockRestart");
@@ -483,6 +498,7 @@ namespace WavSinkNS
 
                 m_pStream.Restart();
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -492,11 +508,12 @@ namespace WavSinkNS
         // Note: For a rateless sink, the clock rate is not important.
         //-------------------------------------------------------------------
 
-        public void OnClockSetRate(
+        public int OnClockSetRate(
             /* [in] */ long hnsSystemTime,
             /* [in] */ float flRate)
         {
             TRACE("CWavSink::OnClockSetRate");
+            return S_Ok;
         }
 
         #endregion
@@ -647,6 +664,7 @@ namespace WavSinkNS
 
         public CWavStream(CWavSink pParent, IMFByteStream pByteStream)
         {
+            int hr;
             TRACE("CWavStream::CWavStream");
 
             m_SampleQueue = new Queue();
@@ -669,7 +687,8 @@ namespace WavSinkNS
             const MFByteStreamCapabilities dwRequiredCaps = (MFByteStreamCapabilities.IsWritable | MFByteStreamCapabilities.IsSeekable);
 
             // Make sure the byte stream has the necessary caps bits.
-            pByteStream.GetCapabilities(out dwCaps);
+            hr = pByteStream.GetCapabilities(out dwCaps);
+            MFError.ThrowExceptionForHR(hr);
 
             if ((dwCaps & dwRequiredCaps) != dwRequiredCaps)
             {
@@ -677,13 +696,16 @@ namespace WavSinkNS
             }
 
             // Move the file pointer to leave room for the RIFF headers.
-            pByteStream.SetCurrentPosition(Marshal.SizeOf(typeof(WAV_FILE_HEADER)));
+            hr = pByteStream.SetCurrentPosition(Marshal.SizeOf(typeof(WAV_FILE_HEADER)));
+            MFError.ThrowExceptionForHR(hr);
 
             // Create the event queue helper.
-            MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
+            hr = MFExternAlt.MFCreateEventQueue(out m_pEventQueue);
+            MFError.ThrowExceptionForHR(hr);
 
             // Allocate a new work queue for async operations.
-            MFExtern.MFAllocateWorkQueue(out m_WorkQueueId);
+            hr = MFExtern.MFAllocateWorkQueue(out m_WorkQueueId);
+            MFError.ThrowExceptionForHR(hr);
 
             m_pByteStream = pByteStream;
             m_pSink = pParent;
@@ -698,36 +720,44 @@ namespace WavSinkNS
         #region IMFMediaEventGenerator methods.
         // Note: These methods call through to the event queue helper object.
 
-        public void BeginGetEvent(
+        public int BeginGetEvent(
             //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             IntPtr pCallback,
             object punkState)
         {
+            int hr;
+
             TRACE("CWavStream::BeginGetEvent");
             lock (this)
             {
                 CheckShutdown();
-                m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
-        public void EndGetEvent(
+        public int EndGetEvent(
             //IMFAsyncResult pResult,
             IntPtr pResult,
             out IMFMediaEvent ppEvent)
         {
+            int hr;
             TRACE("CWavStream::EndGetEvent");
 
             lock (this)
             {
                 CheckShutdown();
 
-                m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
-        public void GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
+        public int GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
         {
+            int hr;
             TRACE("CWavStream::GetEvent");
 
             // NOTE: 
@@ -747,21 +777,26 @@ namespace WavSinkNS
             }   // release lock
 
             // Now get the event.
-            pQueue.GetEvent(dwFlags, out ppEvent);
+            hr = pQueue.GetEvent(dwFlags, out ppEvent);
+            MFError.ThrowExceptionForHR(hr);
 
             //SAFE_RELEASE(pQueue);
+            return S_Ok;
         }
 
-        public void QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
+        public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
+            int hr;
             TRACE(string.Format("CWavStream::QueueEvent ({0})", met.ToString()));
 
             lock (this)
             {
                 CheckShutdown();
 
-                m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
         #endregion
@@ -773,7 +808,7 @@ namespace WavSinkNS
         // Description: Returns the parent media sink.
         //-------------------------------------------------------------------
 
-        public void GetMediaSink(out IMFMediaSinkAlt ppMediaSink)
+        public int GetMediaSink(out IMFMediaSinkAlt ppMediaSink)
         {
             TRACE("CWavStream::GetMediaSink");
 
@@ -783,6 +818,7 @@ namespace WavSinkNS
 
                 ppMediaSink = (IMFMediaSinkAlt)m_pSink;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -790,7 +826,7 @@ namespace WavSinkNS
         // Description: Returns the stream identifier.
         //-------------------------------------------------------------------
 
-        public void GetIdentifier(out int pdwIdentifier)
+        public int GetIdentifier(out int pdwIdentifier)
         {
             TRACE("CWavStream::GetIdentifier");
 
@@ -800,6 +836,7 @@ namespace WavSinkNS
 
                 pdwIdentifier = CWavSink.WAV_SINK_STREAM_ID;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -807,7 +844,7 @@ namespace WavSinkNS
         // Description: Returns a media type handler for this stream.
         //-------------------------------------------------------------------
 
-        public void GetMediaTypeHandler(out IMFMediaTypeHandler ppHandler)
+        public int GetMediaTypeHandler(out IMFMediaTypeHandler ppHandler)
         {
             TRACE("CWavStream::GetMediaTypeHandler");
 
@@ -818,6 +855,7 @@ namespace WavSinkNS
                 // This stream object acts as its own type handler, so we QI ourselves.
                 ppHandler = (IMFMediaTypeHandler)this;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -828,7 +866,7 @@ namespace WavSinkNS
         //       MEStreamSinkRequestSample event.
         //-------------------------------------------------------------------
 
-        public void ProcessSample(IMFSample pSample)
+        public int ProcessSample(IMFSample pSample)
         {
             TRACE("CWavStream::ProcessSample");
             lock (this)
@@ -853,6 +891,7 @@ namespace WavSinkNS
                     QueueAsyncOperation(CAsyncOperation.StreamOperation.OpProcessSample);
                 }
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -868,7 +907,7 @@ namespace WavSinkNS
         //       types, although this sink does not.
         //-------------------------------------------------------------------
 
-        public void PlaceMarker(
+        public int PlaceMarker(
             MFStreamSinkMarkerType eMarkerType,
             ConstPropVariant pvarMarkerValue,
             ConstPropVariant pvarContextValue)
@@ -898,6 +937,7 @@ namespace WavSinkNS
                     QueueAsyncOperation(CAsyncOperation.StreamOperation.OpPlaceMarker); // Increments ref count on pOp.
                 }
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -905,7 +945,7 @@ namespace WavSinkNS
         // Description: Discards all samples that were not processed yet.
         //-------------------------------------------------------------------
 
-        public void Flush()
+        public int Flush()
         {
             TRACE("CWavStream::Flush");
 
@@ -917,6 +957,7 @@ namespace WavSinkNS
                 // any marker events that were queued.
                 ProcessSamplesFromQueue(FlushState.DropSamples);
             }
+            return S_Ok;
         }
 
         #endregion
@@ -931,13 +972,14 @@ namespace WavSinkNS
         // ppMediaType: Optionally, receives a "close match" media type.
         //-------------------------------------------------------------------
 
-        public void IsMediaTypeSupported(
+        public int IsMediaTypeSupported(
             /* [in] */ IMFMediaType pMediaType,
             // /* [out] */ out IMFMediaType ppMediaType)
             IntPtr ppMediaType) // use IntPtr since this can be NULL
         {
             TRACE("CWavStream::IsMediaTypeSupported");
 
+            int hr;
             Guid majorType;
             WaveFormatEx pWav;
             int cbSize;
@@ -946,7 +988,8 @@ namespace WavSinkNS
             {
                 CheckShutdown();
 
-                pMediaType.GetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, out majorType);
+                hr = pMediaType.GetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, out majorType);
+                MFError.ThrowExceptionForHR(hr);
 
                 // First make sure it's audio. 
                 if (majorType != MFMediaType.Audio)
@@ -955,7 +998,8 @@ namespace WavSinkNS
                 }
 
                 // Get a WAVEFORMATEX structure to validate against.
-                MFExtern.MFCreateWaveFormatExFromMFMediaType(pMediaType, out pWav, out cbSize, MFWaveFormatExConvertFlags.Normal);
+                hr = MFExtern.MFCreateWaveFormatExFromMFMediaType(pMediaType, out pWav, out cbSize, MFWaveFormatExConvertFlags.Normal);
+                MFError.ThrowExceptionForHR(hr);
 
                 // Validate the WAVEFORMATEX structure.
                 ValidateWaveFormat(pWav, cbSize);
@@ -968,6 +1012,7 @@ namespace WavSinkNS
             }
 
             //CoTaskMemFree(pWav);
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -975,7 +1020,7 @@ namespace WavSinkNS
         // Description: Return the number of preferred media types.
         //-------------------------------------------------------------------
 
-        public void GetMediaTypeCount(out int pdwTypeCount)
+        public int GetMediaTypeCount(out int pdwTypeCount)
         {
             TRACE("CWavStream::GetMediaTypeCount");
 
@@ -984,6 +1029,7 @@ namespace WavSinkNS
                 CheckShutdown();
                 pdwTypeCount = CWavSink.g_AudioFormats.Length;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -991,10 +1037,11 @@ namespace WavSinkNS
         // Description: Return a preferred media type by index.
         //-------------------------------------------------------------------
 
-        public void GetMediaTypeByIndex(
+        public int GetMediaTypeByIndex(
             /* [in] */ int dwIndex,
             /* [out] */ out IMFMediaType ppType)
         {
+            int hr;
             TRACE("CWavStream::GetMediaTypeByIndex");
 
             lock (this)
@@ -1009,9 +1056,13 @@ namespace WavSinkNS
                 WaveFormatEx wav;
                 InitializePCMWaveFormat(out wav, CWavSink.g_AudioFormats[dwIndex]);
 
-                MFExtern.MFCreateMediaType(out ppType);
-                MFExtern.MFInitMediaTypeFromWaveFormatEx(ppType, wav, Marshal.SizeOf(typeof(WaveFormatEx)));
+                hr = MFExtern.MFCreateMediaType(out ppType);
+                MFError.ThrowExceptionForHR(hr);
+
+                hr = MFExtern.MFInitMediaTypeFromWaveFormatEx(ppType, wav, Marshal.SizeOf(typeof(WaveFormatEx)));
+                MFError.ThrowExceptionForHR(hr);
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -1019,7 +1070,7 @@ namespace WavSinkNS
         // Description: Set the current media type.
         //-------------------------------------------------------------------
 
-        public void SetCurrentMediaType(IMFMediaType pMediaType)
+        public int SetCurrentMediaType(IMFMediaType pMediaType)
         {
             TRACE("CWavStream::SetCurrentMediaType");
 
@@ -1043,6 +1094,7 @@ namespace WavSinkNS
 
                 m_state = State.Ready;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -1050,7 +1102,7 @@ namespace WavSinkNS
         // Description: Return the current media type, if any.
         //-------------------------------------------------------------------
 
-        public void GetCurrentMediaType(out IMFMediaType ppMediaType)
+        public int GetCurrentMediaType(out IMFMediaType ppMediaType)
         {
             TRACE("CWavStream::GetCurrentMediaType");
             lock (this)
@@ -1064,6 +1116,7 @@ namespace WavSinkNS
 
                 ppMediaType = m_pCurrentType;
             }
+            return S_Ok;
         }
 
         //-------------------------------------------------------------------
@@ -1071,11 +1124,12 @@ namespace WavSinkNS
         // Description: Return the major type GUID.
         //-------------------------------------------------------------------
 
-        public void GetMajorType(out Guid pguidMajorType)
+        public int GetMajorType(out Guid pguidMajorType)
         {
             TRACE("CWavStream::GetMajorType");
 
             pguidMajorType = MFMediaType.Audio;
+            return S_Ok;
         }
 
         #endregion
@@ -1161,6 +1215,7 @@ namespace WavSinkNS
 
         public void Finalize(IMFAsyncCallback pCallback, object punkState)
         {
+            int hr;
             lock (this)
             {
                 ValidateOperation(CAsyncOperation.StreamOperation.OpFinalize);
@@ -1171,7 +1226,8 @@ namespace WavSinkNS
                 }
 
                 // Create and store the async result object.
-                MFExtern.MFCreateAsyncResult(null, pCallback, punkState, out m_pFinalizeResult);
+                hr = MFExtern.MFCreateAsyncResult(null, pCallback, punkState, out m_pFinalizeResult);
+                MFError.ThrowExceptionForHR(hr);
 
                 m_state = State.Finalized;
                 QueueAsyncOperation(CAsyncOperation.StreamOperation.OpFinalize);
@@ -1276,15 +1332,18 @@ namespace WavSinkNS
 
         public void Shutdown()
         {
+            int hr;
             Debug.Assert(!m_IsShutdown);
             GC.SuppressFinalize(this);
 
             if (m_pEventQueue != null)
             {
-                m_pEventQueue.Shutdown();
+                hr = m_pEventQueue.Shutdown();
+                MFError.ThrowExceptionForHR(hr);
             }
 
-            MFExtern.MFUnlockWorkQueue(m_WorkQueueId);
+            hr = MFExtern.MFUnlockWorkQueue(m_WorkQueueId);
+            MFError.ThrowExceptionForHR(hr);
 
             m_SampleQueue.Clear();
 
@@ -1310,9 +1369,11 @@ namespace WavSinkNS
 
         void QueueAsyncOperation(CAsyncOperation.StreamOperation op)
         {
+            int hr;
             CAsyncOperation pOp = new CAsyncOperation(op); // Created with ref count = 1
 
-            MFExtern.MFPutWorkItem(m_WorkQueueId, this, pOp);
+            hr = MFExtern.MFPutWorkItem(m_WorkQueueId, this, pOp);
+            MFError.ThrowExceptionForHR(hr);
 
             //SAFE_RELEASE(pOp);
         }
@@ -1324,12 +1385,15 @@ namespace WavSinkNS
 
         void OnDispatchWorkItem(IMFAsyncResult pAsyncResult)
         {
+            int hr;
+
             // Called by work queue thread. Need to hold the critical section.
             lock (this)
             {
                 object pState = null;
 
-                pAsyncResult.GetState(out pState);
+                hr = pAsyncResult.GetState(out pState);
+                MFError.ThrowExceptionForHR(hr);
 
                 try
                 {
@@ -1481,6 +1545,7 @@ namespace WavSinkNS
 
         void WriteSampleToFile(IMFSample pSample)
         {
+            int hr;
             int i;
             long time;
             int cBufferCount; // Number of buffers in the sample.
@@ -1489,7 +1554,8 @@ namespace WavSinkNS
             int cbWritten = 0;
 
             // Get the time stamp
-            pSample.GetSampleTime(out time);
+            hr = pSample.GetSampleTime(out time);
+            MFError.ThrowExceptionForHR(hr);
 
             // If the time stamp is too early, just discard this sample.
             if (time < m_StartTime)
@@ -1500,22 +1566,28 @@ namespace WavSinkNS
             // Note: If there is no time stamp on the sample, proceed anyway.
 
             // Find how many buffers are in this sample.
-            pSample.GetBufferCount(out cBufferCount);
+            hr = pSample.GetBufferCount(out cBufferCount);
+            MFError.ThrowExceptionForHR(hr);
 
             // Loop through all the buffers in the sample.
             for (int iBuffer = 0; iBuffer < cBufferCount; iBuffer++)
             {
                 IMFMediaBuffer pBuffer = null;
 
-                pSample.GetBufferByIndex(iBuffer, out pBuffer);
+                hr = pSample.GetBufferByIndex(iBuffer, out pBuffer);
+                MFError.ThrowExceptionForHR(hr);
 
                 try
                 {
                     // Lock the buffer and write the data to the file.
-                    pBuffer.Lock(out pData, out i, out cbData);
+                    hr = pBuffer.Lock(out pData, out i, out cbData);
+                    MFError.ThrowExceptionForHR(hr);
 
-                    m_pByteStream.Write(pData, cbData, out cbWritten);
-                    pBuffer.Unlock();
+                    hr = m_pByteStream.Write(pData, cbData, out cbWritten);
+                    MFError.ThrowExceptionForHR(hr);
+
+                    hr = pBuffer.Unlock();
+                    MFError.ThrowExceptionForHR(hr);
 
                     // Update the running tally of bytes written.
                     m_cbDataWritten += cbData;
@@ -1577,7 +1649,8 @@ namespace WavSinkNS
                 // Now we're done writing all of the audio data. 
 
                 // Fill in the RIFF headers...
-                MFExtern.MFCreateWaveFormatExFromMFMediaType(m_pCurrentType, out header.WaveFormat, out cbSize, MFWaveFormatExConvertFlags.Normal);
+                hr = MFExtern.MFCreateWaveFormatExFromMFMediaType(m_pCurrentType, out header.WaveFormat, out cbSize, MFWaveFormatExConvertFlags.Normal);
+                MFError.ThrowExceptionForHR(hr);
 
                 header.FileHeader = new RIFFCHUNK();
                 header.FileHeader.fcc = new FourCC('R', 'I', 'F', 'F');
@@ -1594,14 +1667,16 @@ namespace WavSinkNS
 
                 // Move the file pointer back to the start of the file and write the
                 // RIFF headers.
-                m_pByteStream.SetCurrentPosition(0);
+                hr = m_pByteStream.SetCurrentPosition(0);
+                MFError.ThrowExceptionForHR(hr);
 
                 IntPtr ip = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(WAV_FILE_HEADER)));
 
                 try
                 {
                     Marshal.StructureToPtr(header, ip, false);
-                    m_pByteStream.Write(ip, Marshal.SizeOf(typeof(WAV_FILE_HEADER)), out cbWritten);
+                    hr = m_pByteStream.Write(ip, Marshal.SizeOf(typeof(WAV_FILE_HEADER)), out cbWritten);
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 finally
                 {
@@ -1609,7 +1684,8 @@ namespace WavSinkNS
                 }
 
                 // Close the byte stream.
-                m_pByteStream.Close();
+                hr = m_pByteStream.Close();
+                MFError.ThrowExceptionForHR(hr);
 
                 hr = 0;
             }
@@ -1619,8 +1695,10 @@ namespace WavSinkNS
             }
 
             // Set the async status and invoke the callback.
-            m_pFinalizeResult.SetStatus(hr);
-            MFExtern.MFInvokeCallback(m_pFinalizeResult);
+            hr = m_pFinalizeResult.SetStatus(hr);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFInvokeCallback(m_pFinalizeResult);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void InitializePCMWaveFormat(out WaveFormatEx pWav, PCM_Audio_Format_Params param)
@@ -1696,12 +1774,12 @@ namespace WavSinkNS
     
         #region IMFAsyncCallback Members
 
-        public void  GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
  	        throw new COMException("The method or operation is not implemented.", E_NotImplemented);
         }
 
-        public void  Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
             try
             {
@@ -1711,6 +1789,7 @@ namespace WavSinkNS
             {
                 SafeRelease(pAsyncResult);
             }
+            return S_Ok;
         }
 
         #endregion

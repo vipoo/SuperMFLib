@@ -28,9 +28,11 @@ namespace WriteWavFile
 
         static void Main(string[] args)
         {
+            int hr;
             if (args.Length == 2)
             {
-                MFExtern.MFStartup(0x10070, MFStartup.Full);
+                hr = MFExtern.MFStartup(0x10070, MFStartup.Full);
+                MFError.ThrowExceptionForHR(hr);
 
                 try
                 {
@@ -43,7 +45,8 @@ namespace WriteWavFile
                 }
                 finally
                 {
-                    MFExtern.MFShutdown();
+                    hr = MFExtern.MFShutdown();
+                    MFError.ThrowExceptionForHR(hr);
                 }
             }
             else
@@ -65,7 +68,8 @@ namespace WriteWavFile
             IMFTopology pTopology = null;
             WavSinkNS.CWavSink pObj = null;
 
-            MFExtern.MFCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, sOutputFile, out pStream);
+            int hr = MFExtern.MFCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, sOutputFile, out pStream);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
@@ -81,7 +85,8 @@ namespace WriteWavFile
                 // Run the media session.
                 RunMediaSession(pTopology);
 
-                pSource.Shutdown();
+                hr = pSource.Shutdown();
+                MFError.ThrowExceptionForHR(hr);
             }
             finally
             {
@@ -110,16 +115,19 @@ namespace WriteWavFile
 
         static void RunMediaSession(IMFTopology pTopology)
         {
+            int hr;
             IMFMediaSession pSession;
 
             bool bGetAnotherEvent = true;
             PropVariant varStartPosition = new PropVariant();
 
-            MFExtern.MFCreateMediaSession(null, out pSession);
+            hr = MFExtern.MFCreateMediaSession(null, out pSession);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
-                pSession.SetTopology(0, pTopology);
+                hr = pSession.SetTopology(0, pTopology);
+                MFError.ThrowExceptionForHR(hr);
 
                 while (bGetAnotherEvent)
                 {
@@ -129,12 +137,16 @@ namespace WriteWavFile
 
                     int TopoStatus = (int)MFTopoStatus.Invalid; // Used with MESessionTopologyStatus event.    
 
-                    pSession.GetEvent(MFEventFlag.None, out pEvent);
+                    hr = pSession.GetEvent(MFEventFlag.None, out pEvent);
+                    MFError.ThrowExceptionForHR(hr);
 
                     try
                     {
-                        pEvent.GetStatus(out hrStatus);
-                        pEvent.GetType(out meType);
+                        hr = pEvent.GetStatus(out hrStatus);
+                        MFError.ThrowExceptionForHR(hr);
+
+                        hr = pEvent.GetType(out meType);
+                        MFError.ThrowExceptionForHR(hr);
 
                         if (hrStatus >= 0)
                         {
@@ -146,7 +158,8 @@ namespace WriteWavFile
 
                                 case MediaEventType.MESessionTopologyStatus:
                                     // Get the status code.
-                                    pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out TopoStatus);
+                                    hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out TopoStatus);
+                                    MFError.ThrowExceptionForHR(hr);
                                     switch ((MFTopoStatus)TopoStatus)
                                     {
                                         case MFTopoStatus.Ready:
@@ -166,13 +179,14 @@ namespace WriteWavFile
 
                                 case MediaEventType.MESessionEnded:
                                     Debug.WriteLine("MESessionEnded");
-                                    pSession.Stop();
+                                    hr = pSession.Stop();
                                     break;
 
                                 case MediaEventType.MESessionStopped:
                                     Debug.WriteLine("MESessionStopped");
                                     Console.WriteLine("Attempting to close the media session.");
-                                    pSession.Close();
+                                    hr = pSession.Close();
+                                    MFError.ThrowExceptionForHR(hr);
                                     break;
 
                                 case MediaEventType.MESessionClosed:
@@ -201,7 +215,8 @@ namespace WriteWavFile
                 }
 
                 Debug.WriteLine("Shutting down the media session.");
-                pSession.Shutdown();
+                hr = pSession.Shutdown();
+                MFError.ThrowExceptionForHR(hr);
             }
             finally
             {
@@ -222,23 +237,26 @@ namespace WriteWavFile
 
         static void CreateMediaSource(string sURL, out IMFMediaSource ppSource)
         {
+            int hr;
             IMFSourceResolver pSourceResolver;
             object pSourceUnk;
 
             // Create the source resolver.
-            MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            hr = MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
                 // Use the source resolver to create the media source.
                 MFObjectType ObjectType = MFObjectType.Invalid;
-                pSourceResolver.CreateObjectFromURL(
+                hr = pSourceResolver.CreateObjectFromURL(
                         sURL,                      // URL of the source.
                         MFResolution.MediaSource, // Create a source object.
                         null,                      // Optional property store.
                         out ObjectType,               // Receives the object type. 
                         out pSourceUnk   // Receives a pointer to the source.
                     );
+                MFError.ThrowExceptionForHR(hr);
 
                 // Get the IMFMediaSource interface from the media source.
                 ppSource = (IMFMediaSource)pSourceUnk;
@@ -263,26 +281,31 @@ namespace WriteWavFile
 
         static void CreateTopology(IMFMediaSource pSource, IMFMediaSinkAlt pSink, out IMFTopology ppTopology)
         {
+            int hr;
             IMFPresentationDescriptor pPD = null;
             IMFStreamDescriptor pSD = null;
 
             int cStreams = 0;
             bool fConnected = false;
 
-            MFExtern.MFCreateTopology(out ppTopology);
+            hr = MFExtern.MFCreateTopology(out ppTopology);
+            MFError.ThrowExceptionForHR(hr);
 
-            pSource.CreatePresentationDescriptor(out pPD);
+            hr = pSource.CreatePresentationDescriptor(out pPD);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
-                pPD.GetStreamDescriptorCount(out cStreams);
+                hr = pPD.GetStreamDescriptorCount(out cStreams);
+                MFError.ThrowExceptionForHR(hr);
 
                 Guid majorType;
                 bool fSelected = false;
 
                 for (int iStream = 0; iStream < cStreams; iStream++)
                 {
-                    pPD.GetStreamDescriptorByIndex(iStream, out fSelected, out pSD);
+                    hr = pPD.GetStreamDescriptorByIndex(iStream, out fSelected, out pSD);
+                    MFError.ThrowExceptionForHR(hr);
 
                     try
                     {
@@ -299,7 +322,8 @@ namespace WriteWavFile
                         if (majorType != MFMediaType.Audio)
                         {
                             // Deselect this stream
-                            pPD.DeselectStream(iStream);
+                            hr = pPD.DeselectStream(iStream);
+                            MFError.ThrowExceptionForHR(hr);
 
                             continue;
                         }
@@ -356,24 +380,29 @@ namespace WriteWavFile
             out IMFTopologyNode ppNode          // Receives the node pointer.
             )
         {
+            int hr;
 
             // Create the node.
-            MFExtern.MFCreateTopologyNode(
+            hr = MFExtern.MFCreateTopologyNode(
                 MFTopologyType.SourcestreamNode,
                 out ppNode);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the attributes.
-            ppNode.SetUnknown(
+            hr = ppNode.SetUnknown(
                 MFAttributesClsid.MF_TOPONODE_SOURCE,
                 pSource);
+            MFError.ThrowExceptionForHR(hr);
 
-            ppNode.SetUnknown(
+            hr = ppNode.SetUnknown(
                 MFAttributesClsid.MF_TOPONODE_PRESENTATION_DESCRIPTOR,
                 pPD);
+            MFError.ThrowExceptionForHR(hr);
 
-            ppNode.SetUnknown(
+            hr = ppNode.SetUnknown(
                 MFAttributesClsid.MF_TOPONODE_STREAM_DESCRIPTOR,
                 pSD);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -397,6 +426,7 @@ namespace WriteWavFile
             IMFMediaSinkAlt pSink
             )
         {
+            int hr;
             IMFTopologyNode pSourceNode = null;
             IMFTopologyNode pOutputNode = null;
 
@@ -408,10 +438,14 @@ namespace WriteWavFile
 
                 try
                 {
-                    pTopology.AddNode(pSourceNode);
-                    pTopology.AddNode(pOutputNode);
+                    hr = pTopology.AddNode(pSourceNode);
+                    MFError.ThrowExceptionForHR(hr);
 
-                    pSourceNode.ConnectOutput(0, pOutputNode, 0);
+                    hr = pTopology.AddNode(pOutputNode);
+                    MFError.ThrowExceptionForHR(hr);
+
+                    hr = pSourceNode.ConnectOutput(0, pOutputNode, 0);
+                    MFError.ThrowExceptionForHR(hr);
                 }
                 finally
                 {
@@ -441,12 +475,17 @@ namespace WriteWavFile
 
         static void CreateOutputNode(IMFMediaSinkAlt pSink, int iStream, out IMFTopologyNode ppNode)
         {
+            int hr;
             IMFStreamSinkAlt pStream = null;
 
-            pSink.GetStreamSinkByIndex(iStream, out pStream);
+            hr = pSink.GetStreamSinkByIndex(iStream, out pStream);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFCreateTopologyNode(MFTopologyType.OutputNode, out ppNode);
-            ppNode.SetObject(pStream);
+            hr = MFExtern.MFCreateTopologyNode(MFTopologyType.OutputNode, out ppNode);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = ppNode.SetObject(pStream);
+            MFError.ThrowExceptionForHR(hr);
 
             //Marshal.ReleaseComObject(pStream);
         }
@@ -458,13 +497,16 @@ namespace WriteWavFile
 
         static void GetStreamMajorType(IMFStreamDescriptor pSD, out Guid pMajorType)
         {
+            int hr;
             IMFMediaTypeHandler pHandler;
 
-            pSD.GetMediaTypeHandler(out pHandler);
+            hr = pSD.GetMediaTypeHandler(out pHandler);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
-                pHandler.GetMajorType(out pMajorType);
+                hr = pHandler.GetMajorType(out pMajorType);
+                MFError.ThrowExceptionForHR(hr);
             }
             finally
             {

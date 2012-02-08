@@ -542,7 +542,9 @@ class CPlayer : COMBase, IMFAsyncCallback
 
         Debug.Assert(m_pSession != null);
 
-        int hr = m_pSession.Start(Guid.Empty, new PropVariant());
+        int hr;
+
+        hr = m_pSession.Start(Guid.Empty, new PropVariant());
         MFError.ThrowExceptionForHR(hr);
     }
 

@@ -102,7 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MediaFoundation">
-      <HintPath>..\..\src\bin\Debug\MediaFoundation.dll</HintPath>
+      <HintPath>..\..\lib\MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

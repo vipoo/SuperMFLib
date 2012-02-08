@@ -51,7 +51,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MediaFoundation">
-      <HintPath>..\..\src\bin\Debug\MediaFoundation.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

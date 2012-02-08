@@ -31,6 +31,10 @@ Be aware, this COM object masks an IUknown interface that violates COM rules by 
 set of COM rules (ie identity).  However, it appears that c# is willing to live with the violations this 
 object introduces.
 
+The real fix would be for the people who created the rules for COM/IUnknown to *follow* those rules in
+their MF code.  However, since their failure to do so essentially only affects .Net developers, don't expect 
+to see MS in a hurry to repair these types of problems.
+
 As with all COM objects, this object must be registered with COM before it will work.  If you
 build the project with Visual Studio, it will register it for you.  Otherwise, you can run
 

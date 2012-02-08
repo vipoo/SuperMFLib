@@ -15,5 +15,12 @@ that it loads the Grayscale MFT into the topology.
 This sample requires the MFT_GrayScale sample to have been built and 
 registered (since that's the transform we use!).
 
-The most significant difference has to do with how error handling is performed.
-See "Error handling" in docs\ReadMe.rtf for details.
+There has been a major change to how error handling is done since this sample
+was first released.  Now all COM methods return an int (HRESULT) that must
+explicitly be check to make sure the method worked as expected.  Commonly
+this would be done as:
+
+   int hr;
+
+   hr = iSomething.DoSomething();
+   MFError.ThrowExceptionForHR(hr); // Turn hr into exception if it was an error

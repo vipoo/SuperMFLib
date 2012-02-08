@@ -12,8 +12,15 @@ This sample is a c# version of the WavSink sample included in the
 Media Foundation SDK.  Is the opposite of the WavSource sample: It writes 
 audio output to a .wav file.
 
-The most significant difference has to do with how error handling is performed.
-See "Error handling" in docs\ReadMe.rtf for details.
+There has been a major change to how error handling is done since this sample
+was first released.  Now all COM methods return an int (HRESULT) that must
+explicitly be check to make sure the method worked as expected.  Commonly
+this would be done as:
+
+   int hr;
+
+   hr = iSomething.DoSomething();
+   MFError.ThrowExceptionForHR(hr); // Turn hr into exception if it was an error
 
 After you build this sample, you will need to register it with both COM and MF.  
 In theory, you can do this by clicking the "Register as COM" box in Visual Studio.  

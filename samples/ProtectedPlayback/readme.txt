@@ -12,5 +12,12 @@ This sample is a c# version of the ProtectedPlayback sample included in the
 Media Foundation SDK.  It is the same as the BasicPlayer sample, except that 
 it allows for playing protected content.
 
-The most significant difference has to do with how error handling is performed.
-See "Error handling" in docs\ReadMe.rtf for details.
+There has been a major change to how error handling is done since this sample
+was first released.  Now all COM methods return an int (HRESULT) that must
+explicitly be check to make sure the method worked as expected.  Commonly
+this would be done as:
+
+   int hr;
+
+   hr = iSomething.DoSomething();
+   MFError.ThrowExceptionForHR(hr); // Turn hr into exception if it was an error

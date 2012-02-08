@@ -15,5 +15,12 @@ http://msdn2.microsoft.com/en-us/library/bb530124.aspx
 It shows how to parse/process data from WM files.  Test with 
 c:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\Multimedia\WMP_11\media\smooth.wmv
 
-The most significant difference has to do with how error handling is performed.
-See "Error handling" in docs\ReadMe.rtf for details.
+There has been a major change to how error handling is done since this sample
+was first released.  Now all COM methods return an int (HRESULT) that must
+explicitly be check to make sure the method worked as expected.  Commonly
+this would be done as:
+
+   int hr;
+
+   hr = iSomething.DoSomething();
+   MFError.ThrowExceptionForHR(hr); // Turn hr into exception if it was an error

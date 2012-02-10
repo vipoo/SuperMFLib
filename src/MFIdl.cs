@@ -1025,13 +1025,6 @@ namespace MediaFoundation
         Reserved3 = 7
     }
 
-    [UnmanagedName("MF_QUALITY_ADVISE_FLAGS")]
-    public enum MF_QUALITY_ADVISE_FLAGS
-    {
-        None = 0,
-        CannotKeepUp = 0x1,
-    }
-
     [Flags, UnmanagedName("MF_CONNECT_METHOD")]
     public enum MF_CONNECT_METHOD
     {
@@ -1187,15 +1180,6 @@ namespace MediaFoundation
         public Guid guidAttributeKey;
         public MFAttributeType attrType;
         public Unnamed1 u1;
-    }
-
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("MF_TRANSCODE_SINK_INFO")]
-    public struct MF_TRANSCODE_SINK_INFO
-    {
-        int dwVideoStreamID;
-        IMFMediaType pVideoMediaType;
-        int dwAudioStreamID;
-        IMFMediaType pAudioMediaType;
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("MF_TRANSCODE_SINK_INFO")]

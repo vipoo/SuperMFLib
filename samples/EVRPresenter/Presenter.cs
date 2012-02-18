@@ -51,7 +51,7 @@ namespace EVRPresenter
             IntPtr hwnd
             );
 
-        [DllImport("mf.dll", ExactSpelling = true, CallingConvention=CallingConvention.StdCall), SuppressUnmanagedCodeSecurity]
+        [DllImport("mf.dll", ExactSpelling = true, CallingConvention = CallingConvention.StdCall), SuppressUnmanagedCodeSecurity]
         protected static extern int DllCanUnloadNow();
 
         protected enum RenderState
@@ -227,9 +227,18 @@ namespace EVRPresenter
 
         public int GetDeviceID(out Guid pDeviceID)
         {
-            m_pD3DPresentEngine.GetDeviceID(out pDeviceID);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                m_pD3DPresentEngine.GetDeviceID(out pDeviceID);
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                pDeviceID = Guid.Empty;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -238,108 +247,165 @@ namespace EVRPresenter
 
         public int GetCurrentMediaType(out IMFVideoMediaType ppMediaType)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-
-                if (m_pMediaType == null)
+                lock (this)
                 {
-                    throw new COMException("IMFVideoPresenter.GetCurrentMediaType", MFError.MF_E_NOT_INITIALIZED);
+                    CheckShutdown();
+
+                    if (m_pMediaType == null)
+                    {
+                        throw new COMException("IMFVideoPresenter.GetCurrentMediaType", MFError.MF_E_NOT_INITIALIZED);
+                    }
+
+                    // The function returns an IMFVideoMediaType pointer, and we store our media
+                    // type as an IMFMediaType pointer, so we need to QI.
+
+                    ppMediaType = (IMFVideoMediaType)m_pMediaType;
                 }
 
-                // The function returns an IMFVideoMediaType pointer, and we store our media
-                // type as an IMFMediaType pointer, so we need to QI.
-
-                ppMediaType = (IMFVideoMediaType)m_pMediaType;
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppMediaType = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         int IMFVideoPresenter.OnClockPause(long hnsSystemTime)
         {
-            return ((IMFClockStateSink)this).OnClockPause(hnsSystemTime);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                return ((IMFClockStateSink)this).OnClockPause(hnsSystemTime);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         int IMFVideoPresenter.OnClockRestart(long hnsSystemTime)
         {
-            return ((IMFClockStateSink)this).OnClockRestart(hnsSystemTime);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                return ((IMFClockStateSink)this).OnClockRestart(hnsSystemTime);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         int IMFVideoPresenter.OnClockSetRate(long hnsSystemTime, float flRate)
         {
-            return ((IMFClockStateSink)this).OnClockSetRate(hnsSystemTime, flRate);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                return ((IMFClockStateSink)this).OnClockSetRate(hnsSystemTime, flRate);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         int IMFVideoPresenter.OnClockStart(long hnsSystemTime, long llClockStartOffset)
         {
-            return ((IMFClockStateSink)this).OnClockStart(hnsSystemTime, llClockStartOffset);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                return ((IMFClockStateSink)this).OnClockStart(hnsSystemTime, llClockStartOffset);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         int IMFVideoPresenter.OnClockStop(long hnsSystemTime)
         {
-            return ((IMFClockStateSink)this).OnClockStop(hnsSystemTime);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                return ((IMFClockStateSink)this).OnClockStop(hnsSystemTime);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         int IMFVideoPresenter.ProcessMessage(MFVPMessageType eMessage, IntPtr ulParam)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                //Debug.WriteLine(eMessage);
-
-                CheckShutdown();
-
-                switch (eMessage)
+                lock (this)
                 {
-                    // Flush all pending samples.
-                    case MFVPMessageType.Flush:
-                        Flush();
-                        break;
+                    //Debug.WriteLine(eMessage);
 
-                    // Renegotiate the media type with the mixer.
-                    case MFVPMessageType.InvalidateMediaType:
-                        RenegotiateMediaType();
-                        break;
+                    CheckShutdown();
 
-                    // The mixer received a new input sample.
-                    case MFVPMessageType.ProcessInputNotify:
-                        ProcessInputNotify();
-                        break;
+                    switch (eMessage)
+                    {
+                        // Flush all pending samples.
+                        case MFVPMessageType.Flush:
+                            Flush();
+                            break;
 
-                    // Streaming is about to start.
-                    case MFVPMessageType.BeginStreaming:
-                        BeginStreaming();
-                        break;
+                        // Renegotiate the media type with the mixer.
+                        case MFVPMessageType.InvalidateMediaType:
+                            RenegotiateMediaType();
+                            break;
 
-                    // Streaming has ended. (The EVR has stopped.)
-                    case MFVPMessageType.EndStreaming:
-                        EndStreaming();
-                        break;
+                        // The mixer received a new input sample.
+                        case MFVPMessageType.ProcessInputNotify:
+                            ProcessInputNotify();
+                            break;
 
-                    // All input streams have ended.
-                    case MFVPMessageType.EndOfStream:
-                        // Set the EOS flag.
-                        m_bEndStreaming = true;
-                        // Check if it's time to send the EC_COMPLETE event to the EVR.
-                        CheckEndOfStream();
-                        break;
+                        // Streaming is about to start.
+                        case MFVPMessageType.BeginStreaming:
+                            BeginStreaming();
+                            break;
 
-                    // Frame-stepping is starting.
-                    case MFVPMessageType.Step:
-                        PrepareFrameStep(ulParam.ToInt32());
-                        break;
+                        // Streaming has ended. (The EVR has stopped.)
+                        case MFVPMessageType.EndStreaming:
+                            EndStreaming();
+                            break;
 
-                    // Cancels frame-stepping.
-                    case MFVPMessageType.CancelStep:
-                        CancelFrameStep();
-                        break;
+                        // All input streams have ended.
+                        case MFVPMessageType.EndOfStream:
+                            // Set the EOS flag.
+                            m_bEndStreaming = true;
+                            // Check if it's time to send the EC_COMPLETE event to the EVR.
+                            CheckEndOfStream();
+                            break;
 
-                    default:
-                        throw new COMException("ProcessMessage", E_InvalidArgument); // Unknown message. (This case should never occur.)
+                        // Frame-stepping is starting.
+                        case MFVPMessageType.Step:
+                            PrepareFrameStep(ulParam.ToInt32());
+                            break;
+
+                        // Cancels frame-stepping.
+                        case MFVPMessageType.CancelStep:
+                            CancelFrameStep();
+                            break;
+
+                        default:
+                            throw new COMException("ProcessMessage", E_InvalidArgument); // Unknown message. (This case should never occur.)
+                    }
                 }
-            }
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -348,134 +414,174 @@ namespace EVRPresenter
 
         public int OnClockPause(long hnsSystemTime)
         {
-            TRACE(("OnClockPause"));
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // We cannot pause the clock after shutdown.
-                CheckShutdown();
+                TRACE(("OnClockPause"));
 
-                // Set the state. (No other actions are necessary.)
-                m_RenderState = RenderState.Paused;
+                lock (this)
+                {
+                    // We cannot pause the clock after shutdown.
+                    CheckShutdown();
+
+                    // Set the state. (No other actions are necessary.)
+                    m_RenderState = RenderState.Paused;
+                }
+
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int OnClockRestart(long hnsSystemTime)
         {
-            TRACE(("OnClockRestart"));
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE(("OnClockRestart"));
 
-                // The EVR calls OnClockRestart only while paused.
-                Debug.Assert(m_RenderState == RenderState.Paused);
+                lock (this)
+                {
+                    CheckShutdown();
 
-                m_RenderState = RenderState.Started;
+                    // The EVR calls OnClockRestart only while paused.
+                    Debug.Assert(m_RenderState == RenderState.Paused);
 
-                // Possibly we are in the middle of frame-stepping OR we have samples waiting
-                // in the frame-step queue. Deal with these two cases first:
-                StartFrameStep();
+                    m_RenderState = RenderState.Started;
 
-                // Now resume the presentation loop.
-                ProcessOutputLoop();
+                    // Possibly we are in the middle of frame-stepping OR we have samples waiting
+                    // in the frame-step queue. Deal with these two cases first:
+                    StartFrameStep();
+
+                    // Now resume the presentation loop.
+                    ProcessOutputLoop();
+                }
+
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int OnClockSetRate(long hnsSystemTime, float flRate)
         {
-            TRACE(string.Format("OnClockSetRate (rate={0})", flRate));
-
-            // Note:
-            // The presenter reports its maximum rate through the IMFRateSupport interface.
-            // Here, we assume that the EVR honors the maximum rate.
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE(string.Format("OnClockSetRate (rate={0})", flRate));
 
-                // If the rate is changing from zero (scrubbing) to non-zero, cancel the
-                // frame-step operation.
-                if ((m_fRate == 0.0f) && (flRate != 0.0f))
+                // Note:
+                // The presenter reports its maximum rate through the IMFRateSupport interface.
+                // Here, we assume that the EVR honors the maximum rate.
+
+                lock (this)
                 {
-                    CancelFrameStep();
-                    m_FrameStep.samples.Clear();
+                    CheckShutdown();
+
+                    // If the rate is changing from zero (scrubbing) to non-zero, cancel the
+                    // frame-step operation.
+                    if ((m_fRate == 0.0f) && (flRate != 0.0f))
+                    {
+                        CancelFrameStep();
+                        m_FrameStep.samples.Clear();
+                    }
+
+                    m_fRate = flRate;
+
+                    // Tell the scheduler about the new rate.
+                    m_scheduler.SetClockRate(flRate);
                 }
 
-                m_fRate = flRate;
-
-                // Tell the scheduler about the new rate.
-                m_scheduler.SetClockRate(flRate);
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int OnClockStart(long hnsSystemTime, long llClockStartOffset)
         {
-            TRACE(String.Format("OnClockStart (offset = {0})", llClockStartOffset));
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // We cannot start after shutdown.
-                CheckShutdown();
+                TRACE(String.Format("OnClockStart (offset = {0})", llClockStartOffset));
 
-                // Check if the clock is already active (not stopped).
-                if (IsActive())
+                lock (this)
                 {
-                    // May have been paused
-                    m_RenderState = RenderState.Started;
+                    // We cannot start after shutdown.
+                    CheckShutdown();
 
-                    // If the clock position changes while the clock is active, it
-                    // is a seek request. We need to flush all pending samples.
-                    if (llClockStartOffset != PRESENTATION_CURRENT_POSITION)
+                    // Check if the clock is already active (not stopped).
+                    if (IsActive())
                     {
-                        Flush();
+                        // May have been paused
+                        m_RenderState = RenderState.Started;
+
+                        // If the clock position changes while the clock is active, it
+                        // is a seek request. We need to flush all pending samples.
+                        if (llClockStartOffset != PRESENTATION_CURRENT_POSITION)
+                        {
+                            Flush();
+                        }
                     }
-                }
-                else
-                {
-                    // The clock has started from the stopped state.
-                    m_RenderState = RenderState.Started;
+                    else
+                    {
+                        // The clock has started from the stopped state.
+                        m_RenderState = RenderState.Started;
 
-                    // Possibly we are in the middle of frame-stepping OR have samples waiting
-                    // in the frame-step queue. Deal with these two cases first:
-                    StartFrameStep();
+                        // Possibly we are in the middle of frame-stepping OR have samples waiting
+                        // in the frame-step queue. Deal with these two cases first:
+                        StartFrameStep();
+                    }
+
+                    // Now try to get new output samples from the mixer.
+                    ProcessOutputLoop();
                 }
 
-                // Now try to get new output samples from the mixer.
-                ProcessOutputLoop();
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int OnClockStop(long hnsSystemTime)
         {
-            TRACE(("OnClockStop"));
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE(("OnClockStop"));
 
-                if (m_RenderState != RenderState.Stopped)
+                lock (this)
                 {
-                    m_RenderState = RenderState.Stopped;
-                    Flush();
+                    CheckShutdown();
 
-                    // If we are in the middle of frame-stepping, cancel it now.
-                    if (m_FrameStep.state != FrameStepRate.None)
+                    if (m_RenderState != RenderState.Stopped)
                     {
-                        CancelFrameStep();
+                        m_RenderState = RenderState.Stopped;
+                        Flush();
+
+                        // If we are in the middle of frame-stepping, cancel it now.
+                        if (m_FrameStep.state != FrameStepRate.None)
+                        {
+                            CancelFrameStep();
+                        }
                     }
                 }
-            }
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -484,75 +590,101 @@ namespace EVRPresenter
 
         public int GetFastestRate(MFRateDirection eDirection, bool fThin, out float pflRate)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                float fMaxRate = 0.0f;
-
-                CheckShutdown();
-
-                // Get the maximum *forward* rate.
-                fMaxRate = GetMaxRate(fThin);
-
-                // For reverse playback, it's the negative of fMaxRate.
-                if (eDirection == MFRateDirection.Reverse)
+                lock (this)
                 {
-                    fMaxRate = -fMaxRate;
+                    float fMaxRate = 0.0f;
+
+                    CheckShutdown();
+
+                    // Get the maximum *forward* rate.
+                    fMaxRate = GetMaxRate(fThin);
+
+                    // For reverse playback, it's the negative of fMaxRate.
+                    if (eDirection == MFRateDirection.Reverse)
+                    {
+                        fMaxRate = -fMaxRate;
+                    }
+
+                    pflRate = fMaxRate;
                 }
 
-                pflRate = fMaxRate;
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                pflRate = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetSlowestRate(MFRateDirection eDirection, bool fThin, out float pflRate)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                lock (this)
+                {
+                    CheckShutdown();
 
-                // There is no minimum playback rate, so the minimum is zero.
-                pflRate = 0;
+                    // There is no minimum playback rate, so the minimum is zero.
+                    pflRate = 0;
+                }
+
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                pflRate = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int IsRateSupported(bool fThin, float flRate, MfFloat pflNearestSupportedRate)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                float fMaxRate = 0.0f;
-                float fNearestRate = flRate;   // If we support fRate, then fRate *is* the nearest.
-
-                CheckShutdown();
-
-                // Find the maximum forward rate.
-                // Note: We have no minimum rate (ie, we support anything down to 0).
-                fMaxRate = GetMaxRate(fThin);
-
-                if (Math.Abs(flRate) > fMaxRate)
+                lock (this)
                 {
-                    // The nearest supported rate is fMaxRate.
-                    fNearestRate = fMaxRate;
-                    if (flRate < 0)
+                    float fMaxRate = 0.0f;
+                    float fNearestRate = flRate;   // If we support fRate, then fRate *is* the nearest.
+
+                    CheckShutdown();
+
+                    // Find the maximum forward rate.
+                    // Note: We have no minimum rate (ie, we support anything down to 0).
+                    fMaxRate = GetMaxRate(fThin);
+
+                    if (Math.Abs(flRate) > fMaxRate)
                     {
-                        // Negative for reverse playback.
-                        fNearestRate = -fNearestRate;
+                        // The nearest supported rate is fMaxRate.
+                        fNearestRate = fMaxRate;
+                        if (flRate < 0)
+                        {
+                            // Negative for reverse playback.
+                            fNearestRate = -fNearestRate;
+                        }
+
+                        // The (absolute) requested rate exceeds the maximum rate.
+                        throw new COMException("IsRateSupported", MFError.MF_E_UNSUPPORTED_RATE);
                     }
 
-                    // The (absolute) requested rate exceeds the maximum rate.
-                    throw new COMException("IsRateSupported", MFError.MF_E_UNSUPPORTED_RATE);
+                    // Return the nearest supported rate.
+                    if (pflNearestSupportedRate != null)
+                    {
+                        pflNearestSupportedRate = fNearestRate;
+                    }
                 }
 
-                // Return the nearest supported rate.
-                if (pflNearestSupportedRate != null)
-                {
-                    pflNearestSupportedRate = fNearestRate;
-                }
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -561,54 +693,63 @@ namespace EVRPresenter
 
         public int GetService(Guid guidService, Guid riid, out IntPtr ppvObject)
         {
-            ppvObject = IntPtr.Zero;
-            int hr = 0;
-
-            // The only service GUID that we support is MR_VIDEO_RENDER_SERVICE.
-            if (guidService != MFServices.MR_VIDEO_RENDER_SERVICE)
-            {
-                throw new COMException("EVRCustomPresenter::GetService", MFError.MF_E_UNSUPPORTED_SERVICE);
-            }
-
-            bool bAgain = false;
-            // First try to get the service interface from the D3DPresentEngine object.
+            // Make sure we *never* leave this entry point with an exception
             try
             {
-                object o;
+                ppvObject = IntPtr.Zero;
+                int hr = 0;
 
-                m_pD3DPresentEngine.GetService(guidService, riid, out o);
-                IntPtr ip = Marshal.GetIUnknownForObject(o);
-                Marshal.Release(ip);
+                // The only service GUID that we support is MR_VIDEO_RENDER_SERVICE.
+                if (guidService != MFServices.MR_VIDEO_RENDER_SERVICE)
+                {
+                    throw new COMException("EVRCustomPresenter::GetService", MFError.MF_E_UNSUPPORTED_SERVICE);
+                }
 
-                hr = Marshal.QueryInterface(ip, ref riid, out ppvObject);
-                DsError.ThrowExceptionForHR(hr);
-            }
-            catch
-            {
-                bAgain = true;
-            }
-
-            if (bAgain)
-            {
-                // Next, QI to check if this object supports the interface.
-                IntPtr ipThis = Marshal.GetIUnknownForObject(this);
-
+                bool bAgain = false;
+                // First try to get the service interface from the D3DPresentEngine object.
                 try
                 {
-                    hr = Marshal.QueryInterface(ipThis, ref riid, out ppvObject);
+                    object o;
 
-                    if (hr < 0)
-                    {
-                        Marshal.ThrowExceptionForHR(hr);
-                    }
+                    m_pD3DPresentEngine.GetService(guidService, riid, out o);
+                    IntPtr ip = Marshal.GetIUnknownForObject(o);
+                    Marshal.Release(ip);
+
+                    hr = Marshal.QueryInterface(ip, ref riid, out ppvObject);
+                    DsError.ThrowExceptionForHR(hr);
                 }
-                finally
+                catch
                 {
-                    Marshal.Release(ipThis); // Release GetIUnknownForObject
+                    bAgain = true;
                 }
 
+                if (bAgain)
+                {
+                    // Next, QI to check if this object supports the interface.
+                    IntPtr ipThis = Marshal.GetIUnknownForObject(this);
+
+                    try
+                    {
+                        hr = Marshal.QueryInterface(ipThis, ref riid, out ppvObject);
+
+                        if (hr < 0)
+                        {
+                            Marshal.ThrowExceptionForHR(hr);
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.Release(ipThis); // Release GetIUnknownForObject
+                    }
+
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppvObject = IntPtr.Zero;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -618,126 +759,142 @@ namespace EVRPresenter
         //public void InitServicePointers(IMFTopologyServiceLookup pLookup)
         public int InitServicePointers(IntPtr p1Lookup)
         {
-            TRACE(("InitServicePointers"));
-
-            int hr;
-            int dwObjectCount = 0;
-            IMFTopologyServiceLookup pLookup = null;
-            IHack h1 = (IHack)new Hack();
-
+            // Make sure we *never* leave this entry point with an exception
             try
             {
-                h1.Set(p1Lookup, typeof(IMFTopologyServiceLookup).GUID, true);
+                TRACE(("InitServicePointers"));
 
-                pLookup = (IMFTopologyServiceLookup)h1;
+                int hr;
+                int dwObjectCount = 0;
+                IMFTopologyServiceLookup pLookup = null;
+                IHack h1 = (IHack)new Hack();
 
-                lock (this)
+                try
                 {
-                    // Do not allow initializing when playing or paused.
-                    if (IsActive())
+                    h1.Set(p1Lookup, typeof(IMFTopologyServiceLookup).GUID, true);
+
+                    pLookup = (IMFTopologyServiceLookup)h1;
+
+                    lock (this)
                     {
-                        throw new COMException("EVRCustomPresenter::InitServicePointers", MFError.MF_E_INVALIDREQUEST);
-                    }
+                        // Do not allow initializing when playing or paused.
+                        if (IsActive())
+                        {
+                            throw new COMException("EVRCustomPresenter::InitServicePointers", MFError.MF_E_INVALIDREQUEST);
+                        }
 
-                    SafeRelease(m_pClock); m_pClock = null;
-                    SafeRelease(m_pMixer); m_pMixer = null;
-                    SafeRelease(m_h2); m_h2 = null;
-                    m_pMediaEventSink = null; // SafeRelease(m_pMediaEventSink);
+                        SafeRelease(m_pClock); m_pClock = null;
+                        SafeRelease(m_pMixer); m_pMixer = null;
+                        SafeRelease(m_h2); m_h2 = null;
+                        m_pMediaEventSink = null; // SafeRelease(m_pMediaEventSink);
 
-                    dwObjectCount = 1;
-                    object[] o = new object[1];
+                        dwObjectCount = 1;
+                        object[] o = new object[1];
 
-                    try
-                    {
-                        // Ask for the clock. Optional, because the EVR might not have a clock.
+                        try
+                        {
+                            // Ask for the clock. Optional, because the EVR might not have a clock.
+                            hr = pLookup.LookupService(
+                                MFServiceLookupType.Global,   // Not used.
+                                0,                          // Reserved.
+                                MFServices.MR_VIDEO_RENDER_SERVICE,    // Service to look up.
+                                typeof(IMFClock).GUID,         // Interface to look up.
+                                o,
+                                ref dwObjectCount              // Number of elements in the previous parameter.
+                                );
+                            MFError.ThrowExceptionForHR(hr);
+                            m_pClock = (IMFClock)o[0];
+                        }
+                        catch { }
+
+                        // Ask for the mixer. (Required.)
+                        dwObjectCount = 1;
+
                         hr = pLookup.LookupService(
-                            MFServiceLookupType.Global,   // Not used.
-                            0,                          // Reserved.
-                            MFServices.MR_VIDEO_RENDER_SERVICE,    // Service to look up.
-                            typeof(IMFClock).GUID,         // Interface to look up.
+                            MFServiceLookupType.Global,
+                            0,
+                            MFServices.MR_VIDEO_MIXER_SERVICE,
+                            typeof(IMFTransform).GUID,
                             o,
-                            ref dwObjectCount              // Number of elements in the previous parameter.
+                            ref dwObjectCount
                             );
                         MFError.ThrowExceptionForHR(hr);
-                        m_pClock = (IMFClock)o[0];
+                        m_pMixer = (IMFTransform)o[0];
+
+                        // Make sure that we can work with this mixer.
+                        ConfigureMixer(m_pMixer);
+
+                        // Ask for the EVR's event-sink interface. (Required.)
+                        dwObjectCount = 1;
+
+                        IMFTopologyServiceLookupAlt pLookup2 = (IMFTopologyServiceLookupAlt)pLookup;
+                        IntPtr[] p2 = new IntPtr[1];
+
+                        hr = pLookup2.LookupService(
+                            MFServiceLookupType.Global,
+                            0,
+                            MFServices.MR_VIDEO_RENDER_SERVICE,
+                            typeof(IMediaEventSink).GUID,
+                            p2,
+                            ref dwObjectCount
+                            );
+                        MFError.ThrowExceptionForHR(hr);
+
+                        m_h2 = (IHack)new Hack();
+
+                        m_h2.Set(p2[0], typeof(IMediaEventSink).GUID, false);
+
+                        m_pMediaEventSink = (IMediaEventSink)m_h2;
+
+                        // Successfully initialized. Set the state to "stopped."
+                        m_RenderState = RenderState.Stopped;
                     }
-                    catch { }
-
-                    // Ask for the mixer. (Required.)
-                    dwObjectCount = 1;
-
-                    hr = pLookup.LookupService(
-                        MFServiceLookupType.Global,
-                        0,
-                        MFServices.MR_VIDEO_MIXER_SERVICE,
-                        typeof(IMFTransform).GUID,
-                        o,
-                        ref dwObjectCount
-                        );
-                    MFError.ThrowExceptionForHR(hr);
-                    m_pMixer = (IMFTransform)o[0];
-
-                    // Make sure that we can work with this mixer.
-                    ConfigureMixer(m_pMixer);
-
-                    // Ask for the EVR's event-sink interface. (Required.)
-                    dwObjectCount = 1;
-
-                    IMFTopologyServiceLookupAlt pLookup2 = (IMFTopologyServiceLookupAlt)pLookup;
-                    IntPtr[] p2 = new IntPtr[1];
-
-                    hr = pLookup2.LookupService(
-                        MFServiceLookupType.Global,
-                        0,
-                        MFServices.MR_VIDEO_RENDER_SERVICE,
-                        typeof(IMediaEventSink).GUID,
-                        p2,
-                        ref dwObjectCount
-                        );
-                    MFError.ThrowExceptionForHR(hr);
-
-                    m_h2 = (IHack)new Hack();
-
-                    m_h2.Set(p2[0], typeof(IMediaEventSink).GUID, false);
-
-                    m_pMediaEventSink = (IMediaEventSink)m_h2;
-
-                    // Successfully initialized. Set the state to "stopped."
-                    m_RenderState = RenderState.Stopped;
                 }
+                finally
+                {
+                    SafeRelease(h1);
+                }
+                return S_Ok;
             }
-            finally
+            catch (Exception e)
             {
-                SafeRelease(h1);
+                return Marshal.GetHRForException(e);
             }
-            return S_Ok;
         }
 
         public int ReleaseServicePointers()
         {
-            TRACE(("ReleaseServicePointers"));
-
-            // Enter the shut-down state.
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                lock (this)
+                TRACE(("ReleaseServicePointers"));
+
+                // Enter the shut-down state.
                 {
-                    m_RenderState = RenderState.Shutdown;
+                    lock (this)
+                    {
+                        m_RenderState = RenderState.Shutdown;
+                    }
                 }
+
+                // Flush any samples that were scheduled.
+                Flush();
+
+                // Clear the media type and release related resources (surfaces, etc).
+                SetMediaType(null);
+
+                // Release all services that were acquired from InitServicePointers.
+                SafeRelease(m_pClock); m_pClock = null;
+                SafeRelease(m_pMixer); m_pMixer = null;
+                SafeRelease(m_h2); m_h2 = null;
+                m_pMediaEventSink = null; // SafeRelease(m_pMediaEventSink);
+
+                return S_Ok;
             }
-
-            // Flush any samples that were scheduled.
-            Flush();
-
-            // Clear the media type and release related resources (surfaces, etc).
-            SetMediaType(null);
-
-            // Release all services that were acquired from InitServicePointers.
-            SafeRelease(m_pClock); m_pClock = null;
-            SafeRelease(m_pMixer); m_pMixer = null;
-            SafeRelease(m_h2); m_h2 = null;
-            m_pMediaEventSink = null; // SafeRelease(m_pMediaEventSink);
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -746,219 +903,355 @@ namespace EVRPresenter
 
         public int GetAspectRatioMode(out MFVideoAspectRatioMode pdwAspectRatioMode)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                pdwAspectRatioMode = MFVideoAspectRatioMode.None;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetBorderColor(out int pClr)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                pClr = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetCurrentImage(MediaFoundation.Misc.BitmapInfoHeader pBih, out IntPtr pDib, out int pcbDib, out long pTimeStamp)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                pTimeStamp = 0;
+                pDib = IntPtr.Zero;
+                pcbDib = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetFullscreen(out bool pfFullscreen)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                pfFullscreen = false;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetIdealVideoSize(Size pszMin, Size pszMax)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetNativeVideoSize(Size pszVideo, Size pszARVideo)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetRenderingPrefs(out MFVideoRenderPrefs pdwRenderFlags)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                pdwRenderFlags = MFVideoRenderPrefs.None;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetAspectRatioMode(MFVideoAspectRatioMode dwAspectRatioMode)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetBorderColor(int Clr)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetFullscreen(bool fFullscreen)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetRenderingPrefs(MFVideoRenderPrefs dwRenderFlags)
         {
-            throw new NotImplementedException("The method or operation is not implemented.");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException("The method or operation is not implemented.");
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetVideoPosition(MFVideoNormalizedRect pnrcSource, MFRect prcDest)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-
-                // Validate parameters.
-
-                // One parameter can be NULL, but not both.
-                if (pnrcSource == null && prcDest == null)
+                lock (this)
                 {
-                    throw new COMException("EVRCustomPresenter::SetVideoPosition", E_Pointer);
-                }
 
-                // Validate the rectangles.
-                if (pnrcSource != null)
-                {
-                    // The source rectangle cannot be flipped.
-                    if ((pnrcSource.left > pnrcSource.right) ||
-                        (pnrcSource.top > pnrcSource.bottom))
+                    // Validate parameters.
+
+                    // One parameter can be NULL, but not both.
+                    if (pnrcSource == null && prcDest == null)
                     {
-                        throw new COMException("Bad source", E_InvalidArgument);
+                        throw new COMException("EVRCustomPresenter::SetVideoPosition", E_Pointer);
                     }
 
-                    // The source rectangle has range (0..1)
-                    if ((pnrcSource.left < 0) || (pnrcSource.right > 1) ||
-                        (pnrcSource.top < 0) || (pnrcSource.bottom > 1))
+                    // Validate the rectangles.
+                    if (pnrcSource != null)
                     {
-                        throw new COMException("source has invalid values", E_InvalidArgument);
+                        // The source rectangle cannot be flipped.
+                        if ((pnrcSource.left > pnrcSource.right) ||
+                            (pnrcSource.top > pnrcSource.bottom))
+                        {
+                            throw new COMException("Bad source", E_InvalidArgument);
+                        }
+
+                        // The source rectangle has range (0..1)
+                        if ((pnrcSource.left < 0) || (pnrcSource.right > 1) ||
+                            (pnrcSource.top < 0) || (pnrcSource.bottom > 1))
+                        {
+                            throw new COMException("source has invalid values", E_InvalidArgument);
+                        }
                     }
-                }
 
-                if (prcDest != null)
-                {
-                    // The destination rectangle cannot be flipped.
-                    if ((prcDest.left > prcDest.right) ||
-                        (prcDest.top > prcDest.bottom))
+                    if (prcDest != null)
                     {
-                        throw new COMException("bad destination", E_InvalidArgument);
+                        // The destination rectangle cannot be flipped.
+                        if ((prcDest.left > prcDest.right) ||
+                            (prcDest.top > prcDest.bottom))
+                        {
+                            throw new COMException("bad destination", E_InvalidArgument);
+                        }
                     }
-                }
 
-                // Update the source rectangle. Source clipping is performed by the mixer.
-                if (pnrcSource != null)
-                {
-                    m_nrcSource.CopyFrom(pnrcSource);
-
-                    if (m_pMixer != null)
+                    // Update the source rectangle. Source clipping is performed by the mixer.
+                    if (pnrcSource != null)
                     {
-                        SetMixerSourceRect(m_pMixer, m_nrcSource);
-                    }
-                }
+                        m_nrcSource.CopyFrom(pnrcSource);
 
-                // Update the destination rectangle.
-                if (prcDest != null)
-                {
-                    MFRect rcOldDest = m_pD3DPresentEngine.GetDestinationRect();
-
-                    // Check if the destination rectangle changed.
-                    if (!rcOldDest.Equals(prcDest))
-                    {
-                        m_pD3DPresentEngine.SetDestinationRect(prcDest);
-
-                        // Set a new media type on the mixer.
                         if (m_pMixer != null)
                         {
-                            try
+                            SetMixerSourceRect(m_pMixer, m_nrcSource);
+                        }
+                    }
+
+                    // Update the destination rectangle.
+                    if (prcDest != null)
+                    {
+                        MFRect rcOldDest = m_pD3DPresentEngine.GetDestinationRect();
+
+                        // Check if the destination rectangle changed.
+                        if (!rcOldDest.Equals(prcDest))
+                        {
+                            m_pD3DPresentEngine.SetDestinationRect(prcDest);
+
+                            // Set a new media type on the mixer.
+                            if (m_pMixer != null)
                             {
-                                RenegotiateMediaType();
-                            }
-                            catch (COMException e)
-                            {
-                                if (e.ErrorCode == MFError.MF_E_TRANSFORM_TYPE_NOT_SET)
+                                try
                                 {
-                                    // This error means that the mixer is not ready for the media type.
-                                    // Not a failure case -- the EVR will notify us when we need to set
-                                    // the type on the mixer.
+                                    RenegotiateMediaType();
                                 }
-                                else
+                                catch (COMException e)
                                 {
-                                    throw;
+                                    if (e.ErrorCode == MFError.MF_E_TRANSFORM_TYPE_NOT_SET)
+                                    {
+                                        // This error means that the mixer is not ready for the media type.
+                                        // Not a failure case -- the EVR will notify us when we need to set
+                                        // the type on the mixer.
+                                    }
+                                    else
+                                    {
+                                        throw;
+                                    }
                                 }
+                                // The media type changed. Request a repaint of the current frame.
+                                m_bRepaint = true;
+                                ProcessOutput(); // Ignore errors, the mixer might not have a video frame.
                             }
-                            // The media type changed. Request a repaint of the current frame.
-                            m_bRepaint = true;
-                            ProcessOutput(); // Ignore errors, the mixer might not have a video frame.
                         }
                     }
                 }
-            }
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetVideoWindow(IntPtr hwndVideo)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                if (!IsWindow(hwndVideo))
+                lock (this)
                 {
-                    throw new COMException("Invalid window handle", E_InvalidArgument);
+                    if (!IsWindow(hwndVideo))
+                    {
+                        throw new COMException("Invalid window handle", E_InvalidArgument);
+                    }
+
+                    IntPtr oldHwnd = m_pD3DPresentEngine.GetVideoWindow();
+
+                    // If the window has changed, notify the D3DPresentEngine object.
+                    // This will cause a new Direct3D device to be created.
+                    if (oldHwnd != hwndVideo)
+                    {
+                        m_pD3DPresentEngine.SetVideoWindow(hwndVideo);
+
+                        // Tell the EVR that the device has changed.
+                        NotifyEvent(EventCode.DisplayChanged, IntPtr.Zero, IntPtr.Zero);
+                    }
                 }
 
-                IntPtr oldHwnd = m_pD3DPresentEngine.GetVideoWindow();
-
-                // If the window has changed, notify the D3DPresentEngine object.
-                // This will cause a new Direct3D device to be created.
-                if (oldHwnd != hwndVideo)
-                {
-                    m_pD3DPresentEngine.SetVideoWindow(hwndVideo);
-
-                    // Tell the EVR that the device has changed.
-                    NotifyEvent(EventCode.DisplayChanged, IntPtr.Zero, IntPtr.Zero);
-                }
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetVideoPosition(MFVideoNormalizedRect pnrcSource, MFRect prcDest)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                if (pnrcSource == null || prcDest == null)
+                lock (this)
                 {
-                    throw new COMException("EVRCustomPresenter::GetVideoPosition", E_Pointer);
+                    if (pnrcSource == null || prcDest == null)
+                    {
+                        throw new COMException("EVRCustomPresenter::GetVideoPosition", E_Pointer);
+                    }
+
+                    pnrcSource.CopyFrom(m_nrcSource);
+                    prcDest.CopyFrom(m_pD3DPresentEngine.GetDestinationRect());
                 }
 
-                pnrcSource.CopyFrom(m_nrcSource);
-                prcDest.CopyFrom(m_pD3DPresentEngine.GetDestinationRect());
+                return S_Ok;
             }
-
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetVideoWindow(out IntPtr phwndVideo)
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // The D3DPresentEngine object stores the handle.
-                phwndVideo = m_pD3DPresentEngine.GetVideoWindow();
-            }
+                lock (this)
+                {
+                    // The D3DPresentEngine object stores the handle.
+                    phwndVideo = m_pD3DPresentEngine.GetVideoWindow();
+                }
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                phwndVideo = IntPtr.Zero;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int RepaintVideo()
         {
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-
-                // Ignore the request if we have not presented any samples yet.
-                if (m_bPrerolled)
+                lock (this)
                 {
-                    m_bRepaint = true;
-                    ProcessOutput();
-                }
-            }
+                    CheckShutdown();
 
-            return S_Ok;
+                    // Ignore the request if we have not presented any samples yet.
+                    if (m_bPrerolled)
+                    {
+                        m_bRepaint = true;
+                        ProcessOutput();
+                    }
+                }
+
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -967,21 +1260,39 @@ namespace EVRPresenter
 
         public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
-            throw new NotImplementedException();
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                throw new NotImplementedException();
+            }
+            catch (Exception e)
+            {
+                pdwQueue = MFAsyncCallbackQueue.Undefined;
+                pdwFlags = MFASync.None;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int Invoke(IMFAsyncResult pAsyncResult)
         {
+            // Make sure we *never* leave this entry point with an exception
             try
             {
-                OnSampleFree(pAsyncResult);
-            }
-            finally
-            {
-                SafeRelease(pAsyncResult);
-            }
+                try
+                {
+                    OnSampleFree(pAsyncResult);
+                }
+                finally
+                {
+                    SafeRelease(pAsyncResult);
+                }
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -990,38 +1301,92 @@ namespace EVRPresenter
 
         public int get_FramesDroppedInRenderer(out int pcFrames)
         {
-            pcFrames = m_iDiscarded;
-            return S_Ok;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                pcFrames = m_iDiscarded;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                pcFrames = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int get_FramesDrawn(out int pcFramesDrawn)
         {
-            pcFramesDrawn = m_pD3DPresentEngine.GetFrames();
-            return S_Ok;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                pcFramesDrawn = m_pD3DPresentEngine.GetFrames();
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                pcFramesDrawn = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int get_AvgFrameRate(out int piAvgFrameRate)
         {
-            piAvgFrameRate = 0;
-            return E_NotImplemented;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                piAvgFrameRate = 0;
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                piAvgFrameRate = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int get_Jitter(out int iJitter)
         {
-            iJitter = 0;
-            return E_NotImplemented;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                iJitter = 0;
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                iJitter = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int get_AvgSyncOffset(out int piAvg)
         {
-            piAvg = 0;
-            return E_NotImplemented;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                piAvg = 0;
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                piAvg = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int get_DevSyncOffset(out int piDev)
         {
-            piDev = 0;
-            return E_NotImplemented;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                piDev = 0;
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                piDev = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion

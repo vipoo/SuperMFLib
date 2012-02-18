@@ -100,30 +100,38 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
         object punkState
         )
     {
-        Debug.WriteLine("ContentProtectionManager::BeginEnableContent");
-
-        if (m_pEnabler != null)
+        // Make sure we *never* leave this entry point with an exception
+        try
         {
-            throw new COMException("A previous call is still pending", E_Fail);
+            Debug.WriteLine("ContentProtectionManager::BeginEnableContent");
+
+            if (m_pEnabler != null)
+            {
+                throw new COMException("A previous call is still pending", E_Fail);
+            }
+
+            int hr;
+
+            // Save so we can create an async result later
+            m_pCallback = pCallback;
+            m_punkState = punkState;
+
+            // Create the enabler from the IMFActivate pointer.
+            object o;
+            hr = pEnablerActivate.ActivateObject(typeof(IMFContentEnabler).GUID, out o);
+            MFError.ThrowExceptionForHR(hr);
+            m_pEnabler = o as IMFContentEnabler;
+
+            // Notify the application. The application will call DoEnable from the app thread.
+            m_state = Enabler.Ready; // Reset the state.
+            PostMessage(m_hwnd, WM_APP_CONTENT_ENABLER, IntPtr.Zero, IntPtr.Zero);
+
+            return S_Ok;
         }
-
-        int hr;
-
-        // Save so we can create an async result later
-        m_pCallback = pCallback;
-        m_punkState = punkState;
-
-        // Create the enabler from the IMFActivate pointer.
-        object o;
-        hr = pEnablerActivate.ActivateObject(typeof(IMFContentEnabler).GUID, out o);
-        MFError.ThrowExceptionForHR(hr);
-        m_pEnabler = o as IMFContentEnabler;
-
-        // Notify the application. The application will call DoEnable from the app thread.
-        m_state = Enabler.Ready; // Reset the state.
-        PostMessage(m_hwnd, WM_APP_CONTENT_ENABLER, IntPtr.Zero, IntPtr.Zero);
-
-        return S_Ok;
+        catch (Exception e)
+        {
+            return Marshal.GetHRForException(e);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -133,26 +141,34 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
 
     public int EndEnableContent(IMFAsyncResult pResult)
     {
-        Debug.WriteLine("ContentProtectionManager::EndEnableContent");
-
-        if (pResult == null)
+        // Make sure we *never* leave this entry point with an exception
+        try
         {
-            throw new COMException("NULL IMFAsyncResult", E_Pointer);
+            Debug.WriteLine("ContentProtectionManager::EndEnableContent");
+
+            if (pResult == null)
+            {
+                throw new COMException("NULL IMFAsyncResult", E_Pointer);
+            }
+
+            // Release interfaces, so that we're ready to accept another call
+            // to BeginEnableContent.
+            SafeRelease(m_pEnabler);
+            SafeRelease(m_pMEG);
+            SafeRelease(m_punkState);
+            SafeRelease(m_pCallback);
+
+            m_pEnabler = null;
+            m_pMEG = null;
+            m_pCallback = null;
+            m_punkState = null;
+
+            return m_hrStatus;
         }
-
-        // Release interfaces, so that we're ready to accept another call
-        // to BeginEnableContent.
-        SafeRelease(m_pEnabler);
-        SafeRelease(m_pMEG);
-        SafeRelease(m_punkState);
-        SafeRelease(m_pCallback);
-
-        m_pEnabler = null;
-        m_pMEG = null;
-        m_pCallback = null;
-        m_punkState = null;
-
-        return m_hrStatus;
+        catch (Exception e)
+        {
+            return Marshal.GetHRForException(e);
+        }
     }
 
     #endregion
@@ -161,8 +177,18 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
 
     public int GetParameters(out MFASync a, out MFAsyncCallbackQueue b)
     {
-        // Implementation of this method is optional.
-        throw new COMException("GetParameters not implemented", COMBase.E_NotImplemented);
+        // Make sure we *never* leave this entry point with an exception
+        try
+        {
+            // Implementation of this method is optional.
+            throw new COMException("GetParameters not implemented", COMBase.E_NotImplemented);
+        }
+        catch (Exception e)
+        {
+            a = MFASync.None;
+            b = MFAsyncCallbackQueue.Undefined;
+            return Marshal.GetHRForException(e);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -174,60 +200,68 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
 
     int IMFAsyncCallback.Invoke(IMFAsyncResult pAsyncResult)
     {
-        int hr;
-        IMFMediaEvent pEvent;
-        MediaEventType meType = MediaEventType.MEUnknown;  // Event type
-        PropVariant varEventData = new PropVariant();	        // Event data
-
-        // Get the event from the event queue.
-        hr = m_pMEG.EndGetEvent(pAsyncResult, out pEvent);
-        MFError.ThrowExceptionForHR(hr);
-
-        // Get the event type.
-        hr = pEvent.GetType(out meType);
-        MFError.ThrowExceptionForHR(hr);
-
-        // Get the event status. If the operation that triggered the event did
-        // not succeed, the status is a failure code.
-        hr = pEvent.GetStatus(out m_hrStatus);
-        MFError.ThrowExceptionForHR(hr);
-
-        if (m_hrStatus == 862022) // NS_S_DRM_MONITOR_CANCELLED
+        // Make sure we *never* leave this entry point with an exception
+        try
         {
-            m_hrStatus = MFError.MF_E_OPERATION_CANCELLED;
-            m_state = Enabler.Complete;
-        }
+            int hr;
+            IMFMediaEvent pEvent;
+            MediaEventType meType = MediaEventType.MEUnknown;  // Event type
+            PropVariant varEventData = new PropVariant();	        // Event data
 
-        // Get the event data.
-        hr = pEvent.GetValue(varEventData);
-        MFError.ThrowExceptionForHR(hr);
-
-        // For the MEEnablerCompleted action, notify the application.
-        // Otherwise, request another event.
-        Debug.WriteLine(string.Format("Content enabler event: {0}", meType.ToString()));
-
-        if (meType == MediaEventType.MEEnablerCompleted)
-        {
-            PostMessage(m_hwnd, WM_APP_CONTENT_ENABLER, IntPtr.Zero, IntPtr.Zero);
-        }
-        else
-        {
-            if (meType == MediaEventType.MEEnablerProgress)
-            {
-                if (varEventData.GetVariantType() == PropVariant.VariantType.String)
-                {
-                    Debug.WriteLine(string.Format("Progress: {0}", varEventData.GetString()));
-                }
-            }
-            hr = m_pMEG.BeginGetEvent(this, null);
+            // Get the event from the event queue.
+            hr = m_pMEG.EndGetEvent(pAsyncResult, out pEvent);
             MFError.ThrowExceptionForHR(hr);
+
+            // Get the event type.
+            hr = pEvent.GetType(out meType);
+            MFError.ThrowExceptionForHR(hr);
+
+            // Get the event status. If the operation that triggered the event did
+            // not succeed, the status is a failure code.
+            hr = pEvent.GetStatus(out m_hrStatus);
+            MFError.ThrowExceptionForHR(hr);
+
+            if (m_hrStatus == 862022) // NS_S_DRM_MONITOR_CANCELLED
+            {
+                m_hrStatus = MFError.MF_E_OPERATION_CANCELLED;
+                m_state = Enabler.Complete;
+            }
+
+            // Get the event data.
+            hr = pEvent.GetValue(varEventData);
+            MFError.ThrowExceptionForHR(hr);
+
+            // For the MEEnablerCompleted action, notify the application.
+            // Otherwise, request another event.
+            Debug.WriteLine(string.Format("Content enabler event: {0}", meType.ToString()));
+
+            if (meType == MediaEventType.MEEnablerCompleted)
+            {
+                PostMessage(m_hwnd, WM_APP_CONTENT_ENABLER, IntPtr.Zero, IntPtr.Zero);
+            }
+            else
+            {
+                if (meType == MediaEventType.MEEnablerProgress)
+                {
+                    if (varEventData.GetVariantType() == PropVariant.VariantType.String)
+                    {
+                        Debug.WriteLine(string.Format("Progress: {0}", varEventData.GetString()));
+                    }
+                }
+                hr = m_pMEG.BeginGetEvent(this, null);
+                MFError.ThrowExceptionForHR(hr);
+            }
+
+            // Clean up.
+            varEventData.Clear();
+            SafeRelease(pEvent);
+
+            return S_Ok;
         }
-
-        // Clean up.
-        varEventData.Clear();
-        SafeRelease(pEvent);
-
-        return S_Ok;
+        catch (Exception e)
+        {
+            return Marshal.GetHRForException(e);
+        }
     }
 
     #endregion
@@ -469,18 +503,18 @@ public class ContentProtectionManager : COMBase, IMFAsyncCallback, IMFContentPro
 
     #region IDisposable Members
 
-    public void  Dispose()
+    public void Dispose()
     {
         Debug.WriteLine("ContentProtectionManager::Dispose");
- 	    SafeRelease(m_pEnabler);
- 	    SafeRelease(m_pMEG);
- 	    SafeRelease(m_pCallback);
- 	    SafeRelease(m_punkState);
+        SafeRelease(m_pEnabler);
+        SafeRelease(m_pMEG);
+        SafeRelease(m_pCallback);
+        SafeRelease(m_punkState);
 
- 	    m_pEnabler = null;
- 	    m_pMEG = null;
- 	    m_pCallback = null;
- 	    m_punkState = null;
+        m_pEnabler = null;
+        m_pMEG = null;
+        m_pCallback = null;
+        m_punkState = null;
     }
 
     #endregion

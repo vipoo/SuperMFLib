@@ -320,99 +320,117 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     int IMFAsyncCallback.GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
     {
-        pdwFlags = MFASync.FastIOProcessingCallback;
-        pdwQueue = MFAsyncCallbackQueue.Standard;
-        //throw new COMException("IMFAsyncCallback.GetParameters not implemented in Player", E_NotImplemented);
-        return S_Ok;
+        // Make sure we *never* leave this entry point with an exception
+        try
+        {
+            pdwFlags = MFASync.FastIOProcessingCallback;
+            pdwQueue = MFAsyncCallbackQueue.Standard;
+            //throw new COMException("IMFAsyncCallback.GetParameters not implemented in Player", E_NotImplemented);
+            return S_Ok;
+        }
+        catch (Exception e)
+        {
+            pdwQueue = MFAsyncCallbackQueue.Undefined;
+            pdwFlags = MFASync.None;
+            return Marshal.GetHRForException(e);
+        }
     }
 
     int IMFAsyncCallback.Invoke(IMFAsyncResult pResult)
     {
-        int hr;
-        IMFMediaEvent pEvent = null;
-        MediaEventType meType = MediaEventType.MEUnknown;  // Event type
-        int hrStatus = 0;           // Event status
-        MFTopoStatus TopoStatus = MFTopoStatus.Invalid; // Used with MESessionTopologyStatus event.
-
+        // Make sure we *never* leave this entry point with an exception
         try
         {
-            // Get the event from the event queue.
-            hr = m_pSession.EndGetEvent(pResult, out pEvent);
-            MFError.ThrowExceptionForHR(hr);
+            int hr;
+            IMFMediaEvent pEvent = null;
+            MediaEventType meType = MediaEventType.MEUnknown;  // Event type
+            int hrStatus = 0;           // Event status
+            MFTopoStatus TopoStatus = MFTopoStatus.Invalid; // Used with MESessionTopologyStatus event.
 
-            // Get the event type.
-            hr = pEvent.GetType(out meType);
-            MFError.ThrowExceptionForHR(hr);
-
-            // Get the event status. If the operation that triggered the event did
-            // not succeed, the status is a failure code.
-            hr = pEvent.GetStatus(out hrStatus);
-            MFError.ThrowExceptionForHR(hr);
-
-            TRACE(string.Format("Media event: " + meType.ToString()));
-
-            // Check if the async operation succeeded.
-            if (Succeeded(hrStatus))
+            try
             {
-                // Switch on the event type. Update the internal state of the CPlayer as needed.
-                switch (meType)
+                // Get the event from the event queue.
+                hr = m_pSession.EndGetEvent(pResult, out pEvent);
+                MFError.ThrowExceptionForHR(hr);
+
+                // Get the event type.
+                hr = pEvent.GetType(out meType);
+                MFError.ThrowExceptionForHR(hr);
+
+                // Get the event status. If the operation that triggered the event did
+                // not succeed, the status is a failure code.
+                hr = pEvent.GetStatus(out hrStatus);
+                MFError.ThrowExceptionForHR(hr);
+
+                TRACE(string.Format("Media event: " + meType.ToString()));
+
+                // Check if the async operation succeeded.
+                if (Succeeded(hrStatus))
                 {
-                    case MediaEventType.MESessionTopologyStatus:
-                        // Get the status code.
-                        int i;
-                        hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out i);
-                        MFError.ThrowExceptionForHR(hr);
-                        TopoStatus = (MFTopoStatus)i;
-                        switch (TopoStatus)
-                        {
-                            case MFTopoStatus.Ready:
-                                OnTopologyReady(pEvent);
-                                break;
-                            default:
-                                // Nothing to do.
-                                break;
-                        }
-                        break;
+                    // Switch on the event type. Update the internal state of the CPlayer as needed.
+                    switch (meType)
+                    {
+                        case MediaEventType.MESessionTopologyStatus:
+                            // Get the status code.
+                            int i;
+                            hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out i);
+                            MFError.ThrowExceptionForHR(hr);
+                            TopoStatus = (MFTopoStatus)i;
+                            switch (TopoStatus)
+                            {
+                                case MFTopoStatus.Ready:
+                                    OnTopologyReady(pEvent);
+                                    break;
+                                default:
+                                    // Nothing to do.
+                                    break;
+                            }
+                            break;
 
-                    case MediaEventType.MESessionStarted:
-                        OnSessionStarted(pEvent);
-                        break;
+                        case MediaEventType.MESessionStarted:
+                            OnSessionStarted(pEvent);
+                            break;
 
-                    case MediaEventType.MESessionPaused:
-                        OnSessionPaused(pEvent);
-                        break;
+                        case MediaEventType.MESessionPaused:
+                            OnSessionPaused(pEvent);
+                            break;
 
-                    case MediaEventType.MESessionClosed:
-                        OnSessionClosed(pEvent);
-                        break;
+                        case MediaEventType.MESessionClosed:
+                            OnSessionClosed(pEvent);
+                            break;
 
-                    case MediaEventType.MEEndOfPresentation:
-                        OnPresentationEnded(pEvent);
-                        break;
+                        case MediaEventType.MEEndOfPresentation:
+                            OnPresentationEnded(pEvent);
+                            break;
 
-                    default:
-                        Debug.WriteLine(meType);
-                        break;
+                        default:
+                            Debug.WriteLine(meType);
+                            break;
+                    }
+                }
+                else
+                {
+                    // The async operation failed. Notify the application
+                    NotifyError(hrStatus);
                 }
             }
-            else
+            finally
             {
-                // The async operation failed. Notify the application
-                NotifyError(hrStatus);
-            }
-        }
-        finally
-        {
-            // Request another event.
-            if (meType != MediaEventType.MESessionClosed)
-            {
-                hr = m_pSession.BeginGetEvent(this, null);
-                MFError.ThrowExceptionForHR(hr);
-            }
+                // Request another event.
+                if (meType != MediaEventType.MESessionClosed)
+                {
+                    hr = m_pSession.BeginGetEvent(this, null);
+                    MFError.ThrowExceptionForHR(hr);
+                }
 
-            SafeRelease(pEvent);
+                SafeRelease(pEvent);
+            }
+            return S_Ok;
         }
-        return S_Ok;
+        catch (Exception e)
+        {
+            return Marshal.GetHRForException(e);
+        }
     }
 
     #endregion
@@ -842,7 +860,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         {
             StartPlayback();
         }
-        catch(Exception ce)
+        catch (Exception ce)
         {
             hr = Marshal.GetHRForException(ce);
             NotifyError(hr);
@@ -890,9 +908,9 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     #region Member Variables
 
-    protected IMFMediaSession           m_pSession;
-    protected IMFMediaSource            m_pSource;
-    protected IMFVideoDisplayControl    m_pVideoDisplay;
+    protected IMFMediaSession m_pSession;
+    protected IMFMediaSource m_pSource;
+    protected IMFVideoDisplayControl m_pVideoDisplay;
 
     protected IntPtr m_hwndVideo;       // Video window.
     protected IntPtr m_hwndEvent;       // App window to receive events.

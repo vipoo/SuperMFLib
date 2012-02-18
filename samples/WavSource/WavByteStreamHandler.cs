@@ -17,7 +17,7 @@ using Utils;
 
 namespace WavSourceFilter
 {
-    [ComVisible(true), 
+    [ComVisible(true),
     Guid("B2C8B1AF-A0CC-4a47-9F4C-9764CF1CBF6E"),
     ClassInterface(ClassInterfaceType.None)]
     public class CWavByteStreamHandler : COMBase, IMFByteStreamHandler
@@ -46,33 +46,42 @@ namespace WavSourceFilter
             object punkState                  // Can be NULL
         )
         {
-            int hr;
-            m_Log.WriteLine("BeginCreateObject");
-
-            ppIUnknownCancelCookie = null; // We don't return a cancellation cookie.
-
-            if ((pByteStream == null) || (pwszURL == null) || (pCallback == null))
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                throw new COMException("bad stream, url, or callback", E_InvalidArgument);
+                int hr;
+                m_Log.WriteLine("BeginCreateObject");
+
+                ppIUnknownCancelCookie = null; // We don't return a cancellation cookie.
+
+                if ((pByteStream == null) || (pwszURL == null) || (pCallback == null))
+                {
+                    throw new COMException("bad stream, url, or callback", E_InvalidArgument);
+                }
+
+                IMFAsyncResult pResult = null;
+
+                WavSource pSource = new WavSource();
+
+                pSource.Open(pByteStream);
+
+                hr = MFExtern.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
+                MFError.ThrowExceptionForHR(hr);
+
+                hr = MFExtern.MFInvokeCallback(pResult);
+                MFError.ThrowExceptionForHR(hr);
+
+                if (pResult != null)
+                {
+                    Marshal.ReleaseComObject(pResult);
+                }
+                return S_Ok;
             }
-
-            IMFAsyncResult pResult = null;
-
-            WavSource pSource = new WavSource();
-
-            pSource.Open(pByteStream);
-
-            hr = MFExtern.MFCreateAsyncResult(pSource as IMFMediaSource, pCallback, punkState, out pResult);
-            MFError.ThrowExceptionForHR(hr);
-
-            hr = MFExtern.MFInvokeCallback(pResult);
-            MFError.ThrowExceptionForHR(hr);
-
-            if (pResult != null)
+            catch (Exception e)
             {
-                Marshal.ReleaseComObject(pResult);
+                ppIUnknownCancelCookie = null;
+                return Marshal.GetHRForException(e);
             }
-            return S_Ok;
         }
 
         public int EndCreateObject(
@@ -81,45 +90,72 @@ namespace WavSourceFilter
             out object ppObject
         )
         {
-            int hr;
-
-            pObjectType = MFObjectType.Invalid;
-            ppObject = null;
-
-            m_Log.WriteLine("EndCreateObject");
-
-            if (pResult == null)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                throw new COMException("invalid IMFAsyncResult", E_InvalidArgument);
+                int hr;
+
+                pObjectType = MFObjectType.Invalid;
+                ppObject = null;
+
+                m_Log.WriteLine("EndCreateObject");
+
+                if (pResult == null)
+                {
+                    throw new COMException("invalid IMFAsyncResult", E_InvalidArgument);
+                }
+
+                hr = pResult.GetObject(out ppObject);
+                MFError.ThrowExceptionForHR(hr);
+
+                // Minimal sanity check - is it really a media source?
+                IMFMediaSource pSource = (IMFMediaSource)ppObject;
+
+                pObjectType = MFObjectType.MediaSource;
+
+                // unneeded SAFE_RELEASE(pSource);
+                // unneeded SAFE_RELEASE(ppObject);
+                return S_Ok;
             }
-
-            hr = pResult.GetObject(out ppObject);
-            MFError.ThrowExceptionForHR(hr);
-
-            // Minimal sanity check - is it really a media source?
-            IMFMediaSource pSource = (IMFMediaSource)ppObject;
-
-            pObjectType = MFObjectType.MediaSource;
-
-            // unneeded SAFE_RELEASE(pSource);
-            // unneeded SAFE_RELEASE(ppObject);
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppObject = null;
+                pObjectType = MFObjectType.Invalid;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int CancelObjectCreation(object pIUnknownCancelCookie)
         {
-            m_Log.WriteLine("CancelObjectCreation");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                m_Log.WriteLine("CancelObjectCreation");
 
-            throw new COMException("Not implemented", E_NotImplemented);
+                throw new COMException("Not implemented", E_NotImplemented);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetMaxNumberOfBytesRequiredForResolution(out long pqwBytes)
         {
-            m_Log.WriteLine("GetMaxNumberOfBytesRequiredForResolution");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                m_Log.WriteLine("GetMaxNumberOfBytesRequiredForResolution");
 
-            // In a canonical PCM .wav file, the start of the 'data' chunk is at byte offset 44.
-            pqwBytes = 44;
-            return S_Ok;
+                // In a canonical PCM .wav file, the start of the 'data' chunk is at byte offset 44.
+                pqwBytes = 44;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                pqwBytes = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion

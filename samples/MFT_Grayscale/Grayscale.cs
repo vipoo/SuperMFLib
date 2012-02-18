@@ -133,27 +133,35 @@ namespace MFT_Grayscale
             MFInt pdwOutputMaximum
         )
         {
-            TRACE("GetStreamLimits");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("GetStreamLimits");
 
-            // Fixed stream limits.
-            if (pdwInputMinimum != null)
-            {
-                pdwInputMinimum.Assign(1);
-            }
-            if (pdwInputMaximum != null)
-            {
-                pdwInputMaximum.Assign(1);
-            }
-            if (pdwOutputMinimum != null)
-            {
-                pdwOutputMinimum.Assign(1);
-            }
-            if (pdwOutputMaximum != null)
-            {
-                pdwOutputMaximum.Assign(1);
-            }
+                // Fixed stream limits.
+                if (pdwInputMinimum != null)
+                {
+                    pdwInputMinimum.Assign(1);
+                }
+                if (pdwInputMaximum != null)
+                {
+                    pdwInputMaximum.Assign(1);
+                }
+                if (pdwOutputMinimum != null)
+                {
+                    pdwOutputMinimum.Assign(1);
+                }
+                if (pdwOutputMaximum != null)
+                {
+                    pdwOutputMaximum.Assign(1);
+                }
 
-            return S_Ok;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetStreamCount(
@@ -161,19 +169,27 @@ namespace MFT_Grayscale
             MFInt pcOutputStreams
         )
         {
-            TRACE("GetStreamCount");
-
-            // Fixed stream count.
-            if (pcInputStreams != null)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                pcInputStreams.Assign(1);
-            }
+                TRACE("GetStreamCount");
 
-            if (pcOutputStreams != null)
-            {
-                pcOutputStreams.Assign(1);
+                // Fixed stream count.
+                if (pcInputStreams != null)
+                {
+                    pcInputStreams.Assign(1);
+                }
+
+                if (pcOutputStreams != null)
+                {
+                    pcOutputStreams.Assign(1);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetStreamIDs(
@@ -183,17 +199,25 @@ namespace MFT_Grayscale
             int[] pdwOutputIDs
         )
         {
-            TRACE("GetStreamIDs");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("GetStreamIDs");
 
-            // Do not need to implement, because this MFT has a fixed number of 
-            // streams and the stream IDs match the stream indexes.
+                // Do not need to implement, because this MFT has a fixed number of 
+                // streams and the stream IDs match the stream indexes.
 
-            // However, I'm going to implement it anyway
-            //throw new COMException("Fixed # of zero based streams", E_NotImplemented);
+                // However, I'm going to implement it anyway
+                //throw new COMException("Fixed # of zero based streams", E_NotImplemented);
 
-            pdwInputIDs[0] = 0;
-            pdwOutputIDs[0] = 0;
-            return S_Ok;
+                pdwInputIDs[0] = 0;
+                pdwOutputIDs[0] = 0;
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetInputStreamInfo(
@@ -201,21 +225,30 @@ namespace MFT_Grayscale
             out MFTInputStreamInfo pStreamInfo
         )
         {
-            TRACE("GetInputStreamInfo");
-
-            pStreamInfo = new MFTInputStreamInfo();
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidInputStream(dwInputStreamID);
+                TRACE("GetInputStreamInfo");
 
-                pStreamInfo.hnsMaxLatency = 0;
-                pStreamInfo.dwFlags = MFTInputStreamInfoFlags.WholeSamples | MFTInputStreamInfoFlags.SingleSamplePerBuffer;
-                pStreamInfo.cbSize = m_cbImageSize;
-                pStreamInfo.cbMaxLookahead = 0;
-                pStreamInfo.cbAlignment = 0;
+                pStreamInfo = new MFTInputStreamInfo();
+
+                lock (this)
+                {
+                    CheckValidInputStream(dwInputStreamID);
+
+                    pStreamInfo.hnsMaxLatency = 0;
+                    pStreamInfo.dwFlags = MFTInputStreamInfoFlags.WholeSamples | MFTInputStreamInfoFlags.SingleSamplePerBuffer;
+                    pStreamInfo.cbSize = m_cbImageSize;
+                    pStreamInfo.cbMaxLookahead = 0;
+                    pStreamInfo.cbAlignment = 0;
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pStreamInfo = new MFTInputStreamInfo();
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetOutputStreamInfo(
@@ -223,31 +256,60 @@ namespace MFT_Grayscale
             out MFTOutputStreamInfo pStreamInfo
         )
         {
-            TRACE("GetOutputStreamInfo");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidOutputStream(dwOutputStreamID);
+                int hr;
+                TRACE("GetOutputStreamInfo");
 
-                if (m_pOutputType == null)
+                lock (this)
                 {
-                    throw new COMException("No output type set", MFError.MF_E_TRANSFORM_TYPE_NOT_SET);
-                }
+                    CheckValidOutputStream(dwOutputStreamID);
 
-                pStreamInfo.dwFlags = MFTOutputStreamInfoFlags.WholeSamples |
-                     MFTOutputStreamInfoFlags.SingleSamplePerBuffer |
-                     MFTOutputStreamInfoFlags.FixedSampleSize;
-                pStreamInfo.cbSize = m_cbImageSize;
-                pStreamInfo.cbAlignment = 0;
+                    if (m_pOutputType != null)
+                    {
+
+                        pStreamInfo.dwFlags = MFTOutputStreamInfoFlags.WholeSamples |
+                             MFTOutputStreamInfoFlags.SingleSamplePerBuffer |
+                             MFTOutputStreamInfoFlags.FixedSampleSize;
+                        pStreamInfo.cbSize = m_cbImageSize;
+                        pStreamInfo.cbAlignment = 0;
+
+                        hr = S_Ok;
+                    }
+                    else
+                    {
+                        // No output type set
+                        hr = MFError.MF_E_TRANSFORM_TYPE_NOT_SET;
+                        pStreamInfo = new MFTOutputStreamInfo();
+                    }
+                }
+                return hr;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pStreamInfo = new MFTOutputStreamInfo();
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetAttributes(out IMFAttributes pAttributes)
         {
-            TRACE("GetAttributes");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("GetAttributes");
 
-            throw new COMException("No attributes supported", E_NotImplemented);
+                pAttributes = null;
+
+                // No attributes supported
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                pAttributes = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetInputStreamAttributes(
@@ -255,9 +317,21 @@ namespace MFT_Grayscale
             out IMFAttributes ppAttributes
         )
         {
-            TRACE("GetInputStreamAttributes");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("GetInputStreamAttributes");
 
-            throw new COMException("No input attributes supported", E_NotImplemented);
+                ppAttributes = null;
+
+                // No input attributes supported
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                ppAttributes = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetOutputStreamAttributes(
@@ -265,16 +339,37 @@ namespace MFT_Grayscale
             out IMFAttributes ppAttributes
         )
         {
-            TRACE("GetOutputStreamAttributes");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("GetOutputStreamAttributes");
 
-            throw new COMException("No output attributes supported", E_NotImplemented);
+                ppAttributes = null;
+
+                // No output attributes supported
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                ppAttributes = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int DeleteInputStream(int dwStreamID)
         {
-            TRACE("DeleteInputStream");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("DeleteInputStream");
 
-            throw new COMException("Removing streams not supported", E_NotImplemented);
+                // Removing streams not supported
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int AddInputStreams(
@@ -282,9 +377,18 @@ namespace MFT_Grayscale
             int[] adwStreamIDs
         )
         {
-            TRACE("AddInputStreams");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("AddInputStreams");
 
-            throw new COMException("Adding streams not supported", E_NotImplemented);
+                // Adding streams not supported
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetInputAvailableType(
@@ -293,23 +397,32 @@ namespace MFT_Grayscale
             out IMFMediaType ppType
         )
         {
-            TRACE(string.Format("GetInputAvailableType (stream = {0}, type index = {1})", dwInputStreamID, dwTypeIndex));
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidInputStream(dwInputStreamID);
+                TRACE(string.Format("GetInputAvailableType (stream = {0}, type index = {1})", dwInputStreamID, dwTypeIndex));
 
-                if (m_pOutputType != null)
+                lock (this)
                 {
-                    ppType = m_pOutputType;
+                    CheckValidInputStream(dwInputStreamID);
+
+                    if (m_pOutputType != null)
+                    {
+                        ppType = m_pOutputType;
+                    }
+                    else
+                    {
+                        // Create a partial media type.
+                        OnGetPartialType(dwTypeIndex, out ppType);
+                    }
                 }
-                else
-                {
-                    // Create a partial media type.
-                    OnGetPartialType(dwTypeIndex, out ppType);
-                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppType = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetOutputAvailableType(
@@ -318,22 +431,31 @@ namespace MFT_Grayscale
             out IMFMediaType ppType
         )
         {
-            TRACE(string.Format("GetOutputAvailableType (stream = {0}, type index = {1})", dwOutputStreamID, dwTypeIndex));
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidOutputStream(dwOutputStreamID);
+                TRACE(string.Format("GetOutputAvailableType (stream = {0}, type index = {1})", dwOutputStreamID, dwTypeIndex));
 
-                if (m_pInputType != null)
+                lock (this)
                 {
-                    ppType = m_pInputType;
+                    CheckValidOutputStream(dwOutputStreamID);
+
+                    if (m_pInputType != null)
+                    {
+                        ppType = m_pInputType;
+                    }
+                    else
+                    {
+                        OnGetPartialType(dwTypeIndex, out ppType);
+                    }
                 }
-                else
-                {
-                    OnGetPartialType(dwTypeIndex, out ppType);
-                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppType = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetInputType(
@@ -344,30 +466,39 @@ namespace MFT_Grayscale
         {
             TRACE("SetInputType");
 
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidInputStream(dwInputStreamID);
-
-                // Does the caller want us to set the type, or just test it?
-                bool bReallySet = ((dwFlags & MFTSetTypeFlags.TestOnly) == 0);
-
-                // If we have an input sample, the client cannot change the type now.
-                if (HasPendingOutput())
+                lock (this)
                 {
-                    throw new COMException("Can't change type while samples are pending", MFError.MF_E_INVALIDMEDIATYPE);
-                }
+                    CheckValidInputStream(dwInputStreamID);
 
-                // Validate the type.
-                OnCheckInputType(pType);
+                    // Does the caller want us to set the type, or just test it?
+                    bool bReallySet = ((dwFlags & MFTSetTypeFlags.TestOnly) == 0);
 
-                // The type is OK. 
-                // Set the type, unless the caller was just testing.
-                if (bReallySet)
-                {
-                    OnSetInputType(pType);
+                    // If we have an input sample, the client cannot change the type now.
+                    if (HasPendingOutput())
+                    {
+                        // Can't change type while samples are pending
+                        return MFError.MF_E_INVALIDMEDIATYPE;
+                    }
+
+                    // Validate the type.
+                    OnCheckInputType(pType);
+
+                    // The type is OK. 
+                    // Set the type, unless the caller was just testing.
+                    if (bReallySet)
+                    {
+                        OnSetInputType(pType);
+                    }
                 }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetOutputType(
@@ -376,31 +507,40 @@ namespace MFT_Grayscale
             MFTSetTypeFlags dwFlags
         )
         {
-            TRACE("SetOutputType");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidOutputStream(dwOutputStreamID);
+                TRACE("SetOutputType");
 
-                // Does the caller want us to set the type, or just test it?
-                bool bReallySet = ((dwFlags & MFTSetTypeFlags.TestOnly) == 0);
-
-                // If we have an input sample, the client cannot change the type now.
-                if (HasPendingOutput())
+                lock (this)
                 {
-                    throw new COMException("Cannot change type while samples are pending", MFError.MF_E_INVALIDMEDIATYPE);
-                }
+                    CheckValidOutputStream(dwOutputStreamID);
 
-                // Validate the type.
-                OnCheckOutputType(pType);
-                if (bReallySet)
-                {
-                    // The type is OK. 
-                    // Set the type, unless the caller was just testing.
-                    OnSetOutputType(pType);
+                    // Does the caller want us to set the type, or just test it?
+                    bool bReallySet = ((dwFlags & MFTSetTypeFlags.TestOnly) == 0);
+
+                    // If we have an input sample, the client cannot change the type now.
+                    if (HasPendingOutput())
+                    {
+                        // Cannot change type while samples are pending
+                        return MFError.MF_E_INVALIDMEDIATYPE;
+                    }
+
+                    // Validate the type.
+                    OnCheckOutputType(pType);
+                    if (bReallySet)
+                    {
+                        // The type is OK. 
+                        // Set the type, unless the caller was just testing.
+                        OnSetOutputType(pType);
+                    }
                 }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetInputCurrentType(
@@ -408,20 +548,37 @@ namespace MFT_Grayscale
             out IMFMediaType ppType
         )
         {
-            TRACE("GetInputCurrentType");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidInputStream(dwInputStreamID);
+                int hr;
+                TRACE("GetInputCurrentType");
 
-                if (m_pInputType == null)
+                lock (this)
                 {
-                    throw new COMException("Type is not set", MFError.MF_E_TRANSFORM_TYPE_NOT_SET);
-                }
+                    CheckValidInputStream(dwInputStreamID);
 
-                ppType = m_pInputType;
+                    if (m_pInputType != null)
+                    {
+                        ppType = m_pInputType;
+                        hr = S_Ok;
+                    }
+                    else
+                    {
+                        ppType = null;
+
+                        // Type is not set
+                        hr = MFError.MF_E_TRANSFORM_TYPE_NOT_SET;
+                    }
+
+                }
+                return hr;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppType = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetOutputCurrentType(
@@ -429,20 +586,37 @@ namespace MFT_Grayscale
             out IMFMediaType ppType
         )
         {
-            TRACE("GetOutputCurrentType");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidOutputStream(dwOutputStreamID);
+                int hr;
+                TRACE("GetOutputCurrentType");
 
-                if (m_pOutputType == null)
+                lock (this)
                 {
-                    throw new COMException("No output type set", MFError.MF_E_TRANSFORM_TYPE_NOT_SET);
-                }
+                    CheckValidOutputStream(dwOutputStreamID);
 
-                ppType = m_pOutputType;
+                    if (m_pOutputType != null)
+                    {
+                        ppType = m_pOutputType;
+                        hr = S_Ok;
+                    }
+                    else
+                    {
+                        ppType = null;
+
+                        // No output type set
+                        hr = MFError.MF_E_TRANSFORM_TYPE_NOT_SET;
+                    }
+
+                }
+                return hr;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppType = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetInputStatus(
@@ -450,45 +624,63 @@ namespace MFT_Grayscale
             out MFTInputStatusFlags pdwFlags
         )
         {
-            TRACE("GetInputStatus");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckValidInputStream(dwInputStreamID);
+                TRACE("GetInputStatus");
 
-                // If we already have an input sample, we don't accept
-                // another one until the client calls ProcessOutput or Flush.
-                if (m_pSample == null)
+                lock (this)
                 {
-                    pdwFlags = MFTInputStatusFlags.AcceptData;
+                    CheckValidInputStream(dwInputStreamID);
+
+                    // If we already have an input sample, we don't accept
+                    // another one until the client calls ProcessOutput or Flush.
+                    if (m_pSample == null)
+                    {
+                        pdwFlags = MFTInputStatusFlags.AcceptData;
+                    }
+                    else
+                    {
+                        pdwFlags = MFTInputStatusFlags.None;
+                    }
                 }
-                else
-                {
-                    pdwFlags = MFTInputStatusFlags.None;
-                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pdwFlags = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetOutputStatus(
             out MFTOutputStatusFlags pdwFlags)
         {
-            TRACE("GetOutputStatus");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // We can produce an output sample if (and only if)
-                // we have an input sample.
-                if (m_pSample != null)
+                TRACE("GetOutputStatus");
+
+                lock (this)
                 {
-                    pdwFlags = MFTOutputStatusFlags.SampleReady;
+                    // We can produce an output sample if (and only if)
+                    // we have an input sample.
+                    if (m_pSample != null)
+                    {
+                        pdwFlags = MFTOutputStatusFlags.SampleReady;
+                    }
+                    else
+                    {
+                        pdwFlags = MFTOutputStatusFlags.None;
+                    }
                 }
-                else
-                {
-                    pdwFlags = MFTOutputStatusFlags.None;
-                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pdwFlags = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int SetOutputBounds(
@@ -496,9 +688,18 @@ namespace MFT_Grayscale
             long hnsUpperBound
         )
         {
-            TRACE("SetOutputBounds");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("SetOutputBounds");
 
-            throw new COMException("Output bounds not supported", E_NotImplemented);
+                // Output bounds not supported
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int ProcessEvent(
@@ -506,9 +707,18 @@ namespace MFT_Grayscale
             IMFMediaEvent pEvent
         )
         {
-            TRACE("ProcessEvent");
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("ProcessEvent");
 
-            throw new COMException("Events not support", E_NotImplemented);
+                // Events not support
+                return E_NotImplemented;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int ProcessMessage(
@@ -516,46 +726,54 @@ namespace MFT_Grayscale
             IntPtr ulParam
         )
         {
-            TRACE("ProcessMessage");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                switch (eMessage)
+                TRACE("ProcessMessage");
+
+                lock (this)
                 {
-                    case MFTMessageType.CommandFlush:
-                        // Flush the MFT.
-                        OnFlush();
-                        break;
+                    switch (eMessage)
+                    {
+                        case MFTMessageType.CommandFlush:
+                            // Flush the MFT.
+                            OnFlush();
+                            break;
 
-                    // The remaining messages do not require any action from this MFT.
+                        // The remaining messages do not require any action from this MFT.
 
-                    case MFTMessageType.CommandDrain:
-                        // Drain: Tells the MFT not to accept any more input until 
-                        // all of the pending output has been processed. That is our 
-                        // default behevior already, so there is nothing to do.
+                        case MFTMessageType.CommandDrain:
+                            // Drain: Tells the MFT not to accept any more input until 
+                            // all of the pending output has been processed. That is our 
+                            // default behevior already, so there is nothing to do.
 
-                        //MFTDrainType dt = (MFTDrainType)ulParam.ToInt32();
-                        break;
+                            //MFTDrainType dt = (MFTDrainType)ulParam.ToInt32();
+                            break;
 
-                    case MFTMessageType.SetD3DManager:
-                        //object o = Marshal.GetUniqueObjectForIUnknown(ulParam);
-                        break;
+                        case MFTMessageType.SetD3DManager:
+                            //object o = Marshal.GetUniqueObjectForIUnknown(ulParam);
+                            break;
 
-                    case MFTMessageType.NotifyBeginStreaming:
-                        break;
+                        case MFTMessageType.NotifyBeginStreaming:
+                            break;
 
-                    case MFTMessageType.NotifyEndStreaming:
-                        break;
+                        case MFTMessageType.NotifyEndStreaming:
+                            break;
 
-                    case MFTMessageType.NotifyEndOfStream:
-                        //int i = ulParam.ToInt32();
-                        break;
+                        case MFTMessageType.NotifyEndOfStream:
+                            //int i = ulParam.ToInt32();
+                            break;
 
-                    case MFTMessageType.NotifyStartOfStream:
-                        break;
+                        case MFTMessageType.NotifyStartOfStream:
+                            break;
+                    }
                 }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int ProcessInput(
@@ -564,148 +782,176 @@ namespace MFT_Grayscale
             int dwFlags
         )
         {
-            TRACE("ProcessInput");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                if (pSample == null)
+                TRACE("ProcessInput");
+
+                lock (this)
                 {
-                    throw new COMException("No input sample provided", E_Pointer);
+                    if (pSample == null)
+                    {
+                        // No input sample provided"
+                        return E_Pointer;
+                    }
+
+                    CheckValidInputStream(dwInputStreamID);
+
+                    if (dwFlags != 0)
+                    {
+                        // Invalid flags
+                        return E_InvalidArgument;
+                    }
+
+                    if (m_pInputType == null || m_pOutputType == null)
+                    {
+                        // No input or output type specified
+                        return MFError.MF_E_NOTACCEPTING;
+                    }
+
+                    if (m_pSample != null)
+                    {
+                        // Already have input sample
+                        return MFError.MF_E_NOTACCEPTING;
+                    }
+
+                    // Cache the sample. We do the actual work in ProcessOutput.
+                    m_pSample = pSample;
                 }
-
-                CheckValidInputStream(dwInputStreamID);
-
-                if (dwFlags != 0)
-                {
-                    throw new COMException("Invalid flags", E_InvalidArgument);
-                }
-
-                if (m_pInputType == null || m_pOutputType == null)
-                {
-                    throw new COMException("No input or output type specified", MFError.MF_E_NOTACCEPTING);
-                }
-
-                if (m_pSample != null)
-                {
-                    throw new COMException("Already have input sample", MFError.MF_E_NOTACCEPTING);
-                }
-
-                // Cache the sample. We do the actual work in ProcessOutput.
-                m_pSample = pSample;
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int ProcessOutput(
             MFTProcessOutputFlags dwFlags,
             int cOutputBufferCount,
-            MFTOutputDataBuffer [] pOutputSamples, // one per stream
+            MFTOutputDataBuffer[] pOutputSamples, // one per stream
             out ProcessOutputStatus pdwStatus
         )
         {
-            TRACE("ProcessOutput");
+            pdwStatus = 0;
 
-            int hr;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // If we don't have an input sample, we need some input before
-                // we can generate any output.  Check this first for perf
-                if (m_pSample == null)
+                TRACE("ProcessOutput");
+
+                int hr;
+
+                lock (this)
                 {
-                    throw new COMException("No input sample", MFError.MF_E_TRANSFORM_NEED_MORE_INPUT);
-                }
+                    // If we don't have an input sample, we need some input before
+                    // we can generate any output.  Check this first for perf
+                    if (m_pSample == null)
+                    {
+                        // No input sample
+                        pdwStatus = 0;
+                        return MFError.MF_E_TRANSFORM_NEED_MORE_INPUT;
+                    }
 
-                // Check input parameters...
+                    // Check input parameters...
 
-                // There are no flags that we accept in this MFT.
-                // The only defined flag is MFT_PROCESS_OUTPUT_DISCARD_WHEN_NO_BUFFER. This 
-                // flag only applies when the MFT marks an output stream as lazy or optional.
-                // However there are no lazy or optional streams on this MFT, so the flag is
-                // not valid.
-                if (dwFlags != MFTProcessOutputFlags.None)
-                {
-                    throw new COMException("Invalid flag", E_InvalidArgument);
-                }
+                    // There are no flags that we accept in this MFT.
+                    // The only defined flag is MFT_PROCESS_OUTPUT_DISCARD_WHEN_NO_BUFFER. This 
+                    // flag only applies when the MFT marks an output stream as lazy or optional.
+                    // However there are no lazy or optional streams on this MFT, so the flag is
+                    // not valid.
+                    if (dwFlags != MFTProcessOutputFlags.None)
+                    {
+                        // Invalid flag
+                        return E_InvalidArgument;
+                    }
 
-                if (pOutputSamples == null)
-                {
-                    throw new COMException("No output sample stream buffer provided", E_Pointer);
-                }
+                    if (pOutputSamples == null)
+                    {
+                        // No output sample stream buffer provided
+                        return E_Pointer;
+                    }
 
-                // Must be exactly one output buffer.
-                if (cOutputBufferCount != 1)
-                {
-                    throw new COMException("Incorrect # of buffers", E_InvalidArgument);
-                }
+                    // Must be exactly one output buffer.
+                    if (cOutputBufferCount != 1)
+                    {
+                        // Incorrect # of buffers
+                        return E_InvalidArgument;
+                    }
 
-                // It must contain a sample.
-                if (pOutputSamples[0].pSample == IntPtr.Zero)
-                {
-                    throw new COMException("Output buffer contains no sample", E_InvalidArgument);
-                }
+                    // It must contain a sample.
+                    if (pOutputSamples[0].pSample == IntPtr.Zero)
+                    {
+                        // Output buffer contains no sample
+                        return E_InvalidArgument;
+                    }
 
-                IMFMediaBuffer pInput = null;
-                IMFMediaBuffer pOutput = null;
-                IMFSample mypSample = null;
-
-                try
-                {
-                    // Get the input buffer.
-                    hr = m_pSample.GetBufferByIndex(0, out pInput);
-                    MFError.ThrowExceptionForHR(hr);
-
-                    // Get the output buffer.
-                    mypSample = Marshal.GetUniqueObjectForIUnknown(pOutputSamples[0].pSample) as IMFSample;
-                    hr = mypSample.GetBufferByIndex(0, out pOutput);
-                    MFError.ThrowExceptionForHR(hr);
-
-                    OnProcessOutput(pInput, pOutput);
-
-                    // Set status flags.
-                    pOutputSamples[0].dwStatus = MFTOutputDataBufferFlags.None;
-                    pdwStatus = ProcessOutputStatus.None;
-
-                    // Copy the duration and time stamp from the input sample,
-                    // if present.
+                    IMFMediaBuffer pInput = null;
+                    IMFMediaBuffer pOutput = null;
+                    IMFSample mypSample = null;
 
                     try
                     {
-                        long hnsDuration;
-
-                        hr = m_pSample.GetSampleDuration(out hnsDuration);
+                        // Get the input buffer.
+                        hr = m_pSample.GetBufferByIndex(0, out pInput);
                         MFError.ThrowExceptionForHR(hr);
 
-                        hr = mypSample.SetSampleDuration(hnsDuration);
+                        // Get the output buffer.
+                        mypSample = Marshal.GetUniqueObjectForIUnknown(pOutputSamples[0].pSample) as IMFSample;
+                        hr = mypSample.GetBufferByIndex(0, out pOutput);
                         MFError.ThrowExceptionForHR(hr);
+
+                        OnProcessOutput(pInput, pOutput);
+
+                        // Set status flags.
+                        pOutputSamples[0].dwStatus = MFTOutputDataBufferFlags.None;
+                        pdwStatus = ProcessOutputStatus.None;
+
+                        // Copy the duration and time stamp from the input sample,
+                        // if present.
+
+                        try
+                        {
+                            long hnsDuration;
+
+                            hr = m_pSample.GetSampleDuration(out hnsDuration);
+                            MFError.ThrowExceptionForHR(hr);
+
+                            hr = mypSample.SetSampleDuration(hnsDuration);
+                            MFError.ThrowExceptionForHR(hr);
+                        }
+                        catch { }
+
+                        try
+                        {
+                            long hnsTime;
+
+                            hr = m_pSample.GetSampleTime(out hnsTime);
+                            MFError.ThrowExceptionForHR(hr);
+
+                            hr = mypSample.SetSampleTime(hnsTime);
+                            MFError.ThrowExceptionForHR(hr);
+                        }
+                        catch { }
+
+                        SafeRelease(m_pSample);
+                        m_pSample = null;
                     }
-                    catch { }
-
-                    try
+                    finally
                     {
-                        long hnsTime;
-
-                        hr = m_pSample.GetSampleTime(out hnsTime);
-                        MFError.ThrowExceptionForHR(hr);
-
-                        hr = mypSample.SetSampleTime(hnsTime);
-                        MFError.ThrowExceptionForHR(hr);
+                        // Release our input sample.
+                        SafeRelease(pInput);
+                        SafeRelease(pOutput);
+                        SafeRelease(mypSample);
                     }
-                    catch { }
 
-                    SafeRelease(m_pSample);
-                    m_pSample = null;
                 }
-                finally
-                {
-                    // Release our input sample.
-                    SafeRelease(pInput);
-                    SafeRelease(pOutput);
-                    SafeRelease(mypSample);
-                }
-
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -1078,7 +1324,7 @@ namespace MFT_Grayscale
 
         private void GetImageSize(FourCC fcc, int width, int height, out int pcbImage)
         {
-            if ( (fcc == FOURCC_YUY2) || (fcc == FOURCC_UYVY) )
+            if ((fcc == FOURCC_YUY2) || (fcc == FOURCC_UYVY))
             {
                 // check overflow
                 if ((width > int.MaxValue / 2) ||

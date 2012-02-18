@@ -23,7 +23,8 @@ namespace WavSinkNS
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFCustom
     {
-        void SetStream(object pStream);
+        [PreserveSig]
+        int SetStream(object pStream);
     }
 
     // PCM_Audio_Format_Params
@@ -155,14 +156,23 @@ namespace WavSinkNS
 
         public int GetCharacteristics(out MFMediaSinkCharacteristics pdwCharacteristics)
         {
-            TRACE("CWavSink::GetCharacteristics");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::GetCharacteristics");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                pdwCharacteristics = MFMediaSinkCharacteristics.FixedStreams | MFMediaSinkCharacteristics.Rateless;
+                    pdwCharacteristics = MFMediaSinkCharacteristics.FixedStreams | MFMediaSinkCharacteristics.Rateless;
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pdwCharacteristics = MFMediaSinkCharacteristics.None;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -178,8 +188,17 @@ namespace WavSinkNS
             IMFMediaType pMediaType,
             out IMFStreamSinkAlt ppStreamSink)
         {
-            TRACE("CWavSink::AddStreamSink");
-            throw new COMException("Fixed streams", MFError.MF_E_STREAMSINKS_FIXED);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("CWavSink::AddStreamSink");
+                throw new COMException("Fixed streams", MFError.MF_E_STREAMSINKS_FIXED);
+            }
+            catch (Exception e)
+            {
+                ppStreamSink = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -192,8 +211,16 @@ namespace WavSinkNS
 
         public int RemoveStreamSink(int dwStreamSinkIdentifier)
         {
-            TRACE("CWavSink::RemoveStreamSink");
-            throw new COMException("Fixed streams", MFError.MF_E_STREAMSINKS_FIXED);
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("CWavSink::RemoveStreamSink");
+                throw new COMException("Fixed streams", MFError.MF_E_STREAMSINKS_FIXED);
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -203,14 +230,23 @@ namespace WavSinkNS
 
         public int GetStreamSinkCount(out int pcStreamSinkCount)
         {
-            TRACE("CWavSink::GetStreamSinkCount");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::GetStreamSinkCount");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                pcStreamSinkCount = 1;  // Fixed number of streams.
+                    pcStreamSinkCount = 1;  // Fixed number of streams.
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pcStreamSinkCount = 0;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -222,20 +258,29 @@ namespace WavSinkNS
             int dwIndex,
             out IMFStreamSinkAlt ppStreamSink)
         {
-            TRACE("CWavSink::GetStreamSinkByIndex");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // Fixed stream: Index 0. 
-                if (dwIndex > 0)
+                TRACE("CWavSink::GetStreamSinkByIndex");
+                lock (this)
                 {
-                    throw new COMException("Invalid index", MFError.MF_E_INVALIDINDEX);
+                    // Fixed stream: Index 0. 
+                    if (dwIndex > 0)
+                    {
+                        throw new COMException("Invalid index", MFError.MF_E_INVALIDINDEX);
+                    }
+
+                    CheckShutdown();
+
+                    ppStreamSink = m_pStream;
                 }
-
-                CheckShutdown();
-
-                ppStreamSink = m_pStream;
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppStreamSink = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -247,20 +292,29 @@ namespace WavSinkNS
             int dwStreamSinkIdentifier,
             out IMFStreamSinkAlt ppStreamSink)
         {
-            TRACE("CWavSink::GetStreamSinkById");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // Fixed stream ID.
-                if (dwStreamSinkIdentifier != WAV_SINK_STREAM_ID)
+                TRACE("CWavSink::GetStreamSinkById");
+                lock (this)
                 {
-                    throw new COMException("Stream id not valid", MFError.MF_E_INVALIDSTREAMNUMBER);
+                    // Fixed stream ID.
+                    if (dwStreamSinkIdentifier != WAV_SINK_STREAM_ID)
+                    {
+                        throw new COMException("Stream id not valid", MFError.MF_E_INVALIDSTREAMNUMBER);
+                    }
+
+                    CheckShutdown();
+
+                    ppStreamSink = m_pStream;
                 }
-
-                CheckShutdown();
-
-                ppStreamSink = m_pStream;
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppStreamSink = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -272,38 +326,46 @@ namespace WavSinkNS
 
         public int SetPresentationClock(IMFPresentationClock pPresentationClock)
         {
-            int hr;
-            TRACE("CWavSink::SetPresentationClock");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-
-                // If we already have a clock, remove ourselves from that clock's
-                // state notifications.
-
-                if (m_pClock != pPresentationClock)
+                int hr;
+                TRACE("CWavSink::SetPresentationClock");
+                lock (this)
                 {
-                    if (m_pClock != null)
+                    CheckShutdown();
+
+                    // If we already have a clock, remove ourselves from that clock's
+                    // state notifications.
+
+                    if (m_pClock != pPresentationClock)
                     {
-                        hr = m_pClock.RemoveClockStateSink(this);
-                        MFError.ThrowExceptionForHR(hr);
+                        if (m_pClock != null)
+                        {
+                            hr = m_pClock.RemoveClockStateSink(this);
+                            MFError.ThrowExceptionForHR(hr);
+                        }
+
+                        // Register ourselves to get state notifications from the new clock.
+                        if (pPresentationClock != null)
+                        {
+                            hr = pPresentationClock.AddClockStateSink(this);
+                            MFError.ThrowExceptionForHR(hr);
+                        }
+
+                        // Release the pointer to the old clock.
+                        // Store the pointer to the new clock.
+
+                        //SAFE_RELEASE(m_pClock);
+                        m_pClock = pPresentationClock;
                     }
-
-                    // Register ourselves to get state notifications from the new clock.
-                    if (pPresentationClock != null)
-                    {
-                        hr = pPresentationClock.AddClockStateSink(this);
-                        MFError.ThrowExceptionForHR(hr);
-                    }
-
-                    // Release the pointer to the old clock.
-                    // Store the pointer to the new clock.
-
-                    //SAFE_RELEASE(m_pClock);
-                    m_pClock = pPresentationClock;
                 }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -313,22 +375,31 @@ namespace WavSinkNS
 
         public int GetPresentationClock(out IMFPresentationClock ppPresentationClock)
         {
-            TRACE("CWavSink::GetPresentationClock");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::GetPresentationClock");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                if (m_pClock == null)
-                {
-                    throw new COMException("There is no presentation clock.", MFError.MF_E_NO_CLOCK);
+                    if (m_pClock == null)
+                    {
+                        throw new COMException("There is no presentation clock.", MFError.MF_E_NO_CLOCK);
+                    }
+                    else
+                    {
+                        // Return the pointer to the caller.
+                        ppPresentationClock = m_pClock;
+                    }
                 }
-                else
-                {
-                    // Return the pointer to the caller.
-                    ppPresentationClock = m_pClock;
-                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppPresentationClock = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -338,32 +409,40 @@ namespace WavSinkNS
 
         public int Shutdown()
         {
-            TRACE("CWavSink::Shutdown");
-            GC.SuppressFinalize(this);
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                try
+                TRACE("CWavSink::Shutdown");
+                GC.SuppressFinalize(this);
+
+                lock (this)
                 {
-                    CheckShutdown();
-
-                    m_pStream.Shutdown();
-                }
-                finally
-                {
-                    m_IsShutdown = true;
-
-                    SafeRelease(m_pClock);
-                    m_pClock = null;
-
-                    if (m_pStream != null)
+                    try
                     {
-                        m_pStream.Dispose();
-                        m_pStream = null;
+                        CheckShutdown();
+
+                        m_pStream.Shutdown();
+                    }
+                    finally
+                    {
+                        m_IsShutdown = true;
+
+                        SafeRelease(m_pClock);
+                        m_pClock = null;
+
+                        if (m_pStream != null)
+                        {
+                            m_pStream.Dispose();
+                            m_pStream = null;
+                        }
                     }
                 }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -381,16 +460,24 @@ namespace WavSinkNS
             IMFAsyncCallback pCallback,
             object punkState)
         {
-            TRACE("CWavSink::BeginFinalize");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::BeginFinalize");
 
-                // Tell the stream to finalize.
-                m_pStream.Finalize(pCallback, punkState);
+                lock (this)
+                {
+                    CheckShutdown();
+
+                    // Tell the stream to finalize.
+                    m_pStream.Finalize(pCallback, punkState);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -400,15 +487,23 @@ namespace WavSinkNS
 
         public int EndFinalize(IMFAsyncResult pResult)
         {
-            TRACE("CWavSink::EndFinalize");
-
-            // Return the status code from the async result.
-            int hr = pResult.GetStatus();
-            if (hr < 0)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                throw new COMException("Failed status code in EndFinalize", hr);
+                TRACE("CWavSink::EndFinalize");
+
+                // Return the status code from the async result.
+                int hr = pResult.GetStatus();
+                if (hr < 0)
+                {
+                    throw new COMException("Failed status code in EndFinalize", hr);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -432,14 +527,22 @@ namespace WavSinkNS
             /* [in] */ long hnsSystemTime,
             /* [in] */ long llClockStartOffset)
         {
-            TRACE("CWavSink::OnClockStart");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::OnClockStart");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                m_pStream.Start(llClockStartOffset);
+                    m_pStream.Start(llClockStartOffset);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -452,14 +555,22 @@ namespace WavSinkNS
         public int OnClockStop(
             /* [in] */ long hnsSystemTime)
         {
-            TRACE("CWavSink::OnClockStop");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::OnClockStop");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                m_pStream.Stop();
+                    m_pStream.Stop();
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -473,14 +584,22 @@ namespace WavSinkNS
         public int OnClockPause(
             /* [in] */ long hnsSystemTime)
         {
-            TRACE("CWavSink::OnClockPause");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::OnClockPause");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                m_pStream.Pause();
+                    m_pStream.Pause();
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -491,14 +610,22 @@ namespace WavSinkNS
         public int OnClockRestart(
             /* [in] */ long hnsSystemTime)
         {
-            TRACE("CWavSink::OnClockRestart");
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                TRACE("CWavSink::OnClockRestart");
+                lock (this)
+                {
+                    CheckShutdown();
 
-                m_pStream.Restart();
+                    m_pStream.Restart();
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -512,8 +639,16 @@ namespace WavSinkNS
             /* [in] */ long hnsSystemTime,
             /* [in] */ float flRate)
         {
-            TRACE("CWavSink::OnClockSetRate");
-            return S_Ok;
+            // Make sure we *never* leave this entry point with an exception
+            try
+            {
+                TRACE("CWavSink::OnClockSetRate");
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -543,16 +678,25 @@ namespace WavSinkNS
 
         #region IMFCustom Members
 
-        public void SetStream(object pStream)
+        public int SetStream(object pStream)
         {
-            TRACE("CWavSink::SetStream");
-            if (pStream != null)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                m_pStream = new CWavStream(this, (IMFByteStream)pStream);
+                TRACE("CWavSink::SetStream");
+                if (pStream != null)
+                {
+                    m_pStream = new CWavStream(this, (IMFByteStream)pStream);
+                }
+                else
+                {
+                    throw new COMException("Null pstream", E_Pointer);
+                }
+                return S_Ok;
             }
-            else
+            catch (Exception e)
             {
-                throw new COMException("Null pstream", E_Pointer);
+                return Marshal.GetHRForException(e);
             }
         }
 
@@ -1689,7 +1833,7 @@ namespace WavSinkNS
 
                 hr = 0;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 hr = Marshal.GetHRForException(e);
             }
@@ -1771,12 +1915,12 @@ namespace WavSinkNS
         }
 
         #endregion
-    
+
         #region IMFAsyncCallback Members
 
         public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
- 	        throw new COMException("The method or operation is not implemented.", E_NotImplemented);
+            throw new COMException("The method or operation is not implemented.", E_NotImplemented);
         }
 
         public int Invoke(IMFAsyncResult pAsyncResult)

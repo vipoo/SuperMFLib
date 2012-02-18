@@ -130,17 +130,25 @@ namespace WavSourceFilter
             object punkState
             )
         {
-            int hr;
-            m_Log.WriteLine("-BeginGetEvent");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
-                MFError.ThrowExceptionForHR(hr);
-            }
+                int hr;
+                m_Log.WriteLine("-BeginGetEvent");
 
-            return S_Ok;
+                lock (this)
+                {
+                    CheckShutdown();
+                    hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                    MFError.ThrowExceptionForHR(hr);
+                }
+
+                return S_Ok;
+            }
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int EndGetEvent(
@@ -149,53 +157,79 @@ namespace WavSourceFilter
             out IMFMediaEvent ppEvent
             )
         {
-            int hr;
-            m_Log.WriteLine("-EndGetEvent");
-            ppEvent = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
-                MFError.ThrowExceptionForHR(hr);
+                int hr;
+                m_Log.WriteLine("-EndGetEvent");
+                ppEvent = null;
+
+                lock (this)
+                {
+                    CheckShutdown();
+                    hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                    MFError.ThrowExceptionForHR(hr);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppEvent = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
         {
-            int hr;
-            m_Log.WriteLine("-GetEvent");
-            ppEvent = null;
-
-            IMFMediaEventQueue pQueue = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                pQueue = (IMFMediaEventQueue)m_pEventQueue;
+                int hr;
+                m_Log.WriteLine("-GetEvent");
+                ppEvent = null;
+
+                IMFMediaEventQueue pQueue = null;
+
+                lock (this)
+                {
+                    CheckShutdown();
+                    pQueue = (IMFMediaEventQueue)m_pEventQueue;
+                }
+
+                hr = pQueue.GetEvent(dwFlags, out ppEvent);
+                MFError.ThrowExceptionForHR(hr);
+
+                //not needed SAFE_RELEASE(pQueue);
+                return S_Ok;
             }
-
-            hr = pQueue.GetEvent(dwFlags, out ppEvent);
-            MFError.ThrowExceptionForHR(hr);
-
-            //not needed SAFE_RELEASE(pQueue);
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppEvent = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
-            int hr;
-            m_Log.WriteLine("-QueueEvent");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                int hr;
+                m_Log.WriteLine("-QueueEvent");
 
-                hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
-                MFError.ThrowExceptionForHR(hr);
+                lock (this)
+                {
+                    CheckShutdown();
+
+                    hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                    MFError.ThrowExceptionForHR(hr);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -204,111 +238,137 @@ namespace WavSourceFilter
 
         public int GetMediaSource(out IMFMediaSource ppMediaSource)
         {
-            m_Log.WriteLine("-GetMediaSource");
-            ppMediaSource = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                if (m_pSource == null)
-                {
-                    throw new COMException("null WavSource", E_Unexpected);
-                }
+                m_Log.WriteLine("-GetMediaSource");
+                ppMediaSource = null;
 
-                CheckShutdown();
-                ppMediaSource = (IMFMediaSource)m_pSource;
+                lock (this)
+                {
+                    if (m_pSource == null)
+                    {
+                        throw new COMException("null WavSource", E_Unexpected);
+                    }
+
+                    CheckShutdown();
+                    ppMediaSource = (IMFMediaSource)m_pSource;
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppMediaSource = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetStreamDescriptor(out IMFStreamDescriptor ppStreamDescriptor)
         {
-            m_Log.WriteLine("-GetStreamDescriptor");
-            ppStreamDescriptor = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                if (m_pStreamDescriptor == null)
-                {
-                    throw new COMException("null stream descriptor", E_Unexpected);
-                }
+                m_Log.WriteLine("-GetStreamDescriptor");
+                ppStreamDescriptor = null;
 
-                CheckShutdown();
-                ppStreamDescriptor = m_pStreamDescriptor;
+                lock (this)
+                {
+                    if (m_pStreamDescriptor == null)
+                    {
+                        throw new COMException("null stream descriptor", E_Unexpected);
+                    }
+
+                    CheckShutdown();
+                    ppStreamDescriptor = m_pStreamDescriptor;
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppStreamDescriptor = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int RequestSample(object pToken)
         {
-            int hr;
-            m_Log.WriteLine("-RequestSample");
-
-            if (m_pSource == null)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                throw new COMException("null wavsource", E_Unexpected);
-            }
+                int hr;
+                m_Log.WriteLine("-RequestSample");
 
-            IMFSample pSample = null;  // Sample to deliver.
-            bool bReachedEOS = false;   // true if we hit end-of-stream during this method.
-
-            lock (this)
-            {
-                // Check if we are shut down.
-                CheckShutdown();
-
-                // Check if we already reached the end of the stream.
-                if (m_EOS)
+                if (m_pSource == null)
                 {
-                    throw new COMException("at eos", MFError.MF_E_END_OF_STREAM);
+                    throw new COMException("null wavsource", E_Unexpected);
                 }
 
-                // Check the source is stopped.
-                // GetState does not hold the source's critical section. Safe to call.
-                if (m_pSource.GetState() == WavSource.State.Stopped)
+                IMFSample pSample = null;  // Sample to deliver.
+                bool bReachedEOS = false;   // true if we hit end-of-stream during this method.
+
+                lock (this)
                 {
-                    throw new COMException("stopped", MFError.MF_E_INVALIDREQUEST);
+                    // Check if we are shut down.
+                    CheckShutdown();
+
+                    // Check if we already reached the end of the stream.
+                    if (m_EOS)
+                    {
+                        throw new COMException("at eos", MFError.MF_E_END_OF_STREAM);
+                    }
+
+                    // Check the source is stopped.
+                    // GetState does not hold the source's critical section. Safe to call.
+                    if (m_pSource.GetState() == WavSource.State.Stopped)
+                    {
+                        throw new COMException("stopped", MFError.MF_E_INVALIDREQUEST);
+                    }
+
+                    // If we Succeeded to here, we are able to deliver a sample.
+
+                    // Create a new audio sample.
+                    CreateAudioSample(out pSample);
+
+                    // If the caller provided a token, attach it to the sample as
+                    // an attribute.
+
+                    // NOTE: If we processed sample requests asynchronously, we would
+                    // need to call AddRef on the token and put the token onto a FIFO
+                    // queue. See documenation for IMFMediaStream::RequestSample.
+                    if (pToken != null)
+                    {
+                        object o = pToken;
+                        hr = pSample.SetUnknown(MFAttributesClsid.MFSampleExtension_Token, o);
+                        MFError.ThrowExceptionForHR(hr);
+                    }
+
+                    // Send the MEMediaSample event with the new sample.
+                    QueueEvent(MediaEventType.MEMediaSample, Guid.Empty, 0, new PropVariant(pSample));
+
+                    // See if we reached the end of the stream.
+                    CheckEndOfStream();    // This method sends MEEndOfStream if needed.
+                    bReachedEOS = m_EOS;        // Cache this flag in a local variable.
+
+                    //probably not needed SAFE_RELEASE(pSample);
                 }
 
-                // If we Succeeded to here, we are able to deliver a sample.
+                // We only have one stream, so the end of the stream is also the end of the
+                // presentation. Therefore, when we reach the end of the stream, we need to
+                // queue the end-of-presentation event from the source. Logically we would do
+                // this inside the CheckEndOfStream method. However, we cannot hold the
+                // source's critical section while holding the stream's critical section, at
+                // risk of deadlock.
 
-                // Create a new audio sample.
-                CreateAudioSample(out pSample);
-
-                // If the caller provided a token, attach it to the sample as
-                // an attribute.
-
-                // NOTE: If we processed sample requests asynchronously, we would
-                // need to call AddRef on the token and put the token onto a FIFO
-                // queue. See documenation for IMFMediaStream::RequestSample.
-                if (pToken != null)
+                if (bReachedEOS)
                 {
-                    object o = pToken;
-                    hr = pSample.SetUnknown(MFAttributesClsid.MFSampleExtension_Token, o);
-                    MFError.ThrowExceptionForHR(hr);
+                    m_pSource.QueueEvent(MediaEventType.MEEndOfPresentation, Guid.Empty, S_Ok, null);
                 }
-
-                // Send the MEMediaSample event with the new sample.
-                QueueEvent(MediaEventType.MEMediaSample, Guid.Empty, 0, new PropVariant(pSample));
-
-                // See if we reached the end of the stream.
-                CheckEndOfStream();    // This method sends MEEndOfStream if needed.
-                bReachedEOS = m_EOS;        // Cache this flag in a local variable.
-
-                //probably not needed SAFE_RELEASE(pSample);
+                return S_Ok;
             }
-
-            // We only have one stream, so the end of the stream is also the end of the
-            // presentation. Therefore, when we reach the end of the stream, we need to
-            // queue the end-of-presentation event from the source. Logically we would do
-            // this inside the CheckEndOfStream method. However, we cannot hold the
-            // source's critical section while holding the stream's critical section, at
-            // risk of deadlock.
-
-            if (bReachedEOS)
+            catch (Exception e)
             {
-                m_pSource.QueueEvent(MediaEventType.MEEndOfPresentation, Guid.Empty, S_Ok, null);
+                return Marshal.GetHRForException(e);
             }
-            return S_Ok;
         }
 
         #endregion
@@ -581,70 +641,104 @@ namespace WavSourceFilter
 
         public int BeginGetEvent(IMFAsyncCallback pCallback, object punkState)
         {
-            int hr;
-            m_Log.WriteLine("-BeginGetEvent");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
-                MFError.ThrowExceptionForHR(hr);
+                int hr;
+                m_Log.WriteLine("-BeginGetEvent");
+
+                lock (this)
+                {
+                    CheckShutdown();
+                    hr = m_pEventQueue.BeginGetEvent(pCallback, punkState);
+                    MFError.ThrowExceptionForHR(hr);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int EndGetEvent(IMFAsyncResult pResult, out IMFMediaEvent ppEvent)
         {
-            int hr;
-            m_Log.WriteLine("-EndGetEvent");
-            ppEvent = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                int hr;
+                m_Log.WriteLine("-EndGetEvent");
+                ppEvent = null;
+
+                lock (this)
+                {
+                    CheckShutdown();
+                    hr = m_pEventQueue.EndGetEvent(pResult, out ppEvent);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppEvent = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int GetEvent(MFEventFlag dwFlags, out IMFMediaEvent ppEvent)
         {
-            // NOTE: GetEvent can block indefinitely, so we don't hold the
-            //       WavSource lock. This requires some juggling with the
-            //       event queue pointer.
-
-            int hr;
-            m_Log.WriteLine("-GetEvent");
-            ppEvent = null;
-
-            IMFMediaEventQueue pQueue = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                // Check shutdown
-                CheckShutdown();
-                pQueue = m_pEventQueue;
+                // NOTE: GetEvent can block indefinitely, so we don't hold the
+                //       WavSource lock. This requires some juggling with the
+                //       event queue pointer.
+
+                int hr;
+                m_Log.WriteLine("-GetEvent");
+                ppEvent = null;
+
+                IMFMediaEventQueue pQueue = null;
+
+                lock (this)
+                {
+                    // Check shutdown
+                    CheckShutdown();
+                    pQueue = m_pEventQueue;
+                }
+
+                hr = pQueue.GetEvent(dwFlags, out ppEvent);
+                MFError.ThrowExceptionForHR(hr);
+
+                // not needed SAFE_RELEASE(pQueue);
+                return S_Ok;
             }
-
-            hr = pQueue.GetEvent(dwFlags, out ppEvent);
-            MFError.ThrowExceptionForHR(hr);
-
-            // not needed SAFE_RELEASE(pQueue);
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppEvent = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         public int QueueEvent(MediaEventType met, Guid guidExtendedType, int hrStatus, ConstPropVariant pvValue)
         {
-            int hr;
-            m_Log.WriteLine("-QueueEvent");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
-                MFError.ThrowExceptionForHR(hr);
+                int hr;
+                m_Log.WriteLine("-QueueEvent");
+
+                lock (this)
+                {
+                    CheckShutdown();
+                    hr = m_pEventQueue.QueueEventParamVar(met, guidExtendedType, hrStatus, pvValue);
+                    MFError.ThrowExceptionForHR(hr);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion
@@ -658,23 +752,32 @@ namespace WavSourceFilter
 
         public int CreatePresentationDescriptor(out IMFPresentationDescriptor ppPresentationDescriptor)
         {
-            int hr;
-            m_Log.WriteLine("-CreatePresentationDescriptor");
-            ppPresentationDescriptor = null;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                if (m_pPresentationDescriptor == null)
-                {
-                    CreatePresentationDescriptor();
-                }
+                int hr;
+                m_Log.WriteLine("-CreatePresentationDescriptor");
+                ppPresentationDescriptor = null;
 
-                // Clone our default presentation descriptor.
-                hr = m_pPresentationDescriptor.Clone(out ppPresentationDescriptor);
-                MFError.ThrowExceptionForHR(hr);
+                lock (this)
+                {
+                    CheckShutdown();
+                    if (m_pPresentationDescriptor == null)
+                    {
+                        CreatePresentationDescriptor();
+                    }
+
+                    // Clone our default presentation descriptor.
+                    hr = m_pPresentationDescriptor.Clone(out ppPresentationDescriptor);
+                    MFError.ThrowExceptionForHR(hr);
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                ppPresentationDescriptor = null;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -684,15 +787,24 @@ namespace WavSourceFilter
 
         public int GetCharacteristics(out MFMediaSourceCharacteristics pdwCharacteristics)
         {
-            m_Log.WriteLine("-GetCharacteristics");
-            pdwCharacteristics = MFMediaSourceCharacteristics.None;
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
-                pdwCharacteristics = MFMediaSourceCharacteristics.CanPause | MFMediaSourceCharacteristics.CanSeek;
+                m_Log.WriteLine("-GetCharacteristics");
+                pdwCharacteristics = MFMediaSourceCharacteristics.None;
+
+                lock (this)
+                {
+                    CheckShutdown();
+                    pdwCharacteristics = MFMediaSourceCharacteristics.CanPause | MFMediaSourceCharacteristics.CanSeek;
+                }
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                pdwCharacteristics = MFMediaSourceCharacteristics.None;
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -706,144 +818,152 @@ namespace WavSourceFilter
            ConstPropVariant pvarStartPosition
            )
         {
-            int hr;
-            m_Log.WriteLine("-Start");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                PropVariant var;
-                long llStartOffset = 0;
-                bool bIsSeek = false;
-                bool bIsRestartFromCurrentPosition = false;
+                int hr;
+                m_Log.WriteLine("-Start");
 
-                // Fail if the source is shut down.
-                CheckShutdown();
-
-                // Check parameters.
-                // Start position and presentation descriptor cannot be null.
-                if (pPresentationDescriptor == null) // pvarStartPosition == null || 
+                lock (this)
                 {
-                    throw new COMException("null presentation descriptor", E_InvalidArgument);
-                }
+                    PropVariant var;
+                    long llStartOffset = 0;
+                    bool bIsSeek = false;
+                    bool bIsRestartFromCurrentPosition = false;
 
-                // Check the time format. Must be "reference time" units.
-                if ((pguidTimeFormat != null) && (pguidTimeFormat != Guid.Empty))
-                {
-                    // Unrecognized time format GUID.
-                    throw new COMException("unrecognized time format guid", MFError.MF_E_UNSUPPORTED_TIME_FORMAT);
-                }
+                    // Fail if the source is shut down.
+                    CheckShutdown();
 
-                // Check the start position.
-                if ((pvarStartPosition == null) || (pvarStartPosition.GetMFAttributeType() == MFAttributeType.None))
-                {
-                    // Start position is "current position".
-                    // For stopped, that means 0. Otherwise, use the current position.
-                    if (m_state == State.Stopped)
+                    // Check parameters.
+                    // Start position and presentation descriptor cannot be null.
+                    if (pPresentationDescriptor == null) // pvarStartPosition == null || 
                     {
-                        llStartOffset = 0;
+                        throw new COMException("null presentation descriptor", E_InvalidArgument);
+                    }
+
+                    // Check the time format. Must be "reference time" units.
+                    if ((pguidTimeFormat != null) && (pguidTimeFormat != Guid.Empty))
+                    {
+                        // Unrecognized time format GUID.
+                        throw new COMException("unrecognized time format guid", MFError.MF_E_UNSUPPORTED_TIME_FORMAT);
+                    }
+
+                    // Check the start position.
+                    if ((pvarStartPosition == null) || (pvarStartPosition.GetMFAttributeType() == MFAttributeType.None))
+                    {
+                        // Start position is "current position".
+                        // For stopped, that means 0. Otherwise, use the current position.
+                        if (m_state == State.Stopped)
+                        {
+                            llStartOffset = 0;
+                        }
+                        else
+                        {
+                            llStartOffset = GetCurrentPosition();
+                            bIsRestartFromCurrentPosition = true;
+                        }
+                    }
+                    else if (pvarStartPosition.GetMFAttributeType() == MFAttributeType.Uint64)
+                    {
+                        // Start position is given in pvarStartPosition in 100-ns units.
+                        llStartOffset = (long)pvarStartPosition;
+
+                        if (m_state != State.Stopped)
+                        {
+                            // Source is running or paused, so this is a seek.
+                            bIsSeek = true;
+                        }
                     }
                     else
                     {
-                        llStartOffset = GetCurrentPosition();
-                        bIsRestartFromCurrentPosition = true;
-                    }
-                }
-                else if (pvarStartPosition.GetMFAttributeType() == MFAttributeType.Uint64)
-                {
-                    // Start position is given in pvarStartPosition in 100-ns units.
-                    llStartOffset = (long)pvarStartPosition;
-
-                    if (m_state != State.Stopped)
-                    {
-                        // Source is running or paused, so this is a seek.
-                        bIsSeek = true;
-                    }
-                }
-                else
-                {
-                    // We don't support this time format.
-                    throw new COMException("We don't support this time format", MFError.MF_E_UNSUPPORTED_TIME_FORMAT);
-                }
-
-                // Validate the caller's presentation descriptor.
-                ValidatePresentationDescriptor(pPresentationDescriptor);
-
-                // Sends the MENewStream or MEUpdatedStream event.
-                QueueNewStreamEvent(pPresentationDescriptor);
-
-                // Notify the stream of the new start time.
-                m_pStream.SetPosition(llStartOffset);
-
-                // Send Started or Seeked events. We will send them
-                // 1. from the media source
-                // 2. from each stream
-
-                var = new PropVariant(llStartOffset);
-
-                // (1) Send the source event.
-                if (bIsSeek)
-                {
-                    QueueEvent(MediaEventType.MESourceSeeked, Guid.Empty, S_Ok, var);
-                }
-                else
-                {
-                    // For starting, if we are RESTARTING from the current position and our
-                    // previous state was running/paused, then we need to add the
-                    // MF_EVENT_SOURCE_ACTUAL_START attribute to the event. This requires
-                    // creating the event object first.
-
-                    IMFMediaEvent pEvent = null;
-
-                    // Create the event.
-                    hr = MFExtern.MFCreateMediaEvent(
-                        MediaEventType.MESourceStarted,
-                        Guid.Empty,
-                        S_Ok,
-                        var,
-                        out pEvent
-                        );
-                    MFError.ThrowExceptionForHR(hr);
-
-                    // For restarts, set the actual start time as an attribute.
-                    if (bIsRestartFromCurrentPosition)
-                    {
-                        hr = pEvent.SetUINT64(MFAttributesClsid.MF_EVENT_SOURCE_ACTUAL_START, llStartOffset);
-                        MFError.ThrowExceptionForHR(hr);
+                        // We don't support this time format.
+                        throw new COMException("We don't support this time format", MFError.MF_E_UNSUPPORTED_TIME_FORMAT);
                     }
 
-                    // Now  queue the event.
-                    hr = m_pEventQueue.QueueEvent(pEvent);
-                    MFError.ThrowExceptionForHR(hr);
+                    // Validate the caller's presentation descriptor.
+                    ValidatePresentationDescriptor(pPresentationDescriptor);
 
-                    //SAFE_RELEASE(pEvent);
-                }
+                    // Sends the MENewStream or MEUpdatedStream event.
+                    QueueNewStreamEvent(pPresentationDescriptor);
 
-                // 2. Send the stream event.
-                if (m_pStream != null)
-                {
+                    // Notify the stream of the new start time.
+                    m_pStream.SetPosition(llStartOffset);
+
+                    // Send Started or Seeked events. We will send them
+                    // 1. from the media source
+                    // 2. from each stream
+
+                    var = new PropVariant(llStartOffset);
+
+                    // (1) Send the source event.
                     if (bIsSeek)
                     {
-                        m_pStream.QueueEvent(MediaEventType.MEStreamSeeked, Guid.Empty, S_Ok, var);
+                        QueueEvent(MediaEventType.MESourceSeeked, Guid.Empty, S_Ok, var);
                     }
                     else
                     {
-                        m_pStream.QueueEvent(MediaEventType.MEStreamStarted, Guid.Empty, S_Ok, var);
+                        // For starting, if we are RESTARTING from the current position and our
+                        // previous state was running/paused, then we need to add the
+                        // MF_EVENT_SOURCE_ACTUAL_START attribute to the event. This requires
+                        // creating the event object first.
+
+                        IMFMediaEvent pEvent = null;
+
+                        // Create the event.
+                        hr = MFExtern.MFCreateMediaEvent(
+                            MediaEventType.MESourceStarted,
+                            Guid.Empty,
+                            S_Ok,
+                            var,
+                            out pEvent
+                            );
+                        MFError.ThrowExceptionForHR(hr);
+
+                        // For restarts, set the actual start time as an attribute.
+                        if (bIsRestartFromCurrentPosition)
+                        {
+                            hr = pEvent.SetUINT64(MFAttributesClsid.MF_EVENT_SOURCE_ACTUAL_START, llStartOffset);
+                            MFError.ThrowExceptionForHR(hr);
+                        }
+
+                        // Now  queue the event.
+                        hr = m_pEventQueue.QueueEvent(pEvent);
+                        MFError.ThrowExceptionForHR(hr);
+
+                        //SAFE_RELEASE(pEvent);
                     }
+
+                    // 2. Send the stream event.
+                    if (m_pStream != null)
+                    {
+                        if (bIsSeek)
+                        {
+                            m_pStream.QueueEvent(MediaEventType.MEStreamSeeked, Guid.Empty, S_Ok, var);
+                        }
+                        else
+                        {
+                            m_pStream.QueueEvent(MediaEventType.MEStreamStarted, Guid.Empty, S_Ok, var);
+                        }
+                    }
+
+                    // Update our state.
+                    m_state = State.Started;
+
+                    // NOTE: If this method were implemented as an asynchronous operation
+                    // and the operation Failed asynchronously, the media source would need
+                    // to send an MESourceStarted event with the failure code. For this
+                    // sample, all operations are synchronous (which is allowed), so any
+                    // failures are also synchronous.
+
+
+                    var.Clear();
                 }
-
-                // Update our state.
-                m_state = State.Started;
-
-                // NOTE: If this method were implemented as an asynchronous operation
-                // and the operation Failed asynchronously, the media source would need
-                // to send an MESourceStarted event with the failure code. For this
-                // sample, all operations are synchronous (which is allowed), so any
-                // failures are also synchronous.
-
-
-                var.Clear();
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -853,32 +973,40 @@ namespace WavSourceFilter
 
         public int Pause()
         {
-            m_Log.WriteLine("-Pause");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                m_Log.WriteLine("-Pause");
 
-                // Pause is only allowed from started state.
-                if (m_state != State.Started)
+                lock (this)
                 {
-                    throw new COMException("Not started", MFError.MF_E_INVALID_STATE_TRANSITION);
+                    CheckShutdown();
+
+                    // Pause is only allowed from started state.
+                    if (m_state != State.Started)
+                    {
+                        throw new COMException("Not started", MFError.MF_E_INVALID_STATE_TRANSITION);
+                    }
+
+                    // Send the appropriate events.
+                    if (m_pStream != null)
+                    {
+                        m_pStream.QueueEvent(MediaEventType.MEStreamPaused, Guid.Empty, S_Ok, null);
+                    }
+
+                    QueueEvent(MediaEventType.MESourcePaused, Guid.Empty, S_Ok, null);
+
+                    // Update our state.
+                    m_state = State.Paused;
                 }
 
-                // Send the appropriate events.
-                if (m_pStream != null)
-                {
-                    m_pStream.QueueEvent(MediaEventType.MEStreamPaused, Guid.Empty, S_Ok, null);
-                }
-
-                QueueEvent(MediaEventType.MESourcePaused, Guid.Empty, S_Ok, null);
-
-                // Update our state.
-                m_state = State.Paused;
+                // Nothing else for us to do.
+                return S_Ok;
             }
-
-            // Nothing else for us to do.
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -888,24 +1016,32 @@ namespace WavSourceFilter
 
         public int Stop()
         {
-            m_Log.WriteLine("-Stop");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                m_Log.WriteLine("-Stop");
 
-                // Queue events.
-                if (m_pStream != null)
+                lock (this)
                 {
-                    m_pStream.QueueEvent(MediaEventType.MEStreamStopped, Guid.Empty, S_Ok, null);
+                    CheckShutdown();
+
+                    // Queue events.
+                    if (m_pStream != null)
+                    {
+                        m_pStream.QueueEvent(MediaEventType.MEStreamStopped, Guid.Empty, S_Ok, null);
+                    }
+
+                    QueueEvent(MediaEventType.MESourceStopped, Guid.Empty, S_Ok, null);
+
+                    // Update our state.
+                    m_state = State.Stopped;
                 }
-
-                QueueEvent(MediaEventType.MESourceStopped, Guid.Empty, S_Ok, null);
-
-                // Update our state.
-                m_state = State.Stopped;
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         //-------------------------------------------------------------------
@@ -919,37 +1055,45 @@ namespace WavSourceFilter
 
         public int Shutdown()
         {
-            int hr;
-            m_Log.WriteLine("-Shutdown");
-
-            lock (this)
+            // Make sure we *never* leave this entry point with an exception
+            try
             {
-                CheckShutdown();
+                int hr;
+                m_Log.WriteLine("-Shutdown");
 
-                // Shut down the stream object.
-                if (m_pStream != null)
+                lock (this)
                 {
-                    m_pStream.Shutdown();
-                }
+                    CheckShutdown();
 
-                // Shut down the event queue.
-                if (m_pEventQueue != null)
-                {
-                    try
+                    // Shut down the stream object.
+                    if (m_pStream != null)
                     {
-                        hr = m_pEventQueue.Shutdown();
-                        MFError.ThrowExceptionForHR(hr);
+                        m_pStream.Shutdown();
                     }
-                    catch { }
+
+                    // Shut down the event queue.
+                    if (m_pEventQueue != null)
+                    {
+                        try
+                        {
+                            hr = m_pEventQueue.Shutdown();
+                            MFError.ThrowExceptionForHR(hr);
+                        }
+                        catch { }
+                    }
+
+                    // Release objects. (Even if Shutdown Failed for some reason.)
+                    Dispose();
+
+                    // Set our shutdown flag.
+                    m_IsShutdown = true;
                 }
-
-                // Release objects. (Even if Shutdown Failed for some reason.)
-                Dispose();
-
-                // Set our shutdown flag.
-                m_IsShutdown = true;
+                return S_Ok;
             }
-            return S_Ok;
+            catch (Exception e)
+            {
+                return Marshal.GetHRForException(e);
+            }
         }
 
         #endregion

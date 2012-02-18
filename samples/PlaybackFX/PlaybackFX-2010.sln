@@ -5,20 +5,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaybackFX-2010", "Playback
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
-		Release|Any CPU = Release|Any CPU
+		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Debug|x64.ActiveCfg = Debug|x64
 		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Debug|x64.Build.0 = Debug|x64
-		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Debug|x86.ActiveCfg = Debug|x64
+		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Debug|x86.Build.0 = Debug|x64
 		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Release|x64.ActiveCfg = Release|x64
 		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Release|x64.Build.0 = Release|x64
+		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Release|x86.ActiveCfg = Release|x86
+		{70AF3F8F-2D22-40CD-919C-68113371D10F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

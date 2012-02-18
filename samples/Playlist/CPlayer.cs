@@ -606,7 +606,7 @@ namespace Playlist
             IMFMediaEvent pEvent;
             PropVariant eventData = null;
             Exception excpt = null;
-            int hr;
+            int hr = S_Ok;
 
             try
             {
@@ -813,12 +813,16 @@ namespace Playlist
                 MFError.ThrowExceptionForHR(hr);
             }
 
-            if (excpt != null)
+            if (excpt == null)
             {
-                throw excpt;
+                hr = S_Ok;
+            }
+            else
+            {
+                hr = Marshal.GetHRForException(excpt);
             }
 
-            return S_Ok;
+            return hr;
         }
 
         #endregion

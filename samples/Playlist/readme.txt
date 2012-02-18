@@ -12,6 +12,3 @@ This sample is a c# version of the Playlist sample included in the
 Media Foundation SDK.  It plays a collection of media files, one after 
 the other.  It still contains some of the odd behavior from the
 original.
-
-The most significant difference has to do with how error handling is performed.
-See "Error handling" in docs\ReadMe.rtf for details.

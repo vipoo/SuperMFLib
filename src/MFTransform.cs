@@ -194,7 +194,7 @@ namespace MediaFoundation.Transform
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("149c4d73-b4be-4f8d-8b87-079e926b6add")]
-    interface IMFLocalMFTRegistration
+    public interface IMFLocalMFTRegistration
     {
         [PreserveSig]
         int RegisterMFTs(

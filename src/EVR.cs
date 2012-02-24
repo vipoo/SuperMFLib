@@ -673,13 +673,13 @@ namespace MediaFoundation.EVR
             );
 
         [PreserveSig]
-        int SetDesiredSampleTimeAndDuration(
+        void SetDesiredSampleTimeAndDuration(
             [In] long hnsSampleTime,
             [In] long hnsSampleDuration
             );
 
         [PreserveSig]
-        int Clear();
+        void Clear();
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,

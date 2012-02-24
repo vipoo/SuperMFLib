@@ -1,5 +1,7 @@
 This project is required by the EVRPresenter project, but may be used by other code as well.
 
+To build it, you'll want the latest version of the Windows SDK.  As of this writing, that's at http://www.microsoft.com/download/en/details.aspx?id=8279
+
 As with any code that is labeled "sample," you should be clear about what level of quality you are expecting.
 While there are no bugs or gotchas in this code TO MY KNOWLEDGE, that doesn't mean there aren't any.  You should
 review the code yourself, and test it for your specific purposes.

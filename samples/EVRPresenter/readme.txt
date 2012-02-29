@@ -75,4 +75,4 @@ you can register EVRPresenter.dll.
 Making it go:
 -------------
 
-See the EVRPlayer sample.
+See the EVRPlayer sample that is included with DirectShowNet (http://directshownet.sourceforge.net/).

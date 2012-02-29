@@ -326,7 +326,8 @@ class CPlayer : COMBase, IMFAsyncCallback
                     case MediaEventType.MESessionTopologyStatus:
                         // Get the status code.
                         int i;
-                        pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out i);
+                        hr = pEvent.GetUINT32(MFAttributesClsid.MF_EVENT_TOPOLOGY_STATUS, out i);
+                        MFError.ThrowExceptionForHR(hr);
                         TopoStatus = (MFTopoStatus)i;
                         switch (TopoStatus)
                         {
@@ -447,6 +448,7 @@ class CPlayer : COMBase, IMFAsyncCallback
         if (m_pSession != null)
         {
             hr = m_pSession.Shutdown();
+            MFError.ThrowExceptionForHR(hr);
             Marshal.ReleaseComObject(m_pSession);
             m_pSession = null;
         }
@@ -454,12 +456,11 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     protected void StartPlayback()
     {
-        int hr;
         TRACE("CPlayer::StartPlayback");
 
         Debug.Assert(m_pSession != null);
 
-        hr = m_pSession.Start(Guid.Empty, new PropVariant());
+        int hr = m_pSession.Start(Guid.Empty, new PropVariant());
         MFError.ThrowExceptionForHR(hr);
     }
 
@@ -500,8 +501,6 @@ class CPlayer : COMBase, IMFAsyncCallback
 
     protected void CreateTopologyFromSource(out IMFTopology ppTopology)
     {
-        int hr;
-
         TRACE("CPlayer::CreateTopologyFromSource");
 
         Debug.Assert(m_pSession != null);
@@ -510,6 +509,8 @@ class CPlayer : COMBase, IMFAsyncCallback
         IMFTopology pTopology = null;
         IMFPresentationDescriptor pSourcePD = null;
         int cSourceStreams = 0;
+
+        int hr;
 
         try
         {
@@ -607,9 +608,9 @@ class CPlayer : COMBase, IMFAsyncCallback
         out IMFTopologyNode ppNode
         )
     {
-        int hr;
         Debug.Assert(m_pSource != null);
 
+        int hr;
         IMFTopologyNode pNode = null;
 
         try

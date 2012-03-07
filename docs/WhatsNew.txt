@@ -1,3 +1,49 @@
+v2.0 (2012-03-05)
+
+Interfaces
+
+152 defined
+ 75 tested
+ 11 untestable
+
+Externs
+
+188 defined
+ 76 tested
+ 22 untestable
+
+See interfaces.txt for details.
+
+The error handling has been significantly re-worked.  In earlier versions, methods 
+that failed would automatically throw exceptions.  This version returns the COM 
+result codes as integers.  If you have code written to previous versions of this 
+library, you'll need to modify your code for every call to the MF library, like 
+this:
+
+   int hr;
+
+   hr = iSomething.DoSomething();
+   MFError.ThrowExceptionForHR(hr); // Turn hr into exception if it was an error
+
+This was changed because:
+
+1) Consistent with the MF docs
+2) Significantly better performance when exceptions are thrown
+3) Consistent with other libraries (DS & WM)
+4) Some methods already had to use the integer return method,
+resulting in internal inconsistencies and coder confusion.
+
+Also, given the newness of MF and the free availability of 2010 Express
+the solution files for VS2008 and VS2005 have been removed.
+
+
+Thanks to the following SF users who provided feedback for v2.0:
+
+    asa11
+    sstevee
+    longkerdandy
+
+-----------------------------------------------------------------
 v1.1 (2009-06-10)
 
 Interfaces

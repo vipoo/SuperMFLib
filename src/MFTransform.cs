@@ -33,6 +33,13 @@ namespace MediaFoundation.Transform
 
 #if ALLOW_UNTESTED_INTERFACES
 
+    [Flags, UnmanagedName("MF3DVideoOutputType")]
+    public enum MF3DVideoOutputType
+    {
+        MF3DVideoOutputType_BaseView = 0,
+        MF3DVideoOutputType_Stereo = 1
+    }
+
     [StructLayout(LayoutKind.Sequential), UnmanagedName("STREAM_MEDIUM")]
     public struct STREAM_MEDIUM
     {
@@ -51,6 +58,8 @@ namespace MediaFoundation.Transform
         LocalMFT = 0x00000010,   // Enumerates Locally (in-process) registered MFTs
         TranscodeOnly = 0x00000020,   // Enumerates decoder MFTs used by transcode only    
         SortAndFilter = 0x00000040,   // Apply system local, do not use and preferred sorting and filtering
+        SortAndFilterApprovedOnly = 0x000000C0,   // Similar to MFT_ENUM_FLAG_SORTANDFILTER, but apply a local policy of: MF_PLUGIN_CONTROL_POLICY_USE_APPROVED_PLUGINS
+        SortAndFilterWebOnly = 0x00000140,   // Similar to MFT_ENUM_FLAG_SORTANDFILTER, but apply a local policy of: MF_PLUGIN_CONTROL_POLICY_USE_WEB_PLUGINS
         All = 0x0000003F    // Enumerates all MFTs including SW and HW MFTs and applies filtering
     }
 
@@ -67,7 +76,8 @@ namespace MediaFoundation.Transform
     public enum MFTProcessOutputFlags
     {
         None = 0,
-        DiscardWhenNoBuffer = 0x00000001
+        DiscardWhenNoBuffer = 0x00000001,
+        RegenerateLastOutput = 0x00000002
     }
 
     [Flags, UnmanagedName("_MFT_OUTPUT_STATUS_FLAGS")]
@@ -130,6 +140,7 @@ namespace MediaFoundation.Transform
         NotifyStartOfStream = 0x10000003,
         SetD3DManager = 2,
         DropSamples = 0x00000003,
+        CommandTick = 0x00000004,
         CommandMarker = 0x20000000
     }
 

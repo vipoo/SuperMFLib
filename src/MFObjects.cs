@@ -208,6 +208,7 @@ namespace MediaFoundation
         RT = 0x00000002,
         IO = 0x00000003,
         Timer = 0x00000004,
+        QueueMultiThreaded = 0x00000005,
         LongFunction = 0x00000007,
         PrivateMask = unchecked((int)0xFFFF0000),
         All = unchecked((int)0xFFFFFFFF)
@@ -218,7 +219,9 @@ namespace MediaFoundation
     {
         None = 0,
         FastIOProcessingCallback = 0x00000001,
-        SignalCallback = 0x00000002
+        SignalCallback = 0x00000002,
+        BlockingCallback = 0x00000004,
+        ReplyCallback = 0x00000008
     }
 
     [UnmanagedName("MF_ATTRIBUTES_MATCH_TYPE")]
@@ -260,88 +263,99 @@ namespace MediaFoundation
         MENonFatalError = 3,
         MEGenericV1Anchor = MENonFatalError,
         MESessionUnknown = 100,
-        MESessionTopologySet = (MESessionUnknown + 1),
-        MESessionTopologiesCleared = (MESessionTopologySet + 1),
-        MESessionStarted = (MESessionTopologiesCleared + 1),
-        MESessionPaused = (MESessionStarted + 1),
-        MESessionStopped = (MESessionPaused + 1),
-        MESessionClosed = (MESessionStopped + 1),
-        MESessionEnded = (MESessionClosed + 1),
-        MESessionRateChanged = (MESessionEnded + 1),
-        MESessionScrubSampleComplete = (MESessionRateChanged + 1),
-        MESessionCapabilitiesChanged = (MESessionScrubSampleComplete + 1),
-        MESessionTopologyStatus = (MESessionCapabilitiesChanged + 1),
-        MESessionNotifyPresentationTime = (MESessionTopologyStatus + 1),
-        MENewPresentation = (MESessionNotifyPresentationTime + 1),
-        MELicenseAcquisitionStart = (MENewPresentation + 1),
-        MELicenseAcquisitionCompleted = (MELicenseAcquisitionStart + 1),
-        MEIndividualizationStart = (MELicenseAcquisitionCompleted + 1),
-        MEIndividualizationCompleted = (MEIndividualizationStart + 1),
-        MEEnablerProgress = (MEIndividualizationCompleted + 1),
-        MEEnablerCompleted = (MEEnablerProgress + 1),
-        MEPolicyError = (MEEnablerCompleted + 1),
-        MEPolicyReport = (MEPolicyError + 1),
-        MEBufferingStarted = (MEPolicyReport + 1),
-        MEBufferingStopped = (MEBufferingStarted + 1),
-        MEConnectStart = (MEBufferingStopped + 1),
-        MEConnectEnd = (MEConnectStart + 1),
-        MEReconnectStart = (MEConnectEnd + 1),
-        MEReconnectEnd = (MEReconnectStart + 1),
-        MERendererEvent = (MEReconnectEnd + 1),
-        MESessionStreamSinkFormatChanged = (MERendererEvent + 1),
+        MESessionTopologySet = 101,
+        MESessionTopologiesCleared = 102,
+        MESessionStarted = 103,
+        MESessionPaused = 104,
+        MESessionStopped = 105,
+        MESessionClosed = 106,
+        MESessionEnded = 107,
+        MESessionRateChanged = 108,
+        MESessionScrubSampleComplete = 109,
+        MESessionCapabilitiesChanged = 110,
+        MESessionTopologyStatus = 111,
+        MESessionNotifyPresentationTime = 112,
+        MENewPresentation = 113,
+        MELicenseAcquisitionStart = 114,
+        MELicenseAcquisitionCompleted = 115,
+        MEIndividualizationStart = 116,
+        MEIndividualizationCompleted = 117,
+        MEEnablerProgress = 118,
+        MEEnablerCompleted = 119,
+        MEPolicyError = 120,
+        MEPolicyReport = 121,
+        MEBufferingStarted = 122,
+        MEBufferingStopped = 123,
+        MEConnectStart = 124,
+        MEConnectEnd = 125,
+        MEReconnectStart = 126,
+        MEReconnectEnd = 127,
+        MERendererEvent = 128,
+        MESessionStreamSinkFormatChanged = 129,
         MESessionV1Anchor = MESessionStreamSinkFormatChanged,
         MESourceUnknown = 200,
-        MESourceStarted = (MESourceUnknown + 1),
-        MEStreamStarted = (MESourceStarted + 1),
-        MESourceSeeked = (MEStreamStarted + 1),
-        MEStreamSeeked = (MESourceSeeked + 1),
-        MENewStream = (MEStreamSeeked + 1),
-        MEUpdatedStream = (MENewStream + 1),
-        MESourceStopped = (MEUpdatedStream + 1),
-        MEStreamStopped = (MESourceStopped + 1),
-        MESourcePaused = (MEStreamStopped + 1),
-        MEStreamPaused = (MESourcePaused + 1),
-        MEEndOfPresentation = (MEStreamPaused + 1),
-        MEEndOfStream = (MEEndOfPresentation + 1),
-        MEMediaSample = (MEEndOfStream + 1),
-        MEStreamTick = (MEMediaSample + 1),
-        MEStreamThinMode = (MEStreamTick + 1),
-        MEStreamFormatChanged = (MEStreamThinMode + 1),
-        MESourceRateChanged = (MEStreamFormatChanged + 1),
-        MEEndOfPresentationSegment = (MESourceRateChanged + 1),
-        MESourceCharacteristicsChanged = (MEEndOfPresentationSegment + 1),
-        MESourceRateChangeRequested = (MESourceCharacteristicsChanged + 1),
-        MESourceMetadataChanged = (MESourceRateChangeRequested + 1),
-        MESequencerSourceTopologyUpdated = (MESourceMetadataChanged + 1),
+        MESourceStarted = 201,
+        MEStreamStarted = 202,
+        MESourceSeeked = 203,
+        MEStreamSeeked = 204,
+        MENewStream = 205,
+        MEUpdatedStream = 206,
+        MESourceStopped = 207,
+        MEStreamStopped = 208,
+        MESourcePaused = 209,
+        MEStreamPaused = 210,
+        MEEndOfPresentation = 211,
+        MEEndOfStream = 212,
+        MEMediaSample = 213,
+        MEStreamTick = 214,
+        MEStreamThinMode = 215,
+        MEStreamFormatChanged = 216,
+        MESourceRateChanged = 217,
+        MEEndOfPresentationSegment = 218,
+        MESourceCharacteristicsChanged = 219,
+        MESourceRateChangeRequested = 220,
+        MESourceMetadataChanged = 221,
+        MESequencerSourceTopologyUpdated = 222,
         MESourceV1Anchor = MESequencerSourceTopologyUpdated,
+
         MESinkUnknown = 300,
-        MEStreamSinkStarted = (MESinkUnknown + 1),
-        MEStreamSinkStopped = (MEStreamSinkStarted + 1),
-        MEStreamSinkPaused = (MEStreamSinkStopped + 1),
-        MEStreamSinkRateChanged = (MEStreamSinkPaused + 1),
-        MEStreamSinkRequestSample = (MEStreamSinkRateChanged + 1),
-        MEStreamSinkMarker = (MEStreamSinkRequestSample + 1),
-        MEStreamSinkPrerolled = (MEStreamSinkMarker + 1),
-        MEStreamSinkScrubSampleComplete = (MEStreamSinkPrerolled + 1),
-        MEStreamSinkFormatChanged = (MEStreamSinkScrubSampleComplete + 1),
-        MEStreamSinkDeviceChanged = (MEStreamSinkFormatChanged + 1),
-        MEQualityNotify = (MEStreamSinkDeviceChanged + 1),
-        MESinkInvalidated = (MEQualityNotify + 1),
-        MEAudioSessionNameChanged = (MESinkInvalidated + 1),
-        MEAudioSessionVolumeChanged = (MEAudioSessionNameChanged + 1),
-        MEAudioSessionDeviceRemoved = (MEAudioSessionVolumeChanged + 1),
-        MEAudioSessionServerShutdown = (MEAudioSessionDeviceRemoved + 1),
-        MEAudioSessionGroupingParamChanged = (MEAudioSessionServerShutdown + 1),
-        MEAudioSessionIconChanged = (MEAudioSessionGroupingParamChanged + 1),
-        MEAudioSessionFormatChanged = (MEAudioSessionIconChanged + 1),
-        MEAudioSessionDisconnected = (MEAudioSessionFormatChanged + 1),
-        MEAudioSessionExclusiveModeOverride = (MEAudioSessionDisconnected + 1),
+        MEStreamSinkStarted = 301,
+        MEStreamSinkStopped = 302,
+        MEStreamSinkPaused = 303,
+        MEStreamSinkRateChanged = 304,
+        MEStreamSinkRequestSample = 305,
+        MEStreamSinkMarker = 306,
+        MEStreamSinkPrerolled = 307,
+        MEStreamSinkScrubSampleComplete = 308,
+        MEStreamSinkFormatChanged = 309,
+        MEStreamSinkDeviceChanged = 310,
+        MEQualityNotify = 311,
+        MESinkInvalidated = 312,
+        MEAudioSessionNameChanged = 313,
+        MEAudioSessionVolumeChanged = 314,
+        MEAudioSessionDeviceRemoved = 315,
+        MEAudioSessionServerShutdown = 316,
+        MEAudioSessionGroupingParamChanged = 317,
+        MEAudioSessionIconChanged = 318,
+        MEAudioSessionFormatChanged = 319,
+        MEAudioSessionDisconnected = 320,
+        MEAudioSessionExclusiveModeOverride = 321,
         MESinkV1Anchor = MEAudioSessionExclusiveModeOverride,
+
+        MECaptureAudioSessionVolumeChanged = 322,
+        MECaptureAudioSessionDeviceRemoved = 323,
+        MECaptureAudioSessionFormatChanged = 324,
+        MECaptureAudioSessionDisconnected = 325,
+        MECaptureAudioSessionExclusiveModeOverride = 326,
+        MECaptureAudioSessionServerShutdown = 327,
+        MESinkV2Anchor = MECaptureAudioSessionServerShutdown,
+
         METrustUnknown = 400,
-        MEPolicyChanged = (METrustUnknown + 1),
-        MEContentProtectionMessage = (MEPolicyChanged + 1),
-        MEPolicySet = (MEContentProtectionMessage + 1),
+        MEPolicyChanged = 401,
+        MEContentProtectionMessage = 402,
+        MEPolicySet = 403,
         METrustV1Anchor = MEPolicySet,
+
         MEWMDRMLicenseBackupCompleted = 500,
         MEWMDRMLicenseBackupProgress = 501,
         MEWMDRMLicenseRestoreCompleted = 502,
@@ -353,11 +367,15 @@ namespace MediaFoundation
         MEWMDRMLicenseStoreCleaned = 515,
         MEWMDRMRevocationDownloadCompleted = 516,
         MEWMDRMV1Anchor = MEWMDRMRevocationDownloadCompleted,
+
         METransformUnknown = 600,
         METransformNeedInput,
         METransformHaveOutput,
         METransformDrainComplete,
         METransformMarker,
+        MEByteStreamCharacteristicsChanged = 700,
+        MEVideoCaptureDeviceRemoved = 800,
+        MEVideoCaptureDevicePreempted = 801,
         MEReservedMax = 10000
     }
 
@@ -484,11 +502,256 @@ namespace MediaFoundation
         public MFVideoSurfaceInfo surfaceInfo;
     }
 
+#if ALLOW_UNTESTED_INTERFACES
+
+    [UnmanagedName("MF2DBuffer_LockFlags")]
+    public enum MF2DBuffer_LockFlags
+    {
+        None,
+        LockTypeMask = 0x1 | 0x2 | 0x3,
+        Read = 0x1,
+        Write = 0x2,
+        ReadWrite = 0x3,
+
+        ForceDWORD = 0x7FFFFFFF
+    }
+
+    [UnmanagedName("MF_Plugin_Type")]
+    public enum MF_Plugin_Type
+    {
+        MFT = 0,
+        MediaSource = 1,
+        MFT_MatchOutputType = 2,
+        Other = unchecked((int)0xffffffff),
+    }
+
+    [UnmanagedName("MF_PLUGIN_CONTROL_POLICY")]
+    public enum MF_PLUGIN_CONTROL_POLICY
+    {
+        UseAllPlugins = 0,
+        UseApprovedPlugins = 1,
+        UseWebPlugins = 2
+    }
+
+#endif
+
     #endregion
 
     #region Interfaces
 
 #if ALLOW_UNTESTED_INTERFACES
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("C6982083-3DDC-45CB-AF5E-0F7A8CE4DE77"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFPluginControl2 : IMFPluginControl
+    {
+        [PreserveSig]
+        int SetPolicy(
+            MF_PLUGIN_CONTROL_POLICY policy
+        );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("eb533d5d-2db6-40f8-97a9-494692014f07"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFDXGIDeviceManager
+    {
+        [PreserveSig]
+        int CloseDeviceHandle(
+            IntPtr hDevice
+        );
+
+        [PreserveSig]
+        int GetVideoService(
+            IntPtr hDevice,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppService
+        );
+
+        [PreserveSig]
+        int LockDevice(
+            IntPtr hDevice,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppUnkDevice,
+            [MarshalAs(UnmanagedType.Bool)] bool fBlock
+        );
+
+        [PreserveSig]
+        int OpenDeviceHandle(
+            out IntPtr phDevice
+        );
+
+        [PreserveSig]
+        int ResetDevice(
+            [MarshalAs(UnmanagedType.IUnknown)] object pUnkDevice,
+            int resetToken
+        );
+
+        [PreserveSig]
+        int TestDevice(
+            IntPtr hDevice
+        );
+
+        [PreserveSig]
+        int UnlockDevice(
+            IntPtr hDevice,
+            [MarshalAs(UnmanagedType.Bool)]  bool fSaveState
+        );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("a6b43f84-5c0a-42e8-a44d-b1857a76992f"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFByteStreamProxyClassFactory
+    {
+        [PreserveSig]
+        int CreateByteStreamProxy(
+            IMFByteStream pByteStream,
+            IMFAttributes pAttributes,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
+        );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("8feed468-6f7e-440d-869a-49bdd283ad0d"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFSampleOutputStream
+    {
+        [PreserveSig]
+        int BeginWriteSample(
+            IMFSample pSample,
+            IMFAsyncCallback pCallback,
+            [MarshalAs(UnmanagedType.IUnknown)] object punkState
+        );
+
+        [PreserveSig]
+        int EndWriteSample(
+            IMFAsyncResult pResult
+        );
+
+        [PreserveSig]
+        int Close();
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("33ae5ea6-4316-436f-8ddd-d73d22f829ec"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMF2DBuffer2 : IMF2DBuffer
+    {
+        #region IMF2DBuffer Methods
+
+        [PreserveSig]
+        new int Lock2D(
+            [Out] out IntPtr pbScanline0,
+            out int plPitch
+            );
+
+        [PreserveSig]
+        new int Unlock2D();
+
+        [PreserveSig]
+        new int GetScanline0AndPitch(
+            out IntPtr pbScanline0,
+            out int plPitch
+            );
+
+        [PreserveSig]
+        new int IsContiguousFormat(
+            [MarshalAs(UnmanagedType.Bool)] out bool pfIsContiguous
+            );
+
+        [PreserveSig]
+        new int GetContiguousLength(
+            out int pcbLength
+            );
+
+        [PreserveSig]
+        new int ContiguousCopyTo(
+            IntPtr pbDestBuffer,
+            [In] int cbDestBuffer
+            );
+
+        [PreserveSig]
+        new int ContiguousCopyFrom(
+            [In] IntPtr pbSrcBuffer,
+            [In] int cbSrcBuffer
+            );
+
+#endregion
+
+        [PreserveSig]
+        int Lock2DSize(
+            MF2DBuffer_LockFlags lockFlags,
+            out IntPtr ppbScanline0,
+            out int plPitch,
+            out IntPtr ppbBufferStart,
+            out int pcbBufferLength
+        );
+
+        [PreserveSig]
+        int Copy2DTo(
+            IMF2DBuffer2 pDestBuffer
+        );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("e7174cfa-1c9e-48b1-8866-626226bfc258"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFDXGIBuffer
+    {
+        [PreserveSig]
+        int GetResource(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
+        );
+
+        [PreserveSig]
+        int GetSubresourceIndex(
+            out int puSubresource
+        );
+
+        [PreserveSig]
+        int GetUnknown(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guid,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
+        );
+
+        [PreserveSig]
+        int SetUnknown(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guid,
+            [MarshalAs(UnmanagedType.IUnknown)] object pUnkData
+        );
+    }
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    Guid("c7a4dca1-f5f0-47b6-b92b-bf0106d25791"),
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFAsyncCallbackLogging : IMFAsyncCallback
+    {
+        #region IMFAsyncCallback
+
+        [PreserveSig]
+        new int GetParameters(
+            out MFASync pdwFlags,
+            out MFAsyncCallbackQueue pdwQueue
+            );
+
+        [PreserveSig]
+        new int Invoke(
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncResult pAsyncResult
+            );
+
+        #endregion
+
+        [PreserveSig]
+        IntPtr GetObjectPointer();
+
+        [PreserveSig]
+        int GetObjectTag();
+    }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("a27003d0-2354-4f2a-8d6a-ab7cff15437e"),
@@ -752,7 +1015,7 @@ namespace MediaFoundation
         int SetPreferredClsid(
             MFPluginType pluginType,
             [MarshalAs(UnmanagedType.LPWStr)] string selector,
-            [MarshalAs(UnmanagedType.LPStruct)] Guid clsid
+            [MarshalAs(UnmanagedType.LPStruct)] MFGuid clsid
         );
 
         [PreserveSig]

@@ -1928,6 +1928,131 @@ namespace MediaFoundation.Misc
         }
     }
 
+    /// <summary>
+    /// MFGuid is a wrapper class around a System.Guid value type.
+    /// </summary>
+    /// <remarks>
+    /// This class is necessary to enable null paramters passing.
+    /// </remarks>
+    [StructLayout(LayoutKind.Explicit)]
+    public class MFGuid
+    {
+        [FieldOffset(0)]
+        private Guid guid;
+
+        public static readonly MFGuid Empty = Guid.Empty;
+
+        /// <summary>
+        /// Empty constructor. 
+        /// Initialize it with System.Guid.Empty
+        /// </summary>
+        public MFGuid()
+        {
+            this.guid = Empty;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// Initialize this instance with a given System.Guid string representation.
+        /// </summary>
+        /// <param name="g">A valid System.Guid as string</param>
+        public MFGuid(string g)
+        {
+            this.guid = new Guid(g);
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// Initialize this instance with a given System.Guid.
+        /// </summary>
+        /// <param name="g">A System.Guid value type</param>
+        public MFGuid(Guid g)
+        {
+            this.guid = g;
+        }
+
+        /// <summary>
+        /// Get a string representation of this MFGuid Instance.
+        /// </summary>
+        /// <returns>A string representing this instance</returns>
+        public override string ToString()
+        {
+            return this.guid.ToString();
+        }
+
+        /// <summary>
+        /// Get a string representation of this MFGuid Instance with a specific format.
+        /// </summary>
+        /// <param name="format"><see cref="System.Guid.ToString"/> for a description of the format parameter.</param>
+        /// <returns>A string representing this instance according to the format parameter</returns>
+        public string ToString(string format)
+        {
+            return this.guid.ToString(format);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.guid.GetHashCode();
+        }
+
+        /// <summary>
+        /// Define implicit cast between MFGuid and System.Guid for languages supporting this feature.
+        /// VB.Net doesn't support implicit cast. <see cref="MFGuid.ToGuid"/> for similar functionality.
+        /// <code>
+        ///   // Define a new MFGuid instance
+        ///   MFGuid mfG = new MFGuid("{33D57EBF-7C9D-435e-A15E-D300B52FBD91}");
+        ///   // Do implicit cast between MFGuid and Guid
+        ///   Guid g = mfG;
+        ///
+        ///   Console.WriteLine(g.ToString());
+        /// </code>
+        /// </summary>
+        /// <param name="g">MFGuid to be cast</param>
+        /// <returns>A casted System.Guid</returns>
+        public static implicit operator Guid(MFGuid g)
+        {
+            return g.guid;
+        }
+
+        /// <summary>
+        /// Define implicit cast between System.Guid and MFGuid for languages supporting this feature.
+        /// VB.Net doesn't support implicit cast. <see cref="MFGuid.FromGuid"/> for similar functionality.
+        /// <code>
+        ///   // Define a new Guid instance
+        ///   Guid g = new Guid("{B9364217-366E-45f8-AA2D-B0ED9E7D932D}");
+        ///   // Do implicit cast between Guid and MFGuid
+        ///   MFGuid mfG = g;
+        ///
+        ///   Console.WriteLine(mfG.ToString());
+        /// </code>
+        /// </summary>
+        /// <param name="g">System.Guid to be cast</param>
+        /// <returns>A casted MFGuid</returns>
+        public static implicit operator MFGuid(Guid g)
+        {
+            return new MFGuid(g);
+        }
+
+        /// <summary>
+        /// Get the System.Guid equivalent to this MFGuid instance.
+        /// </summary>
+        /// <returns>A System.Guid</returns>
+        public Guid ToGuid()
+        {
+            return this.guid;
+        }
+
+        /// <summary>
+        /// Get a new MFGuid instance for a given System.Guid
+        /// </summary>
+        /// <param name="g">The System.Guid to wrap into a MFGuid</param>
+        /// <returns>A new instance of MFGuid</returns>
+        public static MFGuid FromGuid(Guid g)
+        {
+            return new MFGuid(g);
+        }
+    }
+
     #endregion
 
     #region Utility Classes
@@ -2042,6 +2167,14 @@ namespace MediaFoundation.Misc
         public const int MF_E_MEDIA_SOURCE_WRONGSTATE = unchecked((int)0xC00D3E9B);
         public const int MF_E_MEDIA_SOURCE_NO_STREAMS_SELECTED = unchecked((int)0xC00D3E9C);
         public const int MF_E_CANNOT_FIND_KEYFRAME_SAMPLE = unchecked((int)0xC00D3E9D);
+
+        public const int MF_E_UNSUPPORTED_CHARACTERISTICS = unchecked((int)0xC00D3E9E);
+        public const int MF_E_NO_AUDIO_RECORDING_DEVICE   = unchecked((int)0xC00D3E9F);
+        public const int MF_E_AUDIO_RECORDING_DEVICE_IN_USE = unchecked((int)0xC00D3EA0);
+        public const int MF_E_AUDIO_RECORDING_DEVICE_INVALIDATED = unchecked((int)0xC00D3EA1);
+        public const int MF_E_VIDEO_RECORDING_DEVICE_INVALIDATED = unchecked((int)0xC00D3EA2);
+        public const int MF_E_VIDEO_RECORDING_DEVICE_PREEMPTED = unchecked((int)0xC00D3EA3);
+
         public const int MF_E_NETWORK_RESOURCE_FAILURE = unchecked((int)0xC00D4268);
         public const int MF_E_NET_WRITE = unchecked((int)0xC00D4269);
         public const int MF_E_NET_READ = unchecked((int)0xC00D426A);
@@ -2215,6 +2348,13 @@ namespace MediaFoundation.Misc
         public const int MF_E_ITA_OPL_DATA_NOT_INITIALIZED = unchecked((int)0xC00D7180);
         public const int MF_E_ITA_UNRECOGNIZED_ANALOG_VIDEO_OUTPUT = unchecked((int)0xC00D7181);
         public const int MF_E_ITA_UNRECOGNIZED_DIGITAL_VIDEO_OUTPUT = unchecked((int)0xC00D7182);
+
+        public const int MF_E_RESOLUTION_REQUIRES_PMP_CREATION_CALLBACK = unchecked((int)0xC00D7183);
+        public const int MF_E_INVALID_AKE_CHANNEL_PARAMETERS = unchecked((int)0xC00D7184);
+        public const int MF_E_CONTENT_PROTECTION_SYSTEM_NOT_ENABLED = unchecked((int)0xC00D7185);
+        public const int MF_E_UNSUPPORTED_CONTENT_PROTECTION_SYSTEM = unchecked((int)0xC00D7186);
+        public const int MF_E_DRM_MIGRATION_NOT_SUPPORTED = unchecked((int)0xC00D7187);
+
         public const int MF_E_CLOCK_INVALID_CONTINUITY_KEY = unchecked((int)0xC00D9C40);
         public const int MF_E_CLOCK_NO_TIME_SOURCE = unchecked((int)0xC00D9C41);
         public const int MF_E_CLOCK_STATE_ALREADY_SET = unchecked((int)0xC00D9C42);
@@ -2228,12 +2368,25 @@ namespace MediaFoundation.Misc
         public const int MF_E_TRANSCODE_NO_CONTAINERTYPE = unchecked((int)0xC00DA410);
         public const int MF_E_TRANSCODE_PROFILE_NO_MATCHING_STREAMS = unchecked((int)0xC00DA411);
         public const int MF_E_TRANSCODE_NO_MATCHING_ENCODER = unchecked((int)0xC00DA412);
+
+        public const int MF_E_TRANSCODE_INVALID_PROFILE = unchecked((int)0xC00DA413);
+
         public const int MF_E_ALLOCATOR_NOT_INITIALIZED = unchecked((int)0xC00DA7F8);
         public const int MF_E_ALLOCATOR_NOT_COMMITED = unchecked((int)0xC00DA7F9);
         public const int MF_E_ALLOCATOR_ALREADY_COMMITED = unchecked((int)0xC00DA7FA);
         public const int MF_E_STREAM_ERROR = unchecked((int)0xC00DA7FB);
         public const int MF_E_INVALID_STREAM_STATE = unchecked((int)0xC00DA7FC);
         public const int MF_E_HW_STREAM_NOT_CONNECTED = unchecked((int)0xC00DA7FD);
+
+        public const int MF_E_NO_CAPTURE_DEVICES_AVAILABLE = unchecked((int)0xC00DABE0);
+        public const int MF_E_CAPTURE_SINK_OUTPUT_NOT_SET = unchecked((int)0xC00DABE1);
+        public const int MF_E_CAPTURE_SINK_MIRROR_ERROR = unchecked((int)0xC00DABE2);
+        public const int MF_E_CAPTURE_SINK_ROTATE_ERROR = unchecked((int)0xC00DABE3);
+        public const int MF_E_CAPTURE_ENGINE_INVALID_OP = unchecked((int)0xC00DABE4);
+
+        public const int MF_E_DXGI_DEVICE_NOT_INITIALIZED = unchecked((int)0x80041000);
+        public const int MF_E_DXGI_NEW_VIDEO_DEVICE = unchecked((int)0x80041001);
+        public const int MF_E_DXGI_VIDEO_DEVICE_LOCKED = unchecked((int)0x80041002);
 
         #endregion
 

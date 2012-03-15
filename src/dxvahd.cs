@@ -36,6 +36,8 @@ namespace MediaFoundation.dxvahd
 {
 #if ALLOW_UNTESTED_INTERFACES
 
+    //DEFINE_GUID(DXVAHD_STREAM_STATE_PRIVATE_IVTC, 0x9c601e3c,0x0f33,0x414c,0xa7,0x39,0x99,0x54,0x0e,0xe4,0x2d,0xa5);
+
     public interface IDirect3DSurface9
     {
     }
@@ -44,158 +46,175 @@ namespace MediaFoundation.dxvahd
     {
     }
 
+    [UnmanagedName("DXVAHD_FRAME_FORMAT")]
     public enum DXVAHD_FRAME_FORMAT
     {
-        DXVAHD_FRAME_FORMAT_PROGRESSIVE = 0,
-        DXVAHD_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST = 1,
-        DXVAHD_FRAME_FORMAT_INTERLACED_BOTTOM_FIELD_FIRST = 2
+        Progressive = 0,
+        InterlacedTopFieldFirst = 1,
+        InterlacedBottomFieldFirst = 2
     }
 
+    [UnmanagedName("DXVAHD_DEVICE_USAGE")]
     public enum DXVAHD_DEVICE_USAGE
     {
-        DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL = 0,
-        DXVAHD_DEVICE_USAGE_OPTIMAL_SPEED = 1,
-        DXVAHD_DEVICE_USAGE_OPTIMAL_QUALITY = 2
+        PlaybackNormal = 0,
+        OptimalSpeed = 1,
+        OptimalQuality = 2
     }
 
+    [UnmanagedName("DXVAHD_SURFACE_TYPE")]
     public enum DXVAHD_SURFACE_TYPE
     {
-        DXVAHD_SURFACE_TYPE_VIDEO_INPUT = 0,
-        DXVAHD_SURFACE_TYPE_VIDEO_INPUT_PRIVATE = 1,
-        DXVAHD_SURFACE_TYPE_VIDEO_OUTPUT = 2
+        VideoInput = 0,
+        VideoInputPrivate = 1,
+        VideoOutput = 2
     }
 
+    [UnmanagedName("DXVAHD_DEVICE_TYPE")]
     public enum DXVAHD_DEVICE_TYPE
     {
-        DXVAHD_DEVICE_TYPE_HARDWARE = 0,
-        DXVAHD_DEVICE_TYPE_SOFTWARE = 1,
-        DXVAHD_DEVICE_TYPE_REFERENCE = 2,
-        DXVAHD_DEVICE_TYPE_OTHER = 3
+        Hardware = 0,
+        Software = 1,
+        Reference = 2,
+        Other = 3
     }
 
+    [Flags, UnmanagedName("DXVAHD_DEVICE_CAPS")]
     public enum DXVAHD_DEVICE_CAPS
     {
-        DXVAHD_DEVICE_CAPS_LINEAR_SPACE = 0x1,
-        DXVAHD_DEVICE_CAPS_xvYCC = 0x2,
-        DXVAHD_DEVICE_CAPS_RGB_RANGE_CONVERSION = 0x4,
-        DXVAHD_DEVICE_CAPS_YCbCr_MATRIX_CONVERSION = 0x8
+        LinearSpace = 0x1,
+        xvYCC = 0x2,
+        RGBRangeConversion = 0x4,
+        YCbCrMatrixConversion = 0x8
     }
 
+    [Flags, UnmanagedName("DXVAHD_FEATURE_CAPS")]
     public enum DXVAHD_FEATURE_CAPS
     {
-        DXVAHD_FEATURE_CAPS_ALPHA_FILL = 0x1,
-        DXVAHD_FEATURE_CAPS_CONSTRICTION = 0x2,
-        DXVAHD_FEATURE_CAPS_LUMA_KEY = 0x4,
-        DXVAHD_FEATURE_CAPS_ALPHA_PALETTE = 0x8
+        AlphaFill = 0x1,
+        Constriction = 0x2,
+        LumaKey = 0x4,
+        AlphaPalette = 0x8
     }
 
+    [Flags, UnmanagedName("DXVAHD_FILTER_CAPS")]
     public enum DXVAHD_FILTER_CAPS
     {
-        DXVAHD_FILTER_CAPS_BRIGHTNESS = 0x1,
-        DXVAHD_FILTER_CAPS_CONTRAST = 0x2,
-        DXVAHD_FILTER_CAPS_HUE = 0x4,
-        DXVAHD_FILTER_CAPS_SATURATION = 0x8,
-        DXVAHD_FILTER_CAPS_NOISE_REDUCTION = 0x10,
-        DXVAHD_FILTER_CAPS_EDGE_ENHANCEMENT = 0x20,
-        DXVAHD_FILTER_CAPS_ANAMORPHIC_SCALING = 0x40
+        Brightness = 0x1,
+        Contrast = 0x2,
+        Hue = 0x4,
+        Saturation = 0x8,
+        NoiseReduction = 0x10,
+        EdgeEnhancement = 0x20,
+        AnamorphicScaling = 0x40
     }
 
+    [Flags, UnmanagedName("DXVAHD_INPUT_FORMAT_CAPS")]
     public enum DXVAHD_INPUT_FORMAT_CAPS
     {
-        DXVAHD_INPUT_FORMAT_CAPS_RGB_INTERLACED = 0x1,
-        DXVAHD_INPUT_FORMAT_CAPS_RGB_PROCAMP = 0x2,
-        DXVAHD_INPUT_FORMAT_CAPS_RGB_LUMA_KEY = 0x4,
-        DXVAHD_INPUT_FORMAT_CAPS_PALETTE_INTERLACED = 0x8
+        RGBInterlaced = 0x1,
+        RGBProcAmp = 0x2,
+        RGBLumaKey = 0x4,
+        PaletteInterlaced = 0x8
     }
 
+    [Flags, UnmanagedName("DXVAHD_PROCESSOR_CAPS")]
     public enum DXVAHD_PROCESSOR_CAPS
     {
-        DXVAHD_PROCESSOR_CAPS_DEINTERLACE_BLEND = 0x1,
-        DXVAHD_PROCESSOR_CAPS_DEINTERLACE_BOB = 0x2,
-        DXVAHD_PROCESSOR_CAPS_DEINTERLACE_ADAPTIVE = 0x4,
-        DXVAHD_PROCESSOR_CAPS_DEINTERLACE_MOTION_COMPENSATION = 0x8,
-        DXVAHD_PROCESSOR_CAPS_INVERSE_TELECINE = 0x10,
-        DXVAHD_PROCESSOR_CAPS_FRAME_RATE_CONVERSION = 0x20
+        DeinterlaceBland = 0x1,
+        DeinterlaceBob = 0x2,
+        DeinterlaceAdaptive = 0x4,
+        DeinterlaceMotionCompensation = 0x8,
+        InverseTelecine = 0x10,
+        FrameRateConversion = 0x20
     }
 
+    [Flags, UnmanagedName("DXVAHD_ITELECINE_CAPS")]
     public enum DXVAHD_ITELECINE_CAPS
     {
-        DXVAHD_ITELECINE_CAPS_32 = 0x1,
-        DXVAHD_ITELECINE_CAPS_22 = 0x2,
-        DXVAHD_ITELECINE_CAPS_2224 = 0x4,
-        DXVAHD_ITELECINE_CAPS_2332 = 0x8,
-        DXVAHD_ITELECINE_CAPS_32322 = 0x10,
-        DXVAHD_ITELECINE_CAPS_55 = 0x20,
-        DXVAHD_ITELECINE_CAPS_64 = 0x40,
-        DXVAHD_ITELECINE_CAPS_87 = 0x80,
-        DXVAHD_ITELECINE_CAPS_222222222223 = 0x100,
-        DXVAHD_ITELECINE_CAPS_OTHER = unchecked((int)0x80000000)
+        CAPS_32 = 0x1,
+        CAPS_22 = 0x2,
+        CAPS_2224 = 0x4,
+        CAPS_2332 = 0x8,
+        CAPS_32322 = 0x10,
+        CAPS_55 = 0x20,
+        CAPS_64 = 0x40,
+        CAPS_87 = 0x80,
+        CAPS_222222222223 = 0x100,
+        CAPS_OTHER = unchecked((int)0x80000000)
     }
 
+    [UnmanagedName("DXVAHD_FILTER")]
     public enum DXVAHD_FILTER
     {
-        DXVAHD_FILTER_BRIGHTNESS = 0,
-        DXVAHD_FILTER_CONTRAST = 1,
-        DXVAHD_FILTER_HUE = 2,
-        DXVAHD_FILTER_SATURATION = 3,
-        DXVAHD_FILTER_NOISE_REDUCTION = 4,
-        DXVAHD_FILTER_EDGE_ENHANCEMENT = 5,
-        DXVAHD_FILTER_ANAMORPHIC_SCALING = 6
+        Brightness = 0,
+        Contrast = 1,
+        Hue = 2,
+        Saturation = 3,
+        NoiseReduction = 4,
+        EdgeEnhancement = 5,
+        AnamorphicScaling = 6
     }
 
+    [UnmanagedName("DXVAHD_BLT_STATE")]
     public enum DXVAHD_BLT_STATE
     {
-        DXVAHD_BLT_STATE_TARGET_RECT = 0,
-        DXVAHD_BLT_STATE_BACKGROUND_COLOR = 1,
-        DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE = 2,
-        DXVAHD_BLT_STATE_ALPHA_FILL = 3,
-        DXVAHD_BLT_STATE_CONSTRICTION = 4,
-        DXVAHD_BLT_STATE_PRIVATE = 1000
+        TargetRect = 0,
+        BackgroundColor = 1,
+        OutputColorSpace = 2,
+        AlphaFill = 3,
+        Constriction = 4,
+        Private = 1000
     }
 
+    [UnmanagedName("DXVAHD_ALPHA_FILL_MODE")]
     public enum DXVAHD_ALPHA_FILL_MODE
     {
-        DXVAHD_ALPHA_FILL_MODE_OPAQUE = 0,
-        DXVAHD_ALPHA_FILL_MODE_BACKGROUND = 1,
-        DXVAHD_ALPHA_FILL_MODE_DESTINATION = 2,
-        DXVAHD_ALPHA_FILL_MODE_SOURCE_STREAM = 3
+        Opaque = 0,
+        Background = 1,
+        Destination = 2,
+        SourceStream = 3
     }
 
+    [UnmanagedName("DXVAHD_STREAM_STATE")]
     public enum DXVAHD_STREAM_STATE
     {
-        DXVAHD_STREAM_STATE_D3DFORMAT = 0,
-        DXVAHD_STREAM_STATE_FRAME_FORMAT = 1,
-        DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE = 2,
-        DXVAHD_STREAM_STATE_OUTPUT_RATE = 3,
-        DXVAHD_STREAM_STATE_SOURCE_RECT = 4,
-        DXVAHD_STREAM_STATE_DESTINATION_RECT = 5,
-        DXVAHD_STREAM_STATE_ALPHA = 6,
-        DXVAHD_STREAM_STATE_PALETTE = 7,
-        DXVAHD_STREAM_STATE_LUMA_KEY = 8,
-        DXVAHD_STREAM_STATE_ASPECT_RATIO = 9,
-        DXVAHD_STREAM_STATE_FILTER_BRIGHTNESS = 100,
-        DXVAHD_STREAM_STATE_FILTER_CONTRAST = 101,
-        DXVAHD_STREAM_STATE_FILTER_HUE = 102,
-        DXVAHD_STREAM_STATE_FILTER_SATURATION = 103,
-        DXVAHD_STREAM_STATE_FILTER_NOISE_REDUCTION = 104,
-        DXVAHD_STREAM_STATE_FILTER_EDGE_ENHANCEMENT = 105,
-        DXVAHD_STREAM_STATE_FILTER_ANAMORPHIC_SCALING = 106,
-        DXVAHD_STREAM_STATE_PRIVATE = 1000
+        D3DFormat = 0,
+        FrameFormat = 1,
+        InputColorSpace = 2,
+        OutputRate = 3,
+        SourceRect = 4,
+        DestinationRect = 5,
+        Alpha = 6,
+        Palette = 7,
+        LumaKey = 8,
+        AspectRatio = 9,
+        FilterBrightness = 100,
+        FilterContrast = 101,
+        FilterHue = 102,
+        FilterSaturation = 103,
+        FilterNoiseReduction = 104,
+        FilterEdgeEnhancement = 105,
+        FilterAnamorphicScaling = 106,
+        Private = 1000
     }
 
+    [UnmanagedName("DXVAHD_OUTPUT_RATE")]
     public enum DXVAHD_OUTPUT_RATE
     {
-        DXVAHD_OUTPUT_RATE_NORMAL = 0,
-        DXVAHD_OUTPUT_RATE_HALF = 1,
-        DXVAHD_OUTPUT_RATE_CUSTOM = 2
+        Normal = 0,
+        Half = 1,
+        Custom = 2
     }
 
+    [UnmanagedName("DXVAHD_RATIONAL")]
     public struct DXVAHD_RATIONAL
     {
         public int Numerator;
         public int Denominator;
     }
 
+    [UnmanagedName("DXVAHD_COLOR_RGBA")]
     public struct DXVAHD_COLOR_RGBA
     {
         public float R;
@@ -204,6 +223,7 @@ namespace MediaFoundation.dxvahd
         public float A;
     }
 
+    [UnmanagedName("DXVAHD_COLOR_YCbCrA")]
     public struct DXVAHD_COLOR_YCbCrA
     {
         public float Y;
@@ -221,6 +241,7 @@ namespace MediaFoundation.dxvahd
         public DXVAHD_COLOR_YCbCrA YCbCr;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_CONTENT_DESC")]
     public struct DXVAHD_CONTENT_DESC
     {
         public DXVAHD_FRAME_FORMAT InputFrameFormat;
@@ -232,6 +253,7 @@ namespace MediaFoundation.dxvahd
         public int OutputHeight;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_VPDEVCAPS")]
     public struct DXVAHD_VPDEVCAPS
     {
         public DXVAHD_DEVICE_TYPE DeviceType;
@@ -239,7 +261,7 @@ namespace MediaFoundation.dxvahd
         public int FeatureCaps;
         public int FilterCaps;
         public int InputFormatCaps;
-        public int InputPool; // D3DPOOL
+        public int InputPool;
         public int OutputFormatCount;
         public int InputFormatCount;
         public int VideoProcessorCount;
@@ -247,6 +269,7 @@ namespace MediaFoundation.dxvahd
         public int MaxStreamStates;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_VPCAPS")]
     public struct DXVAHD_VPCAPS
     {
         public Guid VPGuid;
@@ -257,6 +280,7 @@ namespace MediaFoundation.dxvahd
         public int CustomRateCount;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_CUSTOM_RATE_DATA")]
     public struct DXVAHD_CUSTOM_RATE_DATA
     {
         public DXVAHD_RATIONAL CustomRate;
@@ -266,6 +290,7 @@ namespace MediaFoundation.dxvahd
         public int InputFramesOrFields;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_FILTER_RANGE_DATA")]
     public struct DXVAHD_FILTER_RANGE_DATA
     {
         public int Minimum;
@@ -274,6 +299,7 @@ namespace MediaFoundation.dxvahd
         public float Multiplier;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_TARGET_RECT_DATA")]
     public struct DXVAHD_BLT_STATE_TARGET_RECT_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -281,6 +307,7 @@ namespace MediaFoundation.dxvahd
         public MFRect TargetRect;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_BACKGROUND_COLOR_DATA")]
     public struct DXVAHD_BLT_STATE_BACKGROUND_COLOR_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -288,17 +315,20 @@ namespace MediaFoundation.dxvahd
         public DXVAHD_COLOR BackgroundColor;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA")]
     public struct DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA
     {
         public int Value;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_ALPHA_FILL_DATA")]
     public struct DXVAHD_BLT_STATE_ALPHA_FILL_DATA
     {
         public DXVAHD_ALPHA_FILL_MODE Mode;
         public int StreamNumber;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_CONSTRICTION_DATA")]
     public struct DXVAHD_BLT_STATE_CONSTRICTION_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -306,6 +336,7 @@ namespace MediaFoundation.dxvahd
         public Size xSize;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_PRIVATE_DATA")]
     public struct DXVAHD_BLT_STATE_PRIVATE_DATA
     {
         public Guid Guid;
@@ -313,21 +344,25 @@ namespace MediaFoundation.dxvahd
         public IntPtr pData;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_D3DFORMAT_DATA")]
     public struct DXVAHD_STREAM_STATE_D3DFORMAT_DATA
     {
         public int Format; // D3DFORMAT
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA")]
     public struct DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA
     {
         public DXVAHD_FRAME_FORMAT FrameFormat;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA")]
     public struct DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA
     {
         public int Value;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_OUTPUT_RATE_DATA")]
     public struct DXVAHD_STREAM_STATE_OUTPUT_RATE_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -336,6 +371,7 @@ namespace MediaFoundation.dxvahd
         public DXVAHD_RATIONAL CustomRate;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_SOURCE_RECT_DATA")]
     public struct DXVAHD_STREAM_STATE_SOURCE_RECT_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -343,6 +379,7 @@ namespace MediaFoundation.dxvahd
         public MFRect SourceRect;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_DESTINATION_RECT_DATA")]
     public struct DXVAHD_STREAM_STATE_DESTINATION_RECT_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -350,6 +387,7 @@ namespace MediaFoundation.dxvahd
         public MFRect DestinationRect;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_ALPHA_DATA")]
     public struct DXVAHD_STREAM_STATE_ALPHA_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -357,12 +395,14 @@ namespace MediaFoundation.dxvahd
         public float Alpha;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_PALETTE_DATA")]
     public struct DXVAHD_STREAM_STATE_PALETTE_DATA
     {
         public int Count;
         public int[] pEntries; // D3DCOLOR
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_LUMA_KEY_DATA")]
     public struct DXVAHD_STREAM_STATE_LUMA_KEY_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -371,6 +411,7 @@ namespace MediaFoundation.dxvahd
         public float Upper;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_ASPECT_RATIO_DATA")]
     public struct DXVAHD_STREAM_STATE_ASPECT_RATIO_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -379,6 +420,7 @@ namespace MediaFoundation.dxvahd
         public DXVAHD_RATIONAL DestinationAspectRatio;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_FILTER_DATA")]
     public struct DXVAHD_STREAM_STATE_FILTER_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -386,6 +428,7 @@ namespace MediaFoundation.dxvahd
         public int Level;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_PRIVATE_DATA")]
     public struct DXVAHD_STREAM_STATE_PRIVATE_DATA
     {
         public Guid Guid;
@@ -393,6 +436,7 @@ namespace MediaFoundation.dxvahd
         public IntPtr pData;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_DATA")]
     public struct DXVAHD_STREAM_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -406,8 +450,7 @@ namespace MediaFoundation.dxvahd
         public IDirect3DSurface9[] ppFutureSurfaces;
     }
 
-    //DEFINE_GUID(DXVAHD_STREAM_STATE_PRIVATE_IVTC, 0x9c601e3c,0x0f33,0x414c,0xa7,0x39,0x99,0x54,0x0e,0xe4,0x2d,0xa5);
-
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_STREAM_STATE_PRIVATE_IVTC_DATA")]
     public struct DXVAHD_STREAM_STATE_PRIVATE_IVTC_DATA
     {
         [MarshalAs(UnmanagedType.Bool)]
@@ -432,44 +475,51 @@ namespace MediaFoundation.dxvahd
             DXVAHD_SURFACE_TYPE Type,
             int NumSurfaces,
             out IDirect3DSurface9[] ppSurfaces,
-            ref  IntPtr pSharedHandle);
+            ref  IntPtr pSharedHandle
+            );
 
         [PreserveSig]
         int GetVideoProcessorDeviceCaps(
-            out DXVAHD_VPDEVCAPS pCaps);
+            out DXVAHD_VPDEVCAPS pCaps
+            );
 
         [PreserveSig]
         int GetVideoProcessorOutputFormats(
             int Count,
-            out int[] pFormats); // D3DFORMAT 
+            out int[] pFormats // D3DFORMAT 
+            );
 
         [PreserveSig]
         int GetVideoProcessorInputFormats(
             int Count,
-            out int[] pFormats); // D3DFORMAT 
+            out int[] pFormats // D3DFORMAT 
+            );
 
         [PreserveSig]
         int GetVideoProcessorCaps(
             int Count,
-            out DXVAHD_VPCAPS[] pCaps);
+            out DXVAHD_VPCAPS[] pCaps
+            );
 
         [PreserveSig]
         int GetVideoProcessorCustomRates(
             Guid pVPGuid,
             int Count,
-            out DXVAHD_CUSTOM_RATE_DATA[] pRates);
+            out DXVAHD_CUSTOM_RATE_DATA[] pRates
+            );
 
         [PreserveSig]
         int GetVideoProcessorFilterRange(
             DXVAHD_FILTER Filter,
-            out DXVAHD_FILTER_RANGE_DATA pRange);
+            out DXVAHD_FILTER_RANGE_DATA pRange
+            );
 
         [PreserveSig]
         int CreateVideoProcessor(
             Guid pVPGuid,
-            out IDXVAHD_VideoProcessor ppVideoProcessor);
+            out IDXVAHD_VideoProcessor ppVideoProcessor
+            );
     }
-
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("95f4edf4-6e03-4cd7-be1b-3075d665aa52"),
@@ -480,35 +530,40 @@ namespace MediaFoundation.dxvahd
         int SetVideoProcessBltState(
             DXVAHD_BLT_STATE State,
             int DataSize,
-            IntPtr pData);
+            IntPtr pData
+            );
 
         [PreserveSig]
         int GetVideoProcessBltState(
             DXVAHD_BLT_STATE State,
             int DataSize,
-            IntPtr pData);
+            IntPtr pData
+            );
 
         [PreserveSig]
         int SetVideoProcessStreamState(
             int StreamNumber,
             DXVAHD_STREAM_STATE State,
             int DataSize,
-            IntPtr pData);
+            IntPtr pData
+            );
 
         [PreserveSig]
         int GetVideoProcessStreamState(
             int StreamNumber,
             DXVAHD_STREAM_STATE State,
             int DataSize,
-            IntPtr pData);
+            IntPtr pData
+            );
 
         [PreserveSig]
         int VideoProcessBltHD(
             IDirect3DSurface9 pOutputSurface,
             int OutputFrame,
             int StreamCount,
-            DXVAHD_STREAM_DATA[] pStreams);
-    };
+            DXVAHD_STREAM_DATA[] pStreams
+            );
+    }
 
     public delegate int PDXVAHDSW_CreateDevice(
         IDirect3DDevice9Ex pD3DDevice,
@@ -612,6 +667,7 @@ namespace MediaFoundation.dxvahd
         IntPtr hVideoProcessor
         );
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDSW_CALLBACKS")]
     public struct DXVAHDSW_CALLBACKS
     {
         public PDXVAHDSW_CreateDevice CreateDevice;
@@ -649,6 +705,7 @@ namespace MediaFoundation.dxvahd
         public static readonly Guid DESTROYVIDEOPROCESSOR = new Guid(0xf943f0a0, 0x3f16, 0x43e0, 0x80, 0x93, 0x10, 0x5a, 0x98, 0x6a, 0xa5, 0xf1);
    }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDETW_CREATEVIDEOPROCESSOR")]
     public struct DXVAHDETW_CREATEVIDEOPROCESSOR
     {
         public long pObject;
@@ -656,6 +713,7 @@ namespace MediaFoundation.dxvahd
         public Guid VPGuid;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDETW_VIDEOPROCESSBLTSTATE")]
     public struct DXVAHDETW_VIDEOPROCESSBLTSTATE
     {
         public long pObject;
@@ -665,6 +723,7 @@ namespace MediaFoundation.dxvahd
         public bool SetState;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDETW_VIDEOPROCESSSTREAMSTATE")]
     public struct DXVAHDETW_VIDEOPROCESSSTREAMSTATE
     {
         public long pObject;
@@ -675,6 +734,7 @@ namespace MediaFoundation.dxvahd
         public bool SetState;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDETW_VIDEOPROCESSBLTHD")]
     public struct DXVAHDETW_VIDEOPROCESSBLTHD
     {
         public long pObject;
@@ -688,6 +748,7 @@ namespace MediaFoundation.dxvahd
         public bool Enter;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDETW_VIDEOPROCESSBLTHD_STREAM")]
     public struct DXVAHDETW_VIDEOPROCESSBLTHD_STREAM
     {
         public long pObject;
@@ -704,12 +765,13 @@ namespace MediaFoundation.dxvahd
         public int FutureFrames;
     }
 
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHDETW_DESTROYVIDEOPROCESSOR")]
     public struct DXVAHDETW_DESTROYVIDEOPROCESSOR
     {
         public long pObject;
     }
 
-    public class OPMExtern
+    public static class OPMExtern
     {
         [DllImport("Dxva2.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int DXVAHD_CreateDevice(
@@ -718,7 +780,7 @@ namespace MediaFoundation.dxvahd
             DXVAHD_DEVICE_USAGE Usage,
             PDXVAHDSW_Plugin pPlugin,
             out IDXVAHD_Device ppDevice
-            );
+        );
     }
 
     public delegate int PDXVAHD_CreateDevice(

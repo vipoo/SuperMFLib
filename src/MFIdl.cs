@@ -1198,7 +1198,7 @@ namespace MediaFoundation
         Vertical = 2
     }
 
-    [StructLayout(LayoutKind.Sequential), UnmanagedName("")]
+    [StructLayout(LayoutKind.Sequential), UnmanagedName("MF_BYTE_STREAM_CACHE_RANGE")]
     public class MF_BYTE_STREAM_CACHE_RANGE
     {
         long qwStartOffset;
@@ -1854,19 +1854,19 @@ namespace MediaFoundation
         new int GetEvent(
             [In] MFEventFlag dwFlags,
             [MarshalAs(UnmanagedType.Interface)] out IMFMediaEvent ppEvent
-            );
+        );
 
         [PreserveSig]
         new int BeginGetEvent(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [In, MarshalAs(UnmanagedType.IUnknown)] object o
-            );
+        );
 
         [PreserveSig]
         new int EndGetEvent(
             IMFAsyncResult pResult,
             out IMFMediaEvent ppEvent
-            );
+        );
 
         [PreserveSig]
         new int QueueEvent(
@@ -1874,7 +1874,7 @@ namespace MediaFoundation
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidExtendedType,
             [In] int hrStatus,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvValue
-            );
+        );
 
         #endregion
 
@@ -1883,19 +1883,19 @@ namespace MediaFoundation
         [PreserveSig]
         new int GetCharacteristics(
             out MFMediaSourceCharacteristics pdwCharacteristics
-            );
+        );
 
         [PreserveSig]
         new int CreatePresentationDescriptor(
             out IMFPresentationDescriptor ppPresentationDescriptor
-            );
+        );
 
         [PreserveSig]
         new int Start(
             [In, MarshalAs(UnmanagedType.Interface)] IMFPresentationDescriptor pPresentationDescriptor,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid pguidTimeFormat,
             [In, MarshalAs(UnmanagedType.LPStruct)] ConstPropVariant pvarStartPosition
-            );
+        );
 
         [PreserveSig]
         new int Stop();
@@ -1935,7 +1935,7 @@ namespace MediaFoundation
         [PreserveSig]
         new int SetDirectXManager(
             [In, MarshalAs(UnmanagedType.IUnknown)] object pManager
-            );
+        );
 
         [PreserveSig]
         new int UninitializeSampleAllocator();
@@ -1944,12 +1944,12 @@ namespace MediaFoundation
         new int InitializeSampleAllocator(
             [In] int cRequestedFrames,
             [In, MarshalAs(UnmanagedType.Interface)] IMFMediaType pMediaType
-            );
+        );
 
         [PreserveSig]
         new int AllocateSample(
             [MarshalAs(UnmanagedType.Interface)] out IMFSample ppSample
-            );
+        );
 
         #endregion
 
@@ -2023,36 +2023,36 @@ namespace MediaFoundation
         new int BeginRegisterTopologyWorkQueuesWithMMCSS(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState
-            );
+        );
 
         [PreserveSig]
         new int EndRegisterTopologyWorkQueuesWithMMCSS(
             IMFAsyncResult pResult
-            );
+        );
 
         [PreserveSig]
         new int BeginUnregisterTopologyWorkQueuesWithMMCSS(
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState
-            );
+        );
 
         [PreserveSig]
         new int EndUnregisterTopologyWorkQueuesWithMMCSS(
             IMFAsyncResult pResult
-            );
+        );
 
         [PreserveSig]
         new int GetTopologyWorkQueueMMCSSClass(
             [In] int dwTopologyWorkQueueId,
             [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszClass,
             [In, Out] ref int pcchClass
-            );
+        );
 
         [PreserveSig]
         new int GetTopologyWorkQueueMMCSSTaskId(
             [In] int dwTopologyWorkQueueId,
             out int pdwTaskId
-            );
+        );
 
         [PreserveSig]
         new int BeginRegisterPlatformWorkQueueWithMMCSS(
@@ -2061,37 +2061,38 @@ namespace MediaFoundation
             [In] int dwTaskId,
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState
-            );
+        );
 
         [PreserveSig]
         new int EndRegisterPlatformWorkQueueWithMMCSS(
             IMFAsyncResult pResult,
             out int pdwTaskId
-            );
+        );
 
         [PreserveSig]
         new int BeginUnregisterPlatformWorkQueueWithMMCSS(
             [In] int dwPlatformWorkQueue,
             [In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             [MarshalAs(UnmanagedType.IUnknown)] object pState
-            );
+        );
 
         [PreserveSig]
         new int EndUnregisterPlatformWorkQueueWithMMCSS(
             IMFAsyncResult pResult
-            );
+        );
 
         [PreserveSig]
         new int GetPlaftormWorkQueueMMCSSClass(
             [In] int dwPlatformWorkQueueId,
             [Out, MarshalAs(UnmanagedType.LPWStr)] string pwszClass,
-            [In, Out] ref int pcchClass);
+            [In, Out] ref int pcchClass
+        );
 
         [PreserveSig]
         new int GetPlatformWorkQueueMMCSSTaskId(
             [In] int dwPlatformWorkQueueId,
             out int pdwTaskId
-            );
+        );
 
         #endregion
 
@@ -2207,8 +2208,7 @@ namespace MediaFoundation
         int OnSendingRequest( 
             [In, MarshalAs(UnmanagedType.LPWStr)] string pszUrl
         );
-        
-    };
+    }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
@@ -2287,7 +2287,6 @@ namespace MediaFoundation
             out IntPtr ppbOut
         );        
     }
-
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("86CBC910-E533-4751-8E3B-F19B5B806A03"),

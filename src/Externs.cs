@@ -779,10 +779,14 @@ namespace MediaFoundation
         );
 
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
-        public static extern int MFMapDX9FormatToDXGIFormat(int dx9);  // return value is enum in dxgiformat.h
+        public static extern int MFMapDX9FormatToDXGIFormat(
+            int dx9
+        );
 
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
-        public static extern int MFMapDXGIFormatToDX9Format(int dx11); // parameter is enum in dxgiformat.h
+        public static extern int MFMapDXGIFormatToDX9Format(
+            int dx11
+        );
 
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFLockDXGIDeviceManager(

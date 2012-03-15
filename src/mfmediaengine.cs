@@ -205,10 +205,14 @@ namespace MediaFoundation
         int GetExtendedErrorCode();
 
         [PreserveSig]
-        int SetErrorCode(MF_MEDIA_ENGINE_ERR error);
+        int SetErrorCode(
+            MF_MEDIA_ENGINE_ERR error
+            );
 
         [PreserveSig]
-        int SetExtendedErrorCode(int error);
+        int SetExtendedErrorCode(
+            int error
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -221,25 +225,25 @@ namespace MediaFoundation
 
         [PreserveSig]
         int GetStart(
-             int index,
+            int index,
             out double pStart
             );
 
         [PreserveSig]
         int GetEnd(
-             int index,
+            int index,
             out  double pEnd
             );
 
         [return: MarshalAs(UnmanagedType.Bool)]
         bool ContainsTime(
-         double time
-        );
+            double time
+            );
 
         [PreserveSig]
         int AddRange(
-             double startTime,
-             double endTime
+            double startTime,
+            double endTime
             );
 
         [PreserveSig]
@@ -253,7 +257,7 @@ namespace MediaFoundation
     {
         [PreserveSig]
         int EventNotify(
-             MF_MEDIA_ENGINE_EVENT eventid,
+            MF_MEDIA_ENGINE_EVENT eventid,
             IntPtr param1,
             int param2
             );
@@ -482,7 +486,7 @@ namespace MediaFoundation
     public interface IMFMediaEngineEx : IMFMediaEngine
     {
 
-#region IMFMediaEngine methods
+        #region IMFMediaEngine methods
 
         [PreserveSig]
         new int GetError(
@@ -658,7 +662,7 @@ namespace MediaFoundation
             out long pPts
             );
 
-#endregion
+        #endregion
 
         [PreserveSig]
         int SetSourceFromByteStream(
@@ -689,8 +693,8 @@ namespace MediaFoundation
 
         [return: MarshalAs(UnmanagedType.Bool)]
         bool IsPlaybackRateSupported(
-        double rate
-        );
+            double rate
+            );
 
         [PreserveSig]
         int FrameStep(
@@ -888,13 +892,19 @@ namespace MediaFoundation
     public interface IMFMediaEngineProtectedContent
     {
         [PreserveSig]
-        int ShareResources([In, MarshalAs(UnmanagedType.IUnknown)] object pUnkDeviceContext);
+        int ShareResources(
+            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnkDeviceContext
+            );
 
         [PreserveSig]
-        int GetRequiredProtections(out int pFrameProtectionFlags);
+        int GetRequiredProtections(
+            out int pFrameProtectionFlags
+            );
 
         [PreserveSig]
-        int SetOPMWindow(IntPtr hwnd);
+        int SetOPMWindow(
+            IntPtr hwnd
+            );
 
         [PreserveSig]
         int TransferVideoFrame(
@@ -907,8 +917,8 @@ namespace MediaFoundation
 
         [PreserveSig]
         int SetContentProtectionManager(
-                IMFContentProtectionManager pCPM
-                );
+            IMFContentProtectionManager pCPM
+            );
 
         [PreserveSig]
         int SetApplicationCertificate(
@@ -942,6 +952,6 @@ namespace MediaFoundation
 
 #endif
 
-#endregion
+    #endregion
 
 }

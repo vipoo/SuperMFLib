@@ -337,13 +337,15 @@ namespace MediaFoundation.Alt
         new int BeginGetEvent(
             //[In, MarshalAs(UnmanagedType.Interface)] IMFAsyncCallback pCallback,
             IntPtr pCallback,
-            [In, MarshalAs(UnmanagedType.IUnknown)] object o);
+            [In, MarshalAs(UnmanagedType.IUnknown)] object o
+            );
 
         [PreserveSig]
         new int EndGetEvent(
             //IMFAsyncResult pResult,
             IntPtr pResult,
-            out IMFMediaEvent ppEvent);
+            out IMFMediaEvent ppEvent
+            );
 
         [PreserveSig]
         new int QueueEvent(
@@ -448,7 +450,8 @@ namespace MediaFoundation.Alt
 
         [PreserveSig]
         new int GetCharacteristics(
-            out MFMediaSinkCharacteristics pdwCharacteristics);
+            out MFMediaSinkCharacteristics pdwCharacteristics
+            );
 
         [PreserveSig]
         new int AddStreamSink(

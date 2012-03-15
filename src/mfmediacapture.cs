@@ -40,7 +40,9 @@ namespace MediaFoundation
     public interface IAdvancedMediaCaptureInitializationSettings
     {
         [PreserveSig]
-        int SetDirectxDeviceManager(IMFDXGIDeviceManager value);
+        int SetDirectxDeviceManager(
+            IMFDXGIDeviceManager value
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -49,10 +51,14 @@ namespace MediaFoundation
     public interface IAdvancedMediaCaptureSettings
     {
         [PreserveSig]
-        int GetDirectxDeviceManager(out IMFDXGIDeviceManager value);
+        int GetDirectxDeviceManager(
+            out IMFDXGIDeviceManager value
+            );
 
         [PreserveSig]
-        int SetDirectCompositionVisual([MarshalAs(UnmanagedType.IUnknown)] object value);
+        int SetDirectCompositionVisual(
+            [MarshalAs(UnmanagedType.IUnknown)] object value
+            );
 
         [PreserveSig]
         int UpdateVideo(
@@ -62,8 +68,7 @@ namespace MediaFoundation
              [In] MfFloat pSrcNormalizedLeft,
              [In] MFRect pDstSize,
              [In] MFInt pBorderClr
-             );
-
+            );
     }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
@@ -72,7 +77,9 @@ namespace MediaFoundation
     public interface IAdvancedMediaCapture
     {
         [PreserveSig]
-        int GetAdvancedMediaCaptureSettings(out IAdvancedMediaCaptureSettings value);
+        int GetAdvancedMediaCaptureSettings(
+            out IAdvancedMediaCaptureSettings value
+            );
     }
 
 #endif

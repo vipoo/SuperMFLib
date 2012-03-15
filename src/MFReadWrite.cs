@@ -436,7 +436,7 @@ namespace MediaFoundation.ReadWrite
             int dwTransformIndex,
             out Guid pGuidCategory,
             out IMFTransform ppTransform);
-    };
+    }
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
@@ -515,7 +515,7 @@ namespace MediaFoundation.ReadWrite
             int dwTransformIndex,
             out Guid pGuidCategory,
             out IMFTransform ppTransform);
-    };
+    }
 
 #endif
 

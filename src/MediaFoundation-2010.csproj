@@ -87,6 +87,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Alt.cs" />
+    <Compile Include="mfmediacapture.cs" />
+    <Compile Include="mfmediaengine.cs" />
     <Compile Include="mfmp2dlna.cs" />
     <Compile Include="dxvahd.cs" />
     <Compile Include="EVR.cs" />

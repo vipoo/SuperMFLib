@@ -2540,8 +2540,7 @@ namespace EVRPresenter
 
             pDesired = (IMFDesiredSample)pSample;
 
-            hr = pDesired.Clear();
-            MFError.ThrowExceptionForHR(hr);
+            pDesired.Clear();
 
             hr = pSample.SetUINT32(MFSamplePresenter_SampleCounter, counter);
             MFError.ThrowExceptionForHR(hr);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -17,8 +17,8 @@ namespace Testv21
                 MFExtern.MFStartup(0x20070, MFStartup.Full);
                 MFExtern.MFLockPlatform();
 
-                //IEVRFilterConfigExTest t1 = new IEVRFilterConfigExTest();
-                //t1.DoTests();
+                IEVRFilterConfigExTest t1 = new IEVRFilterConfigExTest();
+                t1.DoTests();
 
                 //IMFByteStreamCacheControlTest t2 = new IMFByteStreamCacheControlTest();
                 //t2.DoTests();

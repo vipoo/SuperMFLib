@@ -26,10 +26,7 @@ namespace Testv21
 
         private void GetInterface()
         {
-            string EVRRenderer = "FA10746C-9B63-4B6C-BC49-FC300EA5F256";
-            Type comtype = Type.GetTypeFromCLSID(new Guid(EVRRenderer));
-
-            _filterConfig = Activator.CreateInstance(comtype) as IEVRFilterConfigEx;             
+            _filterConfig = new EnhancedVideoRenderer() as IEVRFilterConfigEx;
         }
 
 

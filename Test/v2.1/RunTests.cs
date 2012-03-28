@@ -17,8 +17,8 @@ namespace Testv21
                 MFExtern.MFStartup(0x20070, MFStartup.Full);
                 MFExtern.MFLockPlatform();
 
-                IEVRFilterConfigExTest t1 = new IEVRFilterConfigExTest();
-                t1.DoTests();
+                //IEVRFilterConfigExTest t1 = new IEVRFilterConfigExTest();
+                //t1.DoTests();
 
                 //IMFByteStreamCacheControlTest t2 = new IMFByteStreamCacheControlTest();
                 //t2.DoTests();
@@ -32,8 +32,8 @@ namespace Testv21
                 //IMFFieldOfUseMFTUnlockTest t5 = new IMFFieldOfUseMFTUnlockTest();
                 //t5.DoTests();
 
-                IMFPluginControlTest t6 = new IMFPluginControlTest();
-                t6.DoTests();
+                //IMFPluginControlTest t6 = new IMFPluginControlTest();
+                //t6.DoTests();
 
                 //IMFPMediaItemTest t7 = new IMFPMediaItemTest();
                 //t7.DoTests();

@@ -168,7 +168,7 @@ namespace MediaFoundation.EVR
         Mask = 0x0000000f
     }
 
-    [UnmanagedName("EVRFilterConfigPrefs")]
+    [Flags, UnmanagedName("EVRFilterConfigPrefs")]
     public enum EVRFilterConfigPrefs
     {
         None = 0,

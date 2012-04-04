@@ -879,6 +879,11 @@ namespace MediaFoundation
 
         #endregion
 
+        [DllImport("MFCaptureEngine.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        public static extern int MFCreateCaptureEngine(
+            out IMFCaptureEngine ppCaptureEngine
+        );
+
         [DllImport("Mfreadwrite.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFCreateSinkWriterFromURL(
             [In, MarshalAs(UnmanagedType.LPWStr)] string pwszOutputURL,

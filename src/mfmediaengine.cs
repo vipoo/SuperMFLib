@@ -165,7 +165,7 @@ namespace MediaFoundation
         RequiresAntiScreenScrapeProtection = 0x04
     }
 
-    [UnmanagedName("MF_MEDIA_ENGINE_CREATEFLAGS")]
+    [Flags, UnmanagedName("MF_MEDIA_ENGINE_CREATEFLAGS")]
     public enum MF_MEDIA_ENGINE_CREATEFLAGS
     {
         AudioOnly = 0x0001,

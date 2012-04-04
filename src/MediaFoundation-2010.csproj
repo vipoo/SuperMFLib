@@ -87,6 +87,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Alt.cs" />
+    <Compile Include="mfcaptureengine.cs" />
     <Compile Include="mfmediacapture.cs" />
     <Compile Include="mfmediaengine.cs" />
     <Compile Include="mfmp2dlna.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="MFObjects.cs" />
     <Compile Include="MFPlay.cs" />
     <Compile Include="MFReadWrite.cs" />
+    <Compile Include="mfsharingengine.cs" />
     <Compile Include="MFTransform.cs" />
     <Compile Include="MFUtils.cs" />
     <Compile Include="misc.cs" />

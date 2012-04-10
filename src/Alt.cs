@@ -65,19 +65,6 @@ namespace MediaFoundation.Alt
     #region Bugs in Vista and W7
 
     [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-    Guid("FA993888-4383-415A-A930-DD472A8CF6F7")]
-    public interface IMFGetServiceAlt
-    {
-        [PreserveSig]
-        int GetService(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            out IntPtr ppvObject
-            );
-    }
-
-    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("FA993889-4383-415A-A930-DD472A8CF6F7"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFTopologyServiceLookupAlt
@@ -105,6 +92,37 @@ namespace MediaFoundation.Alt
 
         [PreserveSig]
         int ReleaseServicePointers();
+    }
+
+    #endregion
+
+    #region "Limitation of .Net"
+
+    // When I originally added IMFGetService to this file, it was my intent that p3 should be
+    //
+    //    [MarshalAs(UnmanagedType.Interface)] out object ppvObject
+    //
+    // However, that isn't possible due to limitations in .Net.  If the MarshalAs is Interface (aka IUnknown)
+    // the pointer that the caller gets *isn't* a pointer to the interface requested in the riid, it's a pointer to an
+    // IUnknown, which is a different value.  While (in theory) the caller could QI the returned pointer for the desired
+    // interface, why should they?  They already called a function specifying what interface they wanted.  It is not
+    // unreasonable for them to expect that that's what they got.
+    //
+    // Were I starting from scratch, I would name this interface IMFGetServiceImpl, indicating that you should use this 
+    // interface (with the IntPtr) if you are implementing IMFGetService, while still having IMFGetService (with 
+    // UnmanagedType.IUnknown) for the people who just want to call it.
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("FA993888-4383-415A-A930-DD472A8CF6F7")]
+    public interface IMFGetServiceAlt
+    {
+        [PreserveSig]
+        int GetService(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            out IntPtr ppvObject
+            );
     }
 
     #endregion

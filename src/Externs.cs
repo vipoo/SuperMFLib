@@ -1244,7 +1244,7 @@ namespace MediaFoundation
 
         [DllImport("mf.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFTranscodeGetAudioOutputAvailableTypes(
-            Guid guidSubType,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidSubType,
             int dwMFTFlags,
             IMFAttributes pCodecConfig,
             out IMFCollection ppAvailableTypes
@@ -1325,7 +1325,7 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFTEnumEx(
-            Guid guidCategory,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidCategory,
             int Flags,
             MFTRegisterTypeInfo pInputType,
             MFTRegisterTypeInfo pOutputType,
@@ -1342,7 +1342,7 @@ namespace MediaFoundation
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFTRegisterLocal(
             [MarshalAs(UnmanagedType.IUnknown)] object pClassFactory,
-            Guid guidCategory,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidCategory,
             [MarshalAs(UnmanagedType.LPWStr)] string pszName,
             int Flags,
             int cInputTypes,
@@ -1358,10 +1358,10 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFTRegisterLocalByCLSID(
-            Guid clisdMFT,
-            Guid guidCategory,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clisdMFT,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidCategory,
             [MarshalAs(UnmanagedType.LPWStr)] string pszName,
-            int Flags,
+            MFT_EnumFlag Flags,
             int cInputTypes,
             MFTRegisterTypeInfo[] pInputTypes,
             int cOutputTypes,
@@ -1370,7 +1370,7 @@ namespace MediaFoundation
 
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFTUnregisterLocalByCLSID(
-            Guid clsidMFT
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsidMFT
         );
 
         #region Untestable

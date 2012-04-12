@@ -125,6 +125,83 @@ namespace MediaFoundation.Alt
             );
     }
 
+    // This is the ASync version of IMFSourceReader.  The only difference is the ReadSample method, which must allow
+    // the final 4 params to be null.
+
+    [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
+    InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+    Guid("70ae66f2-c809-4e4f-8915-bdcb406b7993")]
+    public interface IMFSourceReaderAsync
+    {
+        [PreserveSig]
+        int GetStreamSelection(
+            int dwStreamIndex,
+            [MarshalAs(UnmanagedType.Bool)] out bool pfSelected
+        );
+
+        [PreserveSig]
+        int SetStreamSelection(
+            int dwStreamIndex,
+            bool fSelected
+        );
+
+        [PreserveSig]
+        int GetNativeMediaType(
+            int dwStreamIndex,
+            int dwMediaTypeIndex,
+            out IMFMediaType ppMediaType
+        );
+
+        [PreserveSig]
+        int GetCurrentMediaType(
+            int dwStreamIndex,
+            out IMFMediaType ppMediaType
+        );
+
+        [PreserveSig]
+        int SetCurrentMediaType(
+            int dwStreamIndex,
+            IntPtr pdwReserved,
+            IMFMediaType pMediaType
+        );
+
+        [PreserveSig]
+        int SetCurrentPosition(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidTimeFormat,
+            [In] PropVariant varPosition
+        );
+
+        [PreserveSig]
+        int ReadSample(
+            int dwStreamIndex,
+            int dwControlFlags,
+            IntPtr pdwActualStreamIndex,
+            IntPtr pdwStreamFlags,
+            IntPtr pllTimestamp,
+            IntPtr ppSample
+        );
+
+        [PreserveSig]
+        int Flush(
+            int dwStreamIndex
+        );
+
+        [PreserveSig]
+        int GetServiceForStream(
+            int dwStreamIndex,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidService,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppvObject
+        );
+
+        [PreserveSig]
+        int GetPresentationAttribute(
+            int dwStreamIndex,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidAttribute,
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(PVMarshaler))] PropVariant pvarAttribute
+        );
+    }
+
     #endregion
 
     #region Bugs in Vista that appear to be fixed in W7

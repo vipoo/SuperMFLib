@@ -7,7 +7,6 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
 using System.Security;
 
 using MediaFoundation;
@@ -20,6 +19,8 @@ namespace MFCaptureToFile
 {
     class RegisterDeviceNotifications : IDisposable
     {
+        #region Definitions
+
         [StructLayout(LayoutKind.Sequential)]
         private class DEV_BROADCAST_HDR
         {
@@ -55,18 +56,28 @@ namespace MFCaptureToFile
             IntPtr hDlg
             );
 
+        private const int DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000;
+        private const int DBT_DEVTYP_DEVICEINTERFACE = 0x00000005;
+        private const int DBT_DEVICEARRIVAL = 0x8000;
+        private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
+
+        #endregion
+
         // Handle of the notification.  Used by unregister
         IntPtr m_hdevnotify = IntPtr.Zero;
 
-        public RegisterDeviceNotifications(IntPtr hWnd, int iType, Guid gCat)
+        // Category of events
+        Guid m_Category;
+
+        public RegisterDeviceNotifications(IntPtr hWnd, Guid gCat)
         {
-            const int DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000;
+            m_Category = gCat;
 
             DEV_BROADCAST_DEVICEINTERFACE di = new DEV_BROADCAST_DEVICEINTERFACE();
 
-            // Register to be notified of events of type iType in category gCat
+            // Register to be notified of events of category gCat
             di.dbcc_size = Marshal.SizeOf(di);
-            di.dbcc_devicetype = iType;
+            di.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
             di.dbcc_classguid = gCat;
 
             m_hdevnotify = RegisterDeviceNotification(
@@ -94,12 +105,31 @@ namespace MFCaptureToFile
         }
 
         // Static routine to parse out the device type from the IntPtr received in WndProc
-        public static int ParseDeviceType(IntPtr pHdr)
+        public bool CheckEventDetails(IntPtr pReason, IntPtr pHdr)
         {
+            int iValue = pReason.ToInt32();
+
+            // Check the event type
+            if (iValue != DBT_DEVICEREMOVECOMPLETE && iValue != DBT_DEVICEARRIVAL)
+                return false;
+
+            // Do we have device details yet?
+            if (pHdr == IntPtr.Zero)
+                return false;
+
+            // Parse the first chunk
             DEV_BROADCAST_HDR pBH = new DEV_BROADCAST_HDR();
             Marshal.PtrToStructure(pHdr, pBH);
 
-            return pBH.dbch_devicetype;
+            // Check the device type
+            if (pBH.dbch_devicetype != DBT_DEVTYP_DEVICEINTERFACE)
+                return false;
+
+            // Only parse this if the right device type
+            DEV_BROADCAST_DEVICEINTERFACE pDI = new DEV_BROADCAST_DEVICEINTERFACE();
+            Marshal.PtrToStructure(pHdr, pDI);
+
+            return (pDI.dbcc_classguid == m_Category);
         }
 
         // Static routine to parse out the Symbolic name from the IntPtr received in WndProc
@@ -110,56 +140,93 @@ namespace MFCaptureToFile
         }
     }
 
-    [UnmanagedName("CLSID_CColorConvertDMO"),
-    ComImport,
-    Guid("98230571-0087-4204-b020-3282538e57d3")]
-    public class CColorConvertDMO
+    class MFDevice : IDisposable
     {
-    }
+        private IMFActivate m_Activator;
+        private string m_FriendlyName;
+        private string m_SymbolicName;
 
-    struct EncodingParameters
-    {
-        public Guid subtype;
-        public int bitrate;
-    }
-
-    class DeviceList
-    {
-        private IMFActivate[] m_ppDevices;
-        private Guid m_gType;
-
-        public DeviceList(Guid gType)
+        public MFDevice(IMFActivate Mon)
         {
-            m_gType = gType;
+            m_Activator = Mon;
+            m_FriendlyName = null;
+            m_SymbolicName = null;
         }
 
-        public int Count()
+        ~MFDevice()
         {
-            if (m_ppDevices == null)
-                return 0;
-
-            return m_ppDevices.Length;
-        }
-
-        public void Clear()
-        {
-            for (int i = 0; i < Count(); i++)
+            if (m_Activator != null)
             {
-                if (m_ppDevices[i] != null)
-                {
-                    Marshal.ReleaseComObject(m_ppDevices[i]);
-                }
-            }
+                Marshal.ReleaseComObject(m_Activator);
 
-            m_ppDevices = null;
+                m_Activator = null;
+                m_FriendlyName = null;
+                m_SymbolicName = null;
+            }
         }
 
-        public int EnumerateDevices()
+        public IMFActivate Activator
         {
+            get
+            {
+                return m_Activator;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                if (m_FriendlyName == null)
+                {
+                    int hr = 0;
+                    int iSize = 0;
+
+                    hr = m_Activator.GetAllocatedString(
+                        MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
+                        out m_FriendlyName,
+                        out iSize
+                        );
+                }
+                return m_FriendlyName;
+            }
+        }
+
+        /// <summary>
+        /// Returns a unique identifier for a device
+        /// </summary>
+        public string SymbolicName
+        {
+            get
+            {
+                if (m_SymbolicName == null)
+                {
+                    int iSize;
+                    int hr = m_Activator.GetAllocatedString(
+                        MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
+                        out m_SymbolicName,
+                        out iSize
+                        );
+                }
+
+                return m_SymbolicName;
+            }
+        }
+
+        /// <summary>
+        /// Returns an array of DsDevices of type devcat.
+        /// </summary>
+        /// <param name="cat">Any one of FilterCategory</param>
+        public static MFDevice[] GetDevicesOfCat(Guid FilterCategory)
+        {
+            // Use arrayList to build the retun list since it is easily resizable
+            MFDevice[] devret = null;
+            IMFActivate[] ppDevices;
+
+            //////////
+
             int hr = 0;
             IMFAttributes pAttributes = null;
-
-            Clear();
 
             // Initialize an attribute store. We will use this to 
             // specify the enumeration parameters.
@@ -171,15 +238,25 @@ namespace MFCaptureToFile
             {
                 hr = pAttributes.SetGUID(
                     MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
-                    m_gType
+                    FilterCategory
                     );
             }
 
             // Enumerate devices.
+            int cDevices;
             if (hr >= 0)
             {
-                int cDevices;
-                hr = MFExtern.MFEnumDeviceSources(pAttributes, out m_ppDevices, out cDevices);
+                hr = MFExtern.MFEnumDeviceSources(pAttributes, out ppDevices, out cDevices);
+
+                if (hr >= 0)
+                {
+                    devret = new MFDevice[cDevices];
+
+                    for (int x = 0; x < cDevices; x++)
+                    {
+                        devret[x] = new MFDevice(ppDevices[x]);
+                    }
+                }
             }
 
             if (pAttributes != null)
@@ -187,69 +264,35 @@ namespace MFCaptureToFile
                 Marshal.ReleaseComObject(pAttributes);
             }
 
-            return hr;
+            return devret;
         }
 
-        public int GetDevice(int index, out IMFActivate ppActivate)
+        public override string ToString()
         {
-            if (index >= Count())
-            {
-                ppActivate = null;
-                return -1;
-            }
-
-            ppActivate = m_ppDevices[index];
-
-            return 0;
+            return Name;
         }
 
-        public int GetDeviceName(int index, out string ppszName)
+        public void Dispose()
         {
-            if (index >= Count())
+            if (m_Activator != null)
             {
-                ppszName = null;
-                return -1;
+                Marshal.ReleaseComObject(m_Activator);
+                m_Activator = null;
+                GC.SuppressFinalize(this);
             }
-
-            int hr = 0;
-            int iSize = 0;
-
-            hr = m_ppDevices[index].GetAllocatedString(
-                MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
-                out ppszName,
-                out iSize
-                );
-
-            return hr;
-        }
-
-        public int GetDeviceAndName(int index, out string ppszName, out IMFActivate ppActivate)
-        {
-            if (index >= Count())
-            {
-                ppszName = null;
-                ppActivate = null;
-                return -1;
-            }
-
-            int hr = 0;
-            int iSize = 0;
-
-            ppActivate = m_ppDevices[index];
-
-            hr = ppActivate.GetAllocatedString(
-                MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
-                out ppszName,
-                out iSize
-                );
-
-            return hr;
+            m_FriendlyName = null;
         }
     }
 
     class CCapture : COMBase, IMFSourceReaderCallback
     {
         private const int MF_SOURCE_READER_FIRST_VIDEO_STREAM = unchecked((int)0xfffffffc);
+
+        public struct EncodingParameters
+        {
+            public Guid subtype;
+            public int bitrate;
+        }
 
         private IntPtr m_hwndEvent;        // Application window to receive events. 
         private int m_iMessageID;

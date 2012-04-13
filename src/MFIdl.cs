@@ -35,6 +35,13 @@ namespace MediaFoundation
 {
     #region GUIDs, IIDs
 
+    [UnmanagedName("CLSID_CColorConvertDMO"),
+    ComImport,
+    Guid("98230571-0087-4204-b020-3282538e57d3")]
+    public class CColorConvertDMO
+    {
+    }
+
     [UnmanagedName("CLSID_MFCaptureEngine"),
     ComImport,
     Guid("efce38d3-8914-4674-a7df-ae1b3d654b8a")]

@@ -400,6 +400,10 @@ namespace MFCaptureToFile
             {
                 hr = Marshal.GetHRForException(e);
             }
+            finally
+            {
+                SafeRelease(pSample);
+            }
 
             return hr;
         }

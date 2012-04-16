@@ -1410,7 +1410,7 @@ namespace MediaFoundation
     }
 
     [UnmanagedName("MF_QUALITY_DROP_MODE")]
-    public enum MFQualitydropMode
+    public enum MFQualityDropMode
     {
         None,
         Mode1,
@@ -3205,7 +3205,7 @@ namespace MediaFoundation
     {
         [PreserveSig]
         int SetDropMode(
-            [In] MFQualitydropMode eDropMode
+            [In] MFQualityDropMode eDropMode
             );
 
         [PreserveSig]
@@ -3215,7 +3215,7 @@ namespace MediaFoundation
 
         [PreserveSig]
         int GetDropMode(
-            out MFQualitydropMode peDropMode
+            out MFQualityDropMode peDropMode
             );
 
         [PreserveSig]
@@ -3707,7 +3707,7 @@ namespace MediaFoundation
 
         [PreserveSig]
         new int SetDropMode(
-            [In] MFQualitydropMode eDropMode
+            [In] MFQualityDropMode eDropMode
             );
 
         [PreserveSig]
@@ -3717,7 +3717,7 @@ namespace MediaFoundation
 
         [PreserveSig]
         new int GetDropMode(
-            out MFQualitydropMode peDropMode
+            out MFQualityDropMode peDropMode
             );
 
         [PreserveSig]
@@ -3746,7 +3746,7 @@ namespace MediaFoundation
     {
         [PreserveSig]
         int GetMaximumDropMode(
-            out MFQualitydropMode peDropMode
+            out MFQualityDropMode peDropMode
         );
 
         [PreserveSig]

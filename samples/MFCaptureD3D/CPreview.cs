@@ -23,7 +23,7 @@ namespace MFCaptureD3D
 {
     class CPreview : COMBase, IMFSourceReaderCallback, IDisposable
     {
-        #region externs
+        #region Definitions
 
         [DllImport("user32")]
         private extern static int PostMessage(
@@ -33,10 +33,10 @@ namespace MFCaptureD3D
             IntPtr lParam
             );
 
-        #endregion
+        private const int WM_APP = 0x8000;
+        private const int WM_APP_PREVIEW_ERROR = WM_APP + 2;
 
-        const int WM_APP = 0x8000;
-        const int WM_APP_PREVIEW_ERROR = WM_APP + 2;
+        #endregion
 
         #region Member Variables
 
@@ -348,7 +348,6 @@ namespace MFCaptureD3D
                         if (pSample != null)
                         {
                             // Get the video frame buffer from the sample.
-                            //IMFSample SampleObj = (IMFSample)Marshal.GetObjectForIUnknown(ptrSample);
                             hr = pSample.GetBufferByIndex(0, out pBuffer);
 
                             // Draw the frame.

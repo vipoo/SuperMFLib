@@ -30,13 +30,15 @@ namespace MFCaptureD3D
 
         private const int NUM_BACK_BUFFERS = 2;
 
-        private enum SupportedVideoFormat
+        /// <summary>
+        /// A struct that describes a YUYV pixel
+        /// </summary>
+        private struct YUYV
         {
-            MFVideoFormat_RGB32,
-            MFVideoFormat_RGB24,
-            MFVideoFormat_YUY2,
-            MFVideoFormat_NV12,
-            InvalidMediaType
+            public byte Y;
+            public byte U;
+            public byte Y2;
+            public byte V;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -50,17 +52,24 @@ namespace MFCaptureD3D
 
         private struct VideoFormatGUID
         {
-            public SupportedVideoFormat VideoFormat;
             public Guid SubType;
+            public VideoConversion VideoConvertFunction;
 
-            public VideoFormatGUID(SupportedVideoFormat videoFormat, Guid FormatGuid)
+            public VideoFormatGUID(Guid FormatGuid, VideoConversion cvt)
             {
-                VideoFormat = videoFormat;
                 SubType = FormatGuid;
+                VideoConvertFunction = cvt;
             }
         }
 
-        private delegate void VideoConversion(IntPtr pDest, int lDestStride, IntPtr pSrc, int lSrcStride, int dwWidthInPixels, int dwHeightInPixels);    // Function to convert the video to RGB32
+        // Function to convert the video to RGB32
+        private delegate void VideoConversion(
+            IntPtr pDest, 
+            int lDestStride, 
+            IntPtr pSrc, 
+            int lSrcStride, 
+            int dwWidthInPixels, 
+            int dwHeightInPixels);
 
         #endregion
 
@@ -105,10 +114,10 @@ namespace MFCaptureD3D
             m_rcDest = Rectangle.Empty;
 
             VideoFormatDefs = new VideoFormatGUID[4];
-            VideoFormatDefs[0] = new VideoFormatGUID(SupportedVideoFormat.MFVideoFormat_RGB32, MFMediaType.RGB32);
-            VideoFormatDefs[1] = new VideoFormatGUID(SupportedVideoFormat.MFVideoFormat_RGB24, MFMediaType.RGB24);
-            VideoFormatDefs[2] = new VideoFormatGUID(SupportedVideoFormat.MFVideoFormat_YUY2, MFMediaType.YUY2);
-            VideoFormatDefs[3] = new VideoFormatGUID(SupportedVideoFormat.MFVideoFormat_NV12, MFMediaType.NV12);
+            VideoFormatDefs[0] = new VideoFormatGUID(MFMediaType.RGB32, TransformImage_RGB32);
+            VideoFormatDefs[1] = new VideoFormatGUID(MFMediaType.RGB24, TransformImage_RGB24);
+            VideoFormatDefs[2] = new VideoFormatGUID(MFMediaType.YUY2, TransformImage_YUY2);
+            VideoFormatDefs[3] = new VideoFormatGUID(MFMediaType.NV12, TransformImage_NV12);
 
             m_convertFn = null;
         }
@@ -162,36 +171,17 @@ namespace MFCaptureD3D
 
         private int SetConversionFunction(Guid subtype)
         {
-            SupportedVideoFormat CurVideoFormat = SupportedVideoFormat.InvalidMediaType;
+            int hr = MFError.MF_E_INVALIDMEDIATYPE;
             m_convertFn = null;
 
             for (int i = 0; i < VideoFormatDefs.Length; i++)
             {
                 if (VideoFormatDefs[i].SubType == subtype)
                 {
-                    CurVideoFormat = VideoFormatDefs[i].VideoFormat;
+                    m_convertFn = VideoFormatDefs[i].VideoConvertFunction;
+                    hr = S_Ok;
                     break;
                 }
-            }
-
-            int hr = S_Ok;
-            switch (CurVideoFormat)
-            {
-                case SupportedVideoFormat.MFVideoFormat_RGB24:
-                    m_convertFn = TransformImage_RGB24;
-                    break;
-                case SupportedVideoFormat.MFVideoFormat_RGB32:
-                    m_convertFn = TransformImage_RGB32;
-                    break;
-                case SupportedVideoFormat.MFVideoFormat_YUY2:
-                    m_convertFn = TransformImage_YUY2;
-                    break;
-                case SupportedVideoFormat.MFVideoFormat_NV12:
-                    m_convertFn = TransformImage_NV12;
-                    break;
-                default:
-                    hr = MFError.MF_E_INVALIDMEDIATYPE;
-                    break;
             }
 
             return hr;
@@ -438,7 +428,7 @@ namespace MFCaptureD3D
         //
         // Draw the video frame.
         //-------------------------------------------------------------------
-        public int DrawFrame(IMFMediaBuffer pBuffer)
+        public int DrawFrame(IMFMediaBuffer pCaptureDeviceBuffer)
         {
             if (m_convertFn == null)
             {
@@ -459,7 +449,7 @@ namespace MFCaptureD3D
             }
 
             // Helper object to lock the video buffer.
-            using (VideoBufferLock xbuffer = new VideoBufferLock(pBuffer))
+            using (VideoBufferLock xbuffer = new VideoBufferLock(pCaptureDeviceBuffer))
             {
                 hr = TestCooperativeLevel();
                 if (Failed(hr)) { goto done; }
@@ -561,16 +551,6 @@ namespace MFCaptureD3D
         //
         //-------------------------------------------------------------------
 
-        private static Byte LoByte(UInt16 nValue)
-        {
-            return (Byte)(nValue & 0xFF);
-        }
-
-        private static Byte HiByte(UInt16 nValue)
-        {
-            return (Byte)(nValue >> 8);
-        }
-
         private static byte Clip(int clr)
         {
             return (byte)(clr < 0 ? 0 : (clr > 255 ? 255 : clr));
@@ -596,26 +576,23 @@ namespace MFCaptureD3D
         //
         // RGB-24 to RGB-32
         //-------------------------------------------------------------------
-        private static void TransformImage_RGB24(IntPtr pDest, int lDestStride, IntPtr pSrc, int lSrcStride, int dwWidthInPixels, int dwHeightInPixels)
+        unsafe private static void TransformImage_RGB24(IntPtr pDest, int lDestStride, IntPtr pSrc, int lSrcStride, int dwWidthInPixels, int dwHeightInPixels)
         {
-            unsafe
+            byte* source = (byte*)pSrc;
+            byte* dest = (byte*)pDest;
+
+            for (int y = 0; y < dwHeightInPixels; y++)
             {
-                for (int y = 0; y < dwHeightInPixels; y++)
+                for (int x = 0; x < dwWidthInPixels; x++)
                 {
-                    byte* source = (byte*)pSrc;
-                    byte* dest = (byte*)pDest;
-
-                    for (int x = 0; x < dwWidthInPixels; x++)
-                    {
-                        *dest++ = *source++;
-                        *dest++ = *source++;
-                        *dest++ = *source++;
-                        *dest++ = 0;
-                    }
-
-                    pSrc = new IntPtr(pSrc.ToInt64() + lSrcStride);
-                    pDest = new IntPtr(pDest.ToInt64() + lDestStride);
+                    *dest++ = *source++;
+                    *dest++ = *source++;
+                    *dest++ = *source++;
+                    *dest++ = 0;
                 }
+
+                source += lSrcStride;
+                dest += lDestStride;
             }
         }
 
@@ -637,7 +614,7 @@ namespace MFCaptureD3D
         //
         // YUY2 to RGB-32
         //-------------------------------------------------------------------
-        private static void TransformImage_YUY2(
+        unsafe private static void TransformImage_YUY2(
             IntPtr pDest,
             int lDestStride,
             IntPtr pSrc,
@@ -645,29 +622,22 @@ namespace MFCaptureD3D
             int dwWidthInPixels,
             int dwHeightInPixels)
         {
-            unsafe
+            YUYV* pSrcPel = (YUYV*)pSrc;
+            RGBQUAD* pDestPel = (RGBQUAD*)pDest;
+
+            lSrcStride /= 4; // convert lSrcStride to YUYV
+            lDestStride /= 4; // convert lDestStride to RGBQUAD
+
+            for (int y = 0; y < dwHeightInPixels; y++)
             {
-                for (int y = 0; y < dwHeightInPixels; y++)
+                for (int x = 0; x < dwWidthInPixels / 2; x++)
                 {
-                    RGBQUAD* pDestPel = (RGBQUAD*)pDest;
-                    ushort* pSrcPel = (ushort*)pSrc;
-
-                    for (int x = 0; x < dwWidthInPixels; x += 2)
-                    {
-                        // Byte order is U0 Y0 V0 Y1
-
-                        byte y0 = LoByte(pSrcPel[x]);
-                        byte u0 = HiByte(pSrcPel[x]);
-                        byte y1 = LoByte(pSrcPel[x + 1]);
-                        byte v0 = HiByte(pSrcPel[x + 1]);
-
-                        pDestPel[x] = ConvertYCrCbToRGB(y0, v0, u0);
-                        pDestPel[x + 1] = ConvertYCrCbToRGB(y1, v0, u0);
-                    }
-
-                    pSrc = new IntPtr(pSrc.ToInt64() + lSrcStride);
-                    pDest = new IntPtr(pDest.ToInt64() + lDestStride);
+                    pDestPel[x * 2] = ConvertYCrCbToRGB(pSrcPel[x].Y, pSrcPel[x].V, pSrcPel[x].U);
+                    pDestPel[(x * 2) + 1] = ConvertYCrCbToRGB(pSrcPel[x].Y2, pSrcPel[x].V, pSrcPel[x].U);
                 }
+
+                pSrcPel += lSrcStride;
+                pDestPel += lDestStride;
             }
         }
 
@@ -676,76 +646,73 @@ namespace MFCaptureD3D
         //
         // NV12 to RGB-32
         //-------------------------------------------------------------------
-        private static void TransformImage_NV12(IntPtr pDest, int lDestStride, IntPtr pSrc, int lSrcStride, int dwWidthInPixels, int dwHeightInPixels)
+        unsafe private static void TransformImage_NV12(IntPtr pDest, int lDestStride, IntPtr pSrc, int lSrcStride, int dwWidthInPixels, int dwHeightInPixels)
         {
-            unsafe
+            Byte* lpBitsY = (byte*)pSrc;
+            Byte* lpBitsCb = lpBitsY + (dwHeightInPixels * lSrcStride);
+            Byte* lpBitsCr = lpBitsCb + 1;
+
+            Byte* lpLineY1;
+            Byte* lpLineY2;
+            Byte* lpLineCr;
+            Byte* lpLineCb;
+
+            Byte* lpDibLine1 = (Byte*)pDest;
+            for (UInt32 y = 0; y < dwHeightInPixels; y += 2)
             {
-                Byte* lpBitsY = (byte*)pSrc;
-                Byte* lpBitsCb = lpBitsY + (dwHeightInPixels * lSrcStride);
-                Byte* lpBitsCr = lpBitsCb + 1;
+                lpLineY1 = lpBitsY;
+                lpLineY2 = lpBitsY + lSrcStride;
+                lpLineCr = lpBitsCr;
+                lpLineCb = lpBitsCb;
 
-                Byte* lpLineY1;
-                Byte* lpLineY2;
-                Byte* lpLineCr;
-                Byte* lpLineCb;
+                Byte* lpDibLine2 = lpDibLine1 + lDestStride;
 
-                for (UInt32 y = 0; y < dwHeightInPixels; y += 2)
+                for (UInt32 x = 0; x < dwWidthInPixels; x += 2)
                 {
-                    lpLineY1 = lpBitsY;
-                    lpLineY2 = lpBitsY + lSrcStride;
-                    lpLineCr = lpBitsCr;
-                    lpLineCb = lpBitsCb;
+                    byte y0 = lpLineY1[0];
+                    byte y1 = lpLineY1[1];
+                    byte y2 = lpLineY2[0];
+                    byte y3 = lpLineY2[1];
+                    byte cb = lpLineCb[0];
+                    byte cr = lpLineCr[0];
 
-                    Byte* lpDibLine1 = (Byte*)pDest;
-                    Byte* lpDibLine2 = lpDibLine1 + lDestStride;
+                    RGBQUAD r = ConvertYCrCbToRGB(y0, cr, cb);
+                    lpDibLine1[0] = r.rgbBlue;
+                    lpDibLine1[1] = r.rgbGreen;
+                    lpDibLine1[2] = r.rgbRed;
+                    lpDibLine1[3] = 0; // Alpha
 
-                    for (UInt32 x = 0; x < dwWidthInPixels; x += 2)
-                    {
-                        byte y0 = lpLineY1[0];
-                        byte y1 = lpLineY1[1];
-                        byte y2 = lpLineY2[0];
-                        byte y3 = lpLineY2[1];
-                        byte cb = lpLineCb[0];
-                        byte cr = lpLineCr[0];
+                    r = ConvertYCrCbToRGB(y1, cr, cb);
+                    lpDibLine1[4] = r.rgbBlue;
+                    lpDibLine1[5] = r.rgbGreen;
+                    lpDibLine1[6] = r.rgbRed;
+                    lpDibLine1[7] = 0; // Alpha
 
-                        RGBQUAD r = ConvertYCrCbToRGB(y0, cr, cb);
-                        lpDibLine1[0] = r.rgbBlue;
-                        lpDibLine1[1] = r.rgbGreen;
-                        lpDibLine1[2] = r.rgbRed;
-                        lpDibLine1[3] = 0; // Alpha
+                    r = ConvertYCrCbToRGB(y2, cr, cb);
+                    lpDibLine2[0] = r.rgbBlue;
+                    lpDibLine2[1] = r.rgbGreen;
+                    lpDibLine2[2] = r.rgbRed;
+                    lpDibLine2[3] = 0; // Alpha
 
-                        r = ConvertYCrCbToRGB(y1, cr, cb);
-                        lpDibLine1[4] = r.rgbBlue;
-                        lpDibLine1[5] = r.rgbGreen;
-                        lpDibLine1[6] = r.rgbRed;
-                        lpDibLine1[7] = 0; // Alpha
+                    r = ConvertYCrCbToRGB(y3, cr, cb);
+                    lpDibLine2[4] = r.rgbBlue;
+                    lpDibLine2[5] = r.rgbGreen;
+                    lpDibLine2[6] = r.rgbRed;
+                    lpDibLine2[7] = 0; // Alpha
 
-                        r = ConvertYCrCbToRGB(y2, cr, cb);
-                        lpDibLine2[0] = r.rgbBlue;
-                        lpDibLine2[1] = r.rgbGreen;
-                        lpDibLine2[2] = r.rgbRed;
-                        lpDibLine2[3] = 0; // Alpha
+                    lpLineY1 += 2;
+                    lpLineY2 += 2;
+                    lpLineCr += 2;
+                    lpLineCb += 2;
 
-                        r = ConvertYCrCbToRGB(y3, cr, cb);
-                        lpDibLine2[4] = r.rgbBlue;
-                        lpDibLine2[5] = r.rgbGreen;
-                        lpDibLine2[6] = r.rgbRed;
-                        lpDibLine2[7] = 0; // Alpha
-
-                        lpLineY1 += 2;
-                        lpLineY2 += 2;
-                        lpLineCr += 2;
-                        lpLineCb += 2;
-
-                        lpDibLine1 += 8;
-                        lpDibLine2 += 8;
-                    }
-
-                    pDest = new IntPtr(pDest.ToInt64() + (2 * lDestStride));
-                    lpBitsY += (2 * lSrcStride);
-                    lpBitsCr += lSrcStride;
-                    lpBitsCb += lSrcStride;
+                    lpDibLine1 += 8;
+                    lpDibLine2 += 8;
                 }
+
+                pDest += (2 * lDestStride);
+                lpBitsY += (2 * lSrcStride);
+                lpBitsCr += lSrcStride;
+                lpBitsCb += lSrcStride;
             }
         }
 

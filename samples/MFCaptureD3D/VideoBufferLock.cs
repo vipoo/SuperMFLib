@@ -91,7 +91,7 @@ namespace MFCaptureD3D
                     {
                         // Bottom-up orientation. Return a pointer to the start of the
                         // last row *in memory* which is the top row of the image.
-                        ppbScanLine0 = new IntPtr(pData.ToInt32() + (lDefaultStride) * (dwHeightInPixels - 1));
+                        ppbScanLine0 += lDefaultStride * (dwHeightInPixels - 1);
                     }
                     else
                     {

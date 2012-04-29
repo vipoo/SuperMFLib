@@ -39,15 +39,31 @@ namespace MFCaptureD3D
             public byte U;
             public byte Y2;
             public byte V;
+
+            public YUYV(byte y, byte u, byte y2, byte v)
+            {
+                Y = y;
+                U = u;
+                Y2 = y2;
+                V = v;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
         private struct RGBQUAD
         {
+            public byte B;
+            public byte G;
+            public byte R;
+            public byte A;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RGB24
+        {
             public byte rgbBlue;
             public byte rgbGreen;
             public byte rgbRed;
-            public byte rgbReserved;
         }
 
         private struct VideoFormatGUID
@@ -113,11 +129,12 @@ namespace MFCaptureD3D
             m_PixelAR.Denominator = m_PixelAR.Numerator = 1;
             m_rcDest = Rectangle.Empty;
 
-            VideoFormatDefs = new VideoFormatGUID[4];
-            VideoFormatDefs[0] = new VideoFormatGUID(MFMediaType.RGB32, TransformImage_RGB32);
-            VideoFormatDefs[1] = new VideoFormatGUID(MFMediaType.RGB24, TransformImage_RGB24);
-            VideoFormatDefs[2] = new VideoFormatGUID(MFMediaType.YUY2, TransformImage_YUY2);
-            VideoFormatDefs[3] = new VideoFormatGUID(MFMediaType.NV12, TransformImage_NV12);
+            VideoFormatDefs = new VideoFormatGUID[] {
+                new VideoFormatGUID(MFMediaType.RGB32, TransformImage_RGB32),
+                new VideoFormatGUID(MFMediaType.RGB24, TransformImage_RGB24),
+                new VideoFormatGUID(MFMediaType.YUY2, TransformImage_YUY2),
+                new VideoFormatGUID(MFMediaType.NV12, TransformImage_NV12) 
+            };
 
             m_convertFn = null;
         }
@@ -564,9 +581,9 @@ namespace MFCaptureD3D
             int d = cb - 128;
             int e = cr - 128;
 
-            rgbq.rgbRed = Clip((298 * c + 409 * e + 128) >> 8);
-            rgbq.rgbGreen = Clip((298 * c - 100 * d - 208 * e + 128) >> 8);
-            rgbq.rgbBlue = Clip((298 * c + 516 * d + 128) >> 8);
+            rgbq.R = Clip((298 * c + 409 * e + 128) >> 8);
+            rgbq.G = Clip((298 * c - 100 * d - 208 * e + 128) >> 8);
+            rgbq.B = Clip((298 * c + 516 * d + 128) >> 8);
 
             return rgbq;
         }
@@ -578,17 +595,20 @@ namespace MFCaptureD3D
         //-------------------------------------------------------------------
         unsafe private static void TransformImage_RGB24(IntPtr pDest, int lDestStride, IntPtr pSrc, int lSrcStride, int dwWidthInPixels, int dwHeightInPixels)
         {
-            byte* source = (byte*)pSrc;
-            byte* dest = (byte*)pDest;
+            RGB24* source = (RGB24*)pSrc;
+            RGBQUAD* dest = (RGBQUAD*)pDest;
+
+            lSrcStride /= 3;
+            lDestStride /= 4;
 
             for (int y = 0; y < dwHeightInPixels; y++)
             {
                 for (int x = 0; x < dwWidthInPixels; x++)
                 {
-                    *dest++ = *source++;
-                    *dest++ = *source++;
-                    *dest++ = *source++;
-                    *dest++ = 0;
+                    dest[x].R = source[x].rgbRed;
+                    dest[x].G = source[x].rgbGreen;
+                    dest[x].B = source[x].rgbBlue;
+                    dest[x].A = 0;
                 }
 
                 source += lSrcStride;
@@ -677,27 +697,27 @@ namespace MFCaptureD3D
                     byte cr = lpLineCr[0];
 
                     RGBQUAD r = ConvertYCrCbToRGB(y0, cr, cb);
-                    lpDibLine1[0] = r.rgbBlue;
-                    lpDibLine1[1] = r.rgbGreen;
-                    lpDibLine1[2] = r.rgbRed;
+                    lpDibLine1[0] = r.B;
+                    lpDibLine1[1] = r.G;
+                    lpDibLine1[2] = r.R;
                     lpDibLine1[3] = 0; // Alpha
 
                     r = ConvertYCrCbToRGB(y1, cr, cb);
-                    lpDibLine1[4] = r.rgbBlue;
-                    lpDibLine1[5] = r.rgbGreen;
-                    lpDibLine1[6] = r.rgbRed;
+                    lpDibLine1[4] = r.B;
+                    lpDibLine1[5] = r.G;
+                    lpDibLine1[6] = r.R;
                     lpDibLine1[7] = 0; // Alpha
 
                     r = ConvertYCrCbToRGB(y2, cr, cb);
-                    lpDibLine2[0] = r.rgbBlue;
-                    lpDibLine2[1] = r.rgbGreen;
-                    lpDibLine2[2] = r.rgbRed;
+                    lpDibLine2[0] = r.B;
+                    lpDibLine2[1] = r.G;
+                    lpDibLine2[2] = r.R;
                     lpDibLine2[3] = 0; // Alpha
 
                     r = ConvertYCrCbToRGB(y3, cr, cb);
-                    lpDibLine2[4] = r.rgbBlue;
-                    lpDibLine2[5] = r.rgbGreen;
-                    lpDibLine2[6] = r.rgbRed;
+                    lpDibLine2[4] = r.B;
+                    lpDibLine2[5] = r.G;
+                    lpDibLine2[6] = r.R;
                     lpDibLine2[7] = 0; // Alpha
 
                     lpLineY1 += 2;

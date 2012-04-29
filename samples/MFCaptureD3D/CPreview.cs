@@ -95,7 +95,6 @@ namespace MFCaptureD3D
             IMFActivate pActivate = pDevice.Activator;
             IMFMediaSource pSource = null;
             IMFAttributes pAttributes = null;
-            IMFMediaType pType = null;
             object o = null;
 
             lock (this)
@@ -156,21 +155,29 @@ namespace MFCaptureD3D
                         // Try to find a suitable output type.
                         for (int i = 0; ; i++)
                         {
+                            IMFMediaType pType;
                             hr = m_pReader.GetNativeMediaType((int)MF_SOURCE_READER.FirstVideoStream, i, out pType);
                             if (Failed(hr))
                             {
                                 break;
                             }
 
-                            hr = TryMediaType(pType);
-
-                            SafeRelease(pType);
-                            pType = null;
-
-                            if (Succeeded(hr))
+                            try
                             {
-                                // Found an output type.
-                                break;
+                                hr = TryMediaType(pType);
+
+                                SafeRelease(pType);
+                                pType = null;
+
+                                if (Succeeded(hr))
+                                {
+                                    // Found an output type.
+                                    break;
+                                }
+                            }
+                            finally
+                            {
+                                SafeRelease(pType);
                             }
                         }
                     }
@@ -197,7 +204,6 @@ namespace MFCaptureD3D
                 {
                     SafeRelease(pSource);
                     SafeRelease(pAttributes);
-                    SafeRelease(pType);
                 }
             }
 
@@ -300,7 +306,8 @@ namespace MFCaptureD3D
                 for (int i = 0; ; i++)
                 {
                     // Get the i'th format.
-                    m_draw.GetFormat(i, out subtype);
+                    hr = m_draw.GetFormat(i, out subtype);
+                    if (Failed(hr)) { break; }
 
                     hr = pType.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, subtype);
                     if (Failed(hr)) { break; }

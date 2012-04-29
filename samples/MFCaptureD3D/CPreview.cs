@@ -165,10 +165,6 @@ namespace MFCaptureD3D
                             try
                             {
                                 hr = TryMediaType(pType);
-
-                                SafeRelease(pType);
-                                pType = null;
-
                                 if (Succeeded(hr))
                                 {
                                     // Found an output type.

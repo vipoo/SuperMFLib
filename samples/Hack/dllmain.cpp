@@ -78,10 +78,10 @@ inline HRESULT CreateObjectKeyName(const GUID& guid, WCHAR *sName, DWORD cchMax)
 {
     // convert CLSID uuid to string
     OLECHAR szCLSID[39];
-    HRESULT hr = StringFromGUID2(guid, szCLSID, 39);
-    if (FAILED(hr))
+    int iCount = StringFromGUID2(guid, szCLSID, 39);
+    if (iCount == 0)
     {
-        return hr;
+        return -1;
     }
 
     // Create a string of the form "CLSID\{clsid}"

@@ -11,7 +11,7 @@ using MediaFoundation.EVR;
 
 namespace Testv10
 {
-    class IMFMediaEventQueueTest : IMFAsyncCallback
+    class IMFMediaEventQueueTest : COMBase, IMFAsyncCallback
     {
         IMFMediaEventQueue m_meq;
         AutoResetEvent m_are = new AutoResetEvent(false);
@@ -33,12 +33,14 @@ namespace Testv10
         {
             IMFMediaEvent pEvent;
 
-            m_meq.GetEvent(MFEventFlag.NoWait, out pEvent);
+            int hr = m_meq.GetEvent(MFEventFlag.NoWait, out pEvent);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestBeginGetEvent()
         {
-            m_meq.BeginGetEvent(this, null);
+            int hr = m_meq.BeginGetEvent(this, null);
+            MFError.ThrowExceptionForHR(hr);
             m_are.WaitOne(-1, true);
         }
 
@@ -46,14 +48,16 @@ namespace Testv10
         {
             IMFMediaEvent pEvent;
 
-            MFExtern.MFCreateMediaEvent(
+            int hr = MFExtern.MFCreateMediaEvent(
                 MediaEventType.MESourceStarted,
                 Guid.Empty,
                 0,
                 null,
                 out pEvent
                 );
-            m_meq.QueueEvent(pEvent);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_meq.QueueEvent(pEvent);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestQueueEventParamVar()
@@ -62,44 +66,55 @@ namespace Testv10
             Guid g = Guid.NewGuid();
             PropVariant p = new PropVariant();
 
-            m_meq.QueueEventParamVar(MediaEventType.MESessionClosed, g, 0, new PropVariant("asdf"));
+            int hr = m_meq.QueueEventParamVar(MediaEventType.MESessionClosed, g, 0, new PropVariant("asdf"));
+            MFError.ThrowExceptionForHR(hr);
 
-            m_meq.GetEvent(MFEventFlag.None, out pEvent);
+            hr = m_meq.GetEvent(MFEventFlag.None, out pEvent);
+            MFError.ThrowExceptionForHR(hr);
 
-            pEvent.GetValue(p);
+            hr = pEvent.GetValue(p);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(p.GetString() == "asdf");
         }
 
         void TestQueueEventParamUnk()
         {
-            m_meq.QueueEventParamUnk(MediaEventType.MESessionEnded, Guid.Empty, 0, this);
+            int hr = m_meq.QueueEventParamUnk(MediaEventType.MESessionEnded, Guid.Empty, 0, this);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestShutdown()
         {
-            m_meq.Shutdown();
+            int hr = m_meq.Shutdown();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateEventQueue(out m_meq);
+            int hr = MFExtern.MFCreateEventQueue(out m_meq);
+            MFError.ThrowExceptionForHR(hr);
         }
 
 
         #region IMFAsyncCallback Members
 
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
-            throw new Exception("The method or operation is not implemented.");
+            pdwFlags = 0;
+            pdwQueue = 0;
+            return E_NotImplemented;
         }
 
-        public void Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
             IMFMediaEvent pEvent;
 
-            m_meq.EndGetEvent(pAsyncResult, out pEvent);
+            int hr = m_meq.EndGetEvent(pAsyncResult, out pEvent);
+            MFError.ThrowExceptionForHR(hr);
             m_are.Set();
+
+            return S_Ok;
         }
 
         #endregion

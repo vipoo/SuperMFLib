@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
+using MediaFoundation.Misc;
 
 namespace Testv10
 {
@@ -31,8 +32,10 @@ namespace Testv10
         private void TestGetSampleFlags()
         {
             int i;
-            m_ps.SetSampleFlags(3);
-            m_ps.GetSampleFlags(out i);
+            int hr = m_ps.SetSampleFlags(3);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ps.GetSampleFlags(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 3);
         }
@@ -41,8 +44,10 @@ namespace Testv10
         {
             long l;
 
-            m_ps.SetSampleTime(4);
-            m_ps.GetSampleTime(out l);
+            int hr = m_ps.SetSampleTime(4);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ps.GetSampleTime(out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 4);
         }
@@ -51,8 +56,10 @@ namespace Testv10
         {
             long l;
 
-            m_ps.SetSampleDuration(5);
-            m_ps.GetSampleDuration(out l);
+            int hr = m_ps.SetSampleDuration(5);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ps.GetSampleDuration(out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 5);
         }
@@ -61,7 +68,8 @@ namespace Testv10
         {
             int i;
 
-            m_ps.GetBufferCount(out i);
+            int hr = m_ps.GetBufferCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 1);
         }
 
@@ -69,7 +77,8 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            m_ps.GetBufferByIndex(0, out pBuff);
+            int hr = m_ps.GetBufferByIndex(0, out pBuff);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(pBuff != null);
         }
 
@@ -77,7 +86,8 @@ namespace Testv10
         {
             IMFMediaBuffer pBuffer;
 
-            m_ps.ConvertToContiguousBuffer(out pBuffer);
+            int hr = m_ps.ConvertToContiguousBuffer(out pBuffer);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pBuffer != null);
         }
@@ -86,27 +96,33 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            MFExtern.MFCreateMemoryBuffer(100, out pBuff);
+            int hr = MFExtern.MFCreateMemoryBuffer(100, out pBuff);
+            MFError.ThrowExceptionForHR(hr);
 
-            pBuff.SetCurrentLength(17);
+            hr = pBuff.SetCurrentLength(17);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_ps.AddBuffer(pBuff);
+            hr = m_ps.AddBuffer(pBuff);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestRemoveBufferByIndex()
         {
-            m_ps.RemoveBufferByIndex(0);
+            int hr = m_ps.RemoveBufferByIndex(0);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestRemoveAllBuffers()
         {
-            m_ps.RemoveAllBuffers();
+            int hr = m_ps.RemoveAllBuffers();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestGetTotalLength()
         {
             int i;
-            m_ps.GetTotalLength(out i);
+            int hr = m_ps.GetTotalLength(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 17);
         }
@@ -115,14 +131,17 @@ namespace Testv10
         {
             IMFMediaBuffer pBuff;
 
-            MFExtern.MFCreateMemoryBuffer(17, out pBuff);
+            int hr = MFExtern.MFCreateMemoryBuffer(17, out pBuff);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_ps.CopyToBuffer(pBuff);
+            hr = m_ps.CopyToBuffer(pBuff);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateSample(out m_ps);
+            int hr = MFExtern.MFCreateSample(out m_ps);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

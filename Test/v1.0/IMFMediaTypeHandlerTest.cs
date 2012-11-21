@@ -30,15 +30,18 @@ namespace Testv10
         {
             IMFMediaType mt, mt2;
 
-            MFExtern.MFCreateMediaType(out mt);
+            int hr = MFExtern.MFCreateMediaType(out mt);
+            MFError.ThrowExceptionForHR(hr);
 
-            mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            MFError.ThrowExceptionForHR(hr);
 
             IntPtr ip = Marshal.AllocCoTaskMem(IntPtr.Size);
 
             try
             {
-                m_mth.IsMediaTypeSupported(mt, ip);
+                hr = m_mth.IsMediaTypeSupported(mt, ip);
+                MFError.ThrowExceptionForHR(hr);
 
                 if (Marshal.ReadIntPtr(ip) != IntPtr.Zero)
                 {
@@ -54,7 +57,8 @@ namespace Testv10
         void TestGetMediaTypeCount()
         {
             int i;
-            m_mth.GetMediaTypeCount(out i);
+            int hr = m_mth.GetMediaTypeCount(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 1);
         }
@@ -62,7 +66,8 @@ namespace Testv10
         void TestGetMediaTypeByIndex()
         {
             IMFMediaType pType;
-            m_mth.GetMediaTypeByIndex(0, out pType);
+            int hr = m_mth.GetMediaTypeByIndex(0, out pType);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pType != null);
         }
@@ -71,10 +76,13 @@ namespace Testv10
         {
             IMFMediaType pType, pType2;
 
-            m_mth.GetMediaTypeByIndex(0, out pType);
+            int hr = m_mth.GetMediaTypeByIndex(0, out pType);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_mth.SetCurrentMediaType(pType);
-            m_mth.GetCurrentMediaType(out pType2);
+            hr = m_mth.SetCurrentMediaType(pType);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_mth.GetCurrentMediaType(out pType2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pType == pType2);
         }
@@ -82,7 +90,8 @@ namespace Testv10
         void TestGetMajorType()
         {
             Guid g;
-            m_mth.GetMajorType(out g);
+            int hr = m_mth.GetMajorType(out g);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(g == MFMediaType.Video);
         }
@@ -91,13 +100,16 @@ namespace Testv10
         {
             IMFStreamDescriptor m_sd;
             IMFMediaType[] pmt = new IMFMediaType[1];
-            MFExtern.MFCreateMediaType(out pmt[0]);
+            int hr = MFExtern.MFCreateMediaType(out pmt[0]);
+            MFError.ThrowExceptionForHR(hr);
 
             pmt[0].SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
 
-            MFExtern.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
+            hr = MFExtern.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_sd.GetMediaTypeHandler(out m_mth);
+            hr = m_sd.GetMediaTypeHandler(out m_mth);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

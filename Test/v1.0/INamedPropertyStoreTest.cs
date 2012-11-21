@@ -29,7 +29,8 @@ namespace Testv10
         {
             string s;
 
-            m_pStore.GetNameAt(0, out s);
+            int hr = m_pStore.GetNameAt(0, out s);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(s == "asdf");
         }
@@ -38,8 +39,10 @@ namespace Testv10
         {
             PropVariant p = new PropVariant();
 
-            m_pStore.SetNamedValue("asdf", new PropVariant("testme"));
-            m_pStore.GetNamedValue("asdf", p);
+            int hr = m_pStore.SetNamedValue("asdf", new PropVariant("testme"));
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_pStore.GetNamedValue("asdf", p);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(p.GetString() == "testme");
         }
@@ -48,14 +51,16 @@ namespace Testv10
         {
             int iCnt;
 
-            m_pStore.GetNameCount(out iCnt);
+            int hr = m_pStore.GetNameCount(out iCnt);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == iCnt);
         }
 
         private void GetInterface()
         {
-            MFExtern.CreateNamedPropertyStore(out m_pStore);
+            int hr = MFExtern.CreateNamedPropertyStore(out m_pStore);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

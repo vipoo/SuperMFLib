@@ -23,12 +23,16 @@ namespace Testv10
         public void DoTests()
         {
             int i;
+            int hr;
 
             myEVR my = new myEVR();
             m_fc = my as IEVRFilterConfig;
 
-            m_fc.SetNumberOfStreams(3);
-            m_fc.GetNumberOfStreams(out i);
+            hr = m_fc.SetNumberOfStreams(3);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = m_fc.GetNumberOfStreams(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 3);
         }

@@ -26,7 +26,8 @@ namespace Testv10
         void TestGetCount()
         {
             int i;
-            m_ps.GetCount(out i);
+            int hr = m_ps.GetCount(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 1);
         }
@@ -35,11 +36,13 @@ namespace Testv10
         {
             PropVariant var = new PropVariant();
             PropertyKey key = new PropertyKey();
-            m_ps.GetAt(0, key);
+            int hr = m_ps.GetAt(0, key);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(key.pID == 3);
 
-            m_ps.GetValue(key, var);
+            hr = m_ps.GetValue(key, var);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(var.GetString() == "asdf");
         }
 
@@ -51,21 +54,24 @@ namespace Testv10
             key.fmtid = Guid.NewGuid();
             key.pID = 3;
 
-            m_ps.SetValue(key, var);
+            int hr = m_ps.SetValue(key, var);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestCommit()
         {
             try
             {
-                m_ps.Commit();
+                int hr = m_ps.Commit();
+                MFError.ThrowExceptionForHR(hr);
             }
             catch { } // not implemented
         }
 
         private void GetInterface()
         {
-            MFExtern.CreatePropertyStore(out m_ps);
+            int hr = MFExtern.CreatePropertyStore(out m_ps);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

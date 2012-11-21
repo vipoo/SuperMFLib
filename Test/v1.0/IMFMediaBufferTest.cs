@@ -30,20 +30,24 @@ namespace Testv10
         {
             IntPtr ip;
             int imax, iCur;
-            m_mb.Lock(out ip, out imax, out iCur);
+            int hr = m_mb.Lock(out ip, out imax, out iCur);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestUnlock()
         {
-            m_mb.Unlock();
+            int hr = m_mb.Unlock();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestSetCurrentLength()
         {
             int i;
 
-            m_mb.SetCurrentLength(33);
-            m_mb.GetCurrentLength(out i);
+            int hr = m_mb.SetCurrentLength(33);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_mb.GetCurrentLength(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 33);
         }
@@ -52,14 +56,16 @@ namespace Testv10
         {
             int i;
 
-            m_mb.GetMaxLength(out i);
+            int hr = m_mb.GetMaxLength(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 100);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateMemoryBuffer(100, out m_mb);
+            int hr = MFExtern.MFCreateMemoryBuffer(100, out m_mb);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

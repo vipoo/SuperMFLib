@@ -30,8 +30,10 @@ namespace Testv10
             Guid g1 = Guid.NewGuid();
             Guid g2;
 
-            m_mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, g1);
-            m_mt.GetMajorType(out g2);
+            int hr = m_mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, g1);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_mt.GetMajorType(out g2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(g1 == g2);
         }
@@ -40,8 +42,10 @@ namespace Testv10
         {
             bool b;
 
-            m_mt.SetUINT32(MFAttributesClsid.MF_MT_ALL_SAMPLES_INDEPENDENT, 0);
-            m_mt.IsCompressedFormat(out b);
+            int hr = m_mt.SetUINT32(MFAttributesClsid.MF_MT_ALL_SAMPLES_INDEPENDENT, 0);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_mt.IsCompressedFormat(out b);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(b == true);
         }
@@ -51,13 +55,15 @@ namespace Testv10
             IMFMediaType mt;
             MFMediaEqual f;
 
-            MFExtern.MFCreateMediaType(out mt);
+            int hr = MFExtern.MFCreateMediaType(out mt);
+            MFError.ThrowExceptionForHR(hr);
 
             Guid g1 = Guid.NewGuid();
 
-            mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, g1);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, g1);
+            MFError.ThrowExceptionForHR(hr);
 
-            int hr = m_mt.IsEqual(mt, out f);
+            hr = m_mt.IsEqual(mt, out f);
             Debug.Assert(hr == 1);
         }
 
@@ -85,7 +91,8 @@ namespace Testv10
 
             try
             {
-                m_mt.GetRepresentation(MFRepresentation.MFVideoFormat, out ip);
+                int hr = m_mt.GetRepresentation(MFRepresentation.MFVideoFormat, out ip);
+                MFError.ThrowExceptionForHR(hr);
                 Marshal.PtrToStructure(ip, a);
 
                 if (a.formatType == MFRepresentation.MFVideoFormat)
@@ -93,7 +100,8 @@ namespace Testv10
                     Marshal.PtrToStructure(a.formatPtr, vf);
                 }
 
-                m_mt.FreeRepresentation(MFRepresentation.MFVideoFormat, ip);
+                hr = m_mt.FreeRepresentation(MFRepresentation.MFVideoFormat, ip);
+                MFError.ThrowExceptionForHR(hr);
 
             }
             catch { } // fails because it's not fully formed.  Tested in player.cs
@@ -102,7 +110,8 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFExtern.MFCreateMediaType(out m_mt);
+            int hr = MFExtern.MFCreateMediaType(out m_mt);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

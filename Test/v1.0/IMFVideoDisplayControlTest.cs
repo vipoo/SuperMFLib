@@ -37,23 +37,25 @@ namespace Testv10
 
         void TestGetNativeVideoSize()
         {
-            Size s1, s2;
-            s1 = new Size();
-            s2 = new Size();
+            MFSize s1, s2;
+            s1 = new MFSize(1,1);
+            s2 = new MFSize(1,1);
 
             // Note, this call doesn't seem to do anything, but it uses the
             // same defs as GetidealVideoSize, so I'm assuming it's just cuz
             // nothing is connected.
-            m_vdc.GetNativeVideoSize(s1, s2);
+            int hr = m_vdc.GetNativeVideoSize(s1, s2);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetIdealVideoSize()
         {
-            Size s1, s2;
-            s1 = new Size();
-            s2 = new Size();
+            MFSize s1, s2;
+            s1 = new MFSize();
+            s2 = new MFSize();
 
-            m_vdc.GetIdealVideoSize(s1, s2);
+            int hr = m_vdc.GetIdealVideoSize(s1, s2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(s1.Width > 0 && s1.Height > 0 && s1.Width > 0 && s2.Height > 0);
         }
@@ -69,20 +71,24 @@ namespace Testv10
             r2.bottom = 234;
             r2.right = 345;
 
-            m_vdc.SetVideoPosition(r1, r2);
+            int hr = m_vdc.SetVideoPosition(r1, r2);
+            MFError.ThrowExceptionForHR(hr);
 
             MFVideoNormalizedRect r3 = new MFVideoNormalizedRect();
             MFRect r4 = new MFRect();
 
-            m_vdc.GetVideoPosition(r3, r4);
+            hr = m_vdc.GetVideoPosition(r3, r4);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestSetAspectRatioMode()
         {
             MFVideoAspectRatioMode pMode;
 
-            m_vdc.SetAspectRatioMode(MFVideoAspectRatioMode.PreservePixel);
-            m_vdc.GetAspectRatioMode(out pMode);
+            int hr = m_vdc.SetAspectRatioMode(MFVideoAspectRatioMode.PreservePixel);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_vdc.GetAspectRatioMode(out pMode);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pMode == MFVideoAspectRatioMode.PreservePixel);
         }
@@ -92,15 +98,18 @@ namespace Testv10
             IntPtr ip;
 
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            m_vdc.SetVideoWindow(f.Handle);
-            m_vdc.GetVideoWindow(out ip);
+            int hr = m_vdc.SetVideoWindow(f.Handle);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_vdc.GetVideoWindow(out ip);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(f.Handle == ip);
         }
 
         void TestRepaintVideo()
         {
-            m_vdc.RepaintVideo();
+            int hr = m_vdc.RepaintVideo();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetCurrentImage()
@@ -115,7 +124,8 @@ namespace Testv10
             try
             {
                 // Works in BasicPlayer
-                m_vdc.GetCurrentImage(bmh, out ip, out i, out l);
+                int hr = m_vdc.GetCurrentImage(bmh, out ip, out i, out l);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch { }
         }
@@ -124,8 +134,10 @@ namespace Testv10
         {
             int i;
 
-            m_vdc.SetBorderColor(333);
-            m_vdc.GetBorderColor(out i);
+            int hr = m_vdc.SetBorderColor(333);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_vdc.GetBorderColor(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 333);
         }
@@ -134,8 +146,10 @@ namespace Testv10
         {
             MFVideoRenderPrefs p;
 
-            m_vdc.SetRenderingPrefs(MFVideoRenderPrefs.DoNotRenderBorder);
-            m_vdc.GetRenderingPrefs(out p);
+            int hr = m_vdc.SetRenderingPrefs(MFVideoRenderPrefs.DoNotRenderBorder);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_vdc.GetRenderingPrefs(out p);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(p == MFVideoRenderPrefs.DoNotRenderBorder);
         }
@@ -146,8 +160,10 @@ namespace Testv10
 
             // This doesn't work, but again, I'm assuming it's cuz things aren't well connected.  C++
             // does the same thing
-            m_vdc.SetFullscreen(true);
-            m_vdc.GetFullscreen(out b);
+            int hr = m_vdc.SetFullscreen(true);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_vdc.GetFullscreen(out b);
+            MFError.ThrowExceptionForHR(hr);
 
             //Debug.Assert(b == true);
         }
@@ -157,7 +173,8 @@ namespace Testv10
             object o;
 
             IMFGetService gs = new MFVideoPresenter9() as IMFGetService;
-            gs.GetService(MFServices.MR_VIDEO_RENDER_SERVICE, typeof(IMFVideoDisplayControl).GUID, out o);
+            int hr = gs.GetService(MFServices.MR_VIDEO_RENDER_SERVICE, typeof(IMFVideoDisplayControl).GUID, out o);
+            MFError.ThrowExceptionForHR(hr);
             m_vdc = o as IMFVideoDisplayControl;
         }
 
@@ -167,12 +184,15 @@ namespace Testv10
             IMFActivate pRendererActivate = null;
 
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            MFExtern.MFCreateVideoRendererActivate(IntPtr.Zero, out pRendererActivate);
+            int hr = MFExtern.MFCreateVideoRendererActivate(IntPtr.Zero, out pRendererActivate);
+            MFError.ThrowExceptionForHR(hr);
 
-            pRendererActivate.ActivateObject(typeof(IMFGetService).GUID, out o);
+            hr = pRendererActivate.ActivateObject(typeof(IMFGetService).GUID, out o);
+            MFError.ThrowExceptionForHR(hr);
             IMFGetService imfs = o as IMFGetService;
 
-            imfs.GetService(MFServices.MR_VIDEO_RENDER_SERVICE, typeof(IMFVideoDisplayControl).GUID, out o);
+            hr = imfs.GetService(MFServices.MR_VIDEO_RENDER_SERVICE, typeof(IMFVideoDisplayControl).GUID, out o);
+            MFError.ThrowExceptionForHR(hr);
             m_vdc = o as IMFVideoDisplayControl;
         }
     }

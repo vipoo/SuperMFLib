@@ -11,7 +11,7 @@ using MediaFoundation.EVR;
 
 namespace Testv10
 {
-    class IMFMediaEventGeneratorTest : IMFAsyncCallback
+    class IMFMediaEventGeneratorTest : COMBase, IMFAsyncCallback
     {
         AutoResetEvent m_are = new AutoResetEvent(false);
         IMFMediaEventGenerator m_meg;
@@ -22,10 +22,14 @@ namespace Testv10
 
             GetInterface();
 
-            m_meg.QueueEvent(MediaEventType.MESourceStarted, Guid.NewGuid(), 323, new PropVariant("asdf"));
-            m_meg.GetEvent(MFEventFlag.None, out pEvent);
-            m_meg.QueueEvent(MediaEventType.MESourcePaused, Guid.NewGuid(), 333, new PropVariant("xasdf"));
-            m_meg.BeginGetEvent(this, this);
+            int hr = m_meg.QueueEvent(MediaEventType.MESourceStarted, Guid.NewGuid(), 323, new PropVariant("asdf"));
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_meg.GetEvent(MFEventFlag.None, out pEvent);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_meg.QueueEvent(MediaEventType.MESourcePaused, Guid.NewGuid(), 333, new PropVariant("xasdf"));
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_meg.BeginGetEvent(this, this);
+            MFError.ThrowExceptionForHR(hr);
             m_are.WaitOne(-1, true);
         }
 
@@ -36,15 +40,17 @@ namespace Testv10
             object pSource = null;
 
             // Create the source resolver.
-            MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            int hr = MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            MFError.ThrowExceptionForHR(hr);
 
-            pSourceResolver.CreateObjectFromURL(
+            hr = pSourceResolver.CreateObjectFromURL(
                     @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                     MFResolution.MediaSource,	// Create a source object.
                     null,						// Optional property store.
                     out ObjectType,				// Receives the created object type. 
                     out pSource					// Receives a pointer to the media source.
                 );
+            MFError.ThrowExceptionForHR(hr);
 
             // Get the IMFMediaSource interface from the media source.
             m_meg = (IMFMediaEventGenerator)pSource;
@@ -52,16 +58,21 @@ namespace Testv10
 
         #region IMFAsyncCallback Members
 
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
-            throw new Exception("The method or operation is not implemented.");
+            pdwFlags = 0;
+            pdwQueue = 0;
+            return E_NotImplemented;
         }
 
-        public void Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
             IMFMediaEvent pEvent;
-            m_meg.EndGetEvent(pAsyncResult, out pEvent);
+            int hr = m_meg.EndGetEvent(pAsyncResult, out pEvent);
+            MFError.ThrowExceptionForHR(hr);
             m_are.Set();
+
+            return S_Ok;
         }
 
         #endregion

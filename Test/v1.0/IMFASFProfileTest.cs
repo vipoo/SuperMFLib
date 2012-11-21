@@ -30,7 +30,8 @@ namespace Testv10
         {
             IMFASFProfile ap;
 
-            m_p.Clone(out ap);
+            int hr = m_p.Clone(out ap);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(ap != null);
         }
 
@@ -41,37 +42,49 @@ namespace Testv10
             IMFASFStreamConfig pStream, pStream2, pStream3;
             FourCC cc4 = new FourCC("YUY2");
 
-            MFExtern.MFCreateMediaType(out mt);
+            int hr = MFExtern.MFCreateMediaType(out mt);
+            MFError.ThrowExceptionForHR(hr);
 
-            mt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
-            mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
+            MFError.ThrowExceptionForHR(hr);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_p.CreateStream(mt, out pStream);
+            hr = m_p.CreateStream(mt, out pStream);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pStream != null);
 
-            m_p.SetStream(pStream);
+            hr = m_p.SetStream(pStream);
+            MFError.ThrowExceptionForHR(hr);
 
             int i, i2;
-            m_p.GetStreamCount(out i);
+            hr = m_p.GetStreamCount(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 1);
 
-            m_p.GetStream(0, out s, out pStream2);
+            hr = m_p.GetStream(0, out s, out pStream2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pStream2 != null);
 
-            m_p.GetStreamByNumber(0, out pStream3);
+            hr = m_p.GetStreamByNumber(0, out pStream3);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(pStream2 == pStream3);
 
             IMFASFProfile p2;
 
-            m_p.Clone(out p2);
+            hr = m_p.Clone(out p2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(p2 != null);
-            p2.GetStreamCount(out i);
-            p2.RemoveStream(0);
-            p2.GetStreamCount(out i2);
+            hr = p2.GetStreamCount(out i);
+            MFError.ThrowExceptionForHR(hr);
+            hr = p2.RemoveStream(0);
+            MFError.ThrowExceptionForHR(hr);
+            hr = p2.GetStreamCount(out i2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i2 == i - 1);
 
@@ -82,18 +95,23 @@ namespace Testv10
             int i, i2;
             IMFASFMutualExclusion me, me2;
 
-            m_p.CreateMutualExclusion(out me);
+            int hr = m_p.CreateMutualExclusion(out me);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(me != null);
 
-            m_p.AddMutualExclusion(me);
-            m_p.GetMutualExclusionCount(out i);
+            hr = m_p.AddMutualExclusion(me);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_p.GetMutualExclusionCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 1);
-            m_p.GetMutualExclusion(0, out me2);
+            hr = m_p.GetMutualExclusion(0, out me2);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(me2 != null);
 
-            m_p.RemoveMutualExclusion(0);
-            m_p.GetMutualExclusionCount(out i2);
+            hr = m_p.RemoveMutualExclusion(0);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_p.GetMutualExclusionCount(out i2);
             Debug.Assert(i2 == 0);
 
         }
@@ -134,25 +152,33 @@ namespace Testv10
             IMFASFMutualExclusion pm, pm2;
             int i;
 
-            m_p.GetMutualExclusionCount(out i);
+            int hr = m_p.GetMutualExclusionCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 0);
 
-            m_p.CreateMutualExclusion(out pm);
-            m_p.AddMutualExclusion(pm);
-            m_p.GetMutualExclusionCount(out i);
+            hr = m_p.CreateMutualExclusion(out pm);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_p.AddMutualExclusion(pm);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_p.GetMutualExclusionCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 1);
 
-            m_p.GetMutualExclusion(0, out pm2);
+            hr = m_p.GetMutualExclusion(0, out pm2);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(pm2 != null);
 
-            m_p.RemoveMutualExclusion(0);
-            m_p.GetMutualExclusionCount(out i);
+            hr = m_p.RemoveMutualExclusion(0);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_p.GetMutualExclusionCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 0);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateASFProfile(out m_p);
+            int hr = MFExtern.MFCreateASFProfile(out m_p);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

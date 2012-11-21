@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
+using MediaFoundation.Misc;
 
 namespace Testv10
 {
@@ -23,7 +24,8 @@ namespace Testv10
         {
             int i;
 
-            m_sd.GetStreamIdentifier(out i);
+            int hr = m_sd.GetStreamIdentifier(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 333);
         }
@@ -32,16 +34,19 @@ namespace Testv10
         {
             IMFMediaTypeHandler pHan;
 
-            m_sd.GetMediaTypeHandler(out pHan);
+            int hr = m_sd.GetMediaTypeHandler(out pHan);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(pHan != null);
         }
 
         private void GetInterface()
         {
             IMFMediaType[] pmt = new IMFMediaType[1];
-            MFExtern.MFCreateMediaType(out pmt[0]);
+            int hr = MFExtern.MFCreateMediaType(out pmt[0]);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
+            hr = MFExtern.MFCreateStreamDescriptor(333, 1, pmt, out m_sd);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

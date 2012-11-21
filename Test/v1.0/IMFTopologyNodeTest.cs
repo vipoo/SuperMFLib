@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using MediaFoundation;
+using MediaFoundation.Misc;
 
 namespace Testv10
 {
@@ -32,9 +33,11 @@ namespace Testv10
         void TestSetObject()
         {
             object o;
-            m_tn.SetObject(this);
+            int hr = m_tn.SetObject(this);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_tn.GetObject(out o);
+            hr = m_tn.GetObject(out o);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(this == o);
         }
@@ -43,7 +46,8 @@ namespace Testv10
         {
             MFTopologyType pType;
 
-            m_tn.GetNodeType(out pType);
+            int hr = m_tn.GetNodeType(out pType);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pType == MFTopologyType.TransformNode);
         }
@@ -52,8 +56,10 @@ namespace Testv10
         {
             long l;
 
-            m_tn.SetTopoNodeID(123456789);
-            m_tn.GetTopoNodeID(out l);
+            int hr = m_tn.SetTopoNodeID(123456789);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_tn.GetTopoNodeID(out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 123456789);
         }
@@ -62,7 +68,8 @@ namespace Testv10
         {
             int i;
 
-            m_tn.GetInputCount(out i);
+            int hr = m_tn.GetInputCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 1);
         }
 
@@ -70,7 +77,8 @@ namespace Testv10
         {
             int i;
 
-            m_tn.GetOutputCount(out i);
+            int hr = m_tn.GetOutputCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 1);
         }
 
@@ -78,14 +86,17 @@ namespace Testv10
         {
             IMFTopologyNode tn;
 
-            MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
+            int hr = MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_tn.ConnectOutput(0, tn, 0);
+            hr = m_tn.ConnectOutput(0, tn, 0);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestDisconnectOutput()
         {
-            m_tn.DisconnectOutput(0);
+            int hr = m_tn.DisconnectOutput(0);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetInput()
@@ -95,11 +106,14 @@ namespace Testv10
 
             IMFTopologyNode tn;
 
-            MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
+            int hr = MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
+            MFError.ThrowExceptionForHR(hr);
 
-            tn.ConnectOutput(0, m_tn, 0);
+            hr = tn.ConnectOutput(0, m_tn, 0);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_tn.GetInput(0, out pNode, out pIndex);
+            hr = m_tn.GetInput(0, out pNode, out pIndex);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pNode == tn);
         }
@@ -109,17 +123,21 @@ namespace Testv10
             int pIndex;
             IMFTopologyNode pNode;
 
-            m_tn.GetOutput(0, out pNode, out pIndex);
+            int hr = m_tn.GetOutput(0, out pNode, out pIndex);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestSetOutputPrefType()
         {
             IMFMediaType pType, pType2;
 
-            MFExtern.MFCreateMediaType(out pType);
+            int hr = MFExtern.MFCreateMediaType(out pType);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_tn.SetOutputPrefType(0, pType);
-            m_tn.GetOutputPrefType(0, out pType2);
+            hr = m_tn.SetOutputPrefType(0, pType);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_tn.GetOutputPrefType(0, out pType2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pType == pType2);
         }
@@ -128,13 +146,16 @@ namespace Testv10
         {
             IMFMediaType pType, pType2;
 
-            MFExtern.MFCreateMediaType(out pType);
+            int hr = MFExtern.MFCreateMediaType(out pType);
+            MFError.ThrowExceptionForHR(hr);
 
             // Returns E_NOTIMPL since this is a source node
             try
             {
-                m_tn.SetInputPrefType(0, pType);
-                m_tn.GetInputPrefType(0, out pType2);
+                hr = m_tn.SetInputPrefType(0, pType);
+                MFError.ThrowExceptionForHR(hr);
+                hr = m_tn.GetInputPrefType(0, out pType2);
+                MFError.ThrowExceptionForHR(hr);
                 Debug.Assert(pType == pType2);
             }
             catch { }
@@ -144,14 +165,17 @@ namespace Testv10
         {
             IMFTopologyNode tn;
 
-            MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
+            int hr = MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out tn);
+            MFError.ThrowExceptionForHR(hr);
 
-            tn.CloneFrom(m_tn);
+            hr = tn.CloneFrom(m_tn);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out m_tn);
+            int hr = MFExtern.MFCreateTopologyNode(MFTopologyType.TransformNode, out m_tn);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

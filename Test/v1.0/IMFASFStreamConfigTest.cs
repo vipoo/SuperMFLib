@@ -29,7 +29,9 @@ namespace Testv10
         {
             Guid g;
 
-            m_sc.GetStreamType(out g);
+            int hr = m_sc.GetStreamType(out g);
+            MFError.ThrowExceptionForHR(hr);
+
             Debug.Assert(g == MFMediaType.Video, "GetStreamType");
         }
 
@@ -37,13 +39,16 @@ namespace Testv10
         {
             IMFMediaType mt;
 
-            m_sc.GetMediaType(out mt);
-            m_sc.SetMediaType(mt);
+            int hr = m_sc.GetMediaType(out mt);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_sc.SetMediaType(mt);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestStreamNumber()
         {
-            m_sc.SetStreamNumber(0);
+            int hr = m_sc.SetStreamNumber(0);
+            MFError.ThrowExceptionForHR(hr);
             short s = m_sc.GetStreamNumber();
 
             Debug.Assert(s == 0, "GetStreamNumber");
@@ -53,7 +58,8 @@ namespace Testv10
         {
             IMFASFStreamConfig sc;
 
-            m_sc.Clone(out sc);
+            int hr = m_sc.Clone(out sc);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestPayload()
@@ -67,18 +73,23 @@ namespace Testv10
 
             Marshal.WriteInt64(ip, 1234567890);
 
-            m_sc.AddPayloadExtension(MFASFSampleExtension.SampleDuration, 2, ip, iSize);
-            m_sc.GetPayloadExtensionCount(out s);
+            int hr = m_sc.AddPayloadExtension(MFASFSampleExtension.SampleDuration, 2, ip, iSize);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_sc.GetPayloadExtensionCount(out s);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(s == 1, "GetPayloadExtensionCount");
 
             es = iSize;
-            m_sc.GetPayloadExtension(0, out g, out ds, ip2, ref es);
+            hr = m_sc.GetPayloadExtension(0, out g, out ds, ip2, ref es);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(Marshal.ReadInt64(ip2) == 1234567890 && es == 10 && g == MFASFSampleExtension.SampleDuration && ds == 2);
 
-            m_sc.RemoveAllPayloadExtensions();
-            m_sc.GetPayloadExtensionCount(out s);
+            hr = m_sc.RemoveAllPayloadExtensions();
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_sc.GetPayloadExtensionCount(out s);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(s == 0, "GetPayloadExtensionCount");
         }
@@ -90,13 +101,18 @@ namespace Testv10
 
             IMFASFProfile ap;
 
-            MFExtern.MFCreateASFProfile(out ap);
-            MFExtern.MFCreateMediaType(out mt);
+            int hr = MFExtern.MFCreateASFProfile(out ap);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFCreateMediaType(out mt);
+            MFError.ThrowExceptionForHR(hr);
 
-            mt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
-            mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
+            MFError.ThrowExceptionForHR(hr);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            MFError.ThrowExceptionForHR(hr);
 
-            ap.CreateStream(mt, out m_sc);
+            hr = ap.CreateStream(mt, out m_sc);
+            MFError.ThrowExceptionForHR(hr);
         }
 
     }

@@ -30,45 +30,52 @@ namespace Testv10
         void TestGetElementCount(int iCnt)
         {
             int i;
-            m_col.GetElementCount(out i);
+            int hr = m_col.GetElementCount(out i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == iCnt);
         }
 
         void TestGetElement()
         {
             object o;
-            m_col.GetElement(0, out o);
+            int hr = m_col.GetElement(0, out o);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(o == this);
         }
 
         void TestAddElement()
         {
-            m_col.AddElement(this);
+            int hr = m_col.AddElement(this);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestRemoveElement()
         {
             object o;
-            m_col.RemoveElement(0, out o);
+            int hr = m_col.RemoveElement(0, out o);
+            MFError.ThrowExceptionForHR(hr);
             TestGetElementCount(1);
         }
 
         void TestInsertElementAt()
         {
-            m_col.InsertElementAt(0, this);
+            int hr = m_col.InsertElementAt(0, this);
+            MFError.ThrowExceptionForHR(hr);
             TestGetElementCount(2);
         }
 
         void TestRemoveAllElements()
         {
-            m_col.RemoveAllElements();
+            int hr = m_col.RemoveAllElements();
+            MFError.ThrowExceptionForHR(hr);
             TestGetElementCount(0);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateCollection(out m_col);
+            int hr = MFExtern.MFCreateCollection(out m_col);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

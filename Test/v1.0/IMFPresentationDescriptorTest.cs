@@ -30,7 +30,8 @@ namespace Testv10
         {
             int i;
 
-            m_pd.GetStreamDescriptorCount(out i);
+            int hr = m_pd.GetStreamDescriptorCount(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 2);
         }
@@ -40,26 +41,30 @@ namespace Testv10
             bool b;
             IMFStreamDescriptor pd;
 
-            m_pd.GetStreamDescriptorByIndex(0, out b, out pd);
+            int hr = m_pd.GetStreamDescriptorByIndex(0, out b, out pd);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pd != null);
         }
 
         void TestSelectStream()
         {
-            m_pd.SelectStream(1);
+            int hr = m_pd.SelectStream(1);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestDeselectStream()
         {
-            m_pd.DeselectStream(1);
+            int hr = m_pd.DeselectStream(1);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestClone()
         {
             IMFPresentationDescriptor pd;
 
-            m_pd.Clone(out pd);
+            int hr = m_pd.Clone(out pd);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pd != null);
         }
@@ -71,18 +76,21 @@ namespace Testv10
             MFObjectType pObjectType;
             object pSource;
 
-            MFExtern.MFCreateSourceResolver(out m_sr);
+            int hr = MFExtern.MFCreateSourceResolver(out m_sr);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_sr.CreateObjectFromURL(
+            hr = m_sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.MediaSource,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
             m_pSource = pSource as IMFMediaSource;
 
-            m_pSource.CreatePresentationDescriptor(out m_pd);
+            hr = m_pSource.CreatePresentationDescriptor(out m_pd);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

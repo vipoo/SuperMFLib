@@ -35,13 +35,16 @@ namespace Testv10
         {
             IMFTopology pTop;
 
-            MFExtern.MFCreateTopology(out pTop);
-            m_ms.SetTopology(MFSessionSetTopologyFlags.None, pTop);
+            int hr = MFExtern.MFCreateTopology(out pTop);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ms.SetTopology(MFSessionSetTopologyFlags.None, pTop);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestClearTopologies()
         {
-            m_ms.ClearTopologies();
+            int hr = m_ms.ClearTopologies();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestStart()
@@ -72,7 +75,8 @@ namespace Testv10
         void TestGetClock()
         {
             IMFClock pClock;
-            m_ms.GetClock(out pClock);
+            int hr = m_ms.GetClock(out pClock);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pClock != null);
         }
@@ -81,7 +85,8 @@ namespace Testv10
         {
             MFSessionCapabilities pCaps;
 
-            m_ms.GetSessionCapabilities(out pCaps);
+            int hr = m_ms.GetSessionCapabilities(out pCaps);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetFullTopology()
@@ -95,7 +100,8 @@ namespace Testv10
 
         private void GetInterface()
         {
-            MFExtern.MFCreateMediaSession(null, out m_ms);
+            int hr = MFExtern.MFCreateMediaSession(null, out m_ms);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

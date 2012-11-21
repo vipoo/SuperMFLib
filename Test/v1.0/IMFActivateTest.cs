@@ -17,24 +17,30 @@ namespace Testv10
 
         public void DoTests()
         {
+            int hr;
             object o;
             GetInterface();
 
-            m_a.ActivateObject(typeof(IMFGetService).GUID, out o);
+            hr = m_a.ActivateObject(typeof(IMFGetService).GUID, out o);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
-                m_a.DetachObject(); // Not implemented
+                hr = m_a.DetachObject(); // Not implemented
+                MFError.ThrowExceptionForHR(hr);
             }
             catch { }
 
-            m_a.ShutdownObject();
+            hr = m_a.ShutdownObject();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
+            int hr;
             System.Windows.Forms.Form f = new System.Windows.Forms.Form();
-            MFExtern.MFCreateVideoRendererActivate(IntPtr.Zero, out m_a);
+            hr = MFExtern.MFCreateVideoRendererActivate(IntPtr.Zero, out m_a);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

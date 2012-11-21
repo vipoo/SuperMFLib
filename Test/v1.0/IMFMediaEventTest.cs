@@ -29,7 +29,8 @@ namespace Testv10
         {
             MediaEventType m;
 
-            m_me.GetType(out m);
+            int hr = m_me.GetType(out m);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(MediaEventType.MESourceStarted == m);
         }
@@ -37,7 +38,8 @@ namespace Testv10
         void TestGetExtendedType()
         {
             Guid g;
-            m_me.GetExtendedType(out g);
+            int hr = m_me.GetExtendedType(out g);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(g != Guid.Empty);
         }
@@ -45,7 +47,8 @@ namespace Testv10
         void TestGetStatus()
         {
             int i;
-            m_me.GetStatus(out i);
+            int hr = m_me.GetStatus(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 313);
         }
@@ -53,20 +56,22 @@ namespace Testv10
         void TestGetValue()
         {
             PropVariant p = new PropVariant("FDSA");
-            m_me.GetValue(p);
+            int hr = m_me.GetValue(p);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(p.GetString() == "asdf");
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateMediaEvent(
+            int hr = MFExtern.MFCreateMediaEvent(
                 MediaEventType.MESourceStarted,
                 Guid.NewGuid(),
                 313,
                 new PropVariant("asdf"),
                 out m_me
                 );
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

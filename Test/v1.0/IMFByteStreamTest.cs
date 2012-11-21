@@ -7,12 +7,15 @@ using System.Runtime.InteropServices;
 
 using MediaFoundation;
 using MediaFoundation.Misc;
+using System.IO;
 
 namespace Testv10
 {
     [ComVisible(true)]
-    class IMFByteStreamTest : IMFAsyncCallback
+    class IMFByteStreamTest : COMBase, IMFAsyncCallback
     {
+        const string path = @"C:\sourceforge\mflib\Test\v1.0\test.wmv";
+
         IMFByteStream m_bs;
         AutoResetEvent m_mre = new AutoResetEvent(false);
         bool m_write = false;
@@ -34,13 +37,20 @@ namespace Testv10
             TestWrite();
             TestBeginWrite();
             TestFlush();
+            TestClose();
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
         }
 
         void TestGetCapabilities()
         {
             MFByteStreamCapabilities pcap;
 
-            m_bs.GetCapabilities(out pcap);
+            int hr = m_bs.GetCapabilities(out pcap);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pcap == (MFByteStreamCapabilities.IsSeekable | MFByteStreamCapabilities.IsReadable));
         }
@@ -49,7 +59,8 @@ namespace Testv10
         {
             long l;
 
-            m_bs.GetLength(out l);
+            int hr = m_bs.GetLength(out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 2163028);
         }
@@ -59,19 +70,31 @@ namespace Testv10
             MFObjectType pObjectType;
             object pSource;
             IMFSourceResolver sr;
+            int hr;
 
-            MFExtern.MFCreateSourceResolver(out sr);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            using (FileStream fs = File.Create(path, 1024))
+            {
+            }
 
-            sr.CreateObjectFromURL(
-                @"file://C:\sourceforge\mflib\Test\v1.0\test.wmv",
+            hr = MFExtern.MFCreateSourceResolver(out sr);
+            MFError.ThrowExceptionForHR(hr);            
+
+            hr = sr.CreateObjectFromURL(
+                @"file://" + path,
                 MFResolution.ByteStream | MFResolution.Write,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_bs = pSource as IMFByteStream;
+            m_bs = (IMFByteStream)pSource;
 
-            m_bs.SetLength(100);
+            hr = m_bs.SetLength(100);
+            MFError.ThrowExceptionForHR(hr);
             m_write = true;
 
         }
@@ -80,8 +103,10 @@ namespace Testv10
         {
             long l;
 
-            m_bs.SetCurrentPosition(1);
-            m_bs.GetCurrentPosition(out l);
+            int hr = m_bs.SetCurrentPosition(1);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_bs.GetCurrentPosition(out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 1);
         }
@@ -90,7 +115,8 @@ namespace Testv10
         {
             bool b;
 
-            m_bs.IsEndOfStream(out b);
+            int hr = m_bs.IsEndOfStream(out b);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(b == false);
         }
@@ -101,7 +127,8 @@ namespace Testv10
             int iRead;
             IntPtr b = Marshal.AllocCoTaskMem(iReq);
 
-            m_bs.Read(b, iReq, out iRead);
+            int hr = m_bs.Read(b, iReq, out iRead);
+            MFError.ThrowExceptionForHR(hr);
 
             Marshal.FreeCoTaskMem(b);
         }
@@ -111,7 +138,8 @@ namespace Testv10
             int iReq = 32;
             IntPtr b = Marshal.AllocCoTaskMem(iReq);
 
-            m_bs.BeginRead(b, iReq, this, this);
+            int hr = m_bs.BeginRead(b, iReq, this, this);
+            MFError.ThrowExceptionForHR(hr);
             m_mre.WaitOne(-1, true);
 
             Marshal.FreeCoTaskMem(b);
@@ -122,7 +150,8 @@ namespace Testv10
             int iWrote;
             int iReq = 32;
             IntPtr b = Marshal.AllocCoTaskMem(iReq);
-            m_bs.Write(b, iReq, out iWrote);
+            int hr = m_bs.Write(b, iReq, out iWrote);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(iWrote == iReq);
             Marshal.FreeCoTaskMem(b);
@@ -132,7 +161,8 @@ namespace Testv10
         {
             int iReq = 32;
             IntPtr b = Marshal.AllocCoTaskMem(iReq);
-            m_bs.BeginWrite(b, iReq, this, this);
+            int hr = m_bs.BeginWrite(b, iReq, this, this);
+            MFError.ThrowExceptionForHR(hr);
 
             m_mre.WaitOne(-1, true);
             Marshal.FreeCoTaskMem(b);
@@ -141,19 +171,22 @@ namespace Testv10
         void TestSeek()
         {
             long l;
-            m_bs.Seek(MFByteStreamSeekOrigin.Current, -32, MFByteStreamSeekingFlags.None, out l);
+            int hr = m_bs.Seek(MFByteStreamSeekOrigin.Current, -32, MFByteStreamSeekingFlags.None, out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 1);
         }
 
         void TestFlush()
         {
-            m_bs.Flush();
+            int hr = m_bs.Flush();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestClose()
         {
-            m_bs.Close();
+            int hr = m_bs.Close();
+            MFError.ThrowExceptionForHR(hr);
         }
 
 
@@ -163,14 +196,16 @@ namespace Testv10
             object pSource;
             IMFSourceResolver sr;
 
-            MFExtern.MFCreateSourceResolver(out sr);
+            int hr = MFExtern.MFCreateSourceResolver(out sr);
+            MFError.ThrowExceptionForHR(hr);
 
-            sr.CreateObjectFromURL(
+            hr = sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.ByteStream,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
             m_bs = pSource as IMFByteStream;
 
@@ -178,32 +213,37 @@ namespace Testv10
 
         #region IMFAsyncCallback Members
 
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
-            throw new Exception("The method or operation is not implemented.");
+            pdwFlags = 0;
+            pdwQueue = 0;
+            return E_NotImplemented;
         }
 
-        public void Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
             int i;
             object o;
             IntPtr ip = Marshal.AllocCoTaskMem(8);
 
-            pAsyncResult.GetState(out o);
+            int hr = pAsyncResult.GetState(out o);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(o == this);
 
             ip = pAsyncResult.GetStateNoAddRef();
             o = Marshal.GetObjectForIUnknown(ip);
             Debug.Assert(o == this);
 
-            pAsyncResult.SetStatus(-1);
-            int hr = pAsyncResult.GetStatus();
+            hr = pAsyncResult.SetStatus(-1);
+            MFError.ThrowExceptionForHR(hr);
+            hr = pAsyncResult.GetStatus();
             Debug.Assert(hr == -1);
 
             try
             {
                 // Since the IMFAsyncResult was created with no
-                pAsyncResult.GetObject(out o);
+                hr = pAsyncResult.GetObject(out o);
+                Debug.Assert(hr == E_Pointer);
             }
             catch (Exception e)
             {
@@ -213,18 +253,22 @@ namespace Testv10
 
             if (!m_write)
             {
-                m_bs.EndRead(pAsyncResult, out i);
+                hr = m_bs.EndRead(pAsyncResult, out i);
+                MFError.ThrowExceptionForHR(hr);
 
                 Debug.Assert(i == 32);
             }
             else
             {
-                m_bs.EndWrite(pAsyncResult, out i);
+                hr = m_bs.EndWrite(pAsyncResult, out i);
+                MFError.ThrowExceptionForHR(hr);
 
                 Debug.Assert(i == 32);
             }
 
             m_mre.Set();
+
+            return 0;
         }
 
         #endregion

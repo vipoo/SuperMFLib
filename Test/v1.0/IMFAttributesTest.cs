@@ -44,14 +44,14 @@ namespace Testv10
             o2 = TestGetItem2(new PropVariant("asdf"));
             Debug.Assert(o2.GetString() == "asdf");
 
-            o2 = TestGetItem2(new PropVariant(13));
-            Debug.Assert(o2.GetInt() == 13);
+            o2 = TestGetItem2(new PropVariant((uint)13));
+            Debug.Assert(o2.GetUInt() == 13);
 
             o2 = TestGetItem2(new PropVariant(5.5));
             Debug.Assert(o2.GetDouble() == 5.5);
 
-            o2 = TestGetItem2(new PropVariant(long.MaxValue));
-            Debug.Assert(o2.GetLong() == long.MaxValue);
+            o2 = TestGetItem2(new PropVariant((ulong)long.MaxValue));
+            Debug.Assert(o2.GetULong() == long.MaxValue);
 
             o2 = TestGetItem2(new PropVariant(typeof(IMFAttributes).GUID));
             Debug.Assert(o2.GetGuid() == typeof(IMFAttributes).GUID);
@@ -70,10 +70,16 @@ namespace Testv10
             PropVariant o2 = new PropVariant();
 
             Guid g = Guid.NewGuid();
-            m_attr.SetItem(g, o);
+            int hr;
+            hr = m_attr.SetItem(g, o);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetItem(g, o2);
-            m_attr.GetItemType(g, out pType);
+            hr = m_attr.GetItem(g, o2);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = m_attr.GetItemType(g, out pType);
+            MFError.ThrowExceptionForHR(hr);
+
             Debug.Assert(o2.GetMFAttributeType() == o.GetMFAttributeType() && o2.GetMFAttributeType() == pType);
 
             return o2;
@@ -83,9 +89,11 @@ namespace Testv10
         {
             int i;
             Guid g = Guid.NewGuid();
-            m_attr.SetUINT32(g, 3);
+            int hr = m_attr.SetUINT32(g, 3);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetUINT32(g, out i);
+            hr = m_attr.GetUINT32(g, out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 3);
         }
@@ -94,9 +102,11 @@ namespace Testv10
         {
             long l;
             Guid g = Guid.NewGuid();
-            m_attr.SetUINT64(g, 4);
+            int hr = m_attr.SetUINT64(g, 4);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetUINT64(g, out l);
+            hr = m_attr.GetUINT64(g, out l);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(l == 4);
         }
@@ -105,9 +115,11 @@ namespace Testv10
         {
             double d;
             Guid g = Guid.NewGuid();
-            m_attr.SetDouble(g, 5.5);
+            int hr = m_attr.SetDouble(g, 5.5);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetDouble(g, out d);
+            hr = m_attr.GetDouble(g, out d);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(d == 5.5);
         }
@@ -117,9 +129,11 @@ namespace Testv10
             Guid gv1, gv2;
             Guid g = Guid.NewGuid();
             gv1 = Guid.NewGuid();
-            m_attr.SetGUID(g, gv1);
+            int hr = m_attr.SetGUID(g, gv1);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetGUID(g, out gv2);
+            hr = m_attr.GetGUID(g, out gv2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(gv1 == gv2);
         }
@@ -131,13 +145,16 @@ namespace Testv10
             Guid g = Guid.NewGuid();
             StringBuilder s;
 
-            m_attr.SetString(g, "hey");
+            int hr = m_attr.SetString(g, "hey");
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetStringLength(g, out c);
+            hr = m_attr.GetStringLength(g, out c);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(c == 3);
 
             s = new StringBuilder(c + 1);
-            m_attr.GetString(g, s, c + 1, out c2);
+            hr = m_attr.GetString(g, s, c + 1, out c2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(s.ToString() == "hey");
         }
@@ -148,9 +165,11 @@ namespace Testv10
             Guid g = Guid.NewGuid();
             string s;
 
-            m_attr.SetString(g, "hey there");
+            int hr = m_attr.SetString(g, "hey there");
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetAllocatedString(g, out s, out c);
+            hr = m_attr.GetAllocatedString(g, out s, out c);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(c == 9 && s == "hey there");
         }
@@ -167,12 +186,15 @@ namespace Testv10
                 b[x - 13] = (byte)x;
             }
 
-            m_attr.SetBlob(g, b, b.Length);
-            m_attr.GetBlobSize(g, out c);
+            int hr = m_attr.SetBlob(g, b, b.Length);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_attr.GetBlobSize(g, out c);
+            MFError.ThrowExceptionForHR(hr);
 
             b2 = new byte[c];
 
-            m_attr.GetBlob(g, b2, c, out c2);
+            hr = m_attr.GetBlob(g, b2, c, out c2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(b[0] == b2[0] && b[13] == b2[13] && c2 == b.Length);
         }
@@ -189,14 +211,17 @@ namespace Testv10
                 b[x - 13] = (byte)x;
             }
 
-            m_attr.SetBlob(g, b, b.Length);
-            m_attr.GetBlobSize(g, out c);
+            int hr = m_attr.SetBlob(g, b, b.Length);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_attr.GetBlobSize(g, out c);
+            MFError.ThrowExceptionForHR(hr);
 
             b2 = new byte[c];
 
             IntPtr ip = IntPtr.Zero;
 
-            m_attr.GetAllocatedBlob(g, out ip, out c2);
+            hr = m_attr.GetAllocatedBlob(g, out ip, out c2);
+            MFError.ThrowExceptionForHR(hr);
             Marshal.Copy(ip, b2, 0, c2);
             Marshal.FreeCoTaskMem(ip);
 
@@ -209,17 +234,21 @@ namespace Testv10
             object o;
             Guid IID = new Guid("00000000-0000-0000-C000-000000000046");
 
-            m_attr.SetUnknown(g, m_attr);
+            int hr = m_attr.SetUnknown(g, m_attr);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetUnknown(g, IID, out o);
+            hr = m_attr.GetUnknown(g, IID, out o);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(o == m_attr);
         }
 
         private void TestLockStore()
         {
-            m_attr.LockStore();
-            m_attr.UnlockStore();
+            int hr = m_attr.LockStore();
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_attr.UnlockStore();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestGetItemByIndex()
@@ -229,14 +258,19 @@ namespace Testv10
             int iCnt1, iCnt2;
             bool bRes;
 
-            m_attr.GetCount(out iCnt1);
+            int hr = m_attr.GetCount(out iCnt1);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.GetItemByIndex(0, out g, o);
-            m_attr.CompareItem(g, o, out bRes);
+            hr = m_attr.GetItemByIndex(0, out g, o);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_attr.CompareItem(g, o, out bRes);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(bRes);
 
-            m_attr.DeleteItem(g);
-            m_attr.GetCount(out iCnt2);
+            hr = m_attr.DeleteItem(g);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_attr.GetCount(out iCnt2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(iCnt2 == iCnt1 - 1);
        }
@@ -247,27 +281,35 @@ namespace Testv10
             int iCnt1, iCnt2;
             bool bRes;
 
-            m_attr.GetCount(out iCnt1);
+            int hr = m_attr.GetCount(out iCnt1);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFCreateAttributes(out attr, 20);
+            hr = MFExtern.MFCreateAttributes(out attr, 20);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.CopyAllItems(attr);
-            attr.GetCount(out iCnt2);
+            hr = m_attr.CopyAllItems(attr);
+            MFError.ThrowExceptionForHR(hr);
+            hr = attr.GetCount(out iCnt2);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(iCnt1 == iCnt2 && iCnt1 > 0);
 
-            m_attr.Compare(attr, MFAttributesMatchType.AllItems, out bRes);
+            hr = m_attr.Compare(attr, MFAttributesMatchType.AllItems, out bRes);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(bRes);
 
-            attr.DeleteAllItems();
+            hr = attr.DeleteAllItems();
+            MFError.ThrowExceptionForHR(hr);
 
-            m_attr.Compare(attr, MFAttributesMatchType.AllItems, out bRes);
+            hr = m_attr.Compare(attr, MFAttributesMatchType.AllItems, out bRes);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(!bRes);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateAttributes(out m_attr, 20);
+            int hr = MFExtern.MFCreateAttributes(out m_attr, 20);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

@@ -34,12 +34,13 @@ namespace Testv10
             MFObjectType pObjectType;
             object pSource;
 
-            m_sr.CreateObjectFromURL(
+            int hr = m_sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.ByteStream,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pObjectType == MFObjectType.ByteStream);
             Debug.Assert(pSource != null);
@@ -49,13 +50,14 @@ namespace Testv10
         {
             object pCookie;
 
-            m_sr.BeginCreateObjectFromURL(
+            int hr = m_sr.BeginCreateObjectFromURL(
                 @"http://216.186.32.32/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.ByteStream,
                 null,
                 out pCookie,
                 this,
                 null);
+            MFError.ThrowExceptionForHR(hr);
 
             m_mre.WaitOne(-1, true);  // Timeout takes ~25 seconds
         }
@@ -66,16 +68,18 @@ namespace Testv10
 
             DateTime before = DateTime.Now;
 
-            m_sr.BeginCreateObjectFromURL(
+            int hr = m_sr.BeginCreateObjectFromURL(
                 @"http://216.186.32.32/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.ByteStream,
                 null,
                 out pCookie,
                 this,
                 null);
+            MFError.ThrowExceptionForHR(hr);
 
             Thread.Sleep(2000);
-            m_sr.CancelObjectCreation(pCookie);
+            hr = m_sr.CancelObjectCreation(pCookie);
+            MFError.ThrowExceptionForHR(hr);
 
             m_mre.WaitOne(-1, true);  // Timeout takes ~25 seconds, should be less due to cancel
             DateTime after = DateTime.Now;
@@ -88,20 +92,22 @@ namespace Testv10
             MFObjectType pObjectType, ptype;
             object pSource, pobj;
 
-            m_sr.CreateObjectFromURL(
+            int hr = m_sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.ByteStream,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_sr.CreateObjectFromByteStream(
+            hr = m_sr.CreateObjectFromByteStream(
                 pSource as IMFByteStream,
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.MediaSource,
                 null,
                 out ptype,
                 out pobj);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestBeginCreateObjectFromByteStream()
@@ -112,14 +118,15 @@ namespace Testv10
             pobj = null;
             m_IsURL = false;
 
-            m_sr.CreateObjectFromURL(
+            int hr = m_sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.ByteStream,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_sr.BeginCreateObjectFromByteStream(
+            hr = m_sr.BeginCreateObjectFromByteStream(
                 pSource as IMFByteStream,
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.MediaSource,
@@ -127,26 +134,31 @@ namespace Testv10
                 out pCookie,
                 this,
                 pobj);
+            MFError.ThrowExceptionForHR(hr);
 
             m_mre.WaitOne(-1, true);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateSourceResolver(out m_sr);
+            int hr = MFExtern.MFCreateSourceResolver(out m_sr);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         #region IMFAsyncCallback Members
 
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
             pdwFlags = MFASync.FastIOProcessingCallback;
             pdwQueue = MFAsyncCallbackQueue.Standard;
             //throw new Exception("The method or operation is not implemented.");
+
+            return 0;
         }
 
-        public void Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
+            int hr;
             if (m_IsURL)
             {
                 object o;
@@ -154,7 +166,8 @@ namespace Testv10
 
                 try
                 {
-                    m_sr.EndCreateObjectFromURL(pAsyncResult, out ot, out o);
+                    hr = m_sr.EndCreateObjectFromURL(pAsyncResult, out ot, out o);
+                    MFError.ThrowExceptionForHR(hr);
                     Debug.WriteLine(ot);
                 }
                 catch (Exception e)
@@ -173,7 +186,8 @@ namespace Testv10
 
                 try
                 {
-                    m_sr.EndCreateObjectFromByteStream(pAsyncResult, out ot, out o);
+                    hr = m_sr.EndCreateObjectFromByteStream(pAsyncResult, out ot, out o);
+                    MFError.ThrowExceptionForHR(hr);
                     Debug.WriteLine(ot);
                 }
                 catch (Exception e)
@@ -185,6 +199,7 @@ namespace Testv10
                     m_mre.Set();
                 }
             }
+            return 0;
         }
 
         #endregion

@@ -47,45 +47,53 @@ namespace Testv10
         {
             MFClockCharacteristicsFlags c;
 
-            m_c.GetClockCharacteristics(out c);
+            int hr = m_c.GetClockCharacteristics(out c);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetCorrelatedTime()
         {
             long l, l2;
-            m_c.GetCorrelatedTime(0, out l, out l2);
+            int hr = m_c.GetCorrelatedTime(0, out l, out l2);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetContinuityKey()
         {
             int iKey;
-            m_c.GetContinuityKey(out iKey);
+            int hr = m_c.GetContinuityKey(out iKey);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetState()
         {
             MFClockState pState;
-            m_c.GetState(0, out pState);
+            int hr = m_c.GetState(0, out pState);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         void TestGetProperties()
         {
             MFClockProperties pProp;
 
-            m_c.GetProperties(out pProp);
+            int hr = m_c.GetProperties(out pProp);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
             IMFPresentationClock pc;
 
-            MFExtern.MFCreatePresentationClock(out pc);
+            int hr = MFExtern.MFCreatePresentationClock(out pc);
+            MFError.ThrowExceptionForHR(hr);
             m_c = pc as IMFClock;
 
             IMFMediaSession ms;
 
-            MFExtern.MFCreateMediaSession(null, out ms);
-            ms.GetClock(out m_c);
+            hr = MFExtern.MFCreateMediaSession(null, out ms);
+            MFError.ThrowExceptionForHR(hr);
+            hr = ms.GetClock(out m_c);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

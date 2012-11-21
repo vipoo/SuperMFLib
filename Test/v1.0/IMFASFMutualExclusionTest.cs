@@ -29,7 +29,8 @@ namespace Testv10
         {
             IMFASFMutualExclusion ame;
 
-            m_ame.Clone(out ame);
+            int hr = m_ame.Clone(out ame);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(ame != null);
         }
 
@@ -38,20 +39,26 @@ namespace Testv10
             int iRec, i;
             short[] wa;
 
-            m_ame.AddRecord(out iRec);
-            m_ame.AddStreamForRecord(iRec, 17);
-            m_ame.AddStreamForRecord(iRec, 18);
+            int hr = m_ame.AddRecord(out iRec);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ame.AddStreamForRecord(iRec, 17);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ame.AddStreamForRecord(iRec, 18);
 
             i = 0;
-            m_ame.GetStreamsForRecord(iRec, null, ref i);
+            hr = m_ame.GetStreamsForRecord(iRec, null, ref i);
+            MFError.ThrowExceptionForHR(hr);
 
             wa = new short[i];
-            m_ame.GetStreamsForRecord(iRec, wa, ref i);
+            hr = m_ame.GetStreamsForRecord(iRec, wa, ref i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 2 && wa[0] == 17 && wa[1] == 18);
 
-            m_ame.RemoveStreamFromRecord(iRec, 17);
-            m_ame.GetStreamsForRecord(iRec, wa, ref i);
+            hr = m_ame.RemoveStreamFromRecord(iRec, 17);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ame.GetStreamsForRecord(iRec, wa, ref i);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(i == 1 && wa[0] == 18);
         }
 
@@ -59,20 +66,26 @@ namespace Testv10
         {
             Guid g;
 
-            m_ame.GetType(out g);
-            m_ame.SetType(g);
+            int hr = m_ame.GetType(out g);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ame.SetType(g);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestRecord()
         {
             int iRec, iCnt;
 
-            m_ame.AddRecord(out iRec);
-            m_ame.GetRecordCount(out iCnt);
+            int hr = m_ame.AddRecord(out iRec);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ame.GetRecordCount(out iCnt);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(iCnt == 1);
 
-            m_ame.RemoveRecord(iRec);
-            m_ame.GetRecordCount(out iCnt);
+            hr = m_ame.RemoveRecord(iRec);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_ame.GetRecordCount(out iCnt);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(iCnt == 0);
         }
 
@@ -80,9 +93,11 @@ namespace Testv10
         {
             IMFASFProfile m_p;
 
-            MFExtern.MFCreateASFProfile(out m_p);
+            int hr = MFExtern.MFCreateASFProfile(out m_p);
+            MFError.ThrowExceptionForHR(hr);
             
-            m_p.CreateMutualExclusion(out m_ame);
+            hr = m_p.CreateMutualExclusion(out m_ame);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

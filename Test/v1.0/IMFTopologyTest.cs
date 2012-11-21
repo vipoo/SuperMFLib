@@ -32,37 +32,43 @@ namespace Testv10
 
         private void TestClear()
         {
-            m_Top.Clear();
+            int hr = m_Top.Clear();
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestRemoveNode()
         {
             IMFTopologyNode pNode;
 
-            m_Top.GetNode(0, out pNode);
+            int hr = m_Top.GetNode(0, out pNode);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_Top.RemoveNode(pNode);
+            hr = m_Top.RemoveNode(pNode);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestGetOutputNodeCollection()
         {
             IMFCollection pCol;
 
-            m_Top.GetOutputNodeCollection(out pCol);
+            int hr = m_Top.GetOutputNodeCollection(out pCol);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestGetSourceNodeCollection()
         {
             IMFCollection pCol;
 
-            m_Top.GetSourceNodeCollection(out pCol);
+            int hr = m_Top.GetSourceNodeCollection(out pCol);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestCloneFrom()
         {
             IMFTopology tp;
 
-            MFExtern.MFCreateTopology(out tp);
+            int hr = MFExtern.MFCreateTopology(out tp);
+            MFError.ThrowExceptionForHR(hr);
 
             try
             {
@@ -70,7 +76,8 @@ namespace Testv10
                 // was blank and Clone can't deal with that.  Someday I may update
                 // the AddNode routine to set the other attributes. Today isn't
                 // that day.
-                tp.CloneFrom(m_Top);
+                hr = tp.CloneFrom(m_Top);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch
             { }
@@ -80,7 +87,8 @@ namespace Testv10
         {
             IMFTopologyNode pNode;
 
-            m_Top.GetNodeByID(m_pid, out pNode);
+            int hr = m_Top.GetNodeByID(m_pid, out pNode);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pNode != null);
         }
@@ -89,7 +97,8 @@ namespace Testv10
         {
             IMFTopologyNode pNode;
 
-            m_Top.GetNode(0, out pNode);
+            int hr = m_Top.GetNode(0, out pNode);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pNode != null);
         }
@@ -97,7 +106,8 @@ namespace Testv10
         private void TestGetTopologyID()
         {
             long pid;
-            m_Top.GetTopologyID(out pid);
+            int hr = m_Top.GetTopologyID(out pid);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pid == 1);
         }
@@ -105,7 +115,8 @@ namespace Testv10
         private void TestGetNodeCount()
         {
             short sn;
-            m_Top.GetNodeCount(out sn);
+            int hr = m_Top.GetNodeCount(out sn);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(sn == 1);
         }
@@ -114,16 +125,21 @@ namespace Testv10
         {
             IMFTopologyNode pNode;
 
-            MFExtern.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
-            pNode.GetTopoNodeID(out m_pid);
-            pNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, null);
+            int hr = MFExtern.MFCreateTopologyNode(MFTopologyType.SourcestreamNode, out pNode);
+            MFError.ThrowExceptionForHR(hr);
+            hr = pNode.GetTopoNodeID(out m_pid);
+            MFError.ThrowExceptionForHR(hr);
+            hr = pNode.SetUnknown(MFAttributesClsid.MF_TOPONODE_SOURCE, null);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_Top.AddNode(pNode);
+            hr = m_Top.AddNode(pNode);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
-            MFExtern.MFCreateTopology(out m_Top);
+            int hr = MFExtern.MFCreateTopology(out m_Top);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

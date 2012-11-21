@@ -27,28 +27,34 @@ namespace Testv10
             IMFMediaSource ms;
             IMFTopology pt;
 
-            MFExtern.MFCreateMediaSession(null, out pMediaSession);
+            int hr = MFExtern.MFCreateMediaSession(null, out pMediaSession);
+            MFError.ThrowExceptionForHR(hr);
 
             IMFSequencerSource pSequencerSource;
-            MFExtern.MFCreateSequencerSource(null, out pSequencerSource);
+            hr = MFExtern.MFCreateSequencerSource(null, out pSequencerSource);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFCreateSourceResolver(out sr);
+            hr = MFExtern.MFCreateSourceResolver(out sr);
+            MFError.ThrowExceptionForHR(hr);
 
-            sr.CreateObjectFromURL(
+            hr = sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.MediaSource,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
             ms = pSource as IMFMediaSource;
 
-            MFExtern.MFCreateTopology(out pt);
+            hr = MFExtern.MFCreateTopology(out pt);
+            MFError.ThrowExceptionForHR(hr);
 
             // http://msdn2.microsoft.com/en-us/library/ms701605.aspx
 
             int sid;
-            pSequencerSource.AppendTopology(pt, MFSequencerTopologyFlags.Last, out sid);
+            hr = pSequencerSource.AppendTopology(pt, MFSequencerTopologyFlags.Last, out sid);
+            MFError.ThrowExceptionForHR(hr);
 
             SetFirstTopology(pSequencerSource, pMediaSession);
         }
@@ -64,15 +70,18 @@ namespace Testv10
             pMediaSource = pSequencerSource as IMFMediaSource;
 
             // Create the presentation descriptor for the media source.
-            pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+            int hr = pMediaSource.CreatePresentationDescriptor(out pPresentationDescriptor);
+            MFError.ThrowExceptionForHR(hr);
 
             // Get the topology provider from the sequencer source.
             pMediaSourceTopologyProvider = pSequencerSource as IMFMediaSourceTopologyProvider;
             // Get the first topology from the topology provider.
-            pMediaSourceTopologyProvider.GetMediaSourceTopology(pPresentationDescriptor, out pTopology);
+            hr = pMediaSourceTopologyProvider.GetMediaSourceTopology(pPresentationDescriptor, out pTopology);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the topology on the media session.
-            pMediaSession.SetTopology(0, pTopology);
+            hr = pMediaSession.SetTopology(0, pTopology);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

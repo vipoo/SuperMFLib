@@ -19,8 +19,10 @@ namespace Testv10
         {
             IMFClock pc;
 
-            MFExtern.MFCreateSystemTimeSource(out m_pts);
-            m_pts.GetUnderlyingClock(out pc);
+            int hr = MFExtern.MFCreateSystemTimeSource(out m_pts);
+            MFError.ThrowExceptionForHR(hr);
+            hr = m_pts.GetUnderlyingClock(out pc);
+            MFError.ThrowExceptionForHR(hr);
         }
     }
 }

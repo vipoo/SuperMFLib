@@ -13,7 +13,7 @@ using MediaFoundation.Transform;
 
 namespace Testv10
 {
-    class TestExtern : IMFAsyncCallback, IStream
+    class TestExtern : COMBase, IMFAsyncCallback, IStream
     {
         private int m_size;
         private int m_cur;
@@ -40,41 +40,50 @@ namespace Testv10
             IMFMediaBuffer mb, mb2;
             string[] sa;
             IMFMediaTypeHandler ph;
-            MFExtern.MFGetTimerPeriodicity(out i);
+            int hr = MFExtern.MFGetTimerPeriodicity(out i);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(i == 10);
 
-            MFExtern.MFCreateAlignedMemoryBuffer(1000, 8, out mb);
+            hr = MFExtern.MFCreateAlignedMemoryBuffer(1000, 8, out mb);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(mb != null);
 
             long l = MFExtern.MFGetSystemTime();
             Debug.Assert(l > 206563752489);
 
-            MFExtern.MFGetSupportedSchemes(p);
+            hr = MFExtern.MFGetSupportedSchemes(p);
+            MFError.ThrowExceptionForHR(hr);
             sa = p.GetStringArray();
             Debug.Assert(sa.Length > 13);
 
-            MFExtern.MFGetSupportedMimeTypes(p);
+            hr = MFExtern.MFGetSupportedMimeTypes(p);
+            MFError.ThrowExceptionForHR(hr);
             sa = p.GetStringArray();
             Debug.Assert(sa.Length > 7);
 
-            MFExtern.MFCreateSimpleTypeHandler(out ph);
+            hr = MFExtern.MFCreateSimpleTypeHandler(out ph);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(ph != null);
 
-            MFExtern.MFCreateSequencerSegmentOffset(1, 2, p);
+            hr = MFExtern.MFCreateSequencerSegmentOffset(1, 2, p);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(p.GetMFAttributeType() == MFAttributeType.IUnknown);
 
             object o;
-            MFExtern.MFCreateVideoRenderer(typeof(IMFGetService).GUID, out o);
+            hr = MFExtern.MFCreateVideoRenderer(typeof(IMFGetService).GUID, out o);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(o != null);
 
             mb.SetCurrentLength(300);
-            MFExtern.MFCreateMediaBufferWrapper(mb, 32, 200, out mb2);
+            hr = MFExtern.MFCreateMediaBufferWrapper(mb, 32, 200, out mb2);
             Debug.Assert(mb2 != null);
 
             IMFSample samp;
-            MFExtern.MFCreateSample(out samp);
-            MFExtern.MFCreateLegacyMediaBufferOnMFMediaBuffer(samp, mb, 0, out o);
+            hr = MFExtern.MFCreateSample(out samp);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFCreateLegacyMediaBufferOnMFMediaBuffer(samp, mb, 0, out o);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void UsesUntested()
@@ -134,6 +143,7 @@ namespace Testv10
 
         private void TestVF()
         {
+            int hr;
             IMFVideoMediaType vmt;
             MFMediaEqual me;
             int i;
@@ -141,56 +151,73 @@ namespace Testv10
             IMFMediaType mt, mt2, mt3;
             FourCC cc4 = new FourCC("YUY2");
 
-            MFExtern.MFCreateMediaType(out mt);
-            mt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
-            mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            hr = MFExtern.MFCreateMediaType(out mt);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFCreateMFVideoFormatFromMFMediaType(mt, out vf, out i);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
+            MFError.ThrowExceptionForHR(hr);
+            hr = mt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = MFExtern.MFCreateMFVideoFormatFromMFMediaType(mt, out vf, out i);
+            MFError.ThrowExceptionForHR(hr);
             int cc = MFExtern.MFGetUncompressedVideoFormat(vf);
 
-            MFExtern.MFCreateMediaType(out mt2);
-            MFExtern.MFInitMediaTypeFromMFVideoFormat(mt2, vf, i);
+            hr = MFExtern.MFCreateMediaType(out mt2);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFInitMediaTypeFromMFVideoFormat(mt2, vf, i);
+            MFError.ThrowExceptionForHR(hr);
 
             int iRet = mt.IsEqual(mt2, out me);
             Debug.Assert(iRet == 0);
 
             AMMediaType amt = new AMMediaType();
-            MFExtern.MFInitAMMediaTypeFromMFMediaType(mt, Guid.Empty, amt);
+            hr = MFExtern.MFInitAMMediaTypeFromMFMediaType(mt, Guid.Empty, amt);
+            MFError.ThrowExceptionForHR(hr);
 
             AMMediaType amt2;
-            MFExtern.MFCreateAMMediaTypeFromMFMediaType(mt, MFRepresentation.VideoInfo2, out amt2);
+            hr = MFExtern.MFCreateAMMediaTypeFromMFMediaType(mt, MFRepresentation.VideoInfo2, out amt2);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFCreateMediaType(out mt3);
-            MFExtern.MFInitMediaTypeFromAMMediaType(mt3, amt2);
+            hr = MFExtern.MFCreateMediaType(out mt3);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFInitMediaTypeFromAMMediaType(mt3, amt2);
+            MFError.ThrowExceptionForHR(hr);
 
             iRet = mt.IsEqual(mt3, out me);
             Debug.Assert(iRet == 0);
 
-            MFExtern.MFCreateVideoMediaType(vf, out vmt);
+            hr = MFExtern.MFCreateVideoMediaType(vf, out vmt);
 
             VideoInfoHeader vih = new VideoInfoHeader();
             Marshal.PtrToStructure(amt.formatPtr, vih);
 
             IMFMediaType mt4;
-            MFExtern.MFCreateMediaType(out mt4);
-            MFExtern.MFInitMediaTypeFromVideoInfoHeader(mt4, vih, amt.formatSize, Guid.Empty);
+            hr = MFExtern.MFCreateMediaType(out mt4);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFInitMediaTypeFromVideoInfoHeader(mt4, vih, amt.formatSize, Guid.Empty);
+            MFError.ThrowExceptionForHR(hr);
 
             iRet = mt.IsEqual(mt4, out me);
-            Debug.Assert(iRet == 0);
+            Debug.Assert(iRet == 1 && me == (MediaFoundation.MFMediaEqual.MajorTypes | MediaFoundation.MFMediaEqual.FormatUserData));
 
             VideoInfoHeader2 vih2 = new VideoInfoHeader2();
             Marshal.PtrToStructure(amt2.formatPtr, vih2);
 
             IMFMediaType mt5;
-            MFExtern.MFCreateMediaType(out mt5);
-            MFExtern.MFInitMediaTypeFromVideoInfoHeader2(mt5, vih2, amt2.formatSize, Guid.Empty);
+            hr = MFExtern.MFCreateMediaType(out mt5);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFInitMediaTypeFromVideoInfoHeader2(mt5, vih2, amt2.formatSize, Guid.Empty);
+            MFError.ThrowExceptionForHR(hr);
 
             iRet = mt.IsEqual(mt5, out me);
-            Debug.Assert(iRet == 0);
+            Debug.Assert(iRet == 1 && me == (MediaFoundation.MFMediaEqual.MajorTypes | MediaFoundation.MFMediaEqual.FormatUserData));
 
             IntPtr ip;
-            vmt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
-            vmt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            hr = vmt.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, cc4.ToMediaSubtype());
+            MFError.ThrowExceptionForHR(hr);
+            hr = vmt.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            MFError.ThrowExceptionForHR(hr);
 
             vf = vmt.GetVideoFormat();
 
@@ -202,7 +229,8 @@ namespace Testv10
             AMMediaType amt5 = new AMMediaType();
             Marshal.PtrToStructure(ip, amt5);
             Debug.Assert(amt5.formatType == MFRepresentation.VideoInfo);
-            vmt.FreeRepresentation(MFRepresentation.VideoInfo, ip);
+            hr = vmt.FreeRepresentation(MFRepresentation.VideoInfo, ip);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestQM()
@@ -226,17 +254,22 @@ namespace Testv10
             IMFByteStream bs;
             object pCookie;
 
-            MFExtern.MFCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.NoBuffering, "test.out", out bs);
+            int hr = MFExtern.MFCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.NoBuffering, "test.out", out bs);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(bs != null);
 
-            MFExtern.MFCreateTempFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, out bs);
+            hr = MFExtern.MFCreateTempFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, out bs);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(bs != null);
 
-            MFExtern.MFBeginCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, "test3.out", this, null, out pCookie);
+            hr = MFExtern.MFBeginCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, "test3.out", this, null, out pCookie);
+            MFError.ThrowExceptionForHR(hr);
             m_re.WaitOne();
 
-            MFExtern.MFBeginCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, "http://192.168.1.152", this, null, out pCookie);
-            MFExtern.MFCancelCreateFile(pCookie);
+            hr = MFExtern.MFBeginCreateFile(MFFileAccessMode.Write, MFFileOpenMode.DeleteIfExist, MFFileFlags.None, "http://192.168.1.152", this, null, out pCookie);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFCancelCreateFile(pCookie);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void TestBlob()
@@ -247,18 +280,26 @@ namespace Testv10
             Guid g1 = Guid.NewGuid();
             Guid g2 = Guid.NewGuid();
 
-            MFExtern.MFCreateAttributes(out pa, 10);
-            MFExtern.MFCreateAttributes(out pa2, 10);
-            pa.SetGUID(g1, g2);
-            pa.SetUINT32(g2, 1234321);
+            int hr = MFExtern.MFCreateAttributes(out pa, 10);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFCreateAttributes(out pa2, 10);
+            MFError.ThrowExceptionForHR(hr);
+            hr = pa.SetGUID(g1, g2);
+            MFError.ThrowExceptionForHR(hr);
+            hr = pa.SetUINT32(g2, 1234321);
+            MFError.ThrowExceptionForHR(hr);
 
-            MFExtern.MFGetAttributesAsBlobSize(pa, out i);
+            hr = MFExtern.MFGetAttributesAsBlobSize(pa, out i);
+            MFError.ThrowExceptionForHR(hr);
             IntPtr ip = Marshal.AllocCoTaskMem(i);
             try
             {
-                MFExtern.MFGetAttributesAsBlob(pa, ip, i);
-                MFExtern.MFInitAttributesFromBlob(pa2, ip, i);
-                pa2.Compare(pa, MFAttributesMatchType.AllItems, out b);
+                hr = MFExtern.MFGetAttributesAsBlob(pa, ip, i);
+                MFError.ThrowExceptionForHR(hr);
+                hr = MFExtern.MFInitAttributesFromBlob(pa2, ip, i);
+                MFError.ThrowExceptionForHR(hr);
+                hr = pa2.Compare(pa, MFAttributesMatchType.AllItems, out b);
+                MFError.ThrowExceptionForHR(hr);
                 Debug.Assert(b);
             }
             finally
@@ -268,27 +309,36 @@ namespace Testv10
 
             m_ip = Marshal.AllocCoTaskMem(1000);
             m_size = 0;
-            pa.SetUINT64(Guid.NewGuid(), 77666776);
-            MFExtern.MFSerializeAttributesToStream(pa, MFAttributeSerializeOptions.None, this);
+            hr = pa.SetUINT64(Guid.NewGuid(), 77666776);
+            MFError.ThrowExceptionForHR(hr);
+            hr = MFExtern.MFSerializeAttributesToStream(pa, MFAttributeSerializeOptions.None, this);
+            MFError.ThrowExceptionForHR(hr);
 
             m_cur = 0;
-            MFExtern.MFDeserializeAttributesFromStream(pa2, MFAttributeSerializeOptions.None, this);
-            pa.Compare(pa2, MFAttributesMatchType.AllItems, out b);
+            hr = MFExtern.MFDeserializeAttributesFromStream(pa2, MFAttributeSerializeOptions.None, this);
+            MFError.ThrowExceptionForHR(hr);
+            hr = pa.Compare(pa2, MFAttributesMatchType.AllItems, out b);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(b);
         }
 
         #region IMFAsyncCallback Members
 
-        public void  GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int  GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
- 	        throw new Exception("The method or operation is not implemented.");
+            pdwFlags = 0;
+            pdwQueue = 0;
+            return E_NotImplemented;
         }
 
-        public void  Invoke(IMFAsyncResult pAsyncResult)
+        public int  Invoke(IMFAsyncResult pAsyncResult)
         {
             IMFByteStream bs;
- 	        MFExtern.MFEndCreateFile(pAsyncResult, out bs);
+ 	        int hr = MFExtern.MFEndCreateFile(pAsyncResult, out bs);
+            MFError.ThrowExceptionForHR(hr);
             m_re.Set();
+
+            return 0;
         }
 
         #endregion

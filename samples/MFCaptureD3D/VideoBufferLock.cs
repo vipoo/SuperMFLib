@@ -16,7 +16,7 @@ using System.Diagnostics;
 using MediaFoundation;
 using MediaFoundation.Misc;
 
-namespace MFCaptureAlt
+namespace MFCaptureD3D
 {
     //-------------------------------------------------------------------
     //  VideoBufferLock class

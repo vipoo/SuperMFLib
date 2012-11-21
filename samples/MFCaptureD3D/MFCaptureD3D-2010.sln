@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MFCaptureAlt-2010", "MFCaptureAlt-2010.csproj", "{F9939E35-CA74-46E8-AA49-2A776832CC49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MFCaptureD3D-2010", "MFCaptureD3D-2010.csproj", "{F9939E35-CA74-46E8-AA49-2A776832CC49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

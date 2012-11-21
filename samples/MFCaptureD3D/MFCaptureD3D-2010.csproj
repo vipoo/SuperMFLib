@@ -8,11 +8,11 @@
     <ProjectGuid>{F9939E35-CA74-46E8-AA49-2A776832CC49}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MFCaptureAlt</RootNamespace>
-    <AssemblyName>MFCaptureAlt</AssemblyName>
+    <RootNamespace>MFCaptureD3D</RootNamespace>
+    <AssemblyName>MFCaptureD3D</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <StartupObject>MFCaptureAlt.Program</StartupObject>
+    <StartupObject>MFCaptureD3D.Program</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -63,6 +63,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\MFCaptureD3D.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -79,6 +80,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\MFCaptureD3D.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>

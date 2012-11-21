@@ -18,7 +18,7 @@ using System.Security;
 using MediaFoundation;
 using MediaFoundation.Misc;
 
-namespace MFCaptureAlt
+namespace MFCaptureD3D
 {
     partial class CaptureDevice : Form, IDisposable
     {

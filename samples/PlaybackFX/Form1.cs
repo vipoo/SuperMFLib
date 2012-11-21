@@ -171,7 +171,7 @@ namespace MF_BasicPlayback
             if (I.Invoke() == DialogResult.OK)
             {
                 // Open the file with the playback object.
-                //openFileDialog1.FileName = "C:\\sourceforge\\mflib\\Test\\Media\\Welxcome.waxv";
+                //openFileDialog1.FileName = "C:\\sourceforge\\mflib\\Test\\Media\\Welcome.wavx";
                 hr = g_pPlayer.OpenURL(openFileDialog1.FileName);
 
                 if (hr >= 0)

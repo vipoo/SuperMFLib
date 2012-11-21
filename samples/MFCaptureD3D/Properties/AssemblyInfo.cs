@@ -19,11 +19,11 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: NeutralResourcesLanguageAttribute("en")]
-[assembly: AssemblyTitle("MFCaptureD3D")]
+[assembly: AssemblyTitle("MFCaptureAlt")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MFCaptureD3D")]
+[assembly: AssemblyProduct("MFCaptureAlt")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -34,7 +34,7 @@ using System.Resources;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("8eab3471-f6c9-4dd4-8a33-a21a4469ada0")]
+[assembly: Guid("90CDDB67-E08F-4a85-8A8B-CEC965FF913B")]
 
 // Version information for an assembly consists of the following four values:
 //

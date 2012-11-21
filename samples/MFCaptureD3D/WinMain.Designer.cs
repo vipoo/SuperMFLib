@@ -1,4 +1,4 @@
-﻿namespace MFCaptureD3D
+﻿namespace MFCaptureAlt
 {
     partial class WinMain
     {
@@ -81,7 +81,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "WinMain";
-            this.Text = "MFCaptureD3D";
+            this.Text = "MFCaptureAlt";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.WinMain_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.picbCapture)).EndInit();
             this.menuStrip1.ResumeLayout(false);

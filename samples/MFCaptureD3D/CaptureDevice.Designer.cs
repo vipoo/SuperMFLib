@@ -1,4 +1,4 @@
-﻿namespace MFCaptureD3D
+﻿namespace MFCaptureAlt
 {
     partial class CaptureDevice
     {

@@ -21,8 +21,9 @@ using MediaFoundation.ReadWrite;
 
 using SlimDX.Direct3D9;
 using SlimDX;
+using System.Drawing.Imaging;
 
-namespace MFCaptureD3D
+namespace MFCaptureAlt
 {
     class DrawDevice : COMBase
     {
@@ -70,11 +71,13 @@ namespace MFCaptureD3D
         {
             public Guid SubType;
             public VideoConversion VideoConvertFunction;
+            public BitmapConversion BitmapConvertFunction;
 
-            public VideoFormatGUID(Guid FormatGuid, VideoConversion cvt)
+            public VideoFormatGUID(Guid FormatGuid, VideoConversion cvt, BitmapConversion bmpcvt)
             {
                 SubType = FormatGuid;
                 VideoConvertFunction = cvt;
+                BitmapConvertFunction = bmpcvt;
             }
         }
 
@@ -87,9 +90,26 @@ namespace MFCaptureD3D
             int dwWidthInPixels, 
             int dwHeightInPixels);
 
+        // Function to convert the bitmap to video data type
+        private delegate int BitmapConversion(
+            int dwWidthInPixels,
+            int dwHeightInPixels,
+            int dwDestStride,
+            IntPtr ipSrc,
+            IntPtr ipDest);
+
+        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
+        unsafe private static extern void CopyMemory(byte *Destination, byte *Source, [MarshalAs(UnmanagedType.U4)] uint Length);
+
         #endregion
 
         #region Private Members
+
+        IntPtr m_Data = IntPtr.Zero;
+        private int m_LogoWidth;
+        private int m_LogoHeight;
+        private int m_LogoStride;
+        private BitmapConversion m_bmpconvertFn;
 
         private IntPtr m_hwnd;
         private Device m_pDevice;
@@ -121,6 +141,7 @@ namespace MFCaptureD3D
             m_pSwapChain = null;
 
             m_d3dpp = null;
+            m_Data = IntPtr.Zero;
 
             m_format = Format.X8R8G8B8;
             m_width = 0;
@@ -130,13 +151,46 @@ namespace MFCaptureD3D
             m_rcDest = Rectangle.Empty;
 
             VideoFormatDefs = new VideoFormatGUID[] {
-                new VideoFormatGUID(MFMediaType.RGB32, TransformImage_RGB32),
-                new VideoFormatGUID(MFMediaType.RGB24, TransformImage_RGB24),
-                new VideoFormatGUID(MFMediaType.YUY2, TransformImage_YUY2),
-                new VideoFormatGUID(MFMediaType.NV12, TransformImage_NV12) 
+                new VideoFormatGUID(MFMediaType.RGB32, TransformImage_RGB32, ARGB32_To_RGB32),
+                new VideoFormatGUID(MFMediaType.RGB24, TransformImage_RGB24, ARGB32_To_RGB24),
+                new VideoFormatGUID(MFMediaType.YUY2, TransformImage_YUY2, ARGB32_To_YUY2),
+                new VideoFormatGUID(MFMediaType.NV12, TransformImage_NV12, ARGB32_To_NV12)
             };
 
             m_convertFn = null;
+            m_bmpconvertFn = null;
+        }
+
+        public void SetBitmap(string sFilename)
+        {
+            Bitmap Bitmap = new Bitmap(sFilename);
+
+            try
+            {
+                m_LogoWidth = Bitmap.Width;
+                m_LogoHeight = Bitmap.Height;
+                m_LogoStride = Bitmap.Width * (m_lDefaultStride / m_width);
+
+                Rectangle r = new Rectangle(0, 0, m_LogoWidth, m_LogoHeight);
+                BitmapData bmdLogo = Bitmap.LockBits(r, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+                try
+                {
+                    int buflen = m_LogoStride * m_LogoHeight;
+                    m_Data = Marshal.AllocCoTaskMem(buflen);
+
+                    int a = m_bmpconvertFn(m_LogoWidth, m_LogoHeight, m_LogoStride, bmdLogo.Scan0, m_Data);
+                    Debug.Assert(buflen == a);
+                }
+                finally
+                {
+                    Bitmap.UnlockBits(bmdLogo);
+                }
+            }
+            finally
+            {
+                Bitmap.Dispose();
+            }
         }
 
         //-------------------------------------------------------------------
@@ -190,12 +244,14 @@ namespace MFCaptureD3D
         {
             int hr = MFError.MF_E_INVALIDMEDIATYPE;
             m_convertFn = null;
+            m_bmpconvertFn = null;
 
             for (int i = 0; i < VideoFormatDefs.Length; i++)
             {
                 if (VideoFormatDefs[i].SubType == subtype)
                 {
                     m_convertFn = VideoFormatDefs[i].VideoConvertFunction;
+                    m_bmpconvertFn = VideoFormatDefs[i].BitmapConvertFunction;
                     hr = S_Ok;
                     break;
                 }
@@ -360,6 +416,11 @@ namespace MFCaptureD3D
         //-------------------------------------------------------------------
         public void DestroyDevice()
         {
+            if (m_Data != IntPtr.Zero)
+            {
+                Marshal.FreeCoTaskMem(m_Data);
+                m_Data = IntPtr.Zero;
+            }
             if (m_pSwapChain != null)
             {
                 m_pSwapChain.Dispose();
@@ -435,6 +496,7 @@ namespace MFCaptureD3D
             {
                 m_format = Format.Unknown;
                 m_convertFn = null;
+                m_bmpconvertFn = null;
             }
 
             return hr;
@@ -476,6 +538,23 @@ namespace MFCaptureD3D
 
                 hr = xbuffer.LockBuffer(m_lDefaultStride, m_height, out pbScanline0, out lStride);
                 if (Failed(hr)) { goto done; }
+
+                // Copy in bitmap
+                if (m_Data != IntPtr.Zero)
+                {
+                    unsafe
+                    {
+                        byte *ipSource = (byte *)m_Data;
+                        byte *ipDest = (byte *)pbScanline0;
+
+                        for (int x = 0; x < m_LogoHeight; x++)
+                        {
+                            CopyMemory(ipDest, ipSource, (uint)m_LogoStride);
+                            ipDest += lStride;
+                            ipSource += m_LogoStride;
+                        }
+                    }
+                }
 
                 // Get the swap-chain surface.
                 pSurf = m_pSwapChain.GetBackBuffer(0);
@@ -734,6 +813,165 @@ namespace MFCaptureD3D
                 lpBitsCr += lSrcStride;
                 lpBitsCb += lSrcStride;
             }
+        }
+
+        unsafe static private int ARGB32_To_NV12(
+            int dwWidthInPixels,
+            int dwHeightInPixels,
+            int dwDestStride,
+            IntPtr ipSrc,
+            IntPtr ipDest
+            )
+        {
+            Debug.Assert(dwWidthInPixels % 2 == 0);
+            Debug.Assert(dwHeightInPixels % 2 == 0);
+            Debug.Assert(dwDestStride >= dwWidthInPixels);
+
+            RGBQUAD* pSrcRow = (RGBQUAD*)ipSrc;
+            byte* pDestY = (byte*)ipDest;
+
+            // Convert the Y plane.
+            for (int y = 0; y < dwHeightInPixels; y++)
+            {
+                RGBQUAD* pSrcPixel = (RGBQUAD*)pSrcRow;
+
+                for (int x = 0; x < dwWidthInPixels; x++)
+                {
+                    // Y0
+                    pDestY[x] = (byte)(((66 * pSrcPixel[x].R + 129 * pSrcPixel[x].G + 25 * pSrcPixel[x].B + 128) >> 8) + 16);
+                }
+                pDestY += dwDestStride;
+                pSrcRow += dwWidthInPixels;
+            }
+
+            // Calculate the offsets for the V and U planes.
+            // In NV12, each chroma plane has equal stride and half the height as the Y plane.
+            byte* pDestUV = (byte*)ipDest;
+            pDestUV += (dwDestStride * dwHeightInPixels);
+
+            // Convert the V and U planes.
+            // NV12 is a 4:2:0 format, so each chroma sample is derived from four RGB pixels.
+            // The chroma samples are packed in one plane (U,V)
+            pSrcRow = (RGBQUAD*)ipSrc;
+            for (int y = 0; y < dwHeightInPixels; y += 2)
+            {
+                RGBQUAD* pSrcPixel = (RGBQUAD*)pSrcRow;
+                RGBQUAD* pNextSrcRow = (RGBQUAD*)(pSrcRow + dwWidthInPixels);
+
+                byte* pbUV = pDestUV;
+
+                for (int x = 0; x < dwWidthInPixels; x += 2)
+                {
+                    // Use a simple average to downsample the chroma.
+
+                    // U
+                    *pbUV++ = (byte)((
+                        (byte)(((-38 * pSrcPixel[x].R - 74 * pSrcPixel[x].G + 112 * pSrcPixel[x].B + 128) >> 8) + 128) +
+                        (byte)(((-38 * pSrcPixel[x + 1].R - 74 * pSrcPixel[x + 1].G + 112 * pSrcPixel[x + 1].B + 128) >> 8) + 128) +
+                        (byte)(((-38 * pNextSrcRow[x].R - 74 * pNextSrcRow[x].G + 112 * pNextSrcRow[x].B + 128) >> 8) + 128) +
+                        (byte)(((-38 * pNextSrcRow[x + 1].R - 74 * pNextSrcRow[x + 1].G + 112 * pNextSrcRow[x + 1].B + 128) >> 8) + 128)
+                               ) / 4);
+
+                    // V
+                    *pbUV++ = (byte)((
+                        (byte)(((112 * pSrcPixel[x].R - 94 * pSrcPixel[x].G - 18 * pSrcPixel[x].B + 128) >> 8) + 128) +
+                        (byte)(((112 * pSrcPixel[x + 1].R - 94 * pSrcPixel[x + 1].G - 18 * pSrcPixel[x + 1].B + 128) >> 8) + 128) +
+                        (byte)(((112 * pNextSrcRow[x].R - 94 * pNextSrcRow[x].G - 18 * pNextSrcRow[x].B + 128) >> 8) + 128) +
+                        (byte)(((112 * pNextSrcRow[x + 1].R - 94 * pNextSrcRow[x + 1].G - 18 * pNextSrcRow[x + 1].B + 128) >> 8) + 128)
+                               ) / 4);
+                }
+                pDestUV += dwDestStride;
+
+                // Skip two lines on the source image.
+                pSrcRow += (dwWidthInPixels * 2);
+            }
+
+            return (int)(pDestUV - (byte*)ipDest);
+        }
+
+        unsafe static private int ARGB32_To_RGB32(
+            int dwWidthInPixels,
+            int dwHeightInPixels,
+            int dwDestStride,
+            IntPtr ipSrc,
+            IntPtr ipDest
+            )
+        {
+            byte* pSrc = (byte*)ipSrc;
+            byte* pDest = (byte*)ipDest;
+
+            int iBufsize = dwDestStride * dwHeightInPixels;
+
+            CopyMemory(pDest, pSrc, (uint)iBufsize);
+
+            return iBufsize;
+        }
+
+        unsafe static private int ARGB32_To_RGB24(
+            int dwWidthInPixels,
+            int dwHeightInPixels,
+            int dwDestStride,
+            IntPtr ipSrc,
+            IntPtr ipDest
+            )
+        {
+            RGBQUAD* pSrc = (RGBQUAD*)ipSrc;
+            RGB24* pDest = (RGB24*)ipDest;
+
+            for (int y = 0; y < dwHeightInPixels; y++)
+            {
+                for (int x = 0; x < dwWidthInPixels; x++)
+                {
+                    pDest[x].rgbRed = pSrc[x].R;
+                    pDest[x].rgbGreen = pSrc[x].G;
+                    pDest[x].rgbBlue = pSrc[x].B;
+                }
+
+                pSrc += dwWidthInPixels * 3;
+                pDest += dwDestStride;
+            }
+
+            return dwDestStride * dwHeightInPixels;
+        }
+
+        unsafe static private int ARGB32_To_YUY2(
+            int dwWidthInPixels,
+            int dwHeightInPixels,
+            int dwDestStride,
+            IntPtr ipSrc,
+            IntPtr ipDest
+            )
+        {
+            Debug.Assert(dwDestStride >= (dwWidthInPixels * 2));
+
+            RGBQUAD* pSrcPixel = (RGBQUAD*)ipSrc;
+            YUYV* pDestPixel = (YUYV*)ipDest;
+            int dwUseWidth = dwWidthInPixels / 2;
+
+            // invert
+            pSrcPixel += (dwHeightInPixels - 1) * dwWidthInPixels;
+
+            for (int y = 0; y < dwHeightInPixels; y++)
+            {
+                for (int x = 0; x < dwUseWidth; x++)
+                {
+                    pDestPixel[x].Y = (byte)(((66 * pSrcPixel->R + 129 * pSrcPixel->G + 25 * pSrcPixel->B + 128) >> 8) + 16);
+                    pDestPixel[x].U = (byte)(((-38 * pSrcPixel->R - 74 * pSrcPixel->G + 112 * pSrcPixel->B + 128) >> 8) + 128);
+
+                    pSrcPixel++;
+
+                    pDestPixel[x].Y2 = (byte)(((66 * pSrcPixel->R + 129 * pSrcPixel->G + 25 * pSrcPixel->B + 128) >> 8) + 16);
+                    pDestPixel[x].V = (byte)(((112 * pSrcPixel->R - 94 * pSrcPixel->G - 18 * pSrcPixel->B + 128) >> 8) + 128);
+
+                    pSrcPixel++;
+                }
+                pDestPixel = &pDestPixel[dwDestStride / sizeof(YUYV)];
+
+                // Invert
+                pSrcPixel -= dwWidthInPixels * 2;
+            }
+
+            return (int)((byte*)pDestPixel - (byte*)ipDest);
         }
 
         //-------------------------------------------------------------------

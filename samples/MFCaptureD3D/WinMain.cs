@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 using MediaFoundation.Misc;
 
-namespace MFCaptureD3D
+namespace MFCaptureAlt
 {
     partial class WinMain : Form
     {

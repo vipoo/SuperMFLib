@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace MFCaptureD3D
+namespace MFCaptureAlt
 {
     static class Program
     {

@@ -18,8 +18,9 @@ using MediaFoundation;
 using MediaFoundation.ReadWrite;
 using MediaFoundation.Alt;
 using MediaFoundation.Misc;
+using MediaFoundation.Transform;
 
-namespace MFCaptureD3D
+namespace MFCaptureAlt
 {
     class CPreview : COMBase, IMFSourceReaderCallback, IDisposable
     {
@@ -36,11 +37,20 @@ namespace MFCaptureD3D
         private const int WM_APP = 0x8000;
         private const int WM_APP_PREVIEW_ERROR = WM_APP + 2;
 
+        private const int TARGET_BIT_RATE = 240 * 1000;
+        private readonly Guid MEDIATYPE = MFMediaType.H264;
+        private const string OutputFileName = @"c:\foo.mp4";
+        private const string BitmapOverlayFile = @"c:\lgs.jpg";
+
         #endregion
 
         #region Member Variables
 
         private IMFSourceReaderAsync m_pReader;
+
+        private IMFSinkWriter m_pWriter;
+        private bool m_bFirstSample;
+        private long m_llBaseTime;
 
         private IntPtr m_hwndEvent;       // App window to receive events.
 
@@ -57,6 +67,10 @@ namespace MFCaptureD3D
             m_hwndEvent = hEvent;
             m_pwszSymbolicLink = null;
             m_draw = new DrawDevice();
+
+            m_pWriter = null;
+            m_bFirstSample = false;
+            m_llBaseTime = 0;
 
             int hr = MFExtern.MFStartup(0x20070, MFStartup.Lite);
             MFError.ThrowExceptionForHR(hr);
@@ -180,8 +194,14 @@ namespace MFCaptureD3D
 
                     if (Succeeded(hr))
                     {
-                        // Ask for the first sample.
-                        hr = m_pReader.ReadSample((int)MF_SOURCE_READER.FirstVideoStream, 0, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+                        hr = ConfigWriter();
+                        if (Succeeded(hr))
+                        {
+                            m_draw.SetBitmap(BitmapOverlayFile);
+
+                            // Ask for the first sample.
+                            hr = m_pReader.ReadSample((int)MF_SOURCE_READER.FirstVideoStream, 0, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+                        }
                     }
 
                     if (Failed(hr))
@@ -206,6 +226,129 @@ namespace MFCaptureD3D
             return hr;
         }
 
+        int ConfigWriter()
+        {
+            const int MF_SOURCE_READER_FIRST_VIDEO_STREAM = unchecked((int)0xfffffffc);
+            IMFMediaType pType = null;
+            int sink_stream = 0;
+            m_bFirstSample = true;
+            m_llBaseTime = 0;
+
+            int hr = MFExtern.MFCreateSinkWriterFromURL(
+                OutputFileName,
+                null,
+                null,
+                out m_pWriter
+                );
+            if (Succeeded(hr))
+            {
+                hr = m_pReader.GetCurrentMediaType(
+                    MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+                    out pType
+                    );
+            }
+            if (Succeeded(hr))
+            {
+                hr = ConfigureEncoder(pType, m_pWriter, out sink_stream);
+            }
+            if (Succeeded(hr))
+            {
+                hr = MFExtern.MFTRegisterLocalByCLSID(
+                    typeof(CColorConvertDMO).GUID,
+                    MFTransformCategory.MFT_CATEGORY_VIDEO_PROCESSOR,
+                    "",
+                    MFT_EnumFlag.SyncMFT,
+                    0,
+                    null,
+                    0,
+                    null
+                    );
+            }
+            if (Succeeded(hr))
+            {
+                hr = m_pWriter.SetInputMediaType(sink_stream, pType, null);
+            }
+            if (Succeeded(hr))
+            {
+                hr = m_pWriter.BeginWriting();
+            }
+
+            return hr;
+        }
+
+        int ConfigureEncoder(
+            IMFMediaType pType,
+            IMFSinkWriter pWriter,
+            out int pdwStreamIndex
+            )
+        {
+            int hr = S_Ok;
+
+            IMFMediaType pType2 = null;
+
+            hr = MFExtern.MFCreateMediaType(out pType2);
+
+            if (Succeeded(hr))
+            {
+                hr = pType2.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
+            }
+
+            if (Succeeded(hr))
+            {
+                hr = pType2.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, MEDIATYPE);
+            }
+
+            if (Succeeded(hr))
+            {
+                hr = pType2.SetUINT32(MFAttributesClsid.MF_MT_AVG_BITRATE, TARGET_BIT_RATE);
+            }
+
+            if (Succeeded(hr))
+            {
+                hr = CopyAttribute(pType, pType2, MFAttributesClsid.MF_MT_FRAME_SIZE);
+            }
+
+            if (Succeeded(hr))
+            {
+                hr = CopyAttribute(pType, pType2, MFAttributesClsid.MF_MT_FRAME_RATE);
+            }
+
+            if (Succeeded(hr))
+            {
+                hr = CopyAttribute(pType, pType2, MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO);
+            }
+
+            if (Succeeded(hr))
+            {
+                hr = CopyAttribute(pType, pType2, MFAttributesClsid.MF_MT_INTERLACE_MODE);
+            }
+
+            pdwStreamIndex = 0;
+            if (Succeeded(hr))
+            {
+                hr = pWriter.AddStream(pType2, out pdwStreamIndex);
+            }
+
+            SafeRelease(pType2);
+
+            return hr;
+        }
+
+        int CopyAttribute(IMFAttributes pSrc, IMFAttributes pDest, Guid key)
+        {
+            PropVariant var = new PropVariant();
+
+            int hr = S_Ok;
+
+            hr = pSrc.GetItem(key, var);
+            if (Succeeded(hr))
+            {
+                hr = pDest.SetItem(key, var);
+            }
+
+            return hr;
+        }
+
         //-------------------------------------------------------------------
         //  CloseDevice
         //
@@ -216,6 +359,13 @@ namespace MFCaptureD3D
         {
             lock (this)
             {
+                if (m_pWriter != null)
+                {
+                    m_pWriter.Finalize_();
+                    SafeRelease(m_pWriter);
+                    m_pWriter = null;
+                }
+
                 SafeRelease(m_pReader);
                 m_pReader = null;
 
@@ -354,10 +504,28 @@ namespace MFCaptureD3D
                             hr = pSample.GetBufferByIndex(0, out pBuffer);
 
                             // Draw the frame.
-
                             if (Succeeded(hr))
                             {
                                 hr = m_draw.DrawFrame(pBuffer);
+                            }
+
+                            if (Succeeded(hr))
+                            {
+                                if (m_bFirstSample)
+                                {
+                                    m_llBaseTime = llTimestamp;
+                                    m_bFirstSample = false;
+                                }
+
+                                // rebase the time stamp
+                                llTimestamp -= m_llBaseTime;
+
+                                hr = pSample.SetSampleTime(llTimestamp);
+
+                                if (Succeeded(hr))
+                                {
+                                    hr = m_pWriter.WriteSample(0, pSample);
+                                }
                             }
                         }
                     }

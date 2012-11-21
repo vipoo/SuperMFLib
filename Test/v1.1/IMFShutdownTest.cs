@@ -25,21 +25,28 @@ namespace Testv11
         {
             MFShutdownStatus st, st2;
 
-            m_shut.GetShutdownStatus(out st);
-            m_shut.Shutdown();
+            int hr = m_shut.GetShutdownStatus(out st);
+            Debug.Assert(hr == unchecked((int)0xc00d36b2));
+            hr = m_shut.Shutdown();
+            MFError.ThrowExceptionForHR(hr);
             System.Threading.Thread.Sleep(1000);
-            m_shut.GetShutdownStatus(out st2);
+            hr = m_shut.GetShutdownStatus(out st2);
+            MFError.ThrowExceptionForHR(hr);
+            Debug.Assert(st2 == MFShutdownStatus.Completed);
         }
 
         private void GetInterface()
         {
             IMFPresentationClock pc;
-            MFExtern.MFCreatePresentationClock(out pc);
+            int hr = MFExtern.MFCreatePresentationClock(out pc);
+            MFError.ThrowExceptionForHR(hr);
 
             IMFPresentationTimeSource stc;
-            MFExtern.MFCreateSystemTimeSource(out stc);
+            hr = MFExtern.MFCreateSystemTimeSource(out stc);
+            MFError.ThrowExceptionForHR(hr);
 
-            pc.SetTimeSource(stc);
+            hr = pc.SetTimeSource(stc);
+            MFError.ThrowExceptionForHR(hr);
 
             m_shut = pc as IMFShutdown;
         }

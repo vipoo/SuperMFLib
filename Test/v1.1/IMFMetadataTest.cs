@@ -16,8 +16,8 @@ namespace Testv11
         {
             GetInterface();
 
-            TestLang();
             TestProps();
+            TestLang();
         }
 
         private void TestLang()
@@ -25,12 +25,15 @@ namespace Testv11
             string sLang;
             PropVariant pv = new PropVariant();
 
-            m_md.SetLanguage("asdf");
+            int hr = m_md.SetLanguage("en-gb");
+            MFError.ThrowExceptionForHR(hr);
 
-            m_md.GetLanguage(out sLang);
+            hr = m_md.GetLanguage(out sLang);
+            MFError.ThrowExceptionForHR(hr);
 
-            Debug.Assert(sLang == "asdf");
-            m_md.GetAllLanguages(pv);
+            Debug.Assert(sLang == "en-gb");
+            hr = m_md.GetAllLanguages(pv);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pv.GetVariantType() == ConstPropVariant.VariantType.StringArray);
             string[] sa = pv.GetStringArray();
@@ -44,7 +47,8 @@ namespace Testv11
             PropVariant pv2 = new PropVariant();
             PropVariant pv3 = new PropVariant("moo");
 
-            m_md.GetAllPropertyNames(pv);
+            int hr = m_md.GetAllPropertyNames(pv);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(pv.GetVariantType() == ConstPropVariant.VariantType.StringArray);
             string[] sa = pv.GetStringArray();
@@ -53,17 +57,20 @@ namespace Testv11
             // The sr I'm using is R/O
             try
             {
-                m_md.SetProperty("foo", pv3);
+                hr = m_md.SetProperty("foo", pv3);
+                MFError.ThrowExceptionForHR(hr);
             }
             catch { }
             try
             {
-                m_md.DeleteProperty("foo");
+                hr = m_md.DeleteProperty("foo");
+                MFError.ThrowExceptionForHR(hr);
             }
             catch { }
 
 
-            m_md.GetProperty("Buffer Average", pv2);
+            hr = m_md.GetProperty("Buffer Average", pv2);
+            MFError.ThrowExceptionForHR(hr);
             Debug.Assert(pv2.GetVariantType() == ConstPropVariant.VariantType.UInt32);
             Debug.Assert(pv2.GetUInt() == 200);
 
@@ -77,9 +84,10 @@ namespace Testv11
             MFObjectType pObjectType;
             object pSource;
 
-            MFExtern.MFCreateSourceResolver(out sr);
+            int hr = MFExtern.MFCreateSourceResolver(out sr);
+            MFError.ThrowExceptionForHR(hr);
 
-            sr.CreateObjectFromURL(
+            hr = sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.MediaSource,
                 null,
@@ -90,9 +98,11 @@ namespace Testv11
 
             pSource1 = pSource as IMFMediaSource;
 
-            pSource1.CreatePresentationDescriptor(out pd);
+            hr = pSource1.CreatePresentationDescriptor(out pd);
+            MFError.ThrowExceptionForHR(hr);
 
-            mdp.GetMFMetadata(pd, 0, 0, out m_md);
+            hr = mdp.GetMFMetadata(pd, 0, 0, out m_md);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(m_md != null);
         }

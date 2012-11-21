@@ -26,10 +26,17 @@ namespace Testv11
         {
             bool b;
 
-            m_tvp.IsInTrustedVideoMode(out b);
-            m_tvp.CanConstrict(out b);
-            m_tvp.DisableImageExport(true);
-            m_tvp.SetConstriction(123);
+            int hr = m_tvp.IsInTrustedVideoMode(out b);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = m_tvp.CanConstrict(out b);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = m_tvp.DisableImageExport(true);
+            MFError.ThrowExceptionForHR(hr);
+
+            hr = m_tvp.SetConstriction(123);
+            MFError.ThrowExceptionForHR(hr);
         }
 
 
@@ -41,19 +48,24 @@ namespace Testv11
             pGraph = (IGraphBuilder)new FilterGraph();
             IBaseFilter pSource;
             hr = pGraph.AddSourceFilter(@"C:\SourceForge\mflib\Test\Media\AspectRatio4x3.wmv", null, out pSource);
+            MFError.ThrowExceptionForHR(hr);
             IBaseFilter pEVR = (IBaseFilter)new EnhancedVideoRenderer();
 
             IMFVideoRenderer pRenderer = (IMFVideoRenderer)pEVR;
 
             object oMixer = new MFVideoMixer9();
-            pRenderer.InitializeRenderer(oMixer as IMFTransform, null);
+            hr = pRenderer.InitializeRenderer(oMixer as IMFTransform, null);
+            MFError.ThrowExceptionForHR(hr);
 
             ICaptureGraphBuilder2 cgb;
             cgb = (ICaptureGraphBuilder2)new CaptureGraphBuilder2();
 
             hr = pGraph.AddFilter(pEVR, "EVR");
+            MFError.ThrowExceptionForHR(hr);
             hr = cgb.SetFiltergraph(pGraph);
+            MFError.ThrowExceptionForHR(hr);
             hr = cgb.RenderStream(null, MediaType.Video, pSource, null, pEVR);
+            MFError.ThrowExceptionForHR(hr);
 
             m_tvp = oMixer as IEVRTrustedVideoPlugin;
         }

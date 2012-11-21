@@ -26,25 +26,29 @@ namespace Testv11
             object ppSource;
 
             IPropertyStore pProp;
-            MFExtern.CreatePropertyStore(out pProp);
+            int hr = MFExtern.CreatePropertyStore(out pProp);
+            MFError.ThrowExceptionForHR(hr);
 
             PropVariant var = new PropVariant(this);
 
-            MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            hr = MFExtern.MFCreateSourceResolver(out pSourceResolver);
+            MFError.ThrowExceptionForHR(hr);
 
             // Set the event source property value.
-            pProp.SetValue(MFPKEY.MFPKEY_SourceOpenMonitor, var);
+            hr = pProp.SetValue(MFPKEY.SourceOpenMonitor, var);
+            MFError.ThrowExceptionForHR(hr);
 
             MFObjectType ObjectType = MFObjectType.Invalid;
 
             try
             {
-                pSourceResolver.CreateObjectFromURL(
+                hr = pSourceResolver.CreateObjectFromURL(
                           @"http://moo.local",                    // URL of the source.
                           MFResolution.MediaSource,  // Create a source object.
                           pProp,       // Optional property store.
                           out ObjectType, // Receives the created object type. 
                           out ppSource);   // Receives a pointer to the media source.
+                MFError.ThrowExceptionForHR(hr);
             }
             catch
             {
@@ -56,13 +60,16 @@ namespace Testv11
 
         #region IMFSourceOpenMonitor Members
 
-        public void OnSourceEvent(IMFMediaEvent pEvent)
+        public int OnSourceEvent(IMFMediaEvent pEvent)
         {
             m_iCount++;
 
             MediaEventType typ;
-            pEvent.GetType(out typ);
+            int hr = pEvent.GetType(out typ);
+            MFError.ThrowExceptionForHR(hr);
             Debug.WriteLine(typ);
+
+            return 0;
         }
 
         #endregion

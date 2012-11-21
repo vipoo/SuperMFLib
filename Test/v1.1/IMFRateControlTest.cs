@@ -23,15 +23,18 @@ namespace Testv11
         {
             bool b = true;
             float pf;
-            m_rc.GetRate(ref b, out pf);
+            int hr = m_rc.GetRate(ref b, out pf);
+            MFError.ThrowExceptionForHR(hr);
 
-            m_rc.SetRate(true, 0.5f);
+            hr = m_rc.SetRate(true, 0.5f);
+            MFError.ThrowExceptionForHR(hr);
         }
 
         private void GetInterface()
         {
             IMFMediaSession ms;
-            MFExtern.MFCreateMediaSession(null, out ms);
+            int hr = MFExtern.MFCreateMediaSession(null, out ms);
+            MFError.ThrowExceptionForHR(hr);
             m_rc = ms as IMFRateControl;
         }
     }

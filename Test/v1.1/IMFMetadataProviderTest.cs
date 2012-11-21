@@ -23,23 +23,27 @@ namespace Testv11
             MFObjectType pObjectType;
             object pSource;
 
-            MFExtern.MFCreateSourceResolver(out sr);
+            int hr = MFExtern.MFCreateSourceResolver(out sr);
+            MFError.ThrowExceptionForHR(hr);
 
-            sr.CreateObjectFromURL(
+            hr = sr.CreateObjectFromURL(
                 @"file://c:/sourceforge/mflib/test/media/AspectRatio4x3.wmv",
                 MFResolution.MediaSource,
                 null,
                 out pObjectType,
                 out pSource);
+            MFError.ThrowExceptionForHR(hr);
 
             IMFMetadataProvider mdp = pSource as IMFMetadataProvider;
 
             pSource1 = pSource as IMFMediaSource;
 
-            pSource1.CreatePresentationDescriptor(out pd);
+            hr = pSource1.CreatePresentationDescriptor(out pd);
+            MFError.ThrowExceptionForHR(hr);
 
             IMFMetadata md;
-            mdp.GetMFMetadata(pd, 0, 0, out md);
+            hr = mdp.GetMFMetadata(pd, 0, 0, out md);
+            MFError.ThrowExceptionForHR(hr);
 
             Debug.Assert(md != null);
 

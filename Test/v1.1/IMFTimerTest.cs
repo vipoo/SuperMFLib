@@ -33,11 +33,14 @@ namespace Testv11
 
             try
             {
-                m_time.SetTimer(MFTimeFlags.None, 10000, this, this, out pUnk);
+                int hr = m_time.SetTimer(MFTimeFlags.None, 10000, this, this, out pUnk);
+                MFError.ThrowExceptionForHR(hr);
                 System.Threading.Thread.Sleep(1000);
                 Debug.Assert(m_Count == 1);
-                m_time.SetTimer(MFTimeFlags.Relative, 10000, this, this, out pUnk);
-                m_time.CancelTimer(pUnk);
+                hr = m_time.SetTimer(MFTimeFlags.Relative, 10000, this, this, out pUnk);
+                MFError.ThrowExceptionForHR(hr);
+                hr = m_time.CancelTimer(pUnk);
+                MFError.ThrowExceptionForHR(hr);
                 System.Threading.Thread.Sleep(2000);
             }
             catch
@@ -50,29 +53,35 @@ namespace Testv11
 
         private void GetInterface()
         {
-            MFExtern.MFCreatePresentationClock(out pc);
+            int hr = MFExtern.MFCreatePresentationClock(out pc);
+            MFError.ThrowExceptionForHR(hr);
 
             IMFPresentationTimeSource stc;
-            MFExtern.MFCreateSystemTimeSource(out stc);
+            hr = MFExtern.MFCreateSystemTimeSource(out stc);
+            MFError.ThrowExceptionForHR(hr);
 
-            pc.SetTimeSource(stc);
+            hr = pc.SetTimeSource(stc);
+            MFError.ThrowExceptionForHR(hr);
 
-            pc.Start(0);
+            hr = pc.Start(0);
+            MFError.ThrowExceptionForHR(hr);
 
             m_time = pc as IMFTimer;
         }
 
         #region IMFAsyncCallback Members
 
-        public void GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
+        public int GetParameters(out MFASync pdwFlags, out MFAsyncCallbackQueue pdwQueue)
         {
             throw new NotImplementedException();
         }
 
-        public void Invoke(IMFAsyncResult pAsyncResult)
+        public int Invoke(IMFAsyncResult pAsyncResult)
         {
             Debug.WriteLine("Here");
             m_Count++;
+
+            return 0;
         }
 
         #endregion

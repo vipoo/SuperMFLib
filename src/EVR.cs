@@ -260,7 +260,7 @@ namespace MediaFoundation.EVR
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVA2_ProcAmpValues")]
-    public struct DXVA2ProcAmpValues
+    public class DXVA2ProcAmpValues
     {
         public int Brightness;
         public int Contrast;
@@ -402,14 +402,14 @@ namespace MediaFoundation.EVR
     {
         [PreserveSig]
         int GetNativeVideoSize(
-            [Out] Size pszVideo,
-            [Out] Size pszARVideo
+            [Out] MFSize pszVideo,
+            [Out] MFSize pszARVideo
             );
 
         [PreserveSig]
         int GetIdealVideoSize(
-            [Out] Size pszMin,
-            [Out] Size pszMax
+            [Out] MFSize pszMin,
+            [Out] MFSize pszMax
             );
 
         [PreserveSig]
@@ -703,7 +703,7 @@ namespace MediaFoundation.EVR
 
         [PreserveSig]
         int SetVideoProcessorMode(
-            [In] Guid lpMode);
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid lpMode);
 
         [PreserveSig]
         int GetProcAmpRange(
@@ -713,7 +713,7 @@ namespace MediaFoundation.EVR
         [PreserveSig]
         int GetProcAmpValues(
             DXVA2ProcAmp dwFlags,
-            out DXVA2ProcAmpValues Values);
+            [Out, MarshalAs(UnmanagedType.LPStruct)] DXVA2ProcAmpValues Values);
 
         [PreserveSig]
         int SetProcAmpValues(

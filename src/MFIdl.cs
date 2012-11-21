@@ -2073,8 +2073,8 @@ namespace MediaFoundation
         );
         
         [PreserveSig]
-        int SetConstrictionSize( 
-            Size pConstrictionSize
+        int SetConstrictionSize(
+            MFSize pConstrictionSize
         );
     }
 

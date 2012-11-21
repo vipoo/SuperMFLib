@@ -395,14 +395,14 @@ namespace MediaFoundation.MFPlayer
 
         [PreserveSig]
         int GetNativeVideoSize(
-            out Size pszVideo,
-            out Size pszARVideo
+            out MFSize pszVideo,
+            out MFSize pszARVideo
         );
 
         [PreserveSig]
         int GetIdealVideoSize(
-            out Size pszMin,
-            out Size pszMax
+            out MFSize pszMin,
+            out MFSize pszMax
         );
 
         [PreserveSig]

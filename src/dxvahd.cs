@@ -333,7 +333,7 @@ namespace MediaFoundation.dxvahd
     {
         [MarshalAs(UnmanagedType.Bool)]
         public bool Enable;
-        public Size xSize;
+        public MFSize xSize;
     }
 
     [StructLayout(LayoutKind.Sequential), UnmanagedName("DXVAHD_BLT_STATE_PRIVATE_DATA")]

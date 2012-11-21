@@ -2053,6 +2053,48 @@ namespace MediaFoundation.Misc
         }
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 4), UnmanagedName("SIZE")]
+    public class MFSize
+    {
+        public int cx;
+        public int cy;
+
+        public MFSize()
+        {
+            cx = 0;
+            cy = 0;
+        }
+
+        public MFSize(int iWidth, int iHeight)
+        {
+            cx = iWidth;
+            cy = iHeight;
+        }
+
+        public int Width
+        {
+            get
+            {
+                return cx;
+            }
+            set
+            {
+                cx = value;
+            }
+        }
+        public int Height
+        {
+            get
+            {
+                return cy;
+            }
+            set
+            {
+                cy = value;
+            }
+        }
+    }
+
     #endregion
 
     #region Utility Classes

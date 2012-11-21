@@ -420,7 +420,7 @@ namespace MediaFoundation
     {
         public MFOffset OffsetX;
         public MFOffset OffsetY;
-        public Size Area;
+        public MFSize Area;
 
         public MFVideoArea()
         {
@@ -432,7 +432,7 @@ namespace MediaFoundation
         {
             OffsetX = new MFOffset(x);
             OffsetY = new MFOffset(y);
-            Area = new Size(width, height);
+            Area = new MFSize(width, height);
         }
 
         public void MakeArea(float x, float y, int width, int height)

@@ -187,6 +187,13 @@ namespace MediaFoundation
             out IMFPresentationClock ppPresentationClock
         );
 
+        [DllImport("mf.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
+        public static extern int MFEnumDeviceSources(
+            IMFAttributes pAttributes,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] out IMFActivate[] pppSourceActivate,
+            out int pcSourceActivate
+        );
+
         [DllImport("mfplat.dll", CharSet = CharSet.Unicode, ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFTRegister(
             [In, MarshalAs(UnmanagedType.Struct)] Guid clsidMFT,
@@ -1205,13 +1212,6 @@ namespace MediaFoundation
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFCreateTransformActivate(
             out IMFActivate ppActivate
-        );
-
-        [DllImport("mf.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
-        public static extern int MFEnumDeviceSources(
-            IMFAttributes pAttributes,
-            out IMFActivate[] pppSourceActivate,
-            out int pcSourceActivate
         );
 
         [DllImport("mf.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]

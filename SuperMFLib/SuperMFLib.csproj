@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\MediaFoundation-2010.csproj">
-      <Project>{b78c0f3b-071a-4fd2-829d-7a67e0f7bd1c}</Project>
+      <Project>{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}</Project>
       <Name>MediaFoundation-2010</Name>
     </ProjectReference>
   </ItemGroup>

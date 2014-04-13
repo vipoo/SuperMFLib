@@ -187,7 +187,7 @@ namespace MediaFoundation.ReadWrite
         [PreserveSig]
         int SetCurrentMediaType(
             int dwStreamIndex,
-            ref int pdwReserved,
+			IntPtr pdwReserved,
             IMFMediaType pMediaType
         );
 
@@ -373,7 +373,7 @@ namespace MediaFoundation.ReadWrite
         [PreserveSig]
         new int SetCurrentMediaType(
             int dwStreamIndex,
-            ref int pdwReserved,
+			IntPtr pdwReserved,
             IMFMediaType pMediaType
         );
 

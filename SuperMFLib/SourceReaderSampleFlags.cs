@@ -42,5 +42,10 @@ namespace MediaFoundation.Net
         {
             get { return (flags & (int)MF_SOURCE_READER_FLAG.StreamTick) != 0; }
         }
+
+        public bool EndOfStream
+        {
+            get { return (flags & (int)MF_SOURCE_READER_FLAG.EndOfStream) != 0; }
+        }
     }	
 }

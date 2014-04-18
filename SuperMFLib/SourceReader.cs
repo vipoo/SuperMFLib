@@ -57,7 +57,7 @@ namespace MediaFoundation.Net
 					new SourceStream(this, actualStreamIndex),
 					new SourceReaderSampleFlags(flags), 
 					timestamp,
-					(int)(Math.Max(timestamp, 0) * 100L / (long)duration),
+					(long)duration,
 					sample == null ? null : new Sample(sample),
 					sampleCounts[actualStreamIndex]++
 				);

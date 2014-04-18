@@ -36,7 +36,7 @@ namespace MediaFoundation.Net
             return result;
         }
 
-        public struct LockedMediaBuffer : IDisposable
+		public class LockedMediaBuffer : IDisposable
         {
             internal MFMediaBuffer mediaBuffer;
             internal IntPtr buffer;

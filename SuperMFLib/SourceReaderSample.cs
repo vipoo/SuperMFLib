@@ -23,53 +23,23 @@ using System.Collections.Generic;
 
 namespace MediaFoundation.Net
 {
-	public struct SourceReaderSample
+	public class SourceReaderSample
 	{
-		readonly SourceStream sourceStream;
-		readonly SourceReaderSampleFlags flags;
-		readonly long timestamp;
-		readonly int percentageCompleted;
-		readonly int count;
-		readonly Sample sample;
+		public readonly SourceStream Stream;
+		public readonly SourceReaderSampleFlags Flags;
+		public readonly long Timestamp;
+		public readonly long Duration;
+		public readonly int Count;
+		public readonly Sample Sample;
 
-		public SourceReaderSample (SourceStream sourceStream, SourceReaderSampleFlags flags, long timestamp, int percentageCompleted, Sample sample, int count)
+        public SourceReaderSample(SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
 		{
-			this.sourceStream = sourceStream;
-			this.flags = flags;
-			this.timestamp = timestamp;
-			this.percentageCompleted = percentageCompleted;
-			this.count = count;
-			this.sample = sample;
-		}
-
-		public SourceStream Stream
-		{
-			get { return this.sourceStream; }
-		}
-
-		public SourceReaderSampleFlags Flags
-		{
-			get { return flags; }
-		}
-
-		public long Timestamp
-		{
-			get	{ return timestamp;	}
-		}
-
-		public int PercentageCompleted
-		{
-			get { return percentageCompleted; }
-		}
-
-		public int Count
-		{
-			get { return count;	}
-		}
-
-		public Sample Sample
-		{
-			get { return this.sample; }
+			this.Stream = stream;
+			this.Flags = flags;
+			this.Timestamp = timestamp;
+            this.Duration = duration;
+			this.Count = count;
+			this.Sample = sample;
 		}
 	}
 }

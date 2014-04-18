@@ -37,6 +37,11 @@ namespace MediaFoundation.Net
 			this.index = streamIndex;
 		}
 
+        public void SetInputMediaType(MediaType value, Attributes attributes)
+        {
+            sinkWriter.instance.SetInputMediaType(index, value.instance, attributes.instance).Hr();
+        }
+
 		public MediaType InputMediaType
 		{
 			set

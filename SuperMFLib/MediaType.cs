@@ -78,6 +78,11 @@ namespace MediaFoundation.Net
 			get	{ return GetInt (MFAttributesClsid.MF_MT_AUDIO_SAMPLES_PER_SECOND);	}
 		}
 
+        public int AudioAverageBytesPerSecond
+        {
+            get { return GetInt(MediaFoundation.MFAttributesClsid.MF_MT_AUDIO_AVG_BYTES_PER_SECOND); }
+        }
+
 		public int BitRate
 		{
 			get { return GetInt (MFAttributesClsid.MF_MT_AVG_BITRATE); }

@@ -34,7 +34,7 @@ namespace MediaFoundation.Net
         {
             object tmp;
 
-            var hr = instance.CreateInstanceFromURL(CLSID.CLSID_MFSourceReader, url, attributes.instance, typeof(IMFSourceReader).GUID, out tmp);
+            var hr = instance.CreateInstanceFromURL(CLSID.CLSID_MFSourceReader, url, attributes == null ? null : attributes.instance, typeof(IMFSourceReader).GUID, out tmp);
             MFError.ThrowExceptionForHR(hr);
             return new SourceReader((IMFSourceReader)tmp);
         }

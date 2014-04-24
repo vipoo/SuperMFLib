@@ -21,6 +21,8 @@ using MediaFoundation.Misc;
 using MediaFoundation.ReadWrite;
 using MediaFoundation.Transform;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace MediaFoundation.Net
 {
@@ -35,14 +37,42 @@ namespace MediaFoundation.Net
 
 		public void Dispose ()
 		{
-			SafeRelease(instance);
+            SafeRelease();
 
 			GC.SuppressFinalize(this);
 		}
 
+        void SafeRelease()
+        {
+            if (Marshal.IsComObject(instance))
+            {
+                int i = Marshal.ReleaseComObject(instance);
+                throw new COMException("Object already disposed");
+            }
+            else
+            {
+                IDisposable iDis = instance as IDisposable;
+                if (iDis != null)
+                {
+                    iDis.Dispose();
+                }
+                else
+                {
+                    throw new Exception("Instance type is not disposable");
+                }
+            }
+        }
+
 		~COMDisposable()
 		{
-			Dispose ();
+            try
+            {
+                Dispose();
+            } 
+            catch(COMException e)
+            {
+                Debug.WriteLine(e.Message);
+            }
 		}
 	}
 	

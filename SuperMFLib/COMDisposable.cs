@@ -47,7 +47,8 @@ namespace MediaFoundation.Net
             if (Marshal.IsComObject(instance))
             {
                 int i = Marshal.ReleaseComObject(instance);
-                throw new COMException("Object already disposed");
+                if( i < 0)
+                    throw new COMException("Object already disposed");
             }
             else
             {

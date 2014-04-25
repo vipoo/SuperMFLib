@@ -32,5 +32,10 @@ namespace MediaFoundation.Net
 			this.Numerator = numerator;
 			this.Denominator = denominator;
 		}
+
+        public int ToInt()
+        {
+            return Numerator / Denominator;
+        }
 	}
 }

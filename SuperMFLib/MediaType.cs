@@ -89,6 +89,11 @@ namespace MediaFoundation.Net
 			set { SetInt (MFAttributesClsid.MF_MT_AVG_BITRATE, value); }
 		}
 
+        public bool TryGetBitRate(out int bitRate)
+        {
+            return instance.GetUINT32(MFAttributesClsid.MF_MT_AVG_BITRATE, out bitRate) == 0;
+        }
+
 		public MFVideoInterlaceMode InterlaceMode
 		{
 			get

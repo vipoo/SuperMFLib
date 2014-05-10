@@ -48,5 +48,10 @@ namespace MediaFoundation.Net
 
             return new MFMediaBuffer(mediaBuffer);
         }
+
+        internal void SetSampleTime(long p)
+        {
+            this.instance.SetSampleTime(p);
+        }
     }
 }

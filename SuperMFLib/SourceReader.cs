@@ -113,5 +113,10 @@ namespace MediaFoundation.Net
 
 			return null;
 		}
-	}
+
+        public void SetCurrentPosition(long position)
+        {
+            instance.SetCurrentPosition(Guid.Empty, new MediaFoundation.Misc.PropVariant(position));
+        }
+    }
 }

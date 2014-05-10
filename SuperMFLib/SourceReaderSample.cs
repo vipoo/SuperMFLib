@@ -41,5 +41,10 @@ namespace MediaFoundation.Net
 			this.Count = count;
 			this.Sample = sample;
 		}
-	}
+
+        public void SetSampleTime(long p)
+        {
+            this.Sample.SetSampleTime(p);
+        }
+    }
 }

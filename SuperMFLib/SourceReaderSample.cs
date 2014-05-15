@@ -42,9 +42,26 @@ namespace MediaFoundation.Net
 			this.Sample = sample;
 		}
 
+        public long SampleTime
+        {
+            get
+            {
+                return this.Sample.SampleTime;
+            }
+            set
+            {
+                this.Sample.SampleTime = value;
+            }
+        }
+
         public void SetSampleTime(long p)
         {
             this.Sample.SetSampleTime(p);
+        }
+
+        public long GetSampleTime()
+        {
+            return this.Sample.GetSampleTime();
         }
     }
 }

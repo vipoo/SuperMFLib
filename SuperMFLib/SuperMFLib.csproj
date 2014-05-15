@@ -50,6 +50,7 @@
     <Compile Include="SinkWriter.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="HrExtension.cs" />
+    <Compile Include="Support\TimingExtension.cs" />
     <Compile Include="_MFCollection.cs" />
     <Compile Include="MFSystem.cs" />
     <Compile Include="FrameRate.cs" />

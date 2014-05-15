@@ -29,9 +29,23 @@ namespace MediaFoundation.Net
 		MediaSource = -1
 	}
 
+    public delegate bool ProcessSample(SourceReaderSample sample);
+
 	public class SourceReader : COMDisposable<IMFSourceReader>
 	{
 		public SourceReader(IMFSourceReader instance) : base(instance) { }
+
+        public void Samples(ProcessSample samplesFn)
+        {
+            Samples(samplesFn, (int)MF_SOURCE_READER.AnyStream, 0);
+        }
+
+        public void Samples(ProcessSample samplesFn, int streamIndex, int controlFlags)
+        {
+            foreach( var sample in Samples(streamIndex, controlFlags))
+                if (!samplesFn(sample))
+                    break;
+        }
 
 		public IEnumerable<SourceReaderSample> Samples(int streamIndex = (int)MF_SOURCE_READER.AnyStream, int controlFlags = 0)
 		{

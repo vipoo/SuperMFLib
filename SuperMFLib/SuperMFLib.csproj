@@ -42,6 +42,9 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AVOperations\MediaTypeChange.cs" />
+    <Compile Include="AVOperations\SaveTo.cs" />
+    <Compile Include="AVOperations\SeperateAudioVideo.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="MFMediaBuffer.cs" />
     <Compile Include="SourceReader.cs" />

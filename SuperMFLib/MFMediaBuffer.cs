@@ -27,6 +27,14 @@ namespace MediaFoundation.Net
     {
         public MFMediaBuffer(IMFMediaBuffer instance) : base(instance) { }
 
+        public static MFMediaBuffer CreateMemoryBuffer(int byteCount)
+        {
+            IMFMediaBuffer instance;
+            MFExtern.MFCreateMemoryBuffer(byteCount, out instance).Hr();
+
+            return new MFMediaBuffer(instance);
+        }
+
         public LockedMediaBuffer Lock()
         {
             LockedMediaBuffer result = new LockedMediaBuffer { mediaBuffer = this };

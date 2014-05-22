@@ -59,6 +59,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Alt.cs" />
+    <Compile Include="eAVEncH264VLevel.cs" />
+    <Compile Include="eAVEncH264VProfile.cs" />
     <Compile Include="mfcaptureengine.cs" />
     <Compile Include="mfmediacapture.cs" />
     <Compile Include="mfmediaengine.cs" />

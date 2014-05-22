@@ -30,7 +30,7 @@ namespace MediaFoundation.Net
 		public readonly long Timestamp;
 		public readonly long Duration;
 		public readonly int Count;
-		public readonly Sample Sample;
+		public Sample Sample;
 
         public SourceReaderSample(SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
 		{

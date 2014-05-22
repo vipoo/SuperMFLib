@@ -52,12 +52,12 @@ namespace MediaFoundation.Net
 
         public void WriteSample(Sample sample)
         {
-            sinkWriter.instance.WriteSample(index, sample.instance);
+            sinkWriter.instance.WriteSample(index, sample.instance).Hr();
         }
 
         public void SendStreamTick(long timestamp)
         {
-            sinkWriter.instance.SendStreamTick(index, timestamp);
+            sinkWriter.instance.SendStreamTick(index, timestamp).Hr();
         }
     }
 }

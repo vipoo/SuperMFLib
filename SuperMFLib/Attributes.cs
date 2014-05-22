@@ -26,6 +26,20 @@ using System.Threading.Tasks;
 
 namespace MediaFoundation.Net
 {
+    public enum MFTranscodeContainer
+    {
+        Ac3, 
+        Adts, 
+        Mpeg2, 
+        FMpeg4,
+        Asf,
+        Mpeg4,
+        Mp3,
+        ThreeGp,
+        Wave,
+        Avi 
+    }
+
 	public class Attributes : COMDisposable<IMFAttributes>
     {
 		public Attributes(int initialSize = 1) : base(NewInstance(initialSize))  {  }
@@ -36,6 +50,36 @@ namespace MediaFoundation.Net
 			MFExtern.MFCreateAttributes(out instance, initialSize).Hr();
 			return instance;
 		}
+
+        static readonly Dictionary<MFTranscodeContainer, Guid> mapContainerTypeToGuid = new Dictionary<MFTranscodeContainer, Guid>()
+        {
+            { MFTranscodeContainer.Ac3, MFTranscodeContainerType.AC3 },
+            { MFTranscodeContainer.Adts, MFTranscodeContainerType.ADTS },
+            { MFTranscodeContainer.Mpeg2, MFTranscodeContainerType.MPEG2 },
+            { MFTranscodeContainer.FMpeg4, MFTranscodeContainerType.FMPEG4 },
+            { MFTranscodeContainer.Asf, MFTranscodeContainerType.ASF },
+            { MFTranscodeContainer.Mpeg4, MFTranscodeContainerType.MPEG4 },
+            { MFTranscodeContainer.Mp3, MFTranscodeContainerType.MP3 },
+            { MFTranscodeContainer.ThreeGp, MFTranscodeContainerType.x3GP },
+            { MFTranscodeContainer.Wave, MFTranscodeContainerType.WAVE },
+            { MFTranscodeContainer.Avi, MFTranscodeContainerType.AVI }
+        };
+
+        static readonly Dictionary<Guid, MFTranscodeContainer> mapGuidToContainerType = mapContainerTypeToGuid.ToDictionary(kv => kv.Value, kv => kv.Key);
+
+        public MFTranscodeContainer TranscodeContainerType
+        {
+            get
+            {
+                Guid value;
+                instance.GetGUID(MFAttributesClsid.MF_TRANSCODE_CONTAINERTYPE, out value).Hr();
+                return mapGuidToContainerType[value];
+            }
+            set
+            {
+                instance.SetGUID(MFAttributesClsid.MF_TRANSCODE_CONTAINERTYPE, mapContainerTypeToGuid[value]).Hr();
+            }
+        }
 
         public bool ReadWriterEnableHardwareTransforms
         {
@@ -48,7 +92,48 @@ namespace MediaFoundation.Net
             set
             {
                 MFError.ThrowExceptionForHR(instance.SetUINT32(MFAttributesClsid.MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, value ? 1 : 0));
+            }
+        }
 
+        public eAVEncH264VProfile H264Profile
+        {
+            get
+            {
+                int result;
+                instance.GetUINT32(MFAttributesClsid.MF_MT_MPEG2_PROFILE, out result).Hr();
+                return (eAVEncH264VProfile)result;
+            }
+            set
+            {
+                instance.SetUINT32(MFAttributesClsid.MF_MT_MPEG2_PROFILE, (int)value).Hr();
+            }
+        }
+
+        public eAVEncH264VLevel Mpeg2Level
+        {
+            get
+            {
+                int result;
+                instance.GetUINT32(MFAttributesClsid.MF_MT_MPEG2_LEVEL, out result).Hr();
+                return (eAVEncH264VLevel)result;
+            }
+            set
+            {
+                instance.SetUINT32(MFAttributesClsid.MF_MT_MPEG2_LEVEL, (int)value);
+            }
+        }
+
+        public int MaxKeyFrameSpacing
+        {
+            get
+            {
+                int result;
+                instance.GetUINT32(MFAttributesClsid.MF_MT_MAX_KEYFRAME_SPACING, out result).Hr();
+                return result;
+            }
+            set
+            {
+                instance.SetUINT32(MFAttributesClsid.MF_MT_MAX_KEYFRAME_SPACING, value).Hr();
             }
         }
 
@@ -57,12 +142,12 @@ namespace MediaFoundation.Net
             get
             {
                 int result;
-                MFError.ThrowExceptionForHR(instance.GetUINT32(MFAttributesClsid.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, out result));
+                instance.GetUINT32(MFAttributesClsid.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, out result).Hr();
                 return result != 0;
             }
             set
             {
-                MFError.ThrowExceptionForHR(instance.SetUINT32(MFAttributesClsid.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, value ? 1 : 0));
+                instance.SetUINT32(MFAttributesClsid.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, value ? 1 : 0).Hr();
             }
         }
     }

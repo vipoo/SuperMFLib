@@ -27,6 +27,14 @@ namespace MediaFoundation.Net
 	{
 		public Sample(IMFSample instance) :base(instance) { }
 
+        public static Sample Create()
+        {
+            IMFSample instance;
+            MFExtern.MFCreateSample(out instance).Hr();
+
+            return new Sample(instance);
+        }
+
 		public bool Discontinuity
 		{
 			get 

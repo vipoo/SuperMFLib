@@ -38,6 +38,9 @@ namespace MediaFoundation
 {
     public static class MFExtern
     {
+        [DllImport("Propsys.dll"), SuppressUnmanagedCodeSecurity]
+        public static extern int PSCreateMemoryPropertyStore(Guid riid, out IPropertyStore propStore); 
+
         [DllImport("mfplat.dll", ExactSpelling = true), SuppressUnmanagedCodeSecurity]
         public static extern int MFShutdown();
 

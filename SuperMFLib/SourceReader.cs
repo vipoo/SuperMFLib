@@ -47,6 +47,8 @@ namespace MediaFoundation.Net
                     break;
         }
 
+        static long gcMonitor = 0;
+
 		public IEnumerable<SourceReaderSample> Samples(int streamIndex = (int)MF_SOURCE_READER.AnyStream, int controlFlags = 0)
 		{
 			var countOfSelectedStreams = Streams.Where( s => s.IsSelected ).Count();
@@ -76,7 +78,8 @@ namespace MediaFoundation.Net
 					sampleCounts[actualStreamIndex]++
 				);
 
-                System.GC.Collect(10, GCCollectionMode.Forced);
+                if (gcMonitor++ % 2000 == 0)
+                    System.GC.Collect(10, GCCollectionMode.Forced);
 
 				if( (flags & (int)MF_SOURCE_READER_FLAG.EndOfStream) != 0 )
 					countOfClosedStreams++;

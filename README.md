@@ -2,9 +2,13 @@
 
 This library is a cvs import from a project on SourceForge by snarfle.
 
-
 The original version of this library is available at http://mfnet.SourceForge.Net and is the result of work done by:
 snarfle@users.SourceForge.net
+
+In addition, the repo also contains an adapter/wrapper project - SuperMFLib.  More details of this project can be found in its local [readme](SuperMFLib/README.md)
+
+
+##Original readme
 
 ## See WhatsNew.txt for a list of what has changed since the previous version.
 Purpose of this library - What it is, what it isn't

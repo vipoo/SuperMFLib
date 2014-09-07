@@ -31,9 +31,11 @@ namespace MediaFoundation.Net
 		public readonly long Duration;
 		public readonly int Count;
 		public Sample Sample;
+        public SourceReader Reader;
 
-        public SourceReaderSample(SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
+        public SourceReaderSample(SourceReader reader, SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
 		{
+            this.Reader = reader;
 			this.Stream = stream;
 			this.Flags = flags;
 			this.Timestamp = timestamp;

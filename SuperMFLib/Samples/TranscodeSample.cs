@@ -1,14 +1,26 @@
-﻿using MediaFoundation;
-using MediaFoundation.Misc;
+﻿// This file is part of SuperMFLib.
+//
+// Copyright 2014 Dean Netherton
+// https://github.com/vipoo/SuperMFLib
+//
+// SuperMFLib is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// SuperMFLib is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with SuperMFLib.  If not, see <http://www.gnu.org/licenses/>.
+
+using MediaFoundation;
 using MediaFoundation.Net;
 using MediaFoundation.Transform;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Samples
 {
@@ -16,11 +28,8 @@ namespace Samples
     {
         const string sourceFile = @"C:\Users\dean\Documents\Bandicam\bandicam 2014-05-18 20-06-55-540.avi";
         const string destinationFile = @"C:\Users\dean\Documents\Bandicam\sample3.wmv";
-        const int VideoBitRate = 3*1000000;
+        const int VideoBitRate = 3 * 1000000;
         const int AudioBitRate = 48000;
-
-        //static Guid TARGET_AUDIO_FORMAT = MFMediaType.AAC;
-        //static Guid TARGET_VIDEO_FORMAT = MFMediaType.H264;
 
         static Guid TARGET_AUDIO_FORMAT = MFMediaType.WMAudioV9;
         static Guid TARGET_VIDEO_FORMAT = MFMediaType.WMV3;
@@ -42,24 +51,10 @@ namespace Samples
                     ReadWriterEnableHardwareTransforms = true,
                     SourceReaderEnableVideoProcessing = true,
                     MaxKeyFrameSpacing = 3000
-                    //TranscodeContainerType = MFTranscodeContainer.Mpeg4
-        //            H264Profile = eAVEncH264VProfile._444,
-          //          Mpeg2Level = eAVEncH264VLevel.eAVEncH264VLevel1
                 };
 
                 var sourceReader = readWriteFactory.CreateSourceReaderFromURL(sourceFile, attributes);
                 var sinkWriter = readWriteFactory.CreateSinkWriterFromURL(destinationFile, destAttributes);
-
-            /*    var x = (IMFTransform)new CColorConvertDMO();
-
-                x.SetInputType(0, GetMediaTypeRGB().instance, MFTSetTypeFlags.None).Hr();
-                x.SetOutputType(0, GetMediaTypeYUY2().instance, MFTSetTypeFlags.None).Hr();
-                MFTOutputStreamInfo info;
-                x.GetOutputStreamInfo(0, out info).Hr();
-
-
-                var samples = new List<Sample>();
-                */
 
                 var writeToSink = ConnectStreams(sourceReader, sinkWriter);
 
@@ -76,42 +71,6 @@ namespace Samples
             }
         }
 
-        /*          if (sample.Sample != null && sample.Stream.NativeMediaType.IsVideo)
-                            {
-                                x.ProcessInput(0, sample.Sample.instance, 0).Hr();
-
-                                var sample2 = Sample.Create();
-                                var buffer = MFMediaBuffer.CreateMemoryBuffer(info.cbSize);
-                                sample2.instance.AddBuffer(buffer.instance);
-
-                                var outSamples = new MFTOutputDataBuffer[1];
-                                outSamples[0].dwStreamID = 0;
-                                outSamples[0].dwStatus = MFTOutputDataBufferFlags.None;
-                                outSamples[0].pSample = Marshal.GetComInterfaceForObject(sample2.instance, typeof(IMFSample));
-                                
-                                ProcessOutputStatus status;
-                                x.ProcessOutput(MFTProcessOutputFlags.None, 1, outSamples, out status).Hr();
-
-                                sample.Sample = sample2;
-                                var result = writeToSink(sample);
-
-                                samples.Add(sample2);
-                                if( samples.Count > 120)
-                                {
-                                    var b = samples.First();
-                                    b.instance.RemoveAllBuffers();
-                                    samples.RemoveAt(0);
-                                    b.Dispose();
-                                }
-
-                                //sample2.instance.RemoveAllBuffers().Hr();
-                                buffer.Dispose();
-                                //sample2.Dispose();
-
-                                return result;
-                            }
-                            else
-                    */            
         private ProcessSample ConnectAudioStreams(SourceReader sourceReader, SinkWriter sinkWriter)
         {
             var sourceAudioStream = SetAudioMediaType(sourceReader);
@@ -124,8 +83,6 @@ namespace Samples
         private ProcessSample ConnectVideoStreams(SourceReader sourceReader, SinkWriter sinkWriter)
         {
             var sourceVideoStream = SetVideoMediaType(sourceReader);
-            /*sourceVideoStream.CurrentMediaType*/
-            //GetMediaTypeYUY2()
             var sinkVideoStream = AddStream(sinkWriter, sourceVideoStream.CurrentMediaType, CreateTargetVideoMediaType(sourceVideoStream.NativeMediaType));
 
             return AVOperations.MediaTypeChange(sinkVideoStream, AVOperations.SaveTo(sinkVideoStream));
@@ -158,10 +115,11 @@ namespace Samples
 
         private static MediaType GetMediaTypeRGB()
         {
-            return new MediaType() { 
+            return new MediaType()
+            {
                 MajorType = MFMediaType.Video,
                 SubType = MFMediaType.RGB32,
-                AspectRatio = new AspectRatio(1,1),
+                AspectRatio = new AspectRatio(1, 1),
                 FrameSize = new System.Drawing.Size(1280, 720),
                 InterlaceMode = MFVideoInterlaceMode.Progressive
             };

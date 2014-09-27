@@ -42,9 +42,15 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activate.cs" />
     <Compile Include="AVOperations\MediaTypeChange.cs" />
     <Compile Include="AVOperations\SaveTo.cs" />
     <Compile Include="AVOperations\SeperateAudioVideo.cs" />
+    <Compile Include="MediaSource.cs" />
+    <Compile Include="PresentationDescriptorStream.cs" />
+    <Compile Include="SourceResolver.cs" />
+    <Compile Include="MediaEvent.cs" />
+    <Compile Include="MediaSession.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="MFMediaBuffer.cs" />
     <Compile Include="SourceReader.cs" />
@@ -54,6 +60,10 @@
     <Compile Include="Attributes.cs" />
     <Compile Include="HrExtension.cs" />
     <Compile Include="Support\TimingExtension.cs" />
+    <Compile Include="PresentationDescriptor.cs" />
+    <Compile Include="TopologyNode.cs" />
+    <Compile Include="Topology.cs" />
+    <Compile Include="VideoDisplayControl.cs" />
     <Compile Include="_MFCollection.cs" />
     <Compile Include="MFSystem.cs" />
     <Compile Include="FrameRate.cs" />

@@ -26,28 +26,28 @@ using System.Runtime.InteropServices;
 
 namespace MediaFoundation.Net
 {
-	public abstract class COMDisposable<T> : COMBase, IDisposable
-	{
-		public readonly T instance;
+    public abstract class COMDisposable<T> : COMBase, IDisposable
+    {
+        public readonly T instance;
 
-		public COMDisposable(T instance)
-		{
-			this.instance = instance;
-		}
+        public COMDisposable(T instance)
+        {
+            this.instance = instance;
+        }
 
-		public void Dispose ()
-		{
+        public void Dispose()
+        {
             SafeRelease();
 
-			GC.SuppressFinalize(this);
-		}
+            GC.SuppressFinalize(this);
+        }
 
         void SafeRelease()
         {
             if (Marshal.IsComObject(instance))
             {
                 int i = Marshal.ReleaseComObject(instance);
-                if( i < 0)
+                if (i < 0)
                     throw new COMException("Object already disposed");
             }
             else
@@ -64,17 +64,16 @@ namespace MediaFoundation.Net
             }
         }
 
-		~COMDisposable()
-		{
+        ~COMDisposable()
+        {
             try
             {
                 Dispose();
-            } 
-            catch(COMException e)
+            }
+            catch (COMException e)
             {
                 Debug.WriteLine(e.Message);
             }
-		}
-	}
-	
+        }
+    }
 }

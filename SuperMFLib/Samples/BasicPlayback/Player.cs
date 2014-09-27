@@ -69,7 +69,6 @@ namespace BasicPlayback
         {
             using (var presentationDescriptor = source.CreatePresentationDescriptor())
                 foreach (var stream in presentationDescriptor.Streams.Where(s => s.IsSelected))
-                {
                     using (var sourceNode = TopologyNode.Create(MFTopologyType.SourcestreamNode))
                     {
                         if (!stream.MediaType.IsAudio && !stream.MediaType.IsVideo)
@@ -88,7 +87,6 @@ namespace BasicPlayback
                             sourceNode.ConnectOutput(0, outputNode, 0);
                         }
                     }
-                }
         }
 
         void mediaSession_OnSessionTopologyStatus(MediaEvent mediaEvent)

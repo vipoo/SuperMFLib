@@ -84,6 +84,8 @@ namespace MediaFoundation.Net
         {
             try
             {
+                GC.Collect();
+
                 IMFMediaEvent mediaEventInstance;
                 var h = instance.EndGetEvent(pAsyncResult, out mediaEventInstance);
                 h.Hr();

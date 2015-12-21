@@ -23,6 +23,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;TRACE;</DefineConstants>
     <LangVersion>5</LangVersion>
+    <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <Optimize>false</Optimize>
@@ -30,6 +31,8 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>5</LangVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -96,6 +99,12 @@
     <None Include="LICENSE.txt" />
     <None Include="packages.config" />
     <None Include="README.md" />
+    <None Include="SuperMFLib.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tools\nuget.exe" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\mfnet\mflib\src\MediaFoundation.csproj">

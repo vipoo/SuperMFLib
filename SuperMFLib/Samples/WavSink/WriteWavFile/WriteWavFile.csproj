@@ -56,9 +56,6 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MediaFoundation">
-      <HintPath>..\..\..\lib\MediaFoundation.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -66,12 +63,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\mfnet\mflib\src\MediaFoundation.csproj">
+      <Project>{b78c0f3b-071a-4fd2-829d-7a67e0f7bd1c}</Project>
+      <Name>MediaFoundation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\SuperMFLib.csproj">
       <Project>{59d2b4b5-2852-4396-a0d9-9ca546ac3c09}</Project>
       <Name>SuperMFLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\WavSink\WavSink.csproj">
-      <Project>{EA1F760B-169A-4F0E-9800-4DB45559142C}</Project>
+      <Project>{ea1f760b-169a-4f0e-9800-4db45559142c}</Project>
       <Name>WavSink</Name>
     </ProjectReference>
   </ItemGroup>

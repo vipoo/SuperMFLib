@@ -71,6 +71,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\mfnet\mflib\src\MediaFoundation.csproj">
+      <Project>{b78c0f3b-071a-4fd2-829d-7a67e0f7bd1c}</Project>
+      <Name>MediaFoundation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SuperMFLib.csproj">
       <Project>{59d2b4b5-2852-4396-a0d9-9ca546ac3c09}</Project>
       <Name>SuperMFLib</Name>

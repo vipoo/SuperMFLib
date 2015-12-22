@@ -14,8 +14,6 @@
     <tags>MFLib SuperMFLib</tags>
   </metadata>
   <files>
-    <file src="bin\x64\Release\MediaFoundation.Net.pdb" target="lib\net451" />
-    <file src="bin\x64\Release\MediaFoundation.dll" target="lib\net451" />
-    <file src="bin\x64\Release\MediaFoundation.pdb" target="lib\net451" />
+    <file src="bin\x64\Debug\MediaFoundation.Net.pdb" target="lib\net451" />
   </files>
 </package>

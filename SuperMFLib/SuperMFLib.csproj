@@ -82,11 +82,19 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild" BeforeTargets="CopyFilesToOutputDirectory">
+    <CreateItem Include="@(ReferencePath)" Condition="'%(CopyLocal)'=='true'">
+      <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
+    </CreateItem>
+    <Message Text="MERGING: @(IlmergeAssemblies->'%(Filename)')" Importance="High" />
+    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFiles="obj\x64\Debug\tmp.dll" />
+    <Exec Command="&quot;$(SolutionDir)\packages\ILMerge.2.14.1208\tools\ILMerge.exe&quot; /out:@(IntermediateAssembly) &quot;obj\x64\Debug\tmp.dll&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Message Text="MERGED: @(MainAssembly) and @(IntermediateAssembly)" Importance="High" />
+  </Target>
   <ItemGroup>
     <None Include="LICENSE.txt" />
+    <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
@@ -104,4 +112,8 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

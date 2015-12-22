@@ -77,12 +77,6 @@
     <Compile Include="COMDisposable.cs" />
     <Compile Include="LongEx.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\src\MediaFoundation-2010.csproj">
-      <Project>{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}</Project>
-      <Name>MediaFoundation-2010</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -94,6 +88,12 @@
   <ItemGroup>
     <None Include="LICENSE.txt" />
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\mfnet\mflib\src\MediaFoundation.csproj">
+      <Project>{b78c0f3b-071a-4fd2-829d-7a67e0f7bd1c}</Project>
+      <Name>MediaFoundation</Name>
+    </ProjectReference>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

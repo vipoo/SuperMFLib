@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperMFLib", "SuperMFLib\SuperMFLib.csproj", "{59D2B4B5-2852-4396-A0D9-9CA546AC3C09}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaFoundation-2010", "src\MediaFoundation-2010.csproj", "{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples", "SuperMFLib\Samples\Samples.csproj", "{88C13055-9370-46E3-851F-2F95AB491479}"
 EndProject
@@ -15,7 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WavSink", "SuperMFLib\Sampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteWavFile", "SuperMFLib\Samples\WavSink\WriteWavFile\WriteWavFile.csproj", "{43F6A5CC-0887-4992-A28F-698416C034FC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MFSamples", "SuperMFLib\MFSamples", "{CC1ED1E7-1C6F-465F-88A3-83380BC9D008}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MFSamples", "MFSamples", "{CC1ED1E7-1C6F-465F-88A3-83380BC9D008}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaFoundation", "mfnet\mflib\src\MediaFoundation.csproj", "{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,18 +41,6 @@ Global
 		{59D2B4B5-2852-4396-A0D9-9CA546AC3C09}.Release|x64.ActiveCfg = Release|x64
 		{59D2B4B5-2852-4396-A0D9-9CA546AC3C09}.Release|x64.Build.0 = Release|x64
 		{59D2B4B5-2852-4396-A0D9-9CA546AC3C09}.Release|x86.ActiveCfg = Release|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Mixed Platforms.Build.0 = Debug|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x64.ActiveCfg = Debug|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x64.Build.0 = Debug|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x86.ActiveCfg = Debug|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Any CPU.ActiveCfg = Release|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Mixed Platforms.ActiveCfg = Release|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Mixed Platforms.Build.0 = Release|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x64.ActiveCfg = Release|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x64.Build.0 = Release|x64
-		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x86.ActiveCfg = Release|x64
 		{88C13055-9370-46E3-851F-2F95AB491479}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{88C13055-9370-46E3-851F-2F95AB491479}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
 		{88C13055-9370-46E3-851F-2F95AB491479}.Debug|Mixed Platforms.Build.0 = Debug|x64
@@ -101,6 +89,18 @@ Global
 		{43F6A5CC-0887-4992-A28F-698416C034FC}.Release|x64.ActiveCfg = Release|x64
 		{43F6A5CC-0887-4992-A28F-698416C034FC}.Release|x64.Build.0 = Release|x64
 		{43F6A5CC-0887-4992-A28F-698416C034FC}.Release|x86.ActiveCfg = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x64.ActiveCfg = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x64.Build.0 = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Debug|x86.ActiveCfg = Debug|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Any CPU.ActiveCfg = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|Mixed Platforms.Build.0 = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x64.ActiveCfg = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x64.Build.0 = Release|x64
+		{B78C0F3B-071A-4FD2-829D-7A67E0F7BD1C}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,12 +17,9 @@
 // along with SuperMFLib.  If not, see <http://www.gnu.org/licenses/>.
 
 using MediaFoundation.Misc;
-using MediaFoundation.ReadWrite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MediaFoundation.Net
 {

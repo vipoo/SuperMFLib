@@ -91,8 +91,8 @@
       <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
     </CreateItem>
     <Message Text="MERGING: @(IlmergeAssemblies->'%(Filename)')" Importance="High" />
-    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFiles="obj\x64\Debug\tmp.dll" />
-    <Exec Command="&quot;$(SolutionDir)\packages\ILMerge.2.14.1208\tools\ILMerge.exe&quot; /out:@(IntermediateAssembly) &quot;obj\x64\Debug\tmp.dll&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFiles="obj\x64\$(ConfigurationName)\tmp.dll" />
+    <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILMerge.exe&quot; /out:@(IntermediateAssembly) &quot;obj\x64\$(ConfigurationName)\tmp.dll&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Message Text="MERGED: @(MainAssembly) and @(IntermediateAssembly)" Importance="High" />
   </Target>
   <Target Name="AfterCopy" AfterTargets="CopyFilesToOutputDirectory">
@@ -105,6 +105,7 @@
     <None Include="SuperMFLib.nuspec">
       <SubType>Designer</SubType>
     </None>
+    <None Include="tools\package.cmd" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tools\nuget.exe" />

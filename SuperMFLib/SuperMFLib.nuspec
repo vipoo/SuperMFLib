@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>MediaFoundation.Net</id>
     <version>$version$</version>
     <title>SuperMFLib</title>
     <authors>Dean Netherton</authors>
@@ -14,6 +14,7 @@
     <tags>MFLib SuperMFLib</tags>
   </metadata>
   <files>
-    <file src="bin\x64\Debug\MediaFoundation.Net.pdb" target="lib\net451" />
+    <file src="bin\x64\Release\MediaFoundation.Net.dll" target="lib\net451" />
+    <file src="bin\x64\Release\MediaFoundation.Net.pdb" target="lib\net451" />
   </files>
 </package>

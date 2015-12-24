@@ -85,18 +85,6 @@
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <Target Name="AfterBuild" BeforeTargets="CopyFilesToOutputDirectory">
-    <CreateItem Include="@(ReferencePath)" Condition="'%(CopyLocal)'=='true'">
-      <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
-    </CreateItem>
-    <Message Text="MERGING: @(IlmergeAssemblies->'%(Filename)')" Importance="High" />
-    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFiles="obj\x64\$(ConfigurationName)\tmp.dll" />
-    <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILMerge.exe&quot; /targetplatform:v2,C:\Windows\Microsoft.NET\Framework\v2.0.50727 /out:@(IntermediateAssembly) &quot;obj\x64\$(ConfigurationName)\tmp.dll&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
-    <Message Text="MERGED: @(MainAssembly) and @(IntermediateAssembly)" Importance="High" />
-  </Target>
-  <Target Name="AfterCopy" AfterTargets="CopyFilesToOutputDirectory">
-    <Exec Command="del @(IntermediateAssembly)" />
-  </Target>
   <ItemGroup>
     <None Include="LICENSE.txt" />
     <None Include="packages.config" />

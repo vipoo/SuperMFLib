@@ -17,6 +17,8 @@
 // along with iRacingReplayOverlay.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+using System;
+
 namespace MediaFoundation.Net
 {
     public partial class AVOperations
@@ -31,5 +33,6 @@ namespace MediaFoundation.Net
                     return next(sample);
                 };
         }
+
     }
 }

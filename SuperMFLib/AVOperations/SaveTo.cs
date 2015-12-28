@@ -18,10 +18,14 @@ namespace MediaFoundation.Net
                 if (sample.Count == 0)
                     sample.Sample.Discontinuity = true;
 
+                System.Diagnostics.Trace.WriteLine(string.Format("Saving:   {0} -> {1}", sample.Timestamp.FromNanoToSeconds(), sample.SampleTime.FromNanoToSeconds()));
+
+
                 sinkStream.WriteSample(sample.Sample);
 
                 return true;
             };
         }
+        
     }
 }

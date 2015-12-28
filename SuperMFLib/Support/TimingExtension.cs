@@ -20,7 +20,7 @@ namespace MediaFoundation.Net
 {
     public static class TimingExtensions
     {
-        const double OneNanoSecond = 10000000;
+        public const long OneNanoSecond = 10000000;
 
         public static double FromNanoToSeconds(this long nanoseconds)
         {

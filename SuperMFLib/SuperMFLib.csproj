@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE;</DefineConstants>
     <LangVersion>5</LangVersion>
     <DebugType>full</DebugType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <Optimize>false</Optimize>
@@ -34,6 +35,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -46,11 +48,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activate.cs" />
+    <Compile Include="AVOperations\Concat.cs" />
+    <Compile Include="AVOperations\DataSamplesOnly.cs" />
+    <Compile Include="AVOperations\FadeIn.cs" />
+    <Compile Include="AVOperations\FadeOut.cs" />
     <Compile Include="AVOperations\MediaTypeChange.cs" />
+    <Compile Include="AVOperations\Overlay.cs" />
     <Compile Include="AVOperations\SaveTo.cs" />
     <Compile Include="AVOperations\SeperateAudioVideo.cs" />
     <Compile Include="MediaSource.cs" />
     <Compile Include="PresentationDescriptorStream.cs" />
+    <Compile Include="SourceReaderSampleWithBitmap.cs" />
     <Compile Include="SourceResolver.cs" />
     <Compile Include="MediaEvent.cs" />
     <Compile Include="MediaSession.cs" />

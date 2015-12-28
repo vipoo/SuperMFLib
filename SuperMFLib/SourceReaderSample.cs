@@ -27,43 +27,69 @@ namespace MediaFoundation.Net
 	{
 		public readonly SourceStream Stream;
 		public readonly SourceReaderSampleFlags Flags;
+        /// <summary>
+        /// The original timestamp for this sample, as per its source
+        /// </summary>
 		public readonly long Timestamp;
 		public readonly long Duration;
 		public readonly int Count;
-		public Sample Sample;
-        public SourceReader Reader;
+		public readonly Sample Sample;
+        public readonly SourceReader Reader;
+        internal long SegmentDuration;
+        internal long SegmentTimeStamp;
 
         public SourceReaderSample(SourceReader reader, SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
 		{
-            this.Reader = reader;
-			this.Stream = stream;
-			this.Flags = flags;
-			this.Timestamp = timestamp;
-            this.Duration = duration;
-			this.Count = count;
-			this.Sample = sample;
+            Reader = reader;
+			Stream = stream;
+			Flags = flags;
+			Timestamp = timestamp;
+            Duration = duration;
+			Count = count;
+			Sample = sample;
+
+            SegmentDuration = duration;
+            SegmentTimeStamp = timestamp;
 		}
 
+        /// <summary>
+        /// The time stamp embedded in the sample
+        /// </summary>
         public long SampleTime
         {
             get
             {
-                return this.Sample.SampleTime;
+                return GetSample().SampleTime;
             }
             set
             {
-                this.Sample.SampleTime = value;
+                GetSample().SampleTime = value;
             }
         }
 
-        public void SetSampleTime(long p)
+        /// <summary>
+        /// Set the embedded timestamp within this sample
+        /// </summary>
+        /// <param name="newTime"></param>
+        public void SetSampleTime(long newTime)
         {
-            this.Sample.SetSampleTime(p);
+            GetSample().SetSampleTime(newTime);
         }
 
+        /// <summary>
+        /// The time stamp embedded in the sample
+        /// </summary>
         public long GetSampleTime()
         {
-            return this.Sample.GetSampleTime();
+            return GetSample().GetSampleTime();
+        }
+
+        Sample GetSample()
+        {
+            if (this.Sample == null)
+                throw new Exception(string.Format("This sample does not contain any sample data {0}", Flags));
+
+            return this.Sample;
         }
     }
 }

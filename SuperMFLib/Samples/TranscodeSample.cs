@@ -20,13 +20,15 @@ using MediaFoundation;
 using MediaFoundation.Net;
 using MediaFoundation.Transform;
 using System;
+using System.Drawing;
 using System.Linq;
 
 namespace Samples
 {
     class TranscodeSample
     {
-        const string sourceFile = @"C:\Users\dean\Documents\Bandicam\bandicam 2014-05-18 20-06-55-540.avi";
+        const string shortSourceFile = @"C:\Users\dean\Documents\Bandicam\bandicam 2015-12-27 14-22-19-251.avi";
+        const string mainSourceFile = @"C:\Users\dean\Documents\Bandicam\bandicam 2015-12-27 14-22-47-370.avi";
         const string destinationFile = @"C:\Users\dean\Documents\Bandicam\sample3.wmv";
         const int VideoBitRate = 3 * 1000000;
         const int AudioBitRate = 48000;
@@ -53,25 +55,37 @@ namespace Samples
                     MaxKeyFrameSpacing = 3000
                 };
 
-                var sourceReader = readWriteFactory.CreateSourceReaderFromURL(sourceFile, attributes);
+                var shortSourceReader = readWriteFactory.CreateSourceReaderFromURL(shortSourceFile, attributes);
+                var shortSourceReader2 = readWriteFactory.CreateSourceReaderFromURL(shortSourceFile, attributes);
+                var mainSourceReader = readWriteFactory.CreateSourceReaderFromURL(mainSourceFile, attributes);
                 var sinkWriter = readWriteFactory.CreateSinkWriterFromURL(destinationFile, destAttributes);
 
-                var writeToSink = ConnectStreams(sourceReader, sinkWriter);
+                var writeToSink = ConnectStreams(shortSourceReader, shortSourceReader2, mainSourceReader, sinkWriter);
+
+                var fadeSegments = AVOperations.FadeIn(AVOperations.FadeOut(writeToSink));
+
+                var editoutMiddle = AVOperations.Cut(10.FromSecondsToNano(), (43 * 60).FromSecondsToNano(), fadeSegments);
+
+                var overlay = AVOperations.Overlay(applyOverlay, editoutMiddle);
+
+                var first10Seconds = AVOperations.Cut(0, 10.FromSecondsToNano(), writeToSink, writeToSink);
 
                 using (sinkWriter.BeginWriting())
                 {
-                    sourceReader.Samples(sample =>
-                        {
-                            Console.Clear();
-                            Console.WriteLine(TimeSpan.FromSeconds(sample.Timestamp.FromNanoToSeconds()));
-
-                            return writeToSink(sample);
-                        });
+                    AVOperations.StartConcat(shortSourceReader, writeToSink,
+                        AVOperations.Concat(mainSourceReader, overlay,
+                            AVOperations.Concat(shortSourceReader, first10Seconds)));
                 }
             }
         }
 
-        private ProcessSample ConnectAudioStreams(SourceReader sourceReader, SinkWriter sinkWriter)
+        void applyOverlay(SourceReaderSampleWithBitmap sample)
+        {
+            var f = new Font("Artial", 15, FontStyle.Bold);
+            sample.Graphic.DrawString("TEST", f, new SolidBrush(Color.Black), new PointF(500, 500));
+        }
+
+        ProcessSample ConnectAudioStreams(SourceReader sourceReader, SinkWriter sinkWriter)
         {
             var sourceAudioStream = SetAudioMediaType(sourceReader);
 
@@ -88,8 +102,14 @@ namespace Samples
             return AVOperations.MediaTypeChange(sinkVideoStream, AVOperations.SaveTo(sinkVideoStream));
         }
 
-        private ProcessSample ConnectStreams(SourceReader sourceReader, SinkWriter sinkWriter)
+        private ProcessSample ConnectStreams(SourceReader shortSourceReader, SourceReader shortSourceReader2,  SourceReader sourceReader, SinkWriter sinkWriter)
         {
+            SetAudioMediaType(shortSourceReader);
+            SetVideoMediaType(shortSourceReader);
+
+            SetAudioMediaType(shortSourceReader2);
+            SetVideoMediaType(shortSourceReader2);
+
             return AVOperations.SeperateAudioVideo(
                 ConnectAudioStreams(sourceReader, sinkWriter),
                 ConnectVideoStreams(sourceReader, sinkWriter));
@@ -120,7 +140,7 @@ namespace Samples
                 MajorType = MFMediaType.Video,
                 SubType = MFMediaType.RGB32,
                 AspectRatio = new AspectRatio(1, 1),
-                FrameSize = new System.Drawing.Size(1280, 720),
+                FrameSize = new System.Drawing.Size(960, 540),
                 InterlaceMode = MFVideoInterlaceMode.Progressive
             };
         }
@@ -132,7 +152,7 @@ namespace Samples
                 MajorType = MFMediaType.Video,
                 SubType = MFMediaType.YUY2,
                 AspectRatio = new AspectRatio(1, 1),
-                FrameSize = new System.Drawing.Size(1280, 720),
+                FrameSize = new System.Drawing.Size(960, 540),
                 InterlaceMode = MFVideoInterlaceMode.Progressive
             };
         }

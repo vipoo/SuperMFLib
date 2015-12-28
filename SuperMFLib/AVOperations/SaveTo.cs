@@ -10,7 +10,6 @@ namespace MediaFoundation.Net
             {
                 if (sample.Flags.StreamTick)
                     throw new NotImplementedException();
-                //sinkStream.SendStreamTick(sample.Timestamp - offset);
 
                 if (sample.Sample == null)
                     return true;
@@ -23,5 +22,6 @@ namespace MediaFoundation.Net
                 return true;
             };
         }
+        
     }
 }

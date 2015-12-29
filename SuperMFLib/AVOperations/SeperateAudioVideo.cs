@@ -20,7 +20,7 @@ namespace MediaFoundation.Net
                     return afterEdit(sample);
 
                 if (from > sample.Duration)
-                    throw new Exception(string.Format("Error.  Edit starting position beyond end of segment. {0}, {1}", from.FromNanoToSeconds(), sample.Duration.FromNanoToSeconds()));
+                    throw new Exception(string.Format("Error.  Edit starting position beyond end of segment. {0}, {1}, {2}", from.FromNanoToSeconds(), sample.Duration.FromNanoToSeconds(), sample.Timestamp.FromNanoToSeconds()));
 
                 if (to > sample.Duration)
                     throw new Exception(string.Format("Error.  Edit to position beyond end of segment. {0}, {1}", to.FromNanoToSeconds(), sample.Duration.FromNanoToSeconds()));
@@ -34,9 +34,7 @@ namespace MediaFoundation.Net
                 if (sample.Timestamp < to)
                 {
                     if (!hasJumped)
-                    {
                         sample.Reader.SetCurrentPosition(to);
-                    }
                     hasJumped = true;
                     return true;
                 }
@@ -63,7 +61,7 @@ namespace MediaFoundation.Net
 
                 throw new Exception("Unknown stream type");
             };
-        }
 
+        }
     }
 }

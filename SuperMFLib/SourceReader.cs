@@ -31,7 +31,15 @@ namespace MediaFoundation.Net
 
     public delegate bool ProcessSample(SourceReaderSample sample);
 
-    public class SourceReader : COMDisposable<IMFSourceReader>
+    public interface ISourceReader
+    {
+        long Duration { get; }
+
+        IEnumerable<SourceReaderSample> Samples(int streamIndex = (int)MF_SOURCE_READER.AnyStream, int controlFlags = 0);
+        void SetCurrentPosition(long position);
+    }
+
+    public class SourceReader : COMDisposable<IMFSourceReader>, ISourceReader
     {
         public SourceReader(IMFSourceReader instance) : base(instance) { }
 
@@ -102,6 +110,11 @@ namespace MediaFoundation.Net
                     yield return new SourceStream(this, i++);
                 }
             }
+        }
+
+        public long Duration
+        {
+            get { return (long)MediaSource.Duration; }
         }
 
         public SourceStream MediaSource

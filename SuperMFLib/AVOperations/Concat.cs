@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MediaFoundation.Net
 {
     public partial class AVOperations
     {
-        public static Action<ProcessSample> FromSource(SourceReader shortSourceReader)
+        public static Action<ProcessSample> FromSource(ISourceReader shortSourceReader)
         {
             return next =>
             {
@@ -13,12 +15,17 @@ namespace MediaFoundation.Net
             };
         }
 
-        public static void StartConcat(SourceReader reader, ProcessSample transforms, Action<long, long> next)
+        public static ISourceReader Combine(IEnumerable<SourceReader> readers)
+        {
+            return new CombinedSourceReader(readers);
+        }
+
+        public static void StartConcat(ISourceReader reader, ProcessSample transforms, Action<long, long> next)
         {
             Concat(reader, transforms, next)(0, 0);
         }
 
-        public static Action<long, long> Concat(SourceReader reader, ProcessSample transforms, Action<long, long> next)
+        public static Action<long, long> Concat(ISourceReader reader, ProcessSample transforms, Action<long, long> next)
         {
             return (offsetA, offsetV) =>
             {
@@ -34,10 +41,10 @@ namespace MediaFoundation.Net
                         return false;
 
                     if (s.Stream.CurrentMediaType.IsVideo)
-                        s.SampleTime += offsetV;
+                        s.Resequence(offsetV);
 
                     if (s.Stream.CurrentMediaType.IsAudio)
-                        s.SampleTime += offsetA;
+                        s.Resequence(offsetA);
 
                     var r = transforms(s);
 
@@ -47,7 +54,6 @@ namespace MediaFoundation.Net
                     if (s.Stream.CurrentMediaType.IsAudio)
                         newOffsetA = s.SampleTime;
 
-
                     return r;
                 });
 
@@ -55,7 +61,7 @@ namespace MediaFoundation.Net
             };
         }
 
-        public static Action<long, long> Concat(SourceReader reader, ProcessSample transforms)
+        public static Action<long, long> Concat(ISourceReader reader, ProcessSample transforms)
         {
             return (offsetA, offsetV) =>
             {
@@ -76,10 +82,10 @@ namespace MediaFoundation.Net
                     }
 
                     if (s.Stream.CurrentMediaType.IsVideo)
-                        s.SampleTime += offsetV;
+                        s.Resequence(offsetV);
 
                     if (s.Stream.CurrentMediaType.IsAudio)
-                        s.SampleTime += offsetA;
+                        s.Resequence(offsetA);
 
                     return transforms(s);
                 });

@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activate.cs" />
+    <Compile Include="AVOperations\CombinedSourceReader.cs" />
     <Compile Include="AVOperations\Concat.cs" />
     <Compile Include="AVOperations\DataSamplesOnly.cs" />
     <Compile Include="AVOperations\FadeIn.cs" />

@@ -30,15 +30,15 @@ namespace MediaFoundation.Net
         /// <summary>
         /// The original timestamp for this sample, as per its source
         /// </summary>
-		public readonly long Timestamp;
-		public readonly long Duration;
+		public long Timestamp { get; private set; }
+		public long Duration { get; private set; }
 		public readonly int Count;
 		public readonly Sample Sample;
-        public readonly SourceReader Reader;
+        public ISourceReader Reader  { get; private set; }
         internal long SegmentDuration;
         internal long SegmentTimeStamp;
 
-        public SourceReaderSample(SourceReader reader, SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
+        public SourceReaderSample(ISourceReader reader, SourceStream stream, SourceReaderSampleFlags flags, long timestamp, long duration, Sample sample, int count)
 		{
             Reader = reader;
 			Stream = stream;
@@ -51,6 +51,22 @@ namespace MediaFoundation.Net
             SegmentDuration = duration;
             SegmentTimeStamp = timestamp;
 		}
+
+        internal void Resequence(long offset, long duration, ISourceReader reader)
+        {
+            this.Reader = reader;
+
+            Duration = SegmentDuration = duration;
+
+            Timestamp += offset;
+            SampleTime += offset;
+            SegmentTimeStamp += offset;
+        }
+
+        public void Resequence(long offset)
+        {
+            SampleTime += offset;
+        }
 
         /// <summary>
         /// The time stamp embedded in the sample

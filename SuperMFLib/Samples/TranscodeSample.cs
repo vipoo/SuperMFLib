@@ -20,6 +20,7 @@ using MediaFoundation;
 using MediaFoundation.Net;
 using MediaFoundation.Transform;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
@@ -27,8 +28,8 @@ namespace Samples
 {
     class TranscodeSample
     {
-        const string shortSourceFile = @"C:\Users\dean\Documents\Bandicam\bandicam 2015-12-27 14-22-19-251.avi";
-        const string mainSourceFile = @"C:\Users\dean\Documents\Bandicam\bandicam 2015-12-27 14-22-47-370.avi";
+        const string shortSourceFile = @"C:\Users\dean\Documents\Bandicam\intro.avi";
+        const string mainSourceFile = @"C:\Users\dean\Documents\Bandicam\video16seconds.avi";
         const string destinationFile = @"C:\Users\dean\Documents\Bandicam\sample3.wmv";
         const int VideoBitRate = 3 * 1000000;
         const int AudioBitRate = 48000;
@@ -62,19 +63,27 @@ namespace Samples
 
                 var writeToSink = ConnectStreams(shortSourceReader, shortSourceReader2, mainSourceReader, sinkWriter);
 
-                var fadeSegments = AVOperations.FadeIn(AVOperations.FadeOut(writeToSink));
+                ProcessSample progress = sample =>
+                {
+                    if(!sample.Flags.EndOfStream)
+                        Trace.WriteLine(string.Format("sourceTime: {0}, sampleTime: {1}", sample.Timestamp.FromNanoToSeconds(), sample.SampleTime.FromNanoToSeconds()));
+                    return writeToSink(sample);
+                };
 
-                var editoutMiddle = AVOperations.Cut(10.FromSecondsToNano(), (43 * 60).FromSecondsToNano(), fadeSegments);
+                var fadeSegments = AVOperations.FadeIn(AVOperations.FadeOut(progress));
+
+                var editoutMiddle = AVOperations.Cut(9.FromSecondsToNano(), 19.FromSecondsToNano(), fadeSegments);
 
                 var overlay = AVOperations.Overlay(applyOverlay, editoutMiddle);
 
-                var first10Seconds = AVOperations.Cut(0, 10.FromSecondsToNano(), writeToSink, writeToSink);
+                var first4Seconds = AVOperations.Cut(0.FromSecondsToNano(), 4.FromSecondsToNano(), progress, progress);
+
+                var readers = AVOperations.Combine(new[] { shortSourceReader, mainSourceReader });
 
                 using (sinkWriter.BeginWriting())
                 {
-                    AVOperations.StartConcat(shortSourceReader, writeToSink,
-                        AVOperations.Concat(mainSourceReader, overlay,
-                            AVOperations.Concat(shortSourceReader, first10Seconds)));
+                    AVOperations.StartConcat(readers, overlay,
+                            AVOperations.Concat(shortSourceReader, first4Seconds));
                 }
             }
         }

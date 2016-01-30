@@ -8,7 +8,10 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MediaFoundation.Net</RootNamespace>
-    <AssemblyName>MediaFoundation.Net</AssemblyName>
+
+    <AssemblyName Condition=" '$(OverrideAssemblyName)' == '' ">MediaFoundation.Net</AssemblyName>
+    <AssemblyName Condition=" '$(OverrideAssemblyName)' != '' ">$(OverrideAssemblyName)</AssemblyName>
+
     <FileAlignment>512</FileAlignment>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>

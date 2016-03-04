@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MediaFoundation.Net
 {
@@ -15,9 +14,9 @@ namespace MediaFoundation.Net
             };
         }
 
-        public static ISourceReader Combine(IEnumerable<SourceReader> readers)
+        public static ISourceReader Combine(IEnumerable<SourceReader> readers, double averageLostSecondsBetweenFileSplits)
         {
-            return new CombinedSourceReader(readers);
+            return new CombinedSourceReader(readers, averageLostSecondsBetweenFileSplits);
         }
 
         public static void StartConcat(ISourceReader reader, ProcessSample transforms, Action<long, long> next)

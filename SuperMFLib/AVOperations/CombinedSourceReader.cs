@@ -9,10 +9,12 @@ namespace MediaFoundation.Net
         readonly SourceReader[] readers;
         private bool reposReqeusted = false;
         private long startPosition;
+        private readonly double averageLostSecondsBetweenFileSplits;
 
-        public CombinedSourceReader(IEnumerable<SourceReader> readers)
+        public CombinedSourceReader(IEnumerable<SourceReader> readers, double averageLostSecondsBetweenFileSplits)
         {
             this.readers = readers.ToArray();
+            this.averageLostSecondsBetweenFileSplits = averageLostSecondsBetweenFileSplits;
         }
 
         public long Duration
@@ -26,10 +28,6 @@ namespace MediaFoundation.Net
         public IEnumerable<SourceReaderSample> Samples(int streamIndex = -2, int controlFlags = 0)
         {
             long offsetV = 0;
-            long offsetA = 0;
-
-            long nextOffsetV = 0;
-            long nextOffsetA = 0;
 
             var duration = Duration;
             SourceReaderSample last = null;
@@ -40,73 +38,110 @@ namespace MediaFoundation.Net
             {
                 readerIndex++;
 
-                if (reader.Duration + offsetV < startPosition)
+                if (CheckForSegmentSkip(offsetV, readerIndex, reader))
                 {
-                    Trace.WriteLine(string.Format("File index: {0}, Duration: {1}, offset: {2}, startPosition: {3}", 
-                        readerIndex, 
-                        reader.Duration.FromNanoToSeconds(),
-                        offsetV.FromNanoToSeconds(),
-                        startPosition.FromNanoToSeconds()
-                    ));
-
+                    offsetV += (reader.Duration + averageLostSecondsBetweenFileSplits.FromSecondsToNano());
                     continue;
                 }
-
 
                 Trace.WriteLine(string.Format("File index: {0}, Duration: {1}", readerIndex, reader.Duration.FromNanoToSeconds()));
                 Trace.WriteLine(string.Format("File index: {0}, OffsetV: {1}", readerIndex, offsetV.FromNanoToSeconds()));
 
                 foreach (var sample in reader.Samples(streamIndex, controlFlags))
                 {
-                    if (sample.Flags.EndOfStream)
-                    {
-                        last = sample;
+                    if (isEndOfStream(ref last, sample))
                         continue;
-                    }
 
-                    if(reposReqeusted && sample.SampleTime + offsetV < startPosition)
-                    {
-                        var newPos = startPosition - offsetV;
+                    var isContinue = false;
+                    var isBreak = false;
 
-                        Trace.WriteLine(string.Format("File index: {0}, Repos: {1}-{2} = {3}",
-                            readerIndex,
-                            startPosition.FromNanoToSeconds(),
-                            offsetV.FromNanoToSeconds(),
-                            (newPos).FromNanoToSeconds()
-                            ));
+                    CheckForReposition(offsetV, readerIndex, sample, ref isContinue, ref isBreak);
 
-                        if (newPos > sample.Duration)
-                        {
-                            Trace.WriteLine(string.Format("File index: {0}, Skipping", readerIndex));
-                            break;
-                        }
+                    if (isBreak)
+                        break;
 
-                        sample.Reader.SetCurrentPosition(newPos);
-                        reposReqeusted = false;
+                    if (isContinue)
                         continue;
-                    }
 
-                    if( sample.Stream.NativeMediaType.IsVideo)
-                    {
-                        nextOffsetV = sample.Duration;
-                        sample.Resequence(offsetV, duration, this);
-                    }
-
-                    if (sample.Stream.NativeMediaType.IsAudio)
-                    {
-                        nextOffsetA = sample.Duration;
-                        sample.Resequence(offsetA, duration, this);
-                    }
+                    ResequenceSample(offsetV, duration, sample);
 
                     yield return sample;
                 }
 
-                offsetA += nextOffsetA;
-                offsetV += nextOffsetV;
+                
+                offsetV += (reader.Duration + averageLostSecondsBetweenFileSplits.FromSecondsToNano());
+
+                Trace.WriteLine(string.Format("File index: {0}, duration: {1}, newOffset: {2}", readerIndex, reader.Duration, offsetV));
+
             }
 
-            if(last != null)
+            if (last != null)
                 yield return last;
+        }
+
+        private bool CheckForSegmentSkip(long offsetV, int readerIndex, SourceReader reader)
+        {
+            var isSkipSegment = reader.Duration + offsetV < startPosition;
+
+            if (isSkipSegment)
+            {
+                Trace.WriteLine(string.Format("File index: {0}, Skipping entire file. Duration: {1}, offset: {2}, startPosition: {3}",
+                    readerIndex,
+                    reader.Duration.FromNanoToSeconds(),
+                    offsetV.FromNanoToSeconds(),
+                    startPosition.FromNanoToSeconds()
+                ));
+                
+            }
+
+            return isSkipSegment;
+        }
+
+        private void ResequenceSample(long offsetV, long duration, SourceReaderSample sample)
+        {
+            if (sample.Stream.NativeMediaType.IsVideo)
+                sample.Resequence(offsetV, duration, this);
+
+            if (sample.Stream.NativeMediaType.IsAudio)
+                sample.Resequence(offsetV, duration, this);
+        }
+
+        private void CheckForReposition(long offsetV, int readerIndex, SourceReaderSample sample, ref bool isContinue, ref bool isBreak)
+        {
+            if (reposReqeusted && sample.SampleTime + offsetV < startPosition)
+            {
+                var newPos = startPosition - offsetV;
+
+                Trace.WriteLine(string.Format("File index: {0}, Reposition: {1}-{2} = {3}",
+                    readerIndex,
+                    startPosition.FromNanoToSeconds(),
+                    offsetV.FromNanoToSeconds(),
+                    (newPos).FromNanoToSeconds()
+                    ));
+
+                if (newPos > sample.Duration)
+                {
+                    //nextOffsetA = nextOffsetV = sample.Duration;
+                    Trace.WriteLine(string.Format(
+                        "File index: {0}, Skipping remainder of file. sampleDuration: {1}",
+                        readerIndex, sample.Duration));
+                    isBreak = true;
+                }
+                else
+                {
+                    sample.Reader.SetCurrentPosition(newPos);
+                    reposReqeusted = false;
+                    isContinue = true;
+                }
+            }
+        }
+
+        private bool isEndOfStream(ref SourceReaderSample last, SourceReaderSample sample)
+        {
+            var endOfStream = sample.Flags.EndOfStream;
+            if (endOfStream)
+                last = sample;
+            return endOfStream;
         }
 
         public void SetCurrentPosition(long position)

@@ -78,7 +78,7 @@ namespace Samples
 
                 var first4Seconds = AVOperations.Cut(0.FromSecondsToNano(), 4.FromSecondsToNano(), progress, progress);
 
-                var readers = AVOperations.Combine(new[] { shortSourceReader, mainSourceReader });
+                var readers = AVOperations.Combine(new[] { shortSourceReader, mainSourceReader }, 1.1);
 
                 using (sinkWriter.BeginWriting())
                 {

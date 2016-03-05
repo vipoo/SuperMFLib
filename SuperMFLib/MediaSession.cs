@@ -100,8 +100,8 @@ namespace MediaFoundation.Net
             }
             catch( Exception e)
             {
-                Trace.WriteLine(e.Message, "INFO");
-                Trace.WriteLine(e.StackTrace, "DEBUG");
+                Trace.WriteLine(e.Message, "ERROR");
+                Trace.WriteLine(e.StackTrace, "ERROR");
 
                 return S_False;
             }

@@ -5,12 +5,15 @@ namespace MediaFoundation.Net
 {
     public partial class AVOperations
     {
-        public static Action<ProcessSample> FromSource(ISourceReader shortSourceReader)
+        public static Action<ProcessSample> FromSource(ISourceReader shortSourceReader, Func<bool> isAborted)
         {
             return next =>
             {
                 foreach (var s in shortSourceReader.Samples())
-                    next(s);
+                    if (isAborted())
+                        break;
+                    else
+                        next(s);
             };
         }
 
@@ -19,12 +22,12 @@ namespace MediaFoundation.Net
             return new CombinedSourceReader(readers, averageLostSecondsBetweenFileSplits);
         }
 
-        public static void StartConcat(ISourceReader reader, ProcessSample transforms, Action<long, long> next)
+        public static void StartConcat(ISourceReader reader, ProcessSample transforms, Action<long, long> next, Func<bool> isAborted)
         {
-            Concat(reader, transforms, next)(0, 0);
+            Concat(reader, transforms, next, isAborted)(0, 0);
         }
 
-        public static Action<long, long> Concat(ISourceReader reader, ProcessSample transforms, Action<long, long> next)
+        public static Action<long, long> Concat(ISourceReader reader, ProcessSample transforms, Action<long, long> next, Func<bool> isAborted)
         {
             return (offsetA, offsetV) =>
             {
@@ -32,10 +35,13 @@ namespace MediaFoundation.Net
                 var newOffsetV = offsetV;
 
                 reader.SetCurrentPosition(0);
-                var stream = FromSource(reader);
+                var stream = FromSource(reader, isAborted);
 
                 stream(s =>
                 {
+                    if (isAborted())
+                        return false;
+
                     if (s.Flags.EndOfStream)
                         return false;
 
@@ -60,17 +66,20 @@ namespace MediaFoundation.Net
             };
         }
 
-        public static Action<long, long> Concat(ISourceReader reader, ProcessSample transforms)
+        public static Action<long, long> Concat(ISourceReader reader, ProcessSample transforms, Func<bool> isAborted)
         {
             return (offsetA, offsetV) =>
             {
                 reader.SetCurrentPosition(0);
 
-                var stream = FromSource(reader);
+                var stream = FromSource(reader, isAborted);
                 bool firstV = false;
 
                 stream(s =>
                 {
+                    if (isAborted())
+                        return false;
+
                     if (s.Flags.EndOfStream)
                         return transforms(s);
 

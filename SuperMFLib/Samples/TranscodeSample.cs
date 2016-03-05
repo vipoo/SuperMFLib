@@ -83,7 +83,7 @@ namespace Samples
                 using (sinkWriter.BeginWriting())
                 {
                     AVOperations.StartConcat(readers, overlay,
-                            AVOperations.Concat(shortSourceReader, first4Seconds));
+                            AVOperations.Concat(shortSourceReader, first4Seconds, () => false), () => false);
                 }
             }
         }

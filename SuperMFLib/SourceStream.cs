@@ -18,8 +18,6 @@
 
 using System;
 using MediaFoundation.Misc;
-using MediaFoundation.ReadWrite;
-using System.Collections.Generic;
 
 namespace MediaFoundation.Net
 {
@@ -32,6 +30,11 @@ namespace MediaFoundation.Net
         {
             this.sourceReader = sourceReader;
             this.index = index;
+        }
+
+        public bool IsNull
+        {
+            get { return sourceReader == null; }
         }
 
         public bool IsSelected

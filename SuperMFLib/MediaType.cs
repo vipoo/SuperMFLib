@@ -19,6 +19,7 @@
 using System;
 using MediaFoundation.Misc;
 using System.Drawing;
+using System.Reflection;
 
 namespace MediaFoundation.Net
 {
@@ -56,6 +57,23 @@ namespace MediaFoundation.Net
         {
             get { return GetGuid(MFAttributesClsid.MF_MT_SUBTYPE); }
             set { SetGuid(MFAttributesClsid.MF_MT_SUBTYPE, value); }
+        }
+
+        public string SubTypeName
+        {
+            get
+            {
+                var subType = SubType;
+
+                foreach(var f in typeof(MFMediaType).GetFields(BindingFlags.Static | BindingFlags.Public))
+                {
+                    var guid = (Guid)f.GetValue(null);
+                    if (guid == subType)
+                        return f.Name;
+                }
+
+                return "Unknown";
+            }
         }
 
         public bool IsAudio

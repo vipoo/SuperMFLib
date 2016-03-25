@@ -44,8 +44,7 @@ namespace MediaFoundation.Net
                     continue;
                 }
 
-                Trace.WriteLine(string.Format("File index: {0}, Duration: {1}", readerIndex, reader.Duration.FromNanoToSeconds()));
-                Trace.WriteLine(string.Format("File index: {0}, OffsetV: {1}", readerIndex, offsetV.FromNanoToSeconds()));
+                Trace.WriteLine(string.Format("File index: {0}, Duration: {1}, OffsetV: {1}", readerIndex, reader.Duration.FromNanoToSeconds(), offsetV.FromNanoToSeconds()));
 
                 foreach (var sample in reader.Samples(streamIndex, controlFlags))
                 {
@@ -70,9 +69,6 @@ namespace MediaFoundation.Net
 
                 
                 offsetV += (reader.Duration + averageLostSecondsBetweenFileSplits.FromSecondsToNano());
-
-                Trace.WriteLine(string.Format("File index: {0}, duration: {1}, newOffset: {2}", readerIndex, reader.Duration, offsetV));
-
             }
 
             if (last != null)
